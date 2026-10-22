@@ -1,0 +1,17 @@
+# Curated material properties. The material-inference model only ever picks a key from this
+# table; code reads the numbers from here. The model never writes a number.
+#
+# Every entry needs a source for each value. Do not add an entry without one, and do not
+# fill values from memory. Ranges express real variation within the class, not our guesses.
+#
+# Schema of one entry:
+#
+#   ceramic:
+#     density_kg_m3:        {low: ..., nominal: ..., high: ...}
+#     friction_coefficient: {low: ..., nominal: ..., high: ...}   # against a typical table surface
+#     restitution:          {low: ..., nominal: ..., high: ...}
+#     sources: ["<citation or measurement id>", ...]
+#
+# Populated in PLAN.md task P4.3.
+
+materials: {}

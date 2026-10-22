@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Secrets
+.env
+
+# Data and model weights never go into git (see AGENTS.md, "Data, models and secrets")
+data/*
+!data/.gitkeep
+benchmark/scenes/
+runs/
+*.mp4
+*.mov
+*.ckpt
+*.pt
+*.pth
+*.safetensors
+*.npy
+*.npz
+*.ply
+*.glb
+*.usd
+*.usda
+*.usdc
+*.usdz
+
+# Editors and OS
+.DS_Store
+.idea/
+.vscode/
