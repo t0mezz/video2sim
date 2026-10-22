@@ -15,7 +15,8 @@ build/
 # Data and model weights never go into git (see AGENTS.md, "Data, models and secrets")
 data/*
 !data/.gitkeep
-benchmark/scenes/
+benchmark/scenes/*
+!benchmark/scenes/.gitkeep
 runs/
 *.mp4
 *.mov
