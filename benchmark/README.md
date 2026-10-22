@@ -17,9 +17,19 @@ truth is free. Measure the others with calipers and a kitchen scale.
 
 ## Splits
 
-Proposed: 12 **dev** scenes and 8 **test** scenes, mixed across tiers. Tune and debug on dev.
-Run test only at phase gates, and never tune on it. If a result only holds on dev, it does not
-count.
+12 **dev** scenes and 8 **test** scenes (D-009), stratified by tier:
+
+| Tier | Dev | Test |
+| --- | --- | --- |
+| easy | 6 | 4 |
+| medium | 4 | 2 |
+| hard | 2 | 2 |
+
+Three of the easy scenes use a clean board (production tags only, no printed grid): two in dev,
+one in test. Boards are generated with `benchmark/make_board.py`.
+
+Tune and debug on dev. Run test only at phase gates, and never tune on it. If a result only
+holds on dev, it does not count.
 
 ## Layout of one scene
 

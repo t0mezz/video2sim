@@ -127,6 +127,9 @@ Tasks
 
 - [ ] **P0.1** Capture the benchmark: 20 scenes, about 60 objects, two camera paths each.
       Tiers: 10 easy, 6 medium, 4 hard. Prefer objects with published meshes.
+      Three of the easy scenes use a clean board (production tags only, no printed grid) with
+      object positions measured by tape, to check that the grid texture does not flatter
+      registration. The rest use the benchmark grid board. Same tag IDs and size on both.
       Where: `benchmark/scenes/` (not in git)
 - [ ] **P0.2** Record ground truth per scene: weights, sizes, grid positions, orientations.
       Format: `benchmark/README.md`
@@ -348,7 +351,7 @@ one that supersedes.
 | D-006 | Where benchmark videos and meshes are stored | Open | Week 1 | Not in git; they may show people or private spaces |
 | D-007 | Scale source: printed marker, phone depth as optional cross-check | Assumed | Week 1 | |
 | D-008 | Model for material-class inference | Open | Week 8 | The original brief names the Meta Model API |
-| D-009 | Benchmark split: 12 dev scenes, 8 test scenes | Proposed | Week 1 | Test is run only at phase gates |
+| D-009 | Benchmark split: 12 dev scenes, 8 test scenes, stratified by tier: easy 6/4, medium 4/2, hard 2/2 (dev/test). Of the three clean-board easy scenes, two are dev and one is test | Decided | Week 1 | Test is run only at phase gates |
 | D-010 | Object frame origin at the volume centroid; meshes in meters | Decided | | Encoded in `schemas.py` |
 | D-011 | Python 3.10+, uv, pydantic for contracts, ruff and mypy strict | Decided | | Encoded in `pyproject.toml` |
 
@@ -372,3 +375,5 @@ In order:
 | Date | Change |
 | --- | --- |
 | 2026-10-22 | First version, from the roadmap document |
+| 2026-10-22 | P0.1: three of the ten easy scenes use a clean board without the printed grid |
+| 2026-10-22 | D-009: split decided, stratified by tier, clean-board scenes two dev and one test |
