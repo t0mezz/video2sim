@@ -1,0 +1,28 @@
+# Default pipeline configuration. Everything that changes a result belongs here, so that the
+# config hash in the run manifest identifies it. Values marked TODO are decided in a PLAN.md phase.
+
+seed: 0
+
+capture:
+  target_fps: 5                # TODO(P1.4): frame sampling rate for reconstruction
+  marker:
+    family: null               # TODO(P0.4): for example an ArUco dictionary name
+    tag_size_m: null           # TODO(P0.4): printed tag edge length, measured with calipers
+
+reconstruction:
+  backend: null                # TODO(P1.1): chosen in the Phase 1 comparison
+
+segmentation:
+  sam_backend: null            # "api" or "self_hosted", see PLAN.md decision D-004
+  keyframes_per_object: 5
+
+shape:
+  backend: null                # TODO(P3.3): chosen in the Phase 3 bake-off
+  samples_per_keyframe: 3
+
+physics:
+  material_table: configs/material_table.yaml
+  max_convex_parts: 16
+
+export:
+  simulator: isaac_sim         # assumed, see PLAN.md decision D-001

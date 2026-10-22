@@ -1,0 +1,30 @@
+# MVP success targets. Single source of truth for the evaluation harness and the phase gates.
+# PLAN.md section 2 shows the same numbers for humans; if the two disagree, this file wins
+# and PLAN.md is wrong. Targets are provisional: re-set them once the Phase 0 baseline exists.
+# Only a human changes this file (see AGENTS.md).
+
+status: provisional
+
+targets:
+  object_recall_min: 0.90            # fraction of visible objects that become assets
+  size_error_median_max: 0.05        # relative error of object bounding-box size
+  position_error_median_max_m: 0.015
+  orientation_error_median_max_deg: 10.0
+  mass_within_30pct_fraction_min: 0.70   # share of objects with mass within 30% of truth
+  mass_tolerance: 0.30
+  stability_pass_fraction_min: 0.95  # share of scenes that settle under gravity
+  stability_max_drift_m: 0.02        # per object, over the settle window
+  stability_window_s: 5.0
+  asset_validity_fraction_min: 1.0   # exported meshes passing every validator
+  runtime_max_minutes: 60            # per scene, one GPU
+
+# Phase gates that are not end-to-end metrics.
+gates:
+  reconstruction:
+    registered_frame_fraction_min: 0.95
+    mean_reprojection_error_max_px: 1.0
+    marker_distance_error_max: 0.02
+    up_axis_error_max_deg: 2.0
+  segmentation:
+    id_switches_per_scene_max: 1.0
+    cluster_bbox_error_max: 0.10
