@@ -52,9 +52,15 @@ DIAL_RADIUS_MM = 16.0
 SMALL_DIAL_RADIUS_MM = 7.0
 FOOTER_HEIGHT_MM = 12.0
 
-GRID_GREY = 0.82
-GRID_MAJOR_GREY = 0.68
+GRID_GREY = 0.74
+GRID_MAJOR_GREY = 0.55
 STATION_GREY = 0.35
+GRID_LINE_MM = 0.25
+GRID_MAJOR_LINE_MM = 0.4
+LABEL_GREY = 0.25
+EDGE_LABEL_MM = 12.0  # outer labels, 3x the first version, readable on video
+EDGE_MM_VALUE_MM = 5.0
+EDGE_SMALL_LABEL_MM = 8.4
 
 
 def _num(value: float) -> str:
@@ -192,7 +198,7 @@ def build(size: str, tag_mm: float, clean: bool) -> tuple[Canvas, dict[str, obje
 
     if not clean:
         canvas.stroke_grey(GRID_GREY)
-        canvas.line_width(0.15)
+        canvas.line_width(GRID_LINE_MM)
         for k in range(int(grid_w / GRID_MM) + 1):
             if (k * GRID_MM) % STATION_MM:
                 canvas.line(ox + k * GRID_MM, oy, ox + k * GRID_MM, oy + grid_h)
@@ -200,11 +206,14 @@ def build(size: str, tag_mm: float, clean: bool) -> tuple[Canvas, dict[str, obje
             if (k * GRID_MM) % STATION_MM:
                 canvas.line(ox, oy + k * GRID_MM, ox + grid_w, oy + k * GRID_MM)
         canvas.stroke_grey(GRID_MAJOR_GREY)
-        canvas.line_width(0.25)
+        canvas.line_width(GRID_MAJOR_LINE_MM)
         for k in range(int(grid_w / STATION_MM) + 1):
             canvas.line(ox + k * STATION_MM, oy, ox + k * STATION_MM, oy + grid_h)
         for k in range(int(grid_h / STATION_MM) + 1):
             canvas.line(ox, oy + k * STATION_MM, ox + grid_w, oy + k * STATION_MM)
+
+    if not clean:
+        draw_edge_labels(canvas, ox, oy, grid_w, grid_h)
 
     # Tags, drawn after the grid so that nothing prints inside the quiet zone.
     canvas.fill_grey(1.0)
@@ -294,6 +303,45 @@ def build(size: str, tag_mm: float, clean: bool) -> tuple[Canvas, dict[str, obje
         "note": "Nominal values. Measure the printed sheet and use the measured numbers.",
     }
     return canvas, layout
+
+
+def _centered(canvas: Canvas, cx: float, y: float, size: float, label: str, grey: float) -> None:
+    canvas.text(cx - 0.28 * size * len(label), y, size, label, grey)  # Helvetica ~0.56 em/char
+
+
+def draw_edge_labels(canvas: Canvas, ox: float, oy: float, grid_w: float, grid_h: float) -> None:
+    """Label the grid lines outside the grid area, on all four edges, large enough for video.
+
+    Large-station lines: letters (columns, x) and numbers (rows, y) with the mm value beside
+    (top and bottom) or below (left and right). Small-station cell centres: lowercase letters
+    and numbers, matching small station names.
+    """
+    big, mm, small = EDGE_LABEL_MM, EDGE_MM_VALUE_MM, EDGE_SMALL_LABEL_MM
+    gap = 2.5
+    side = 5.5  # label centre distance from the grid edge on the left and right
+    for k in range(1, int(grid_w / STATION_MM) + 1):
+        x = ox + k * STATION_MM
+        letter = chr(ord("A") + k - 1)
+        value = str(k * int(STATION_MM))
+        width = 0.67 * big + 2.0 + 0.556 * mm * len(value)
+        for y in (oy - gap - 0.72 * big, oy + grid_h + gap):
+            canvas.text(x - width / 2, y, big, letter, LABEL_GREY)
+            canvas.text(x - width / 2 + 0.67 * big + 2.0, y, mm, value, STATION_GREY)
+    for k in range(1, int(grid_h / STATION_MM) + 1):
+        y = oy + k * STATION_MM
+        for x_c in (ox - side, ox + grid_w + side):
+            _centered(canvas, x_c, y - 0.2, big, str(k), LABEL_GREY)
+            _centered(
+                canvas, x_c, y - 0.2 - 1.5 - 0.72 * mm, mm, str(k * int(STATION_MM)), STATION_GREY
+            )
+    for i in range(int(grid_w / STATION_MM)):
+        x = ox + i * STATION_MM + GRID_MM
+        for y in (oy - gap - 0.72 * small, oy + grid_h + gap):
+            _centered(canvas, x, y, small, chr(ord("a") + i), STATION_GREY)
+    for j in range(int(grid_h / STATION_MM)):
+        y = oy + j * STATION_MM + GRID_MM
+        for x_c in (ox - side, ox + grid_w + side):
+            _centered(canvas, x_c, y - 0.36 * small, small, str(j + 1), STATION_GREY)
 
 
 def draw_station(canvas: Canvas, cx: float, cy: float, name: str) -> None:
