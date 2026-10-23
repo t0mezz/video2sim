@@ -177,7 +177,7 @@ files, write a short plan and get agreement before editing.
 ticked with evidence, or the remaining work is written there. If you added a command or
 changed a convention, this file says so.
 
-**Git.** One branch per task, named like `p3-2-registration`. Small commits, imperative
+**Git.** One branch named like `p3-2-registration`. Small commits, imperative
 mood, task id first: `P3.2: add one-sided chamfer registration`. A pull request says what
 changed, why, the metric evidence, and what could go wrong.
 
