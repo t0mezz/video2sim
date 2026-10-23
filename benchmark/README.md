@@ -75,16 +75,11 @@ Rules:
 
 * `position_m` is the object's volume centroid in the world frame (+Z up, origin on the
   board), measured from the grid. `yaw_deg` is rotation about +Z.
-* `size_m` is the axis-aligned bounding box in the object's resting pose, length by width by
-  height.
-* Object axes: local x is the length axis, local y the width axis, local z up (height).
-  Length is the longer of the two horizontal extents, so length >= width. For an object with
-  a clear front (nose of a car, handle of a mug), local +x points to the front. Record the
-  chosen front in `notes.md` when it is not obvious.
-* `yaw_deg` is the angle from the world +X axis to the object's local +x axis, counterclockwise
-  seen from above. Yaw 0 means the front points along +X (right, with the board's long edge
-  horizontal), 90 along +Y, 180 along -X. Objects with no front are symmetric under a 180
-  degree turn, so score their yaw modulo 180.
+* `size_m` is the axis-aligned bounding box in the object's resting pose: `[length, width,
+  height]`, with `length >= width`. `height` is the vertical extent in the resting pose, so it
+  can be larger or smaller than either horizontal side. When `length` and `width` are equal
+  (cylinders, cubes), the horizontal axes are interchangeable, `yaw_deg` is arbitrary, and the
+  orientation metric skips the object. Checks: `video2sim.evaluation.ground_truth`.
 * Weigh every object. Mass ground truth is what calibrates and scores the physics stage.
 * Never edit ground truth to make a number pass. If a measurement was wrong, fix it, note why
   in `notes.md`, and say so in the PR.
