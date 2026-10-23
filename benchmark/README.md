@@ -127,3 +127,13 @@ can skip it. `--strict` exits with 1 on any warning. The z of `position_m` is ha
 height, the bounding-box center, which differs from the volume centroid for cones and mugs.
 The JSON has `shape_primitive` where the sketch above shows `reference_mesh`; a mesh path is
 not recorded yet.
+
+## Object photos
+
+`benchmark/inventory_images/` holds one photo per inventory object, named `<object_id>.jpg`.
+
+* `originals/` is ignored by git. Full-size phone photos are large, carry EXIF data (location,
+  time) and can show the room, so they stay with the other private benchmark data (D-006).
+* `thumbnails/` is tracked: about 512 px on the long side, EXIF stripped, neutral background.
+  It shows which exact item was measured, since labels alone are ambiguous.
+
