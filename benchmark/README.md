@@ -132,7 +132,7 @@ not recorded yet.
 
 `benchmark/inventory_images/` holds one photo per inventory object, named `<object_id>.jpg`.
 
-* `originals/` is ignored by git. Full-size phone photos are large, carry EXIF data (location,
+* `originals/` is ignored by git and not in a fresh clone; create it yourself. Full-size phone photos are large, carry EXIF data (location,
   time) and can show the room, so they stay with the other private benchmark data (D-006).
 * `thumbnails/` is tracked: about 512 px on the long side, EXIF stripped, neutral background.
   It shows which exact item was measured, since labels alone are ambiguous.
