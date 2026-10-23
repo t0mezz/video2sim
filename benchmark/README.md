@@ -91,7 +91,7 @@ row 1, one table per sheet, `.` as decimal separator.
 
 **Inventory**, one row per physical object: `object_id` (the older name `obj_id` is accepted),
 `label`, `length_mm_1..3`, `width_mm_1..3`, `height_mm_1..3` (repeated readings, averaged),
-`mass_g`, `material_class`, `hollow` (TRUE or FALSE), `shape_primitive` (the older name
+`mass_g`, `material_class`, `hollow` and `deformable` (TRUE or FALSE), `shape_primitive` (the older name
 `reference_mesh` is accepted). Other columns are ignored.
 
 **Scenes**, one row per object placed in a scene. Scene-level columns repeat on every row of
@@ -103,16 +103,25 @@ the scene. See `scenes_example.csv`; its positions are made up.
 | `tier`, `split`, `board` | `easy` / `medium` / `hard`, `dev` / `test`, `grid` / `clean` |
 | `marker_family`, `tag_size_mm` | Scale marker, for example `aruco_4x4_50` and `60` |
 | `object_id` | Row in the inventory |
-| `x_mm`, `y_mm` | Object position on the board, from the board origin |
+| `station` | Grid scenes: `B2` (capital, large station on the 100 mm lattice, x = 200, y = 200) or `c3` (lower case, small station in the middle of the cell, x = 250, y = 250). Same names as printed by `make_board.py` |
+| `x_mm`, `y_mm` | Tape-measured scenes: position from the board origin (bottom-left of the grid area, +X along the long edge, +Y up). Leave empty when `station` is set |
 | `yaw_deg` | Rotation about +Z, see the size convention above |
 
+A position is either a `station` or `x_mm` and `y_mm`, never both. The position is where the
+object's bounding-box center sits, so put the object's center on the cross of the station. A
+station only fixes the position to a few millimetres; read the yaw from the dial.
+
 ```bash
-uv run python -m video2sim.evaluation.benchmark_tables inventory.csv scenes.csv
+uv run python -m video2sim.evaluation.benchmark_tables scenes.csv     --board-layout board_a2.json
 ```
+
+The inventory defaults to `benchmark/inventory.csv`; `--inventory PATH`
+overrides it. `--board-layout` takes the JSON that `make_board.py` writes next to the PDF. It adds a warning
+for a station that is not printed on that board, because stations near the tags are left out.
 
 This writes `benchmark/scenes/<scene_id>/ground_truth.json` and logs one warning for every
 gap: an object missing from the inventory, a missing size, mass, material, hollow flag,
-position or yaw, a scene field that differs between rows, an object in no scene or in several.
+position or yaw, a station name that is malformed or used on a clean board, a scene field that differs between rows, an object in no scene or in several.
 An object with gaps is still written, with the gap names in `incomplete`, so the evaluation
 can skip it. `--strict` exits with 1 on any warning. The z of `position_m` is half the
 height, the bounding-box center, which differs from the volume centroid for cones and mugs.
