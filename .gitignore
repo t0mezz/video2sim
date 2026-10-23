@@ -18,8 +18,7 @@ data/*
 benchmark/scenes/*
 !benchmark/scenes/.gitkeep
 # Full-size object photos: large, with EXIF data and room backgrounds. Thumbnails are tracked.
-benchmark/inventory_images/originals/*
-!benchmark/inventory_images/originals/.gitkeep
+benchmark/inventory_images/originals/
 runs/
 *.mp4
 *.mov
