@@ -75,8 +75,11 @@ Rules:
 
 * `position_m` is the object's volume centroid in the world frame (+Z up, origin on the
   board), measured from the grid. `yaw_deg` is rotation about +Z.
-* `size_m` is the axis-aligned bounding box in the object's resting pose, length by width by
-  height.
+* `size_m` is the axis-aligned bounding box in the object's resting pose: `[length, width,
+  height]`, with `length >= width`. `height` is the vertical extent in the resting pose, so it
+  can be larger or smaller than either horizontal side. When `length` and `width` are equal
+  (cylinders, cubes), the horizontal axes are interchangeable, `yaw_deg` is arbitrary, and the
+  orientation metric skips the object. Checks: `video2sim.evaluation.ground_truth`.
 * Weigh every object. Mass ground truth is what calibrates and scores the physics stage.
 * Never edit ground truth to make a number pass. If a measurement was wrong, fix it, note why
   in `notes.md`, and say so in the PR.
