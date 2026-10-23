@@ -1,0 +1,11 @@
+scene_id,tier,split,board,marker_family,tag_size_mm,object_id,x_mm,y_mm,yaw_deg,notes
+s01_easy_kitchen,easy,dev,grid,aruco_4x4_50,60,obj_004,150,150,0,EXAMPLE ONLY: positions are made up
+s01_easy_kitchen,easy,dev,grid,aruco_4x4_50,60,obj_041,350,150,35,
+s01_easy_kitchen,easy,dev,grid,aruco_4x4_50,60,obj_007,150,350,15,
+s01_easy_kitchen,easy,dev,grid,aruco_4x4_50,60,obj_003,350,350,-20,
+s02_easy_clean,easy,test,clean,aruco_4x4_50,60,obj_029,200,150,20,positions measured by tape
+s02_easy_clean,easy,test,clean,aruco_4x4_50,60,obj_013,400,150,0,
+s02_easy_clean,easy,test,clean,aruco_4x4_50,60,obj_039,250,350,90,
+s03_hard_glass,hard,dev,grid,aruco_4x4_50,60,obj_026,150,150,0,glass and reflective objects
+s03_hard_glass,hard,dev,grid,aruco_4x4_50,60,obj_035,330,150,45,
+s03_hard_glass,hard,dev,grid,aruco_4x4_50,60,obj_009,250,350,-15,

@@ -83,3 +83,38 @@ Rules:
 * Weigh every object. Mass ground truth is what calibrates and scores the physics stage.
 * Never edit ground truth to make a number pass. If a measurement was wrong, fix it, note why
   in `notes.md`, and say so in the PR.
+
+## Sheets to `ground_truth.json`
+
+Ground truth is kept in two Google Sheets, exported as CSV (File, Download, CSV). Header in
+row 1, one table per sheet, `.` as decimal separator.
+
+**Inventory**, one row per physical object: `object_id` (the older name `obj_id` is accepted),
+`label`, `length_mm_1..3`, `width_mm_1..3`, `height_mm_1..3` (repeated readings, averaged),
+`mass_g`, `material_class`, `hollow` (TRUE or FALSE), `shape_primitive` (the older name
+`reference_mesh` is accepted). Other columns are ignored.
+
+**Scenes**, one row per object placed in a scene. Scene-level columns repeat on every row of
+the scene. See `scenes_example.csv`; its positions are made up.
+
+| Column | Meaning |
+| --- | --- |
+| `scene_id` | Becomes the folder name; letters, digits, `_` and `-` only |
+| `tier`, `split`, `board` | `easy` / `medium` / `hard`, `dev` / `test`, `grid` / `clean` |
+| `marker_family`, `tag_size_mm` | Scale marker, for example `aruco_4x4_50` and `60` |
+| `object_id` | Row in the inventory |
+| `x_mm`, `y_mm` | Object position on the board, from the board origin |
+| `yaw_deg` | Rotation about +Z, see the size convention above |
+
+```bash
+uv run python -m video2sim.evaluation.benchmark_tables inventory.csv scenes.csv
+```
+
+This writes `benchmark/scenes/<scene_id>/ground_truth.json` and logs one warning for every
+gap: an object missing from the inventory, a missing size, mass, material, hollow flag,
+position or yaw, a scene field that differs between rows, an object in no scene or in several.
+An object with gaps is still written, with the gap names in `incomplete`, so the evaluation
+can skip it. `--strict` exits with 1 on any warning. The z of `position_m` is half the
+height, the bounding-box center, which differs from the volume centroid for cones and mugs.
+The JSON has `shape_primitive` where the sketch above shows `reference_mesh`; a mesh path is
+not recorded yet.
