@@ -6,8 +6,8 @@ seed: 0
 capture:
   target_fps: 5                # TODO(P1.4): frame sampling rate for reconstruction
   marker:
-    family: null               # TODO(P0.4): for example an ArUco dictionary name
-    tag_size_m: null           # TODO(P0.4): printed tag edge length, measured with calipers
+    family: aruco_4x4_50       # ArUco DICT_4X4_50, ids 0 to 5, see benchmark/make_board.py
+    tag_size_m: 0.100          # printed tag edge length, verified with calipers
 
 reconstruction:
   backend: null                # TODO(P1.1): chosen in the Phase 1 comparison

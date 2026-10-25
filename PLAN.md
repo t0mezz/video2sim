@@ -131,11 +131,13 @@ Tasks
       object positions measured by tape, to check that the grid texture does not flatter
       registration. The rest use the benchmark grid board. Same tag IDs and size on both.
       Where: `benchmark/scenes/` (not in git)
-- [ ] **P0.2** Record ground truth per scene: weights, sizes, grid positions, orientations.
-      Format: `benchmark/README.md`
-- [ ] **P0.3** Revise the capture protocol after the first scenes. Where: `docs/capture_protocol.md`
-- [ ] **P0.4** Print the scale marker board, measure the tag size with calipers, set the
-      marker config. Where: `configs/default.yaml`
+- [x] **P0.2** Record ground truth per scene: weights, sizes, grid positions, orientations.
+      Format: `benchmark/README.md`. Evidence: commits e2aa49c, 322b27c, 1e808e7
+- [x] **P0.3** Revise the capture protocol after the first scenes. Where: `docs/capture_protocol.md`.
+      Evidence: commit 417cacb
+- [x] **P0.4** Print the scale marker board, measure the tag size with calipers, set the
+      marker config. Where: `configs/default.yaml`. Evidence: tag 100 mm verified by calipers
+      (reported by the user), `capture.marker` set in `configs/default.yaml`
 - [ ] **P0.5** Stage runner: run folder, manifest, hash-based caching. Where: `src/video2sim/runner.py`
 - [ ] **P0.6** Evaluation harness that computes the section 2 metrics and writes a JSON and
       an HTML report. Run it on a trivial baseline (boxes from masks) to get a floor.
