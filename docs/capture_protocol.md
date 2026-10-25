@@ -5,7 +5,7 @@ changed and why at the bottom.
 
 ## What to film
 
-One handheld video, 60 to 90 seconds, of a static tabletop with 5 to 15 rigid objects.
+One handheld video, 10 to 60 seconds, of a static tabletop with 5 to 15 rigid objects.
 
 ## Setup
 
@@ -34,3 +34,4 @@ One handheld video, 60 to 90 seconds, of a static tabletop with 5 to 15 rigid ob
 | Date | Change | Why |
 | --- | --- | --- |
 | 2026-10-22 | First draft | From the roadmap |
+| 2026-10-25 | Video length 60–90s to 10–60s | Shorter captures per human instruction |

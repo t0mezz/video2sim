@@ -34,7 +34,7 @@ Status values: Not started, In progress, Done. Gate values: Open, Passed, Failed
 
 ## 1. MVP definition
 
-The MVP turns one 60 to 90 second phone video of a static tabletop into a metric-scale USD
+The MVP turns one 10 to 60 second phone video of a static tabletop into a metric-scale USD
 scene that loads in Isaac Sim, stays stable under gravity, and needs no manual steps on the
 happy path.
 
