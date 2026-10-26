@@ -332,6 +332,9 @@ STAGE_ORDER: tuple[StageName, ...] = (
 class StageRecord(Model):
     status: Literal["pending", "done", "failed", "skipped"] = "pending"
     seconds: float | None = Field(default=None, ge=0)
+    input_sha256: str | None = Field(
+        default=None, description="Cache key: hash of everything that decides this stage's result"
+    )
     output_sha256: str | None = None
     message: str | None = None
 
