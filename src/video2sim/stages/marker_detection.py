@@ -66,9 +66,10 @@ def triangulate_tag_corners(
 ) -> Triangulation:
     """Triangulate every tag corner seen in at least ``min_views`` frames (linear DLT).
 
-    A tag with any corner above ``max_reprojection_px`` is dropped and not used for the scale,
-    since one bad detection would skew it. Raises if nothing survives, which the caller turns
-    into a user-facing "marker not visible" message.
+    Each corner drops its worst views until all remaining ones reproject within
+    ``max_reprojection_px``. A tag whose corner cannot reach that with ``min_views`` views is
+    left out of the scale. Raises if nothing survives, which the caller turns into a
+    user-facing "marker not seen" message.
     """
     import cv2
 
@@ -96,25 +97,67 @@ def triangulate_tag_corners(
             continue
         pts3 = np.zeros((4, 3))
         tag_err: list[float] = []
+        used: set[int] = set()
         for j in range(4):
-            rows = []
-            for k in seen:
-                x, y = norm[k][tag_id][j]
-                p = proj[k]
-                rows.append(x * p[2] - p[0])
-                rows.append(y * p[2] - p[1])
-            h = np.linalg.svd(np.asarray(rows))[2][-1]
-            pts3[j] = h[:3] / h[3]
-            for k in seen:
-                cam = proj[k] @ np.append(pts3[j], 1.0)
-                x, y = norm[k][tag_id][j]
-                f = views[k].K[0, 0]  # normalized error * focal length ~ pixels
-                tag_err.append(float(np.hypot(cam[0] / cam[2] - x, cam[1] / cam[2] - y) * f))
-        if max(tag_err) > max_reprojection_px:
-            continue
-        corners[tag_id] = pts3
-        n_views[tag_id] = len(seen)
-        errors.extend(tag_err)
+            point, err, kept = _robust_corner(
+                [(proj[k], norm[k][tag_id][j], float(views[k].K[0, 0]), k) for k in seen],
+                min_views,
+                max_reprojection_px,
+            )
+            if point is None:
+                break
+            pts3[j] = point
+            tag_err.extend(err)
+            used.update(kept)
+        else:
+            corners[tag_id] = pts3
+            n_views[tag_id] = len(used)
+            errors.extend(tag_err)
     if not corners:
         raise ValueError("no tag could be triangulated: marker not seen in enough frames")
     return Triangulation(corners, float(np.mean(errors)), float(np.max(errors)), n_views)
+
+
+def _dlt(obs: list[tuple[F64, F64, float, int]]) -> tuple[F64, list[float]]:
+    """Linear triangulation of one point; returns it and its per-view reprojection error (px)."""
+    rows = []
+    for p, (x, y), _, _ in obs:
+        rows.append(x * p[2] - p[0])
+        rows.append(y * p[2] - p[1])
+    h = np.linalg.svd(np.asarray(rows))[2][-1]
+    point = h[:3] / h[3]
+    err = []
+    for p, (x, y), f, _ in obs:
+        cam = p @ np.append(point, 1.0)
+        err.append(float(np.hypot(cam[0] / cam[2] - x, cam[1] / cam[2] - y) * f))
+    return point, err
+
+
+# Above this many views one outlier barely moves the fit, so the worst view is the bad one.
+# Below it, an outlier drags the point toward itself, so each view is tried in turn instead.
+_LEAVE_ONE_OUT_MAX_VIEWS = 12
+
+
+def _robust_corner(
+    obs: list[tuple[F64, F64, float, int]], min_views: int, max_reprojection_px: float
+) -> tuple[F64 | None, list[float], list[int]]:
+    """DLT for one corner; drop the worst view until all fit or ``min_views`` remain.
+
+    Detections in blurred frames, or in frames where the pose is poor, can be several pixels
+    off. Dropping one tag for one bad view would throw away good data, so only the view goes.
+    Returns ``(None, [], [])`` if the corner still does not fit with ``min_views`` left.
+    """
+    obs = list(obs)
+    point, err = _dlt(obs)
+    while max(err) > max_reprojection_px:
+        if len(obs) <= min_views:
+            return None, [], []
+        if len(obs) <= _LEAVE_ONE_OUT_MAX_VIEWS:
+            trials = [_dlt(obs[:i] + obs[i + 1 :]) for i in range(len(obs))]
+            drop = int(np.argmin([max(e) for _, e in trials]))
+            point, err = trials[drop]
+        else:
+            drop = int(np.argmax(err))
+            point, err = _dlt(obs[:drop] + obs[drop + 1 :])
+        del obs[drop]
+    return point, err, [k for _, _, _, k in obs]

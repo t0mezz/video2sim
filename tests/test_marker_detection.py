@@ -137,8 +137,19 @@ def test_triangulation_needs_two_views(layout: BoardLayout) -> None:
         triangulate_tag_corners(_views(_board_texture(), POSES[:1]))
 
 
-def test_outlier_detection_drops_that_tag(layout: BoardLayout) -> None:
+def test_one_bad_view_is_dropped_but_the_tag_survives(layout: BoardLayout) -> None:
     views = _views(_board_texture(), POSES)
+    clean = triangulate_tag_corners(views)
+    bad = dict(views[0].corners_px)
+    bad[2] = bad[2] + np.array([40.0, -30.0])
+    views[0] = TagView(K, np.zeros(0), views[0].T_world_from_camera, bad)
+    tri = triangulate_tag_corners(views, max_reprojection_px=1.0)
+    assert 2 in tri.corners and tri.n_views[2] == 3
+    assert np.abs(tri.corners[2] - clean.corners[2]).max() < 1e-3
+
+
+def test_tag_that_cannot_fit_with_min_views_is_left_out(layout: BoardLayout) -> None:
+    views = _views(_board_texture(), POSES[:2])
     bad = dict(views[0].corners_px)
     bad[2] = bad[2] + np.array([40.0, -30.0])
     views[0] = TagView(K, np.zeros(0), views[0].T_world_from_camera, bad)
