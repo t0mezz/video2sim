@@ -229,3 +229,27 @@ def test_cli_board_layout_option(tmp_path: Path) -> None:
 def test_missing_deformable_flag_is_a_gap() -> None:
     obj, _ = _one_object({"station": "B2"})  # the helper's inventory row has no flags
     assert {"hollow", "deformable"} <= set(obj["incomplete"])
+
+
+def test_numeric_object_ids_and_repeated_mass_readings(tmp_path: Path) -> None:
+    inv = tmp_path / "inv.csv"
+    scn = tmp_path / "scn.csv"
+    inv.write_text(
+        "obj_id,label,length_mm_1,width_mm_1,height_mm_1,mass_g_1,mass_g_2,mass_g_3,"
+        "material_class,hollow,deformable\n"
+        "obj_007,box,100,50,20,100,102,101,cardboard,FALSE,FALSE\n",
+        encoding="utf-8",
+    )
+    scn.write_text(
+        "scene_id,tier,split,board,marker_family,tag_size_mm,object_id,x_mm,y_mm,yaw_deg\n"
+        "s1,easy,dev,clean,aruco_4x4_50,100,7,200,100,30\n",
+        encoding="utf-8",
+    )
+    rows, _ = load_table(inv, ["object_id"])
+    placed, _ = load_table(scn, ["scene_id", "object_id"])
+    scenes, warnings = build_scenes(rows, placed)
+    obj = scenes["s1"]["objects"][0]
+    assert obj["object_id"] == "obj_007"
+    assert obj["mass_kg"] == 0.101
+    assert obj["incomplete"] == []
+    assert warnings == []

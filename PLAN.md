@@ -125,14 +125,16 @@ access, and start reading the model licenses (P0.7).
 
 Tasks
 
-- [ ] **P0.1** Capture the benchmark: 24 scenes, two camera paths each.
+- [x] **P0.1** Capture the benchmark: 24 scenes, two camera paths each.
       Tiers: 10 easy, 6 medium, 8 hard (D-013). Prefer objects with published meshes.
       Four scenes use a clean board (production tags only, no printed grid) with object
       positions measured by tape, to check that the grid texture does not flatter
       registration. The rest use the benchmark grid board. Same tag IDs and size on both.
       Where: `benchmark/scenes/` (not in git), record in `benchmark/scene_list.yaml`.
-      Status 2026-10-26: all 24 scenes captured per the scene list; s01 to s23 are on disk,
-      s24 and the ground truth files are still to be imported. Tick when all are in place.
+      Done 2026-10-26: 24 scenes captured and 24 `ground_truth.json` files generated from
+      `benchmark/scenes.csv` and `benchmark/inventory.csv`, 103 objects, none incomplete.
+      s06, s14 and s24 have only `video_b.mp4`: no orbit was possible there (kitchen surface
+      against the wall, accepted). Evidence: `benchmark/scene_list.yaml`, the two sheets in `benchmark/`.
 - [x] **P0.2** Record ground truth per scene: weights, sizes, grid positions, orientations.
       Format: `benchmark/README.md`. Evidence: commits e2aa49c, 322b27c, 1e808e7
 - [x] **P0.3** Revise the capture protocol after the first scenes. Where: `docs/capture_protocol.md`.
@@ -153,7 +155,7 @@ Tasks
 
 Exit criteria
 
-- [ ] 24 scenes captured, ground truth stored next to each
+- [x] 24 scenes captured, ground truth stored next to each
 - [ ] Evaluation harness produces the full metric report on the baseline
 - [ ] Written decisions on SAM 3.1 hosting (D-004) and on model licensing (D-005)
 - [ ] Container image runs all models

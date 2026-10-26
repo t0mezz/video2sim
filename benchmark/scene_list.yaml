@@ -109,7 +109,7 @@
     board: clean
     environment: kitchen
     done: true
-    notes: easy objects, clutter, dark surface
+    notes: easy objects, clutter, dark surface, no orbit possible (surface against the wall)
 -
     scene: s15
     tier: medium

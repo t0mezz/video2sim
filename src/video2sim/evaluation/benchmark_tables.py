@@ -79,7 +79,11 @@ def load_table(path: Path, required: Sequence[str]) -> tuple[list[Row], list[str
         if not any(cell.strip() for cell in cells):
             continue
         padded = [*cells, *[""] * (len(header) - len(cells))]
-        rows.append({h: cell.strip() for h, cell in zip(header, padded, strict=False) if h})
+        row = {h: cell.strip() for h, cell in zip(header, padded, strict=False) if h}
+        if row.get("object_id", "").isdigit():
+            # The sheets may hold a bare number such as 7 where the inventory says obj_007.
+            row["object_id"] = f"obj_{int(row['object_id']):03d}"
+        rows.append(row)
     return rows, warnings
 
 
@@ -141,7 +145,12 @@ def _object_from_inventory(row: Row) -> tuple[Scene, list[str]]:
     if size_m is not None and size_convention_errors(size_m):
         gaps.append("size_m")
 
-    mass_g = _number(row.get("mass_g", ""))
+    mass_readings = [
+        v for v in (_number(row.get(f"mass_g_{i}", "")) for i in (1, 2, 3)) if v is not None
+    ]
+    mass_g = (
+        sum(mass_readings) / len(mass_readings) if mass_readings else _number(row.get("mass_g", ""))
+    )
     if mass_g is None or mass_g <= 0:
         mass_g = None
         gaps.append("mass_g")

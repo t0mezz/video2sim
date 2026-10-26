@@ -38,10 +38,10 @@ Scenes with known deviations from `docs/capture_protocol.md`:
 | Scene | Deviation |
 | --- | --- |
 | s05 | Clean board. Positions are measured from marker 0 (bottom left), which is x = 0, y = 0 |
-| s06, s24 | No full orbit was possible |
+| s06, s14, s24 | No full orbit was possible, so only `video_b.mp4` exists |
 | s24 | Glossy stove surface, and a second marker on the wall |
 | s12 | The video is blurred |
-| s21 to s23 | Contain a deformable object. Deformables are post-MVP: the harness leaves them out and still scores the rigid objects |
+| s21 to s23 | Contain a deformable object. Deformables are post-MVP: the harness leaves out the whole scene (D-014) |
 
 Tune and debug on dev. Run test only at phase gates, and never tune on it. If a result only
 holds on dev, it does not count.
@@ -111,7 +111,7 @@ row 1, one table per sheet, `.` as decimal separator.
 
 **Inventory**, one row per physical object: `object_id` (the older name `obj_id` is accepted),
 `label`, `length_mm_1..3`, `width_mm_1..3`, `height_mm_1..3` (repeated readings, averaged),
-`mass_g`, `material_class`, `hollow` and `deformable` (TRUE or FALSE), `shape_primitive` (the older name
+`mass_g` (or repeated readings `mass_g_1..3`, averaged), `material_class`, `hollow` and `deformable` (TRUE or FALSE), `shape_primitive` (the older name
 `reference_mesh` is accepted). Other columns are ignored.
 
 **Scenes**, one row per object placed in a scene. Scene-level columns repeat on every row of
