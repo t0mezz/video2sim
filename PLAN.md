@@ -158,7 +158,10 @@ Tasks
       released checkpoint: video length, rate limits, cost. SAM 3D license and GPU memory.
       TRELLIS.2 GPU memory. Record decisions D-004 and D-005. Where: `docs/licenses.md`
 - [ ] **P0.8** One GPU environment that runs every model, as a container image. Where: `Dockerfile`
-- [ ] **P0.9** Continuous integration: ruff, mypy and pytest on every push.
+- [x] **P0.9** Continuous integration: ruff, mypy and pytest on every push.
+      Where: `.github/workflows/ci.yml` (Python 3.10 and 3.12). Evidence: commit 9efb031; the
+      same four commands pass locally on 2026-10-26 (ruff check, ruff format --check, mypy,
+      102 tests). A green run on GitHub has not been checked.
 
 Exit criteria
 
