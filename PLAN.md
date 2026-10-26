@@ -158,6 +158,7 @@ Tasks
       released checkpoint: video length, rate limits, cost. SAM 3D license and GPU memory.
       TRELLIS.2 GPU memory. Record decisions D-004 and D-005. Where: `docs/licenses.md`
 - [ ] **P0.8** One GPU environment that runs every model, as a container image. Where: `Dockerfile`
+      Deferred past the MVP (2026-10-26): no Docker image for now. Not done, so unticked.
 - [x] **P0.9** Continuous integration: ruff, mypy and pytest on every push.
       Where: `.github/workflows/ci.yml` (Python 3.10 and 3.12). Evidence: commit 9efb031; the
       same four commands pass locally on 2026-10-26 (ruff check, ruff format --check, mypy,
@@ -168,7 +169,7 @@ Exit criteria
 - [x] 24 scenes captured, ground truth stored next to each
 - [x] Evaluation harness produces the full metric report on the baseline
 - [ ] Written decisions on SAM 3.1 hosting (D-004) and on model licensing (D-005)
-- [ ] Container image runs all models
+- [ ] Container image runs all models (deferred past the MVP, see P0.8)
 
 Evidence:
 
@@ -400,3 +401,4 @@ In order:
 | 2026-10-26 | D-013: benchmark is 24 scenes (15 dev, 9 test) with four clean-board scenes; `benchmark/scene_list.yaml` added |
 | 2026-10-26 | D-014: the harness leaves out whole scenes with a deformable object |
 | 2026-10-26 | P0.6: harness implemented on synthetic fixtures; floor is a constant-box baseline, boxes-from-masks deferred; D-012 records the metric conventions |
+| 2026-10-26 | P0.8: Docker image skipped for the MVP and deferred; the matching exit criterion is deferred with it |
