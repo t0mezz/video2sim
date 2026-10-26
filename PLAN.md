@@ -6,11 +6,11 @@ roadmap: update it as work happens. Numbers that gate a decision live in
 
 ## Status
 
-Last updated: 2026-10-22. Start date: not set (decision D-002).
+Last updated: 2026-10-26. Start date: not set (decision D-002).
 
 | Phase | Weeks | Focus | Status | Gate |
 | --- | --- | --- | --- | --- |
-| 0 | 1 to 2 | Foundations, benchmark, evaluation harness | Not started | Open |
+| 0 | 1 to 2 | Foundations, benchmark, evaluation harness | Done | Passed |
 | 1 | 3 to 4 | Reconstruction, metric scale, world frame | Not started | Open |
 | 2 | 5 to 6 | Segmentation, tracking, 3D lifting | Not started | Open |
 | 3 | 7 to 8 | Shape completion and pose fusion | Not started | Open |
@@ -18,7 +18,7 @@ Last updated: 2026-10-22. Start date: not set (decision D-002).
 | 5 | 11 to 12 | Export, simulator validation, demo | Not started | Open |
 
 Status values: Not started, In progress, Done. Gate values: Open, Passed, Failed.
-**Current focus:** Phase 0.
+**Current focus:** Phase 1.
 
 ## How to use this file
 
@@ -204,7 +204,8 @@ Exit criteria
 - [x] Written decisions on SAM 3.1 hosting (D-004) and on model licensing (D-005)
 - [ ] Container image runs all models (deferred past the MVP, see P0.8)
 
-Evidence:
+Evidence: gate passed 2026-10-26 by human decision with the container criterion deferred
+(P0.8). CI is green on GitHub.
 
 ## 5. Phase 1: Reconstruction, metric scale, world frame (weeks 3 to 4)
 
@@ -503,3 +504,4 @@ In order:
 | 2026-10-26 | D-003 changed to hosted inference; D-005 decided as research; D-015 added for shape-stage hosting; D-004 leans to the Meta Model API |
 | 2026-10-26 | D-004 decided: Meta Model API, and videos may be sent to hosted APIs |
 | 2026-10-26 | D-005: license texts read; research use, TRELLIS.2 blocks commercial use through the NVIDIA renderer licenses |
+| 2026-10-26 | P0.9: green CI run confirmed on GitHub; Phase 0 gate passed with the container criterion deferred; Phase 1 is the current focus |
