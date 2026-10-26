@@ -222,7 +222,7 @@ Tasks
 - [ ] **P1.2** Metric scale from the marker board: detect tags, compare their measured spacing
 
       with the known printed size, scale the reconstruction. Accept phone depth or LiDAR as an
-      optional cross-check.
+      optional cross-check after the MVP.
 
 - [ ] **P1.3** Fit the table plane (RANSAC), take its normal as the up axis, put the origin on
 
