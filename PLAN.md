@@ -144,16 +144,16 @@ Tasks
       (reported by the user), `capture.marker` set in `configs/default.yaml`
 - [x] **P0.5** Stage runner: run folder, manifest, hash-based caching. Where: `src/video2sim/runner.py`.
       Evidence: commit 98a46f4
-- [ ] **P0.6** Evaluation harness that computes the section 2 metrics and writes a JSON and
+- [x] **P0.6** Evaluation harness that computes the section 2 metrics and writes a JSON and
       an HTML report. Run it on a trivial baseline to get a floor. Where:
-      `src/video2sim/evaluation/`, command `video2sim eval`. Conventions: D-012.
-      Built and tested on synthetic fixtures (branch `p0-6-evaluation`). Tick it when the
-      report has been produced on the real dev scenes, which needs P0.1 and the
-      `ground_truth.json` files (no scene has one yet). The floor is a constant-box baseline
-      plus a noise-perturbed oracle that tests the metrics. The boxes-from-masks baseline
-      (segment, then extrude a box on the table plane from the marker pose) moves to the
-      next iteration, with its costs: it needs a segmentation backend (D-004), the marker
-      pose and the table plane from Phase 1.
+      `src/video2sim/evaluation/`, command `video2sim eval`. Conventions: D-012, D-014.
+      Evidence: commit 46faede. On the 13 scored dev scenes (63 objects; s21 and s22 left
+      out as deformable) the oracle scores 100% recall with zero error, and the constant-box
+      floor scores 0% recall, so it has no error medians. The floor is a constant box plus a
+      noise-perturbed oracle that tests the metrics. The boxes-from-masks baseline (segment,
+      then extrude a box on the table plane from the marker pose) moves to the next
+      iteration, with its costs: it needs a segmentation backend (D-004), the marker pose and
+      the table plane from Phase 1.
 - [ ] **P0.7** Access and limits. SAM 3.1 through the Meta Model API versus self-hosting the
       released checkpoint: video length, rate limits, cost. SAM 3D license and GPU memory.
       TRELLIS.2 GPU memory. Record decisions D-004 and D-005. Where: `docs/licenses.md`
@@ -163,7 +163,7 @@ Tasks
 Exit criteria
 
 - [x] 24 scenes captured, ground truth stored next to each
-- [ ] Evaluation harness produces the full metric report on the baseline
+- [x] Evaluation harness produces the full metric report on the baseline
 - [ ] Written decisions on SAM 3.1 hosting (D-004) and on model licensing (D-005)
 - [ ] Container image runs all models
 
