@@ -4,11 +4,12 @@ import itertools
 
 import numpy as np
 import pytest
+from numpy.typing import NDArray
 
 from video2sim.evaluation.matching import gate_m, linear_sum_assignment, match
 
 
-def _brute_force_cost(cost: np.ndarray) -> float:
+def _brute_force_cost(cost: NDArray[np.float64]) -> float:
     n, m = cost.shape
     k = min(n, m)
     best = np.inf

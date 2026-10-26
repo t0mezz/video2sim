@@ -61,6 +61,11 @@ It defaults to the dev split; `--split test` is for phase gates only, and `--sce
 scores one scene. Scenes with a deformable object are left out (D-014) unless named with `--scene`. It writes `report.json` and `report.html` and exits 0 unless
 `--fail-on-target` is given. The metric definitions are decision D-012 in `PLAN.md`.
 
+CI (`.github/workflows/ci.yml`) runs ruff check, `ruff format --check`, mypy and the fast
+pytest set on every push, on Python 3.10 and 3.12, with `uv sync --locked`. A change that
+touches dependencies commits the updated `uv.lock`. To reproduce the 3.10 run locally:
+`uv run --python 3.10 --isolated mypy`.
+
 Commands that arrive with their task: `video2sim run` (P5.5).
 Never document a command that does not exist. When you add one, add it here in the same
 change.
