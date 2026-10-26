@@ -11,6 +11,10 @@ capture:
 
 reconstruction:
   backend: null                # TODO(P1.1): chosen in the Phase 1 comparison
+  world_frame:
+    plane_inlier_threshold_m: 0.004   # TODO(P1.6): tune on dev scenes; a guess, not yet measured
+    plane_ransac_iterations: 500      # TODO(P1.6): tune on dev scenes
+    max_tag_fit_rms_m: 0.005          # TODO(P1.6): tag fit residual above which scale is flagged
 
 segmentation:
   sam_backend: null            # "api" or "self_hosted", see PLAN.md decision D-004
