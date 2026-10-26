@@ -129,8 +129,10 @@ notice. Breaking one gives a scene that loads fine and behaves wrongly.
 * No videos, meshes, point clouds, model weights or secrets in git. The `.gitignore` covers
   the usual extensions; do not add exceptions. Keys live in `.env`, listed in `.env.example`.
 * Videos of workspaces can show people, screens and documents. Treat benchmark videos as
-  private. Whether videos may be sent to a hosted API is decision D-004 in `PLAN.md`; until
-  it is confirmed, ask before uploading anything.
+  private. Decision D-004 in `PLAN.md` allows sending benchmark videos to hosted APIs (Meta Model
+  API; Modal or Baseten under D-015). Never use the Muse "contributor" modes, which let
+  Meta train on the content. Retention terms are not yet read, so ask before the first
+  upload.
 * Do not download large model weights unless asked. Record each checkpoint id in the run
   manifest.
 * Before depending on a new model, tool or dataset, check and update `docs/licenses.md`.
