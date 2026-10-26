@@ -34,7 +34,8 @@ src/video2sim/
   schemas.py             the contracts between stages; start here
   stages/                one module per stage; each documents its contract
   models/                adapters around external models (SAM 3.1, SAM 3D, TRELLIS.2, VLM)
-  evaluation/            metrics and reports against benchmark ground truth
+  evaluation/            metrics, baselines and reports against benchmark ground truth
+  cli.py                 the `video2sim` command (`eval` today)
 tests/                   fast tests; no GPU, weights or network needed
 benchmark/               ground-truth format; scene data itself is not in git
 docs/                    capture protocol, license tracker
@@ -51,9 +52,21 @@ uv run pytest                # tests
 uv run ruff check .          # lint
 uv run ruff format .         # format (use --check in CI)
 uv run mypy                  # type check, strict
+uv run video2sim eval --baseline constant   # metric report on the dev scenes, see below
 ```
 
-Commands that arrive with their task: `video2sim eval` (P0.6) and `video2sim run` (P5.5).
+`video2sim eval` scores a baseline (`--baseline oracle|constant`) or pipeline runs
+(`--runs DIR`, one run folder per scene id) against `benchmark/scenes/*/ground_truth.json`.
+It defaults to the dev split; `--split test` is for phase gates only, and `--scene ID`
+scores one scene. Scenes with a deformable object are left out (D-014) unless named with `--scene`. It writes `report.json` and `report.html` and exits 0 unless
+`--fail-on-target` is given. The metric definitions are decision D-012 in `PLAN.md`.
+
+CI (`.github/workflows/ci.yml`) runs ruff check, `ruff format --check`, mypy and the fast
+pytest set on every push, on Python 3.10 and 3.12, with `uv sync --locked`. A change that
+touches dependencies commits the updated `uv.lock`. To reproduce the 3.10 run locally:
+`uv run --python 3.10 --isolated mypy`.
+
+Commands that arrive with their task: `video2sim run` (P5.5).
 Never document a command that does not exist. When you add one, add it here in the same
 change.
 
@@ -116,8 +129,10 @@ notice. Breaking one gives a scene that loads fine and behaves wrongly.
 * No videos, meshes, point clouds, model weights or secrets in git. The `.gitignore` covers
   the usual extensions; do not add exceptions. Keys live in `.env`, listed in `.env.example`.
 * Videos of workspaces can show people, screens and documents. Treat benchmark videos as
-  private. Whether videos may be sent to a hosted API is decision D-004 in `PLAN.md`; until
-  it is confirmed, ask before uploading anything.
+  private. Decision D-004 in `PLAN.md` allows sending benchmark videos to hosted APIs (Meta Model
+  API; Modal or Baseten under D-015). Never use the Muse "contributor" modes, which let
+  Meta train on the content. Retention terms are not yet read, so ask before the first
+  upload.
 * Do not download large model weights unless asked. Record each checkpoint id in the run
   manifest.
 * Before depending on a new model, tool or dataset, check and update `docs/licenses.md`.
@@ -148,7 +163,7 @@ notice. Breaking one gives a scene that loads fine and behaves wrongly.
   $I_{xx} = \tfrac{1}{12}\, m\,(b^{2} + c^{2})$. Build synthetic fixtures (box, cylinder,
   sphere) with known volume, mass and inertia, and check transforms by round trip.
 * Do not judge quality by looking at one scene. A change that affects quality reports metric
-  deltas from the evaluation harness on the dev scenes (once P0.6 exists).
+  deltas from `video2sim eval` on the dev scenes.
 
 ## Working agreements for agents
 

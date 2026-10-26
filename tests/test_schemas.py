@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 
 import numpy as np
 import pytest
+from numpy.typing import NDArray
 from pydantic import ValidationError
 
 from video2sim.schemas import (
@@ -20,7 +21,7 @@ from video2sim.schemas import (
 )
 
 
-def rot_z(angle: float) -> np.ndarray:
+def rot_z(angle: float) -> NDArray[np.float64]:
     c, s = math.cos(angle), math.sin(angle)
     a = np.eye(4)
     a[:2, :2] = [[c, -s], [s, c]]

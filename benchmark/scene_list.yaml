@@ -1,0 +1,200 @@
+-
+    scene: s01
+    tier: easy
+    split: dev
+    board: grid
+    environment: uni desk
+    done: true
+    notes: simple matte shapes and packages
+-
+    scene: s02
+    tier: easy
+    split: dev
+    board: grid
+    environment: uni desk
+    done: true
+    notes: mugs
+-
+    scene: s03
+    tier: easy
+    split: dev
+    board: grid
+    environment: uni desk
+    done: true
+    notes: sphere only
+-
+    scene: s04
+    tier: easy
+    split: dev
+    board: grid
+    environment: uni desk
+    done: true
+    notes: sphere and some packages
+-
+    scene: s05
+    tier: easy
+    split: dev
+    board: clean
+    environment: uni desk
+    done: true
+    notes: coordinate measurmens based of orientation of marker0 (bottom left) <=> x=0, y=0
+-
+    scene: s06
+    tier: easy
+    split: dev
+    board: grid
+    environment: kitchen
+    done: true
+    notes: simple objects on textured dark surface, no orbit possible
+-
+    scene: s07
+    tier: easy
+    split: test
+    board: grid
+    environment: uni desk
+    done: true
+    notes: simple matte shapes and packages
+-
+    scene: s08
+    tier: easy
+    split: test
+    board: grid
+    environment: uni desk
+    done: true
+    notes: mugs
+-
+    scene: s09
+    tier: easy
+    split: test
+    board: grid
+    environment: uni desk
+    done: true
+    notes: 3 easy bigger objects
+-
+    scene: s10
+    tier: easy
+    split: test
+    board: clean
+    environment: living room
+    done: true
+    notes: tablecloth easy objects natural lighting
+-
+    scene: s11
+    tier: medium
+    split: dev
+    board: grid
+    environment: uni desk
+    done: true
+    notes: small objects, black, 3d printed geometric shapes, low texture
+-
+    scene: s12
+    tier: medium
+    split: dev
+    board: grid
+    environment: uni desk
+    done: true
+    notes: many easy objecs with occlusion, video came out blurred
+-
+    scene: s13
+    tier: medium
+    split: dev
+    board: grid
+    environment: uni desk
+    done: true
+    notes: easy stack of objects
+-
+    scene: s14
+    tier: medium
+    split: dev
+    board: clean
+    environment: kitchen
+    done: true
+    notes: easy objects, clutter, dark surface, no orbit possible (surface against the wall)
+-
+    scene: s15
+    tier: medium
+    split: test
+    board: grid
+    environment: uni desk
+    done: true
+    notes: easy objects, occlusion
+-
+    scene: s16
+    tier: medium
+    split: test
+    board: grid
+    environment: living room
+    done: true
+    notes: easy stack of objects, easy lighting
+-
+    scene: s17
+    tier: hard
+    split: dev
+    board: grid
+    environment: uni desk
+    done: true
+    notes: reflective objects
+-
+    scene: s18
+    tier: hard
+    split: dev
+    board: grid
+    environment: uni desk
+    done: true
+    notes: hard geometry
+-
+    scene: s19
+    tier: hard
+    split: test
+    board: grid
+    environment: uni desk
+    done: true
+    notes: hard geometry
+-
+    scene: s20
+    tier: hard
+    split: test
+    board: grid
+    environment: uni desk
+    done: true
+    notes: reflective objects
+-
+    scene: 
+    tier: 
+    split: 
+    board: 
+    environment: 
+    done: 
+    notes: 
+-
+    scene: s21_deformable
+    tier: hard
+    split: dev
+    board: grid
+    environment: uni desk
+    done: true
+    notes: with deformable
+-
+    scene: s22_deformable
+    tier: hard
+    split: dev
+    board: grid
+    environment: uni desk
+    done: true
+    notes: with deformable
+-
+    scene: s23_deformable
+    tier: hard
+    split: test
+    board: grid
+    environment: uni desk
+    done: true
+    notes: with deformable
+-
+    scene: s24
+    tier: hard
+    split: dev
+    board: clean
+    environment: kitchen
+    done: true
+    notes: very glossy stove surface, easy cuboid object, second marker at wall, no orbit possible
