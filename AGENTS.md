@@ -34,7 +34,8 @@ src/video2sim/
   schemas.py             the contracts between stages; start here
   stages/                one module per stage; each documents its contract
   models/                adapters around external models (SAM 3.1, SAM 3D, TRELLIS.2, VLM)
-  evaluation/            metrics and reports against benchmark ground truth
+  evaluation/            metrics, baselines and reports against benchmark ground truth
+  cli.py                 the `video2sim` command (`eval` today)
 tests/                   fast tests; no GPU, weights or network needed
 benchmark/               ground-truth format; scene data itself is not in git
 docs/                    capture protocol, license tracker
@@ -51,9 +52,16 @@ uv run pytest                # tests
 uv run ruff check .          # lint
 uv run ruff format .         # format (use --check in CI)
 uv run mypy                  # type check, strict
+uv run video2sim eval --baseline constant   # metric report on the dev scenes, see below
 ```
 
-Commands that arrive with their task: `video2sim eval` (P0.6) and `video2sim run` (P5.5).
+`video2sim eval` scores a baseline (`--baseline oracle|constant`) or pipeline runs
+(`--runs DIR`, one run folder per scene id) against `benchmark/scenes/*/ground_truth.json`.
+It defaults to the dev split; `--split test` is for phase gates only, and `--scene ID`
+scores one scene. Scenes with a deformable object are left out (D-014) unless named with `--scene`. It writes `report.json` and `report.html` and exits 0 unless
+`--fail-on-target` is given. The metric definitions are decision D-012 in `PLAN.md`.
+
+Commands that arrive with their task: `video2sim run` (P5.5).
 Never document a command that does not exist. When you add one, add it here in the same
 change.
 
@@ -148,7 +156,7 @@ notice. Breaking one gives a scene that loads fine and behaves wrongly.
   $I_{xx} = \tfrac{1}{12}\, m\,(b^{2} + c^{2})$. Build synthetic fixtures (box, cylinder,
   sphere) with known volume, mass and inertia, and check transforms by round trip.
 * Do not judge quality by looking at one scene. A change that affects quality reports metric
-  deltas from the evaluation harness on the dev scenes (once P0.6 exists).
+  deltas from `video2sim eval` on the dev scenes.
 
 ## Working agreements for agents
 

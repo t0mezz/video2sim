@@ -17,6 +17,7 @@ uv sync                 # install runtime and dev dependencies
 uv run pytest           # fast tests, no GPU or model weights needed
 uv run ruff check .     # lint
 uv run mypy             # type check
+uv run video2sim eval --baseline constant   # metric report on the benchmark dev scenes
 ```
 
 ## Where to read next

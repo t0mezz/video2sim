@@ -145,8 +145,15 @@ Tasks
 - [x] **P0.5** Stage runner: run folder, manifest, hash-based caching. Where: `src/video2sim/runner.py`.
       Evidence: commit 98a46f4
 - [ ] **P0.6** Evaluation harness that computes the section 2 metrics and writes a JSON and
-      an HTML report. Run it on a trivial baseline (boxes from masks) to get a floor.
-      Where: `src/video2sim/evaluation/`
+      an HTML report. Run it on a trivial baseline to get a floor. Where:
+      `src/video2sim/evaluation/`, command `video2sim eval`. Conventions: D-012.
+      Built and tested on synthetic fixtures (branch `p0-6-evaluation`). Tick it when the
+      report has been produced on the real dev scenes, which needs P0.1 and the
+      `ground_truth.json` files (no scene has one yet). The floor is a constant-box baseline
+      plus a noise-perturbed oracle that tests the metrics. The boxes-from-masks baseline
+      (segment, then extrude a box on the table plane from the marker pose) moves to the
+      next iteration, with its costs: it needs a segmentation backend (D-004), the marker
+      pose and the table plane from Phase 1.
 - [ ] **P0.7** Access and limits. SAM 3.1 through the Meta Model API versus self-hosting the
       released checkpoint: video length, rate limits, cost. SAM 3D license and GPU memory.
       TRELLIS.2 GPU memory. Record decisions D-004 and D-005. Where: `docs/licenses.md`
@@ -361,7 +368,9 @@ one that supersedes.
 | D-009 | Benchmark split: 12 dev scenes, 8 test scenes, stratified by tier: easy 6/4, medium 4/2, hard 2/2 (dev/test). Of the three clean-board easy scenes, two are dev and one is test | Decided | Week 1 | Test is run only at phase gates |
 | D-010 | Object frame origin at the volume centroid; meshes in meters | Decided | | Encoded in `schemas.py` |
 | D-011 | Python 3.10+, uv, pydantic for contracts, ruff and mypy strict | Decided | | Encoded in `pyproject.toml` |
+| D-012 | Evaluation conventions (P0.6). Matching: Hungarian on box-center distance, gate = max(5 cm, half the smaller horizontal side). Predicted box: minimum-area rectangle of the XY footprint (hull edges) plus Z extent, so size, yaw and center follow the ground-truth convention. Size error: largest relative error over the three axes. Position error: 3D center distance. Orientation: yaw modulo 180 degrees, skipped for symmetric footprints. Mass: nominal within `mass_tolerance`; a matched object with no predicted mass fails. Medians cover matched objects only; misses count in recall. Ground truth and prediction share the board frame, with no alignment. Dev split by default; `--split test` and `--scene` are explicit. Stability, asset validity and manual steps report `not_measured` until Phase 5. Adds the `trimesh` dependency | Decided | Week 2 | `evaluation/metrics.py`, `evaluation/geometry.py` |
 | D-013 | Benchmark grown from 20 to 24 scenes, supersedes D-009. Four hard scenes were added: s21 to s23 contain a deformable object and s24 is a glossy kitchen stove. Split is now 15 dev and 9 test: easy 6/4, medium 4/2, hard 5/3. Four clean-board scenes: s05, s14, s24 dev and s10 test. Deformable objects are for testing after the MVP: the harness excludes objects whose ground truth has `deformable: true` (counted as excluded, not scored) and scores the rigid objects in the same scenes | Decided | Week 2 | `benchmark/scene_list.yaml`, `evaluation/metrics.py` |
+| D-014 | Deformables, refining D-013: `video2sim eval` leaves out every scene that has an object with `deformable: true` in its ground truth (s21 to s23), not just the object. They are listed in the report header as `scenes_excluded_deformable` and do not enter any metric or count. `--scene ID` still evaluates one on request. The scenes stay in the benchmark for testing after the MVP | Decided | Week 2 | `evaluation/scenes.py`, `cli.py` |
 
 ## 12. After the MVP
 
@@ -386,3 +395,5 @@ In order:
 | 2026-10-22 | P0.1: three of the ten easy scenes use a clean board without the printed grid |
 | 2026-10-22 | D-009: split decided, stratified by tier, clean-board scenes two dev and one test |
 | 2026-10-26 | D-013: benchmark is 24 scenes (15 dev, 9 test) with four clean-board scenes; `benchmark/scene_list.yaml` added |
+| 2026-10-26 | D-014: the harness leaves out whole scenes with a deformable object |
+| 2026-10-26 | P0.6: harness implemented on synthetic fixtures; floor is a constant-box baseline, boxes-from-masks deferred; D-012 records the metric conventions |
