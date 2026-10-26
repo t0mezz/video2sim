@@ -239,7 +239,7 @@ Exit criteria
 
 - [ ] 95% of frames registered on easy and medium scenes
 - [ ] Mean reprojection error 1 px or less
-- [ ] Distance between two known marker points correct within 2% after scaling
+- [ ] Distance between two known marker points correct within 2% after scaling. Only applies to the scenes that are shot on the known grid surface.
 - [ ] Up axis within 2 degrees of the measured table normal
 - [ ] Quality gate rejects the deliberately bad test videos with a useful message
 
