@@ -152,11 +152,11 @@ Tasks
 
 - [x] **P0.2** Record ground truth per scene: weights, sizes, grid positions, orientations.
 
-      Format: `benchmark/README.md`. Evidence: commits e2aa49c, 322b27c, 1e808e7
+      Format: `benchmark/README.md`. Evidence: commits deeade1, d7af32d, acd2d78
 
 - [x] **P0.3** Revise the capture protocol after the first scenes. Where: `docs/capture_protocol.md`.
 
-      Evidence: commit 417cacb
+      Evidence: commit 4768c4e
 
 - [x] **P0.4** Print the scale marker board, measure the tag size with calipers, set the
 
@@ -165,13 +165,13 @@ Tasks
 
 - [x] **P0.5** Stage runner: run folder, manifest, hash-based caching. Where: `src/video2sim/runner.py`.
 
-      Evidence: commit 98a46f4
+      Evidence: commit 3ba4d80
 
 - [x] **P0.6** Evaluation harness that computes the section 2 metrics and writes a JSON and
 
       an HTML report. Run it on a trivial baseline to get a floor. Where:
       `src/video2sim/evaluation/`, command `video2sim eval`. Conventions: D-012, D-014.
-      Evidence: commit 46faede. On the 13 scored dev scenes (63 objects; s21 and s22 left
+      Evidence: commit 9bdcce7. On the 13 scored dev scenes (63 objects; s21 and s22 left
       out as deformable) the oracle scores 100% recall with zero error, and the constant-box
       floor scores 0% recall, so it has no error medians. The floor is a constant box plus a
       noise-perturbed oracle that tests the metrics. The boxes-from-masks baseline (segment,
@@ -184,7 +184,7 @@ Tasks
       released checkpoint: video length, rate limits, cost. SAM 3D license and GPU memory.
       TRELLIS.2 GPU memory. Record decisions D-004 and D-005. Where: `docs/licenses.md`
       Evidence: `docs/licenses.md`, D-004 and D-005 rows in the decision table, commits
-      75f630f and 84e1e72. Open: Meta Model API retention and length limits, Modal and
+      2a3bbe0 and 49730c9. Open: Meta Model API retention and length limits, Modal and
       Baseten terms.
 
 - [ ] **P0.8** One GPU environment that runs every model, as a container image. Where: `Dockerfile`
@@ -193,7 +193,7 @@ Tasks
 
 - [x] **P0.9** Continuous integration: ruff, mypy and pytest on every push.
 
-      Where: `.github/workflows/ci.yml` (Python 3.10 and 3.12). Evidence: commit 9efb031; the
+      Where: `.github/workflows/ci.yml` (Python 3.10 and 3.12). Evidence: commit 70c531d; the
       same four commands pass locally on 2026-10-26 (ruff check, ruff format --check, mypy,
       102 tests). A green run on GitHub has not been checked.
 
