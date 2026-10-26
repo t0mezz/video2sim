@@ -363,9 +363,9 @@ one that supersedes.
 | --- | --- | --- | --- | --- |
 | D-001 | Target simulator: Isaac Sim and Isaac Lab | Assumed | Week 1 | Changing it changes Phase 5 |
 | D-002 | 12 weeks, two engineers, start date not set | Assumed | Week 1 | All durations depend on it |
-| D-003 | Compute: one GPU workstation | Open | Week 1 | GPU memory needs of SAM 3D, SAM 3.1 and TRELLIS.2 not yet checked |
-| D-004 | SAM 3.1: Meta Model API or self-hosted checkpoint | Open | Week 2 | Also decides whether videos may leave the machine |
-| D-005 | Intended use (research or commercial) and the license consequences | Open | Week 2 | See `docs/licenses.md` |
+| D-003 | Compute: no local GPU inference. SAM 3.1 and the language model through the Meta Model API; SAM 3D and TRELLIS.2 checkpoints on a hosted GPU service (Modal or Baseten). Supersedes the single GPU workstation | Assumed | Week 1 | Not yet confirmed that either service can run the checkpoints; see D-015. Not checked: SAM 3D and TRELLIS.2 GPU memory (TRELLIS.2 needs 24 GB or more) |
+| D-004 | SAM 3.1 through the Meta Model API, not self-hosted. Benchmark videos may be sent to hosted APIs (Meta Model API; Modal or Baseten under D-015). Never use the Muse "contributor" modes, which let Meta train on the content | Decided | Week 2 | Retention terms and video length limits still to be read (`docs/licenses.md`). `AGENTS.md` still says to ask before uploading |
+| D-005 | Intended use: research. Licenses are read on that basis; commercial use would need a new check of the SAM License and the NVIDIA terms | Decided | Week 2 | See `docs/licenses.md`. Full license texts still to be read by a human |
 | D-006 | Where benchmark videos and meshes are stored | Open | Week 1 | Not in git; they may show people or private spaces |
 | D-007 | Scale source: printed marker, phone depth as optional cross-check | Assumed | Week 1 | |
 | D-008 | Model for material-class inference | Open | Week 8 | The original brief names the Meta Model API |
@@ -375,6 +375,7 @@ one that supersedes.
 | D-012 | Evaluation conventions (P0.6). Matching: Hungarian on box-center distance, gate = max(5 cm, half the smaller horizontal side). Predicted box: minimum-area rectangle of the XY footprint (hull edges) plus Z extent, so size, yaw and center follow the ground-truth convention. Size error: largest relative error over the three axes. Position error: 3D center distance. Orientation: yaw modulo 180 degrees, skipped for symmetric footprints. Mass: nominal within `mass_tolerance`; a matched object with no predicted mass fails. Medians cover matched objects only; misses count in recall. Ground truth and prediction share the board frame, with no alignment. Dev split by default; `--split test` and `--scene` are explicit. Stability, asset validity and manual steps report `not_measured` until Phase 5. Adds the `trimesh` dependency | Decided | Week 2 | `evaluation/metrics.py`, `evaluation/geometry.py` |
 | D-013 | Benchmark grown from 20 to 24 scenes, supersedes D-009. Four hard scenes were added: s21 to s23 contain a deformable object and s24 is a glossy kitchen stove. Split is now 15 dev and 9 test: easy 6/4, medium 4/2, hard 5/3. Four clean-board scenes: s05, s14, s24 dev and s10 test. Deformable objects are for testing after the MVP: the harness excludes objects whose ground truth has `deformable: true` (counted as excluded, not scored) and scores the rigid objects in the same scenes | Decided | Week 2 | `benchmark/scene_list.yaml`, `evaluation/metrics.py` |
 | D-014 | Deformables, refining D-013: `video2sim eval` leaves out every scene that has an object with `deformable: true` in its ground truth (s21 to s23), not just the object. They are listed in the report header as `scenes_excluded_deformable` and do not enter any metric or count. `--scene ID` still evaluates one on request. The scenes stay in the benchmark for testing after the MVP | Decided | Week 2 | `evaluation/scenes.py`, `cli.py` |
+| D-015 | Shape stage inference: run the SAM 3D Objects and TRELLIS.2 checkpoints on Modal or Baseten GPUs, because the Meta Model API does not offer them. Hope for support, not confirmed | Open | Week 2 | Needs: gated Hugging Face access to SAM 3D, a check that the SAM License and the hosts' terms allow it, a privacy check because images leave the machine (D-004, D-006), and a fallback of boxes from masks if neither host works |
 
 ## 12. After the MVP
 
@@ -402,3 +403,5 @@ In order:
 | 2026-10-26 | D-014: the harness leaves out whole scenes with a deformable object |
 | 2026-10-26 | P0.6: harness implemented on synthetic fixtures; floor is a constant-box baseline, boxes-from-masks deferred; D-012 records the metric conventions |
 | 2026-10-26 | P0.8: Docker image skipped for the MVP and deferred; the matching exit criterion is deferred with it |
+| 2026-10-26 | D-003 changed to hosted inference; D-005 decided as research; D-015 added for shape-stage hosting; D-004 leans to the Meta Model API |
+| 2026-10-26 | D-004 decided: Meta Model API, and videos may be sent to hosted APIs |
