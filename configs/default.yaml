@@ -14,6 +14,8 @@ reconstruction:
   world_frame:
     plane_inlier_threshold_m: 0.004   # TODO(P1.6): tune on dev scenes; a guess, not yet measured
     plane_ransac_iterations: 500      # TODO(P1.6): tune on dev scenes
+    plane_radius_m: 1.0               # TODO(P1.6): points this close to the reference tag fit the table; a guess
+    max_tag_reprojection_px: 3.0      # TODO(P1.6): per-view limit when triangulating tag corners; a guess
     max_tag_scale_spread: 0.03        # TODO(P1.6): tag-to-tag scale disagreement that is flagged; a guess
     max_tag_fit_rms_m: 0.005          # TODO(P1.6): grid-board fit residual, benchmark check only
 

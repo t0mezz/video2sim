@@ -1,0 +1,424 @@
+{
+  "date": "2026-10-27",
+  "git_commit": "92e70ec",
+  "pycolmap": "4.2.1",
+  "board_assumed": "A1 grid, nominal layout, tag edge from capture.marker.tag_size_m",
+  "gates": {
+    "registered_frame_fraction_min": 0.95,
+    "mean_reprojection_error_max_px": 1.0,
+    "marker_distance_error_max": 0.02,
+    "up_axis_error_max_deg": 2.0
+  },
+  "world_frame_config": {
+    "plane_inlier_threshold_m": 0.004,
+    "plane_ransac_iterations": 500,
+    "plane_radius_m": 1.0,
+    "max_tag_reprojection_px": 3.0,
+    "max_tag_scale_spread": 0.03,
+    "max_tag_fit_rms_m": 0.005
+  },
+  "videos": [
+    {
+      "scene": "s01",
+      "video": "video_a",
+      "frames": 54,
+      "registered": 54,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        54
+      ],
+      "sfm_reprojection_px": 0.64,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 48,
+        "1": 19,
+        "2": 45,
+        "3": 31,
+        "4": 40,
+        "5": 35
+      },
+      "tag_reprojection_px": 0.888,
+      "scale_m_per_unit": 0.2906042990536465,
+      "scale_spread_pct": 0.33,
+      "scale_vs_board_pct": 0.3,
+      "board_fit_rms_mm": 1.03,
+      "reference_tag": 0,
+      "plane_inlier_fraction": 0.513,
+      "plane_rms_mm": 1.55,
+      "up_axis_error_deg": 0.053,
+      "max_pair_distance_error_pct": 0.47,
+      "flags": [],
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s01",
+      "video": "video_b",
+      "frames": 28,
+      "registered": 28,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        28
+      ],
+      "sfm_reprojection_px": 0.529,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 27,
+        "1": 14,
+        "2": 14,
+        "3": 19,
+        "4": 16,
+        "5": 17
+      },
+      "tag_reprojection_px": 0.691,
+      "scale_m_per_unit": 0.21898459307364826,
+      "scale_spread_pct": 1.11,
+      "scale_vs_board_pct": 0.25,
+      "board_fit_rms_mm": 1.19,
+      "reference_tag": 0,
+      "plane_inlier_fraction": 0.417,
+      "plane_rms_mm": 1.83,
+      "up_axis_error_deg": 0.199,
+      "max_pair_distance_error_pct": 0.75,
+      "flags": [],
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s02",
+      "video": "video_a",
+      "frames": 108,
+      "registered": 108,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        3,
+        108
+      ],
+      "sfm_reprojection_px": 0.735,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 86,
+        "1": 79,
+        "2": 89,
+        "3": 54,
+        "4": 94,
+        "5": 98
+      },
+      "tag_reprojection_px": 0.807,
+      "scale_m_per_unit": 0.28584264180722785,
+      "scale_spread_pct": 0.32,
+      "scale_vs_board_pct": 0.29,
+      "board_fit_rms_mm": 0.98,
+      "reference_tag": 5,
+      "plane_inlier_fraction": 0.542,
+      "plane_rms_mm": 1.54,
+      "up_axis_error_deg": 0.076,
+      "max_pair_distance_error_pct": 0.67,
+      "flags": [
+        "sfm_fragmented"
+      ],
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s02",
+      "video": "video_b",
+      "frames": 30,
+      "registered": 30,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        30
+      ],
+      "sfm_reprojection_px": 0.618,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 17,
+        "1": 14,
+        "2": 15,
+        "3": 20,
+        "4": 30,
+        "5": 25
+      },
+      "tag_reprojection_px": 0.806,
+      "scale_m_per_unit": 0.245534539519292,
+      "scale_spread_pct": 0.8,
+      "scale_vs_board_pct": 0.11,
+      "board_fit_rms_mm": 1.26,
+      "reference_tag": 4,
+      "plane_inlier_fraction": 0.505,
+      "plane_rms_mm": 1.65,
+      "up_axis_error_deg": 0.04,
+      "max_pair_distance_error_pct": 0.69,
+      "flags": [],
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s03",
+      "video": "video_a",
+      "frames": 122,
+      "registered": 122,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        3,
+        122
+      ],
+      "sfm_reprojection_px": 0.575,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 95,
+        "1": 88,
+        "2": 85,
+        "3": 98,
+        "4": 100,
+        "5": 100
+      },
+      "tag_reprojection_px": 0.787,
+      "scale_m_per_unit": 0.27330602554273464,
+      "scale_spread_pct": 0.26,
+      "scale_vs_board_pct": 0.08,
+      "board_fit_rms_mm": 1.08,
+      "reference_tag": 4,
+      "plane_inlier_fraction": 0.804,
+      "plane_rms_mm": 1.53,
+      "up_axis_error_deg": 0.019,
+      "max_pair_distance_error_pct": 0.31,
+      "flags": [
+        "sfm_fragmented"
+      ],
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s03",
+      "video": "video_b",
+      "frames": 45,
+      "registered": 45,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        45
+      ],
+      "sfm_reprojection_px": 0.555,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 28,
+        "1": 34,
+        "2": 37,
+        "3": 35,
+        "4": 41,
+        "5": 45
+      },
+      "tag_reprojection_px": 0.663,
+      "scale_m_per_unit": 0.24337445560448417,
+      "scale_spread_pct": 0.21,
+      "scale_vs_board_pct": 0.18,
+      "board_fit_rms_mm": 1.2,
+      "reference_tag": 5,
+      "plane_inlier_fraction": 0.784,
+      "plane_rms_mm": 1.67,
+      "up_axis_error_deg": 0.032,
+      "max_pair_distance_error_pct": 0.36,
+      "flags": [],
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s04",
+      "video": "video_a",
+      "frames": 149,
+      "registered": 149,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        149
+      ],
+      "sfm_reprojection_px": 0.693,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 76,
+        "1": 94,
+        "2": 103,
+        "3": 102,
+        "4": 101,
+        "5": 88
+      },
+      "tag_reprojection_px": 0.842,
+      "scale_m_per_unit": 0.3224383662316995,
+      "scale_spread_pct": 0.37,
+      "scale_vs_board_pct": 0.24,
+      "board_fit_rms_mm": 1.13,
+      "reference_tag": 2,
+      "plane_inlier_fraction": 0.498,
+      "plane_rms_mm": 1.56,
+      "up_axis_error_deg": 0.03,
+      "max_pair_distance_error_pct": 0.55,
+      "flags": [],
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s04",
+      "video": "video_b",
+      "frames": 45,
+      "registered": 45,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        45
+      ],
+      "sfm_reprojection_px": 0.714,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 35,
+        "1": 13,
+        "2": 18,
+        "3": 27,
+        "4": 39,
+        "5": 20
+      },
+      "tag_reprojection_px": 0.598,
+      "scale_m_per_unit": 0.14987597596857377,
+      "scale_spread_pct": 0.23,
+      "scale_vs_board_pct": 0.12,
+      "board_fit_rms_mm": 1.17,
+      "reference_tag": 4,
+      "plane_inlier_fraction": 0.493,
+      "plane_rms_mm": 1.58,
+      "up_axis_error_deg": 0.044,
+      "max_pair_distance_error_pct": 0.43,
+      "flags": [],
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s06",
+      "video": "video_b",
+      "frames": 71,
+      "registered": 71,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        71
+      ],
+      "sfm_reprojection_px": 0.622,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 34,
+        "1": 35,
+        "2": 61,
+        "3": 62,
+        "4": 58,
+        "5": 70
+      },
+      "tag_reprojection_px": 0.937,
+      "scale_m_per_unit": 0.13530806314217278,
+      "scale_spread_pct": 0.52,
+      "scale_vs_board_pct": 0.46,
+      "board_fit_rms_mm": 3.05,
+      "reference_tag": 5,
+      "plane_inlier_fraction": 0.356,
+      "plane_rms_mm": 2.0,
+      "up_axis_error_deg": 0.35,
+      "max_pair_distance_error_pct": 0.75,
+      "flags": [],
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    }
+  ]
+}

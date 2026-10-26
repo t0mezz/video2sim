@@ -223,14 +223,25 @@ Tasks
       yet. The VGGT and MASt3R comparison and the GPU build are deferred, see section 12. Not
       ticked: the comparison did not happen.
 
-- [ ] **P1.2** Metric scale from the marker board: detect tags, compare their measured spacing
+- [x] **P1.2** Metric scale from the marker board: detect tags, compare their measured spacing
 
       with the known printed size, scale the reconstruction. Accept phone depth or LiDAR as an
       optional cross-check after the MVP.
 
-- [ ] **P1.3** Fit the table plane (RANSAC), take its normal as the up axis, put the origin on
+      Done with the printed tag edge instead of the spacing, so one or two arbitrarily placed
+      tags are enough; the grid board's known spacing is only a check on grid scenes. Evidence:
+      `benchmark/results/p1_world_frame_dev.json` (9 dev grid videos: scale within 0.5% of the
+      board scale, tag pair distances within 0.75%); code in commits b65dfb4, 72215b7, 540c39e,
+      92e70ec. Not measured: clean-board scenes, caliper-measured tag edge and layout (the
+      board is the nominal A1 layout).
+
+- [x] **P1.3** Fit the table plane (RANSAC), take its normal as the up axis, put the origin on
 
       the marker board.
+
+      The origin is on a reference tag (the one seen in most frames). Evidence: same file; up
+      axis within 0.35 degrees of the board normal on the 9 dev grid videos. The board normal
+      comes from the tag corners, so it is not fully independent of the plane fit.
 
 - [ ] **P1.4** Quality gate and frame sampling: blur and exposure filter, camera coverage,
 
@@ -516,3 +527,4 @@ In order:
 | 2026-10-26 | D-005: license texts read; research use, TRELLIS.2 blocks commercial use through the NVIDIA renderer licenses |
 | 2026-10-26 | P0.9: green CI run confirmed on GitHub; Phase 0 gate passed with the container criterion deferred; Phase 1 is the current focus |
 | 2026-10-26 | D-016: pycolmap on CPU is the MVP reconstruction back end; VGGT, MASt3R and the CUDA build moved to section 12 |
+| 2026-10-27 | P1.2, P1.3: scale from tag edge and world frame on a reference tag pass on 9 dev grid videos; results in `benchmark/results/p1_world_frame_dev.json` |

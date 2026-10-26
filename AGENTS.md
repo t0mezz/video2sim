@@ -66,6 +66,10 @@ pytest set on every push, on Python 3.10 and 3.12, with `uv sync --locked`. A ch
 touches dependencies commits the updated `uv.lock`. To reproduce the 3.10 run locally:
 `uv run --python 3.10 --isolated mypy`.
 
+`python benchmark/eval_world_frame.py scene/video ... --out results.json` runs pycolmap, tag
+scale and the world frame on grid-board scenes and checks them against the printed board and
+`gates.reconstruction` (P1.2, P1.3). Results are in `benchmark/results/`.
+
 Commands that arrive with their task: `video2sim run` (P5.5).
 Never document a command that does not exist. When you add one, add it here in the same
 change.
