@@ -138,7 +138,8 @@ Tasks
 - [x] **P0.4** Print the scale marker board, measure the tag size with calipers, set the
       marker config. Where: `configs/default.yaml`. Evidence: tag 100 mm verified by calipers
       (reported by the user), `capture.marker` set in `configs/default.yaml`
-- [ ] **P0.5** Stage runner: run folder, manifest, hash-based caching. Where: `src/video2sim/runner.py`
+- [x] **P0.5** Stage runner: run folder, manifest, hash-based caching. Where: `src/video2sim/runner.py`.
+      Evidence: commit 98a46f4
 - [ ] **P0.6** Evaluation harness that computes the section 2 metrics and writes a JSON and
       an HTML report. Run it on a trivial baseline (boxes from masks) to get a floor.
       Where: `src/video2sim/evaluation/`
