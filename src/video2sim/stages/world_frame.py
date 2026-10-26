@@ -1,13 +1,18 @@
-"""Metric scale and world frame from the marker board (P1.2, P1.3).
+"""Metric scale and world frame from marker tags (P1.2, P1.3).
 
 Pure geometry on NumPy arrays; it does not detect tags or run a reconstruction. The caller
 supplies the 3D corners of the detected tags in the reconstruction frame, which has an arbitrary
-scale and orientation, plus the table points. Detection and triangulation arrive with P1.1.
+scale and orientation, plus the table points.
 
-Frames: ``recon`` is the reconstruction frame, ``board`` is the printed board (X along the long
-edge, Y up the short edge, Z out of the sheet, origin at the grid corner), ``world`` is +Z up
-with the origin on the board. Scale is returned as a number and applied to geometry once, by
-``apply_scale``; no transform returned here contains it.
+Production use is one or two tags placed anywhere, so only the printed tag edge is known:
+``estimate_scale`` reads scale from the tag edges and ``world_from_tag`` puts the world origin
+on a reference tag. The benchmark grid board additionally has known tag positions;
+``fit_board`` uses them as an independent check and is not part of the pipeline.
+
+Frames: ``recon`` is the reconstruction frame, ``board`` is the printed grid board (X along the
+long edge, Y up the short edge, Z out of the sheet, origin at the grid corner), ``world`` is +Z
+up with the origin on the reference tag or board. Scale is returned as a number and applied to
+geometry once, by ``apply_scale``; no transform returned here contains it.
 """
 
 from __future__ import annotations
@@ -90,7 +95,10 @@ def fit_similarity(src: F64, dst: F64) -> SimilarityFit:
 
 
 def fit_board(layout: BoardLayout, detected_corners_recon: dict[int, F64]) -> SimilarityFit:
-    """Fit the board to tag corners triangulated in the reconstruction frame (P1.2).
+    """Fit the grid board to tag corners triangulated in the reconstruction frame.
+
+    Grid benchmark scenes only: it needs the known tag positions, so it is a check on
+    ``estimate_scale`` there and not part of the pipeline.
 
     ``detected_corners_recon`` maps tag id to a (4, 3) array in the layout's corner order.
     Ids that are not on the board are an error rather than being ignored, because a wrong id
@@ -105,6 +113,70 @@ def fit_board(layout: BoardLayout, detected_corners_recon: dict[int, F64]) -> Si
     src = np.concatenate([detected_corners_recon[i] for i in ids])
     dst = np.concatenate([layout.tag_corners_m[i] for i in ids])
     return fit_similarity(src, dst)
+
+
+@dataclass(frozen=True)
+class ScaleEstimate:
+    """Metric scale from tag edges. ``scale`` multiplies reconstruction units to give meters."""
+
+    scale: float
+    per_tag: dict[int, float]
+    spread: float  # (max - min) / median over tags; 0 with a single tag
+    disagree: bool  # tags disagree by more than the limit; surfaced in the QA report
+
+
+def estimate_scale(
+    corners_recon: dict[int, F64], tag_edge_m: float, max_spread: float
+) -> ScaleEstimate:
+    """Scale from the printed tag edge (P1.2), one estimate per tag, median over tags.
+
+    Works with a single tag. With two or more, a spread above ``max_spread`` sets ``disagree``
+    instead of dropping a tag, because the pipeline must not quietly pick one.
+    """
+    if not corners_recon:
+        raise ValueError("need at least one tag")
+    per_tag: dict[int, float] = {}
+    for tag_id, c in corners_recon.items():
+        edges = np.linalg.norm(c - np.roll(c, -1, axis=0), axis=1)
+        mean_edge = float(edges.mean())
+        if mean_edge <= 0.0:
+            raise ValueError(f"tag {tag_id} has zero size in the reconstruction")
+        per_tag[tag_id] = tag_edge_m / mean_edge
+    values = np.array(list(per_tag.values()))
+    median = float(np.median(values))
+    spread = float((values.max() - values.min()) / median) if len(values) > 1 else 0.0
+    return ScaleEstimate(median, per_tag, spread, spread > max_spread)
+
+
+def reference_tag_id(n_views: dict[int, int]) -> int:
+    """The tag that carries the world origin: seen in the most frames, lowest id on a tie."""
+    if not n_views:
+        raise ValueError("need at least one tag")
+    return min(n_views, key=lambda i: (-n_views[i], i))
+
+
+def world_from_tag(tag_corners_scaled: F64, table: Plane) -> F64:
+    """World frame on a reference tag (P1.3). Returns ``T_world_from_scaled_recon``.
+
+    Up is the table normal. The origin is the tag centre dropped onto the table plane, and
+    world X is the tag's lower-left to lower-right edge projected into the plane. Corners must
+    already be scaled with ``apply_scale``, in the layout's corner order, and ``table`` must be
+    fitted on points in the same scaled frame.
+    """
+    up = np.asarray(table.normal, dtype=np.float64)
+    x_edge = tag_corners_scaled[1] - tag_corners_scaled[0]
+    x_axis = x_edge - (x_edge @ up) * up
+    norm = float(np.linalg.norm(x_axis))
+    if norm < 1e-9:
+        raise ValueError("tag edge is parallel to the table normal; tag is not on the table")
+    x_axis /= norm
+    rot_recon_from_world = np.column_stack([x_axis, np.cross(up, x_axis), up])
+    centre = tag_corners_scaled.mean(axis=0)
+    origin = centre - (up @ centre - table.offset_m) * up
+    t = np.eye(4)
+    t[:3, :3] = rot_recon_from_world.T
+    t[:3, 3] = -rot_recon_from_world.T @ origin
+    return t
 
 
 def apply_scale(points: F64, scale: float) -> F64:

@@ -13,7 +13,7 @@ from video2sim.stages.marker_detection import (
     detect_tags,
     triangulate_tag_corners,
 )
-from video2sim.stages.world_frame import BoardLayout, apply_scale, fit_board
+from video2sim.stages.world_frame import BoardLayout, apply_scale, estimate_scale, fit_board
 
 F64 = NDArray[np.float64]
 
@@ -144,3 +144,17 @@ def test_outlier_detection_drops_that_tag(layout: BoardLayout) -> None:
     views[0] = TagView(K, np.zeros(0), views[0].T_world_from_camera, bad)
     tri = triangulate_tag_corners(views, max_reprojection_px=1.0)
     assert 2 not in tri.corners and 0 in tri.corners
+
+
+def test_single_tag_gives_scale_without_any_board_layout() -> None:
+    """Production case: one tag, only its printed edge known. Within the 2% gate."""
+    wrong_scale = 3.7
+    views = []
+    for p, v in zip(POSES, _views(_board_texture(), POSES), strict=True):
+        q = p.copy()
+        q[:3, 3] *= wrong_scale
+        views.append(TagView(K, np.zeros(0), q, {3: v.corners_px[3]}))
+    tri = triangulate_tag_corners(views)
+    assert list(tri.corners) == [3]
+    est = estimate_scale(tri.corners, tag_edge_m=TAG_MM / 1000, max_spread=0.03)
+    assert abs(est.scale * wrong_scale - 1.0) < 0.02
