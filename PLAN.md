@@ -219,6 +219,10 @@ Tasks
       COLMAP-style SfM with MVS against a feed-forward model such as VGGT or MASt3R. Judge on
       pose accuracy, runtime and failures on low-texture tables. Keep one and a fallback.
 
+      Decision D-016 (2026-10-26): pycolmap on CPU is the back end for the MVP, with no fallback
+      yet. The VGGT and MASt3R comparison and the GPU build are deferred, see section 12. Not
+      ticked: the comparison did not happen.
+
 - [ ] **P1.2** Metric scale from the marker board: detect tags, compare their measured spacing
 
       with the known printed size, scale the reconstruction. Accept phone depth or LiDAR as an
@@ -465,6 +469,7 @@ one that supersedes.
 | D-013 | Benchmark grown from 20 to 24 scenes, supersedes D-009. Four hard scenes were added: s21 to s23 contain a deformable object and s24 is a glossy kitchen stove. Split is now 15 dev and 9 test: easy 6/4, medium 4/2, hard 5/3. Four clean-board scenes: s05, s14, s24 dev and s10 test. Deformable objects are for testing after the MVP: the harness excludes objects whose ground truth has `deformable: true` (counted as excluded, not scored) and scores the rigid objects in the same scenes | Decided | Week 2 | `benchmark/scene_list.yaml`, `evaluation/metrics.py` |
 | D-014 | Deformables, refining D-013: `video2sim eval` leaves out every scene that has an object with `deformable: true` in its ground truth (s21 to s23), not just the object. They are listed in the report header as `scenes_excluded_deformable` and do not enter any metric or count. `--scene ID` still evaluates one on request. The scenes stay in the benchmark for testing after the MVP | Decided | Week 2 | `evaluation/scenes.py`, `cli.py` |
 | D-015 | Shape stage inference: run the SAM 3D Objects and TRELLIS.2 checkpoints on Modal or Baseten GPUs, because the Meta Model API does not offer them. Hope for support, not confirmed | Open | Week 2 | Terms of Modal and Baseten read 2026-10-26: neither trains on customer data, neither forbids it, both leave the model licenses in force. SAM 3D access granted 2026-10-26. Needs: GPU credits on Modal or Baseten, a test run of a checkpoint on one host, and a fallback of boxes from masks if neither host works |
+| D-016 | Reconstruction back end for the MVP: pycolmap on CPU (`reconstruction.backend: pycolmap`). Evidence 2026-10-26, mean reprojection error and frames registered: s01_b 0.50 px 28/28, s02_a 0.72 px 108/108, s05_b 0.54 px 20/20, s10_a 0.46 px 187/187, s19_a 0.58 px 193/193, s23_a 0.47 px 68/68, at 3 fps and 1280 px on an Apple M4 CPU, 3 s to 281 s per video. Pose and scale accuracy not yet measured. VGGT, MASt3R and `pycolmap-cuda12` are deferred past the MVP | Decided | Week 3 | Run was in a scratchpad script, not committed. `pycolmap-cuda12` is a separate Linux-only package with the same module name, so it would be a mutually exclusive extra |
 
 ## 12. After the MVP
 
@@ -490,6 +495,11 @@ In order:
 
    replacing the material-class guess.
 
+6. **Reconstruction back ends (from P1.1).** Compare VGGT (and MASt3R) with pycolmap on the
+   benchmark for tag-scale and up-axis error and on failures on low-texture tables, and check
+   that `pycolmap-cuda12` runs and how much faster it is on a GPU. Both need a GPU host,
+   weight downloads and license decisions (`docs/licenses.md`).
+
 ## 13. Changelog
 
 | Date | Change |
@@ -505,3 +515,4 @@ In order:
 | 2026-10-26 | D-004 decided: Meta Model API, and videos may be sent to hosted APIs |
 | 2026-10-26 | D-005: license texts read; research use, TRELLIS.2 blocks commercial use through the NVIDIA renderer licenses |
 | 2026-10-26 | P0.9: green CI run confirmed on GitHub; Phase 0 gate passed with the container criterion deferred; Phase 1 is the current focus |
+| 2026-10-26 | D-016: pycolmap on CPU is the MVP reconstruction back end; VGGT, MASt3R and the CUDA build moved to section 12 |

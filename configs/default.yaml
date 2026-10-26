@@ -10,7 +10,7 @@ capture:
     tag_size_m: 0.100          # printed tag edge length, verified with calipers
 
 reconstruction:
-  backend: null                # TODO(P1.1): chosen in the Phase 1 comparison
+  backend: pycolmap            # CPU SfM, decision D-016; VGGT and CUDA build deferred past the MVP
   world_frame:
     plane_inlier_threshold_m: 0.004   # TODO(P1.6): tune on dev scenes; a guess, not yet measured
     plane_ransac_iterations: 500      # TODO(P1.6): tune on dev scenes
