@@ -365,7 +365,7 @@ one that supersedes.
 | D-002 | 12 weeks, two engineers, start date not set | Assumed | Week 1 | All durations depend on it |
 | D-003 | Compute: no local GPU inference. SAM 3.1 and the language model through the Meta Model API; SAM 3D and TRELLIS.2 checkpoints on a hosted GPU service (Modal or Baseten). Supersedes the single GPU workstation | Assumed | Week 1 | Not yet confirmed that either service can run the checkpoints; see D-015. Not checked: SAM 3D and TRELLIS.2 GPU memory (TRELLIS.2 needs 24 GB or more) |
 | D-004 | SAM 3.1 through the Meta Model API, not self-hosted. Benchmark videos may be sent to hosted APIs (Meta Model API; Modal or Baseten under D-015). Never use the Muse "contributor" modes, which let Meta train on the content | Decided | Week 2 | Retention terms and video length limits still to be read (`docs/licenses.md`). `AGENTS.md` still says to ask before uploading |
-| D-005 | Intended use: research. Licenses are read on that basis; commercial use would need a new check of the SAM License and the NVIDIA terms | Decided | Week 2 | See `docs/licenses.md`. Full license texts still to be read by a human |
+| D-005 | Intended use: research. The SAM License has no research-only or commercial wording and asks for acknowledgment in publications. `nvdiffrast` and `nvdiffrec`, which TRELLIS.2 needs, allow research or evaluation only, so commercial use is blocked until they are replaced or relicensed | Decided | Week 2 | Texts read 2026-10-26, see `docs/licenses.md`. Still open: official Meta Model API terms and the Modal or Baseten terms |
 | D-006 | Where benchmark videos and meshes are stored | Open | Week 1 | Not in git; they may show people or private spaces |
 | D-007 | Scale source: printed marker, phone depth as optional cross-check | Assumed | Week 1 | |
 | D-008 | Model for material-class inference | Open | Week 8 | The original brief names the Meta Model API |
@@ -405,3 +405,4 @@ In order:
 | 2026-10-26 | P0.8: Docker image skipped for the MVP and deferred; the matching exit criterion is deferred with it |
 | 2026-10-26 | D-003 changed to hosted inference; D-005 decided as research; D-015 added for shape-stage hosting; D-004 leans to the Meta Model API |
 | 2026-10-26 | D-004 decided: Meta Model API, and videos may be sent to hosted APIs |
+| 2026-10-26 | D-005: license texts read; research use, TRELLIS.2 blocks commercial use through the NVIDIA renderer licenses |
