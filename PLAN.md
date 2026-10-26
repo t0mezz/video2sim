@@ -125,12 +125,14 @@ access, and start reading the model licenses (P0.7).
 
 Tasks
 
-- [ ] **P0.1** Capture the benchmark: 20 scenes, about 60 objects, two camera paths each.
-      Tiers: 10 easy, 6 medium, 4 hard. Prefer objects with published meshes.
-      Three of the easy scenes use a clean board (production tags only, no printed grid) with
-      object positions measured by tape, to check that the grid texture does not flatter
+- [ ] **P0.1** Capture the benchmark: 24 scenes, two camera paths each.
+      Tiers: 10 easy, 6 medium, 8 hard (D-013). Prefer objects with published meshes.
+      Four scenes use a clean board (production tags only, no printed grid) with object
+      positions measured by tape, to check that the grid texture does not flatter
       registration. The rest use the benchmark grid board. Same tag IDs and size on both.
-      Where: `benchmark/scenes/` (not in git)
+      Where: `benchmark/scenes/` (not in git), record in `benchmark/scene_list.yaml`.
+      Status 2026-10-26: all 24 scenes captured per the scene list; s01 to s23 are on disk,
+      s24 and the ground truth files are still to be imported. Tick when all are in place.
 - [x] **P0.2** Record ground truth per scene: weights, sizes, grid positions, orientations.
       Format: `benchmark/README.md`. Evidence: commits e2aa49c, 322b27c, 1e808e7
 - [x] **P0.3** Revise the capture protocol after the first scenes. Where: `docs/capture_protocol.md`.
@@ -151,7 +153,7 @@ Tasks
 
 Exit criteria
 
-- [ ] 20 scenes captured, ground truth stored next to each
+- [ ] 24 scenes captured, ground truth stored next to each
 - [ ] Evaluation harness produces the full metric report on the baseline
 - [ ] Written decisions on SAM 3.1 hosting (D-004) and on model licensing (D-005)
 - [ ] Container image runs all models
@@ -357,6 +359,7 @@ one that supersedes.
 | D-009 | Benchmark split: 12 dev scenes, 8 test scenes, stratified by tier: easy 6/4, medium 4/2, hard 2/2 (dev/test). Of the three clean-board easy scenes, two are dev and one is test | Decided | Week 1 | Test is run only at phase gates |
 | D-010 | Object frame origin at the volume centroid; meshes in meters | Decided | | Encoded in `schemas.py` |
 | D-011 | Python 3.10+, uv, pydantic for contracts, ruff and mypy strict | Decided | | Encoded in `pyproject.toml` |
+| D-013 | Benchmark grown from 20 to 24 scenes, supersedes D-009. Four hard scenes were added: s21 to s23 contain a deformable object and s24 is a glossy kitchen stove. Split is now 15 dev and 9 test: easy 6/4, medium 4/2, hard 5/3. Four clean-board scenes: s05, s14, s24 dev and s10 test. Deformable objects are for testing after the MVP: the harness excludes objects whose ground truth has `deformable: true` (counted as excluded, not scored) and scores the rigid objects in the same scenes | Decided | Week 2 | `benchmark/scene_list.yaml`, `evaluation/metrics.py` |
 
 ## 12. After the MVP
 
@@ -380,3 +383,4 @@ In order:
 | 2026-10-22 | First version, from the roadmap document |
 | 2026-10-22 | P0.1: three of the ten easy scenes use a clean board without the printed grid |
 | 2026-10-22 | D-009: split decided, stratified by tier, clean-board scenes two dev and one test |
+| 2026-10-26 | D-013: benchmark is 24 scenes (15 dev, 9 test) with four clean-board scenes; `benchmark/scene_list.yaml` added |

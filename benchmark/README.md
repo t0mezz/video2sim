@@ -1,6 +1,6 @@
 # Benchmark
 
-20 tabletop scenes, about 60 objects, with ground truth. This is how we know whether a change
+24 tabletop scenes, with ground truth. This is how we know whether a change
 helped. Videos and meshes are large and may show people or private spaces, so they are
 **not in git**; `benchmark/scenes/` is ignored. Where they live is decision D-006 in PLAN.md.
 
@@ -10,23 +10,38 @@ helped. Videos and meshes are large and may show people or private spaces, so th
 | --- | --- | --- |
 | easy | 10 | Matte, textured, well separated objects |
 | medium | 6 | Clutter and partial occlusion |
-| hard | 4 | Reflective, thin or dark objects |
+| hard | 8 | Reflective, thin, dark or deformable (post-MVP) objects, glossy surfaces |
+
+`benchmark/scene_list.yaml` is the record of what was captured: one entry per scene with
+`tier`, `split`, `board`, `environment` (uni desk, kitchen or living room), `done` and free
+notes. It is tracked in git; the videos are not. Keep it in step with the scenes sheet.
 
 Prefer objects with published meshes (the YCB set, for example) because their shape ground
 truth is free. Measure the others with calipers and a kitchen scale.
 
 ## Splits
 
-12 **dev** scenes and 8 **test** scenes (D-009), stratified by tier:
+15 **dev** scenes and 9 **test** scenes (D-013, which supersedes D-009), stratified by tier:
 
 | Tier | Dev | Test |
 | --- | --- | --- |
 | easy | 6 | 4 |
 | medium | 4 | 2 |
-| hard | 2 | 2 |
+| hard | 5 | 3 |
 
-Three of the easy scenes use a clean board (production tags only, no printed grid): two in dev,
-one in test. Boards are generated with `benchmark/make_board.py`.
+Four scenes use a clean board (production tags only, no printed grid): s05 (easy, dev), s10
+(easy, test), s14 (medium, dev) and s24 (hard, dev). Boards are generated with
+`benchmark/make_board.py`.
+
+Scenes with known deviations from `docs/capture_protocol.md`:
+
+| Scene | Deviation |
+| --- | --- |
+| s05 | Clean board. Positions are measured from marker 0 (bottom left), which is x = 0, y = 0 |
+| s06, s24 | No full orbit was possible |
+| s24 | Glossy stove surface, and a second marker on the wall |
+| s12 | The video is blurred |
+| s21 to s23 | Contain a deformable object. Deformables are post-MVP: the harness leaves them out and still scores the rigid objects |
 
 Tune and debug on dev. Run test only at phase gates, and never tune on it. If a result only
 holds on dev, it does not count.
@@ -39,7 +54,12 @@ benchmark/scenes/<scene_id>/
   video_b.mp4          second path, different from the first
   ground_truth.json    see below
   notes.md             anything odd about the capture
+  alt_lighting/ alt_path/ alt_closeup/   optional extra captures; the harness ignores them
 ```
+
+The folder name is the `scene_id` of the scenes sheet and of `ground_truth.json`, and the
+harness looks scenes up by it. `scene_list.yaml` must use the same ids (it currently calls
+s21 to s23 `s21_deformable` and so on).
 
 Capture each scene on the printed grid with the scale marker in view (see
 `docs/capture_protocol.md`). The grid exists only to produce position and orientation ground
