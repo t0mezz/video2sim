@@ -241,3 +241,94 @@ def solve_world_frame(
     return WorldFrameResult(
         est, ref, plane, t, tri.corners, centers, tri.n_views, tri.mean_reprojection_px, flags
     )
+
+
+@dataclass(frozen=True)
+class ReconstructionLimits:
+    """Gate numbers: ``gates.reconstruction`` in targets.yaml plus ``reconstruction.quality``."""
+
+    registered_fraction_min: float
+    mean_reprojection_error_max_px: float
+    min_azimuth_coverage_deg: float
+
+    @classmethod
+    def from_configs(cls, cfg: dict[str, Any], targets: dict[str, Any]) -> ReconstructionLimits:
+        gates = targets["gates"]["reconstruction"]
+        return cls(
+            registered_fraction_min=float(gates["registered_frame_fraction_min"]),
+            mean_reprojection_error_max_px=float(gates["mean_reprojection_error_max_px"]),
+            min_azimuth_coverage_deg=float(
+                cfg["reconstruction"]["quality"]["min_azimuth_coverage_deg"]
+            ),
+        )
+
+
+@dataclass(frozen=True)
+class CameraCoverage:
+    azimuth_deg: float  # 360 minus the largest empty gap in camera bearing around the marker
+    elevation_min_deg: float
+    elevation_max_deg: float
+
+
+def camera_coverage(model: SfmModel, world: WorldFrameResult) -> CameraCoverage:
+    """How much of the table the camera path sees, from camera positions in the world frame.
+
+    Azimuth is the bearing of each camera around the world Z axis through the reference tag;
+    coverage is 360 degrees minus the largest gap between neighbouring bearings, so a path with
+    a hole in it counts as less than a path that is one continuous arc of the same length.
+    """
+    t = world.T_world_from_scaled_recon
+    centers = np.array(
+        [
+            t[:3, :3] @ (im.T_world_from_camera[:3, 3] * world.scale.scale) + t[:3, 3]
+            for im in model.images
+        ]
+    )
+    az = np.sort(np.degrees(np.arctan2(centers[:, 1], centers[:, 0])))
+    gaps = np.diff(np.concatenate([az, [az[0] + 360.0]]))
+    elev = np.degrees(np.arctan2(centers[:, 2], np.linalg.norm(centers[:, :2], axis=1)))
+    return CameraCoverage(float(360.0 - gaps.max()), float(elev.min()), float(elev.max()))
+
+
+def check_reconstruction(
+    model: SfmModel, world: WorldFrameResult | None, limits: ReconstructionLimits
+) -> list[str]:
+    """One specific, actionable message per failed check; empty when the video passes.
+
+    ``world`` is ``None`` when no marker could be triangulated.
+    """
+    out = []
+    frac = model.registered_fraction
+    if frac < limits.registered_fraction_min:
+        split = (
+            f" The video fell apart into {len(model.model_sizes)} disconnected pieces; the "
+            "largest holds " + f"{len(model.images)} of {model.n_input_frames} frames."
+            if model.fragmented
+            else ""
+        )
+        out.append(
+            f"Only {100 * frac:.0f}% of frames could be placed in 3D (need "
+            f"{100 * limits.registered_fraction_min:.0f}%).{split} Usual causes are fast movement, "
+            "motion blur, or a plain table with little texture. Film slower, keep the views "
+            "overlapping, and put some textured items on the table."
+        )
+    if model.mean_reprojection_px > limits.mean_reprojection_error_max_px:
+        out.append(
+            f"Camera tracking is inaccurate (mean error {model.mean_reprojection_px:.2f} px, "
+            f"limit {limits.mean_reprojection_error_max_px:.1f} px). The video is probably "
+            "blurred or the scene moved during filming."
+        )
+    if world is None:
+        out.append(
+            "The scale marker could not be located in 3D. Keep the printed marker flat on the "
+            "table and in view from several directions."
+        )
+    else:
+        cov = camera_coverage(model, world)
+        if cov.azimuth_deg < limits.min_azimuth_coverage_deg:
+            out.append(
+                f"The camera path covers only {cov.azimuth_deg:.0f} degrees around the table "
+                f"(need {limits.min_azimuth_coverage_deg:.0f}). Walk further around the objects "
+                "so each is seen from several directions."
+            )
+    return out

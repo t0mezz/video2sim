@@ -6,9 +6,12 @@ from numpy.typing import NDArray
 
 from video2sim.stages.marker_detection import TagView
 from video2sim.stages.reconstruction import (
+    ReconstructionLimits,
     SfmImage,
     SfmModel,
     WorldFrameConfig,
+    camera_coverage,
+    check_reconstruction,
     solve_world_frame,
 )
 
@@ -126,3 +129,51 @@ def test_sfm_model_reports_fragmentation_and_registered_fraction() -> None:
     split = SfmModel([img] * 95, np.zeros((0, 3)), 0.5, 100, [3, 95])
     assert whole.registered_fraction == 0.95 and not whole.fragmented
     assert split.fragmented
+
+
+def _model_from(
+    views: list[TagView], n_input: int, sizes: list[int], reproj: float = 0.5
+) -> SfmModel:
+    images = [
+        SfmImage(f"{i}.png", v.K, v.distortion, v.T_world_from_camera) for i, v in enumerate(views)
+    ]
+    return SfmModel(images, np.zeros((0, 3)), reproj, n_input, sizes)
+
+
+LIMITS = ReconstructionLimits(
+    registered_fraction_min=0.95, mean_reprojection_error_max_px=1.0, min_azimuth_coverage_deg=60
+)
+
+
+def test_good_reconstruction_passes_the_gate() -> None:
+    views, points = _scene(3.0)
+    world = solve_world_frame(views, points, CFG)
+    model = _model_from(views, len(views), [len(views)])
+    cov = camera_coverage(model, world)
+    assert cov.azimuth_deg > 60
+    assert check_reconstruction(model, world, LIMITS) == []
+
+
+def test_low_registration_message_names_fragmentation() -> None:
+    views, points = _scene(3.0)
+    world = solve_world_frame(views, points, CFG)
+    model = _model_from(views, 20, [3, len(views)])
+    reasons = check_reconstruction(model, world, LIMITS)
+    assert len(reasons) == 1 and "20%" in reasons[0] and "2 disconnected pieces" in reasons[0]
+
+
+def test_reprojection_and_missing_marker_messages() -> None:
+    views, _ = _scene(3.0)
+    model = _model_from(views, len(views), [len(views)], reproj=2.4)
+    reasons = check_reconstruction(model, None, LIMITS)
+    assert any("2.40 px" in r for r in reasons)
+    assert any("marker could not be located" in r for r in reasons)
+
+
+def test_narrow_camera_path_is_reported() -> None:
+    views, points = _scene(3.0)
+    world = solve_world_frame(views, points, CFG)
+    model = _model_from(views, len(views), [len(views)])
+    strict = ReconstructionLimits(0.95, 1.0, min_azimuth_coverage_deg=359)
+    reasons = check_reconstruction(model, world, strict)
+    assert len(reasons) == 1 and "degrees around the table" in reasons[0]

@@ -69,6 +69,8 @@ touches dependencies commits the updated `uv.lock`. To reproduce the 3.10 run lo
 `python benchmark/eval_world_frame.py scene/video ... --out results.json` runs pycolmap, tag
 scale and the world frame on grid-board scenes and checks them against the printed board and
 `gates.reconstruction` (P1.2, P1.3). Results are in `benchmark/results/`.
+`python benchmark/eval_capture_gate.py --out results.json` runs the capture quality gate on the
+dev videos and on degraded copies of one good video (P1.4).
 
 Commands that arrive with their task: `video2sim run` (P5.5).
 Never document a command that does not exist. When you add one, add it here in the same

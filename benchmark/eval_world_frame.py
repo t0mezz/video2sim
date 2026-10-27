@@ -31,7 +31,10 @@ import numpy as np
 import yaml
 
 from video2sim.stages.reconstruction import (
+    ReconstructionLimits,
     WorldFrameConfig,
+    camera_coverage,
+    check_reconstruction,
     extract_frames,
     run_sfm,
     solve_world_frame,
@@ -56,16 +59,34 @@ def _board_layout(tag_edge_m: float) -> BoardLayout:
 
 
 def evaluate(
-    scene: str, video: str, work: Path, cfg: dict[str, Any], layout: BoardLayout
+    scene: str,
+    video: str,
+    work: Path,
+    cfg: dict[str, Any],
+    layout: BoardLayout,
+    limits: ReconstructionLimits,
 ) -> dict[str, Any]:
     wf = WorldFrameConfig.from_config(cfg)
-    root = work / f"{scene}_{video}"
+    root = work / f"{scene}_{video.replace('/', '_')}"
     frames_dir = root / "frames"
     if not frames_dir.exists():
         extract_frames(ROOT / f"benchmark/scenes/{scene}/{video}.mp4", frames_dir, 3.0)
     sfm = run_sfm(frames_dir, root / "sfm")
     views = tag_views(sfm, frames_dir, cfg["capture"]["marker"]["family"])
-    res = solve_world_frame(views, sfm.points_xyz, wf)
+    try:
+        res = solve_world_frame(views, sfm.points_xyz, wf)
+    except ValueError as e:  # no marker in 3D: the gate says so, there is nothing to compare
+        return {
+            "scene": scene,
+            "video": video,
+            "frames": sfm.n_input_frames,
+            "registered": len(sfm.images),
+            "registered_fraction": round(sfm.registered_fraction, 4),
+            "model_sizes": sfm.model_sizes,
+            "sfm_reprojection_px": round(sfm.mean_reprojection_px, 3),
+            "world_frame_error": str(e),
+            "gate_reasons": check_reconstruction(sfm, None, limits),
+        }
 
     # Independent check from the known board spacing; the pipeline never sees it.
     board = fit_board(layout, res.tag_corners_recon)
@@ -105,6 +126,8 @@ def evaluate(
         "up_axis_error_deg": round(up_err, 3),
         "max_pair_distance_error_pct": round(float(np.max(np.abs(pair_err))), 2),
         "flags": res.flags + (["sfm_fragmented"] if sfm.fragmented else []),
+        "azimuth_coverage_deg": round(camera_coverage(sfm, res).azimuth_deg, 1),
+        "gate_reasons": check_reconstruction(sfm, res, limits),
     }
 
 
@@ -131,15 +154,16 @@ def main() -> None:
         "reconstruction"
     ]
     layout = _board_layout(float(cfg["capture"]["marker"]["tag_size_m"]))
+    limits = ReconstructionLimits.from_configs(cfg, {"gates": {"reconstruction": gates}})
 
     rows = []
     for item in args.videos:
-        scene, video = item.split("/")
+        scene, video = item.split("/", 1)  # video may be a path such as alt_lighting/s01B
         try:
-            row = evaluate(scene, video, args.work, cfg, layout)
+            row = evaluate(scene, video, args.work, cfg, layout, limits)
         except ValueError as e:  # a user-facing reconstruction failure, kept in the results
             row = {"scene": scene, "video": video, "error": str(e)}
-        if "error" not in row:
+        if "error" not in row and "scale_vs_board_pct" in row:
             row["passes_gates"] = {
                 "registered_fraction": row["registered_fraction"]
                 >= gates["registered_frame_fraction_min"],
@@ -161,6 +185,7 @@ def main() -> None:
         "board_assumed": "A1 grid, nominal layout, tag edge from capture.marker.tag_size_m",
         "gates": gates,
         "world_frame_config": cfg["reconstruction"]["world_frame"],
+        "quality_config": cfg["reconstruction"]["quality"],
         "videos": rows,
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)

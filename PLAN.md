@@ -243,9 +243,26 @@ Tasks
       axis within 0.35 degrees of the board normal on the 9 dev grid videos. The board normal
       comes from the tag corners, so it is not fully independent of the plane fit.
 
-- [ ] **P1.4** Quality gate and frame sampling: blur and exposure filter, camera coverage,
+- [x] **P1.4** Quality gate and frame sampling: blur and exposure filter, camera coverage,
 
       reprojection error. A failing video gets a specific message.
+
+      Two gates, one message per failed check, all failures in one report. Before
+      reconstruction (`stages/capture.py`): blur-aware sampling (sharpest frame of each
+      1/5 s window), blur, exposure, marker visibility, frame count. After it
+      (`reconstruction.check_reconstruction`): registered fraction, fragmentation,
+      reprojection error, marker in 3D, camera coverage. Evidence:
+      `benchmark/results/p1_4_capture_gate.json` (36 dev videos, 31 accepted, 5 deliberately degraded copies
+      of s01 video_a: all 5 rejected with the matching message) and
+      `benchmark/results/p1_world_frame_dev.json` (20 dev videos with reconstruction gate
+      reasons). Findings: s12, the scene noted as blurred, passes both gates and reconstructs
+      (0.4 to 0.6% scale error); s01 alt_lighting B is rejected by both (37% blurred, 71% of
+      frames registered); s12 alt_path is rejected for blur but reconstructs (1.0% scale error),
+      so the blur limit is stricter than reconstruction needs. Thresholds are guesses tuned on
+      dev videos (`capture.quality`, `reconstruction.quality`); the coverage limit (60 degrees)
+      is not backed by data and should be revisited in Phase 3. Not done: a duration limit (the
+      10 to 60 s rule would reject benchmark videos that reconstruct fine), wiring the gates
+      into the stage runner (P1.5), and a rolling-shutter or autofocus-hunting check.
 
 - [ ] **P1.5** Emit `WorldModel`.
 - [ ] **P1.6** Evaluate the gate on the benchmark (`gates.reconstruction` in the config).
@@ -528,3 +545,4 @@ In order:
 | 2026-10-26 | P0.9: green CI run confirmed on GitHub; Phase 0 gate passed with the container criterion deferred; Phase 1 is the current focus |
 | 2026-10-26 | D-016: pycolmap on CPU is the MVP reconstruction back end; VGGT, MASt3R and the CUDA build moved to section 12 |
 | 2026-10-27 | P1.2, P1.3: scale from tag edge and world frame on a reference tag pass on 9 dev grid videos; results in `benchmark/results/p1_world_frame_dev.json` |
+| 2026-10-27 | P1.4: capture and reconstruction quality gates, saved results in `benchmark/results/` |
