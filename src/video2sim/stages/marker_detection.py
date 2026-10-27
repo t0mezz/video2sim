@@ -78,7 +78,7 @@ def triangulate_tag_corners(
     proj: list[F64] = []
     for v in views:
         t_cw = np.linalg.inv(v.T_world_from_camera)
-        proj.append(t_cw[:3, :4])
+        proj.append(np.asarray(t_cw[:3, :4], dtype=np.float64))
         per_tag: dict[int, F64] = {}
         for tag_id, px in v.corners_px.items():
             pts = cv2.undistortPoints(

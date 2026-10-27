@@ -97,7 +97,9 @@ def score_frame(gray: NDArray[np.uint8]) -> tuple[float, float]:
             gray, (w, round(gray.shape[0] * w / gray.shape[1])), interpolation=cv2.INTER_AREA
         )
     )
-    return float(cv2.Laplacian(small, cv2.CV_64F).var()), float(np.median(small))
+    return float(cv2.Laplacian(small, cv2.CV_64F).var()), float(
+        np.median(np.asarray(small, dtype=np.float64))
+    )
 
 
 def _sha256(path: Path) -> str:

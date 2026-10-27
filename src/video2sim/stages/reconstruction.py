@@ -133,7 +133,7 @@ def run_sfm(frames_dir: Path, work_dir: Path) -> SfmModel:
             SfmImage(
                 im.name,
                 np.asarray(cam.calibration_matrix(), dtype=np.float64),
-                np.array([k1, 0.0, 0.0, 0.0, 0.0]),
+                np.array([k1, 0.0, 0.0, 0.0, 0.0], dtype=np.float64),
                 np.linalg.inv(t_cw),
             )
         )
