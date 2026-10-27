@@ -140,6 +140,7 @@ class StageContext:
 
     stage: StageName
     run_dir: Path
+    video: Path
     out_dir: Path
     config: Mapping[str, Any]
     seed: int
@@ -232,7 +233,7 @@ class Runner:
                 and (run_dir / stage.name).is_dir()
             ):
                 continue
-            manifest = self._execute(stage, run_dir, manifest, key)
+            manifest = self._execute(stage, run_dir, video, manifest, key)
         return manifest
 
     # -- internals -----------------------------------------------------------------------
@@ -288,7 +289,9 @@ class Runner:
         }
         return canonical_sha256(payload)
 
-    def _execute(self, stage: Stage, run_dir: Path, manifest: RunManifest, key: str) -> RunManifest:
+    def _execute(
+        self, stage: Stage, run_dir: Path, video: Path, manifest: RunManifest, key: str
+    ) -> RunManifest:
         final = run_dir / stage.name
         tmp = run_dir / f"{stage.name}.tmp"
         shutil.rmtree(tmp, ignore_errors=True)
@@ -296,6 +299,7 @@ class Runner:
         ctx = StageContext(
             stage=stage.name,
             run_dir=run_dir,
+            video=video,
             out_dir=tmp,
             config=self.config.get(stage.name, {}),
             seed=seed_for(manifest.seed, stage.name),

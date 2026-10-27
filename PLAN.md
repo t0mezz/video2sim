@@ -214,14 +214,16 @@ frame. Everything later depends on this being right.
 
 Tasks
 
-- [ ] **P1.1** Compare two or three back ends on the benchmark, for example classical
+- [x] **P1.1** Compare two or three back ends on the benchmark, for example classical
 
       COLMAP-style SfM with MVS against a feed-forward model such as VGGT or MASt3R. Judge on
       pose accuracy, runtime and failures on low-texture tables. Keep one and a fallback.
 
       Decision D-016 (2026-10-26): pycolmap on CPU is the back end for the MVP, with no fallback
-      yet. The VGGT and MASt3R comparison and the GPU build are deferred, see section 12. Not
-      ticked: the comparison did not happen.
+      yet. The VGGT and MASt3R comparison and the GPU build are deferred, see section 12.
+      Ticked 2026-10-27 by human decision with the comparison deferred: it did not happen, and
+      the evidence is D-016 (six scenes, reprojection 0.46 to 0.72 px, all frames registered), not
+      a back-end comparison.
 
 - [x] **P1.2** Metric scale from the marker board: detect tags, compare their measured spacing
 
@@ -545,4 +547,5 @@ In order:
 | 2026-10-26 | P0.9: green CI run confirmed on GitHub; Phase 0 gate passed with the container criterion deferred; Phase 1 is the current focus |
 | 2026-10-26 | D-016: pycolmap on CPU is the MVP reconstruction back end; VGGT, MASt3R and the CUDA build moved to section 12 |
 | 2026-10-27 | P1.2, P1.3: scale from tag edge and world frame on a reference tag pass on 9 dev grid videos; results in `benchmark/results/p1_world_frame_dev.json` |
+| 2026-10-27 | P1.1 ticked by human decision with the VGGT and MASt3R comparison deferred (section 12, D-016) |
 | 2026-10-27 | P1.4: capture and reconstruction quality gates, saved results in `benchmark/results/` |

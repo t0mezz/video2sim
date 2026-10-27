@@ -8,7 +8,10 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from video2sim.stages.capture import CaptureQualityConfig, sample_and_check
+from video2sim.runner import OUTPUT_FILE, Runner, StageFailed
+from video2sim.schemas import CaptureResult
+from video2sim.stages.capture import CaptureQualityConfig, CaptureStage, sample_and_check
+from video2sim.stages.reconstruction import ReconstructionStage, reconstruction_stage_config
 
 U8 = NDArray[np.uint8]
 W, H, FPS, SECONDS = 640, 480, 10, 6
@@ -137,3 +140,55 @@ def test_independent_problems_are_reported_together_and_no_frames_are_left(
 def test_unreadable_video_is_an_error(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="cannot open"):
         sample_and_check(tmp_path / "missing.mp4", tmp_path / "run", "frames", CFG)
+
+
+CAPTURE_SECTION = {
+    "target_fps": 5,
+    "marker": {"family": "aruco_4x4_50", "tag_size_m": 0.1},
+    "quality": {
+        "blur_relative_floor": 0.3,
+        "blur_reference_percentile": 90,
+        "min_median_sharpness": 50,
+        "max_blurred_fraction": 0.3,
+        "min_median_brightness": 35,
+        "max_median_brightness": 235,
+        "max_bad_exposure_fraction": 0.25,
+        "min_marker_fraction": 0.5,
+        "min_usable_frames": 10,
+    },
+}
+
+
+def test_capture_stage_runs_in_the_runner_with_run_relative_frame_paths(tmp_path: Path) -> None:
+    video = _write(tmp_path / "v.avi", lambda i: _base_frame())
+    runner = Runner(tmp_path / "runs", [CaptureStage()], {"capture": CAPTURE_SECTION})
+    runner.run(video, run_id="r1")
+
+    run_dir = tmp_path / "runs" / "r1"
+    out = CaptureResult.model_validate_json((run_dir / "capture" / OUTPUT_FILE).read_text())
+    assert out.accepted and len(out.frame_paths) == SECONDS * 5
+    assert out.frame_paths[0] == "capture/frames/00000.png"
+    assert all((run_dir / p).is_file() for p in out.frame_paths)
+    assert (run_dir / "capture" / "quality.json").is_file()
+
+
+def test_rejected_capture_is_an_output_and_stops_reconstruction_with_the_reasons(
+    tmp_path: Path,
+) -> None:
+    video = _write(tmp_path / "v.avi", lambda i: _blur(_base_frame()))
+    cfg = {
+        "capture": CAPTURE_SECTION,
+        "reconstruction": reconstruction_stage_config(
+            {"seed": 0, "capture": CAPTURE_SECTION, "reconstruction": {"backend": "pycolmap"}},
+            {"gates": {"reconstruction": {}}},
+        ),
+    }
+    runner = Runner(tmp_path / "runs", [CaptureStage(), ReconstructionStage()], cfg)
+    with pytest.raises(StageFailed) as err:
+        runner.run(video, run_id="r1")
+
+    run_dir = tmp_path / "runs" / "r1"
+    out = CaptureResult.model_validate_json((run_dir / "capture" / OUTPUT_FILE).read_text())
+    assert not out.accepted and out.reasons
+    assert err.value.stage == "reconstruction"
+    assert out.reasons[0] in (err.value.manifest.stages["reconstruction"].message or "")

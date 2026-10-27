@@ -21,6 +21,7 @@ pixels.
 from __future__ import annotations
 
 import hashlib
+import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -28,7 +29,8 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from video2sim.schemas import CaptureResult
+from video2sim.runner import StageContext
+from video2sim.schemas import CaptureResult, StageName
 
 # Fixed width for the sharpness measure, so the value does not depend on the phone's resolution.
 _SHARPNESS_WIDTH_PX = 960
@@ -258,3 +260,28 @@ def _reasons(m: dict[str, float], cfg: CaptureQualityConfig) -> list[str]:
             "for most of the video."
         )
     return out
+
+
+class CaptureStage:
+    """Runner stage: a video in, the sampled frames and the gate verdict out.
+
+    Its config section is ``capture`` from ``default.yaml``. A video that fails the gate is a
+    valid output (``accepted=False`` with reasons), not an exception, so the reasons reach the
+    manifest and the next stage can quote them. ``quality.json`` holds the measurements.
+    """
+
+    name: StageName = "capture"
+    output_type = CaptureResult
+    dependencies: tuple[StageName, ...] = ()
+    extra_inputs: tuple[Path, ...] = ()
+
+    def run(self, ctx: StageContext) -> CaptureResult:
+        cfg = CaptureQualityConfig.from_config({"capture": dict(ctx.config)})
+        result, report = sample_and_check(ctx.video, ctx.out_dir, "frames", cfg)
+        (ctx.out_dir / "quality.json").write_text(
+            json.dumps(report.metrics, indent=2, sort_keys=True), encoding="utf-8"
+        )
+        # Frames were written relative to the stage folder; the contract wants the run folder.
+        return result.model_copy(
+            update={"frame_paths": [f"{self.name}/{p}" for p in result.frame_paths]}
+        )

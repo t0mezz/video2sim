@@ -430,13 +430,27 @@ def build_world_model(
     )
 
 
+def reconstruction_stage_config(cfg: dict[str, Any], targets: dict[str, Any]) -> dict[str, Any]:
+    """The config section the runner hands ``ReconstructionStage`` (and hashes into its cache key).
+
+    It holds everything that changes the result: ``reconstruction`` from ``default.yaml``, plus
+    the marker, the seed and the gate numbers, which live elsewhere. Without them, a new tag
+    edge or gate limit would not invalidate a cached ``WorldModel``.
+    """
+    return {
+        **cfg["reconstruction"],
+        "marker": cfg["capture"]["marker"],
+        "seed": cfg["seed"],
+        "gates": targets["gates"]["reconstruction"],
+    }
+
+
 class ReconstructionStage:
     """Runner stage: ``CaptureResult`` in, ``WorldModel`` out, gate failures raised.
 
-    Takes the whole default config and the targets because the runner only hands a stage its own
-    config section, and this stage also needs ``capture.marker`` and ``gates.reconstruction``.
-    Warnings that do not reject the video (tags disagree, one tag only, fragmented model) go
-    in ``WorldModel.flags`` for the QA report.
+    Its config section is built by ``reconstruction_stage_config``. Warnings that do not reject
+    the video (tags disagree, one tag only, fragmented model) go in ``WorldModel.flags`` for the
+    QA report.
     """
 
     name: StageName = "reconstruction"
@@ -444,28 +458,26 @@ class ReconstructionStage:
     dependencies: tuple[StageName, ...] = ("capture",)
     extra_inputs: tuple[Path, ...] = ()
 
-    def __init__(self, cfg: dict[str, Any], targets: dict[str, Any]) -> None:
-        self._cfg = cfg
-        self._world_cfg = WorldFrameConfig.from_config(cfg)
-        self._limits = ReconstructionLimits.from_configs(cfg, targets)
-
     def run(self, ctx: StageContext) -> WorldModel:
         capture = ctx.load("capture", CaptureResult)
         if not capture.accepted:
-            raise ValueError("capture was rejected; nothing to reconstruct")
+            raise ValueError("capture was rejected: " + " ".join(capture.reasons))
+
+        sec = dict(ctx.config)
+        cfg = {"seed": sec["seed"], "capture": {"marker": sec["marker"]}, "reconstruction": sec}
+        world_cfg = WorldFrameConfig.from_config(cfg)
+        limits = ReconstructionLimits.from_configs(cfg, {"gates": {"reconstruction": sec["gates"]}})
         frames_dir = ctx.run_dir / Path(capture.frame_paths[0]).parent
         work = ctx.run_dir / "reconstruction.work"  # outside the hashed stage folder
         shutil.rmtree(work, ignore_errors=True)
 
         sfm = run_sfm(frames_dir, work)
-        views = tag_views(sfm, frames_dir, self._cfg["capture"]["marker"]["family"])
+        views = tag_views(sfm, frames_dir, sec["marker"]["family"])
         try:
-            world: WorldFrameResult | None = solve_world_frame(
-                views, sfm.points_xyz, self._world_cfg
-            )
+            world: WorldFrameResult | None = solve_world_frame(views, sfm.points_xyz, world_cfg)
         except ValueError:  # no marker in 3D; the gate words it
             world = None
-        reasons = check_reconstruction(sfm, world, self._limits)
+        reasons = check_reconstruction(sfm, world, limits)
         if reasons or world is None:
             raise ReconstructionRejected(reasons)
 
