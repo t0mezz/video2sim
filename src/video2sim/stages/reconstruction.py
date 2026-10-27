@@ -134,7 +134,7 @@ def run_sfm(frames_dir: Path, work_dir: Path) -> SfmModel:
                 im.name,
                 np.asarray(cam.calibration_matrix(), dtype=np.float64),
                 np.array([k1, 0.0, 0.0, 0.0, 0.0], dtype=np.float64),
-                np.linalg.inv(t_cw),
+                np.asarray(np.linalg.inv(t_cw), dtype=np.float64),
             )
         )
     points = np.array([p.xyz for p in best.points3D.values()], dtype=np.float64).reshape(-1, 3)
