@@ -226,7 +226,8 @@ def fit_plane_ransac(
 
     inl = points[best_mask]
     centroid = inl.mean(axis=0)
-    normal = np.linalg.svd(inl - centroid)[2][-1]
+    # Thin SVD: the full U would be (N, N), tens of GiB for dense point clouds.
+    normal = np.linalg.svd(inl - centroid, full_matrices=False)[2][-1]
     if float(normal @ up_hint) < 0:
         normal = -normal
     dist = (points - centroid) @ normal
