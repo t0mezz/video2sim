@@ -4,13 +4,32 @@
 seed: 0
 
 capture:
-  target_fps: 5                # TODO(P1.4): frame sampling rate for reconstruction
+  target_fps: 5                # frame sampling rate: one frame, the sharpest, per 1/target_fps window
+  quality:                     # P1.4 capture gate. All guesses tuned on dev videos; see PLAN.md
+    blur_relative_floor: 0.3        # a frame is blurred below this fraction of the video's sharp level
+    blur_reference_percentile: 90   # the sharp level: this percentile of per-window sharpness
+    min_median_sharpness: 50        # Laplacian variance at 960 px; below it the whole video is soft
+    max_blurred_fraction: 0.3       # reject when more windows than this are blurred
+    min_median_brightness: 35       # grey level 0..255 per frame
+    max_median_brightness: 245      # s11 alt_lighting reaches 244 and reconstructs fine; synthetic overexposed is 251
+    max_bad_exposure_fraction: 0.25
+    min_marker_fraction: 0.5        # capture protocol says visible in "most" of the video
+    min_usable_frames: 20
   marker:
     family: aruco_4x4_50       # ArUco DICT_4X4_50, ids 0 to 5, see benchmark/make_board.py
-    tag_size_m: 0.100          # printed tag edge length, verified with calipers
+    tag_size_m: 0.1003         # printed tag edge, mean of 5 caliper readings (100.1 to 100.4 mm, mean 100.26, s.e. 0.06)
 
 reconstruction:
-  backend: null                # TODO(P1.1): chosen in the Phase 1 comparison
+  quality:                     # P1.4; registered fraction and reprojection gates are in targets.yaml
+    min_azimuth_coverage_deg: 60    # TODO(P1.6): guess from the capture protocol's "three different directions"; tune in Phase 3
+  backend: pycolmap            # CPU SfM, decision D-016; VGGT and CUDA build deferred past the MVP
+  world_frame:
+    plane_inlier_threshold_m: 0.004   # TODO(P1.6): tune on dev scenes; a guess, not yet measured
+    plane_ransac_iterations: 500      # TODO(P1.6): tune on dev scenes
+    plane_radius_m: 1.0               # TODO(P1.6): points this close to the reference tag fit the table; a guess
+    max_tag_reprojection_px: 3.0      # TODO(P1.6): per-view limit when triangulating tag corners; a guess
+    max_tag_scale_spread: 0.03        # TODO(P1.6): tag-to-tag scale disagreement that is flagged; a guess
+    max_tag_fit_rms_m: 0.005          # TODO(P1.6): grid-board fit residual, benchmark check only
 
 segmentation:
   sam_backend: null            # "api" or "self_hosted", see PLAN.md decision D-004

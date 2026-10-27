@@ -1,0 +1,50 @@
+{
+  "task": "P1.5",
+  "video": "benchmark/scenes/s01/video_b.mp4",
+  "run_id": "s01_b",
+  "command": "uv run python benchmark/run_stages.py benchmark/scenes/s01/video_b.mp4 --run-id s01_b",
+  "git_commit": "11a835a",
+  "seconds": {
+    "capture": 2.8,
+    "reconstruction": 39.6
+  },
+  "world_model": {
+    "intrinsics": {
+      "fx": 1531.7755629618612,
+      "fy": 1531.7755629618612,
+      "cx": 960.0,
+      "cy": 540.0,
+      "width_px": 1920,
+      "height_px": 1080,
+      "distortion": [
+        0.02787710541002045,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "scale_factor": 0.21280800530109584,
+    "scale_source": "marker",
+    "table_plane": {
+      "normal": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "offset_m": 0.0
+    },
+    "point_cloud_path": "reconstruction/points.ply",
+    "mean_reprojection_error_px": 0.5418016392587685,
+    "registered_fraction": 1.0,
+    "flags": []
+  },
+  "n_frames": 46,
+  "camera_height_m": {
+    "min": 0.58,
+    "median": 0.63,
+    "max": 0.75
+  },
+  "points": 10846,
+  "fraction_within_0.5m_of_origin_with_abs_z_lt_5mm": 0.49
+}

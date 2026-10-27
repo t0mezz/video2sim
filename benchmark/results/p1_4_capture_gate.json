@@ -1,0 +1,750 @@
+{
+  "date": "2026-10-27",
+  "git_commit": "81f0e25",
+  "capture_config": {
+    "target_fps": 5,
+    "quality": {
+      "blur_relative_floor": 0.3,
+      "blur_reference_percentile": 90,
+      "min_median_sharpness": 50,
+      "max_blurred_fraction": 0.3,
+      "min_median_brightness": 35,
+      "max_median_brightness": 245,
+      "max_bad_exposure_fraction": 0.25,
+      "min_marker_fraction": 0.5,
+      "min_usable_frames": 20
+    },
+    "marker": {
+      "family": "aruco_4x4_50",
+      "tag_size_m": 0.1
+    }
+  },
+  "degraded_from": "s01/video_a",
+  "real_videos": [
+    {
+      "video": "s01/alt_lighting/s01A.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 87,
+      "metrics": {
+        "duration_s": 18.637,
+        "windows": 94.0,
+        "median_sharpness": 267.77,
+        "reference_sharpness": 528.141,
+        "blurred_fraction": 0.074,
+        "median_brightness": 136.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 87.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s01/alt_lighting/s01B.mp4",
+      "accepted": false,
+      "reasons": [
+        "37% of the video is motion-blurred (limit 30%). Move more slowly, with your body and not your wrists, especially at corners and when changing height."
+      ],
+      "frames": 0,
+      "metrics": {
+        "duration_s": 6.968,
+        "windows": 35.0,
+        "median_sharpness": 246.592,
+        "reference_sharpness": 579.087,
+        "blurred_fraction": 0.371,
+        "median_brightness": 137.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 22.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s01/video_a.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 89,
+      "metrics": {
+        "duration_s": 17.77,
+        "windows": 89.0,
+        "median_sharpness": 515.739,
+        "reference_sharpness": 682.812,
+        "blurred_fraction": 0.0,
+        "median_brightness": 163.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 89.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s01/video_b.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 46,
+      "metrics": {
+        "duration_s": 9.135,
+        "windows": 46.0,
+        "median_sharpness": 567.13,
+        "reference_sharpness": 716.457,
+        "blurred_fraction": 0.0,
+        "median_brightness": 155.5,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 46.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s02/alt_lighting/s02LA.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 154,
+      "metrics": {
+        "duration_s": 30.663,
+        "windows": 154.0,
+        "median_sharpness": 456.173,
+        "reference_sharpness": 605.013,
+        "blurred_fraction": 0.0,
+        "median_brightness": 170.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 154.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s02/video_a.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 177,
+      "metrics": {
+        "duration_s": 35.995,
+        "windows": 180.0,
+        "median_sharpness": 384.053,
+        "reference_sharpness": 589.997,
+        "blurred_fraction": 0.017,
+        "median_brightness": 85.5,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 177.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s02/video_b.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 50,
+      "metrics": {
+        "duration_s": 9.932,
+        "windows": 50.0,
+        "median_sharpness": 404.434,
+        "reference_sharpness": 517.579,
+        "blurred_fraction": 0.0,
+        "median_brightness": 87.5,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 50.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s03/video_a.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 201,
+      "metrics": {
+        "duration_s": 40.372,
+        "windows": 202.0,
+        "median_sharpness": 656.639,
+        "reference_sharpness": 929.931,
+        "blurred_fraction": 0.005,
+        "median_brightness": 187.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 201.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s03/video_b.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 75,
+      "metrics": {
+        "duration_s": 14.968,
+        "windows": 75.0,
+        "median_sharpness": 769.248,
+        "reference_sharpness": 1134.62,
+        "blurred_fraction": 0.0,
+        "median_brightness": 177.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 75.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s04/video_a.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 248,
+      "metrics": {
+        "duration_s": 49.507,
+        "windows": 248.0,
+        "median_sharpness": 741.639,
+        "reference_sharpness": 1071.103,
+        "blurred_fraction": 0.0,
+        "median_brightness": 185.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 248.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s04/video_b.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 75,
+      "metrics": {
+        "duration_s": 15.002,
+        "windows": 75.0,
+        "median_sharpness": 786.85,
+        "reference_sharpness": 1065.178,
+        "blurred_fraction": 0.0,
+        "median_brightness": 183.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 75.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s05/alt_path/s05B2.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 50,
+      "metrics": {
+        "duration_s": 11.235,
+        "windows": 57.0,
+        "median_sharpness": 326.031,
+        "reference_sharpness": 628.441,
+        "blurred_fraction": 0.123,
+        "median_brightness": 218.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 50.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s05/video_a.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 191,
+      "metrics": {
+        "duration_s": 38.172,
+        "windows": 191.0,
+        "median_sharpness": 427.506,
+        "reference_sharpness": 557.017,
+        "blurred_fraction": 0.0,
+        "median_brightness": 218.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 191.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s05/video_b.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 33,
+      "metrics": {
+        "duration_s": 6.6,
+        "windows": 33.0,
+        "median_sharpness": 442.171,
+        "reference_sharpness": 601.902,
+        "blurred_fraction": 0.0,
+        "median_brightness": 181.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 33.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s06/alt_path/s06B2.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 80,
+      "metrics": {
+        "duration_s": 15.968,
+        "windows": 80.0,
+        "median_sharpness": 147.254,
+        "reference_sharpness": 272.428,
+        "blurred_fraction": 0.0,
+        "median_brightness": 151.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 80.0,
+        "marker_fraction": 0.9
+      }
+    },
+    {
+      "video": "s06/alt_path/s06B3.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 75,
+      "metrics": {
+        "duration_s": 15.402,
+        "windows": 77.0,
+        "median_sharpness": 205.01,
+        "reference_sharpness": 358.651,
+        "blurred_fraction": 0.026,
+        "median_brightness": 176.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 75.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s06/video_b.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 118,
+      "metrics": {
+        "duration_s": 23.537,
+        "windows": 118.0,
+        "median_sharpness": 308.177,
+        "reference_sharpness": 372.096,
+        "blurred_fraction": 0.0,
+        "median_brightness": 187.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 118.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s11/alt_lighting/s11LB2.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 67,
+      "metrics": {
+        "duration_s": 13.265,
+        "windows": 67.0,
+        "median_sharpness": 408.262,
+        "reference_sharpness": 519.837,
+        "blurred_fraction": 0.0,
+        "median_brightness": 244.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 67.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s11/video_a.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 194,
+      "metrics": {
+        "duration_s": 38.805,
+        "windows": 194.0,
+        "median_sharpness": 1172.245,
+        "reference_sharpness": 1575.768,
+        "blurred_fraction": 0.0,
+        "median_brightness": 169.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 194.0,
+        "marker_fraction": 0.985
+      }
+    },
+    {
+      "video": "s11/video_b.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 98,
+      "metrics": {
+        "duration_s": 19.537,
+        "windows": 98.0,
+        "median_sharpness": 1131.843,
+        "reference_sharpness": 1464.77,
+        "blurred_fraction": 0.0,
+        "median_brightness": 194.5,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 98.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s12/alt_path/s12B.mp4",
+      "accepted": false,
+      "reasons": [
+        "49% of the video is motion-blurred (limit 30%). Move more slowly, with your body and not your wrists, especially at corners and when changing height."
+      ],
+      "frames": 0,
+      "metrics": {
+        "duration_s": 22.563,
+        "windows": 113.0,
+        "median_sharpness": 149.021,
+        "reference_sharpness": 469.137,
+        "blurred_fraction": 0.487,
+        "median_brightness": 183.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 58.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s12/video_a.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 137,
+      "metrics": {
+        "duration_s": 33.928,
+        "windows": 170.0,
+        "median_sharpness": 340.754,
+        "reference_sharpness": 567.298,
+        "blurred_fraction": 0.194,
+        "median_brightness": 187.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 137.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s12/video_b.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 81,
+      "metrics": {
+        "duration_s": 18.563,
+        "windows": 93.0,
+        "median_sharpness": 466.043,
+        "reference_sharpness": 699.874,
+        "blurred_fraction": 0.129,
+        "median_brightness": 191.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 81.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s13/video_a.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 261,
+      "metrics": {
+        "duration_s": 52.14,
+        "windows": 261.0,
+        "median_sharpness": 716.171,
+        "reference_sharpness": 873.681,
+        "blurred_fraction": 0.0,
+        "median_brightness": 185.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 261.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s13/video_b.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 89,
+      "metrics": {
+        "duration_s": 18.868,
+        "windows": 95.0,
+        "median_sharpness": 487.903,
+        "reference_sharpness": 674.186,
+        "blurred_fraction": 0.063,
+        "median_brightness": 191.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 89.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s14/alt_path/s14B2.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 61,
+      "metrics": {
+        "duration_s": 12.068,
+        "windows": 61.0,
+        "median_sharpness": 470.571,
+        "reference_sharpness": 625.661,
+        "blurred_fraction": 0.0,
+        "median_brightness": 130.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 61.0,
+        "marker_fraction": 0.705
+      }
+    },
+    {
+      "video": "s14/alt_path/s14B3.mp4",
+      "accepted": false,
+      "reasons": [
+        "The scale marker is visible in only 48% of the usable frames (need 50%). Keep the printed marker in view for most of the video."
+      ],
+      "frames": 0,
+      "metrics": {
+        "duration_s": 22.637,
+        "windows": 114.0,
+        "median_sharpness": 370.992,
+        "reference_sharpness": 567.497,
+        "blurred_fraction": 0.061,
+        "median_brightness": 126.5,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 107.0,
+        "marker_fraction": 0.477
+      }
+    },
+    {
+      "video": "s14/video_b.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 51,
+      "metrics": {
+        "duration_s": 10.568,
+        "windows": 53.0,
+        "median_sharpness": 356.149,
+        "reference_sharpness": 577.766,
+        "blurred_fraction": 0.038,
+        "median_brightness": 136.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 51.0,
+        "marker_fraction": 0.588
+      }
+    },
+    {
+      "video": "s17/glass_bottle_close/s17A2.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 36,
+      "metrics": {
+        "duration_s": 7.1,
+        "windows": 36.0,
+        "median_sharpness": 1334.855,
+        "reference_sharpness": 1540.155,
+        "blurred_fraction": 0.0,
+        "median_brightness": 201.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 36.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s17/video_a.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 297,
+      "metrics": {
+        "duration_s": 60.442,
+        "windows": 303.0,
+        "median_sharpness": 839.378,
+        "reference_sharpness": 1092.636,
+        "blurred_fraction": 0.02,
+        "median_brightness": 186.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 297.0,
+        "marker_fraction": 0.997
+      }
+    },
+    {
+      "video": "s17/video_b.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 84,
+      "metrics": {
+        "duration_s": 16.735,
+        "windows": 84.0,
+        "median_sharpness": 887.288,
+        "reference_sharpness": 1106.577,
+        "blurred_fraction": 0.0,
+        "median_brightness": 183.5,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 84.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s18/video_a.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 209,
+      "metrics": {
+        "duration_s": 41.807,
+        "windows": 209.0,
+        "median_sharpness": 1059.26,
+        "reference_sharpness": 1473.003,
+        "blurred_fraction": 0.0,
+        "median_brightness": 185.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 209.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s18/video_b.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 85,
+      "metrics": {
+        "duration_s": 16.835,
+        "windows": 85.0,
+        "median_sharpness": 1397.618,
+        "reference_sharpness": 1638.001,
+        "blurred_fraction": 0.0,
+        "median_brightness": 187.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 85.0,
+        "marker_fraction": 1.0
+      }
+    },
+    {
+      "video": "s24/alt_path/s24B2.mp4",
+      "accepted": false,
+      "reasons": [
+        "The scale marker is visible in only 46% of the usable frames (need 50%). Keep the printed marker in view for most of the video."
+      ],
+      "frames": 0,
+      "metrics": {
+        "duration_s": 15.268,
+        "windows": 77.0,
+        "median_sharpness": 252.371,
+        "reference_sharpness": 397.045,
+        "blurred_fraction": 0.013,
+        "median_brightness": 119.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 76.0,
+        "marker_fraction": 0.461
+      }
+    },
+    {
+      "video": "s24/alt_path/s24B3.mp4",
+      "accepted": false,
+      "reasons": [
+        "The whole video is out of focus or too soft. Tap and hold on an object to lock focus before recording, and keep the phone 30 to 80 cm from the nearest objects."
+      ],
+      "frames": 0,
+      "metrics": {
+        "duration_s": 10.868,
+        "windows": 55.0,
+        "median_sharpness": 42.612,
+        "reference_sharpness": 72.277,
+        "blurred_fraction": 0.255,
+        "median_brightness": 93.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 41.0,
+        "marker_fraction": 0.561
+      }
+    },
+    {
+      "video": "s24/video_b.mp4",
+      "accepted": true,
+      "reasons": [],
+      "frames": 51,
+      "metrics": {
+        "duration_s": 10.102,
+        "windows": 51.0,
+        "median_sharpness": 178.783,
+        "reference_sharpness": 308.315,
+        "blurred_fraction": 0.0,
+        "median_brightness": 128.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 51.0,
+        "marker_fraction": 0.902
+      }
+    }
+  ],
+  "degraded_videos": [
+    {
+      "video": "degraded/blur_whole",
+      "accepted": false,
+      "reasons": [
+        "The whole video is out of focus or too soft. Tap and hold on an object to lock focus before recording, and keep the phone 30 to 80 cm from the nearest objects.",
+        "The scale marker is visible in only 43% of the usable frames (need 50%). Keep the printed marker in view for most of the video."
+      ],
+      "frames": 0,
+      "metrics": {
+        "duration_s": 17.77,
+        "windows": 89.0,
+        "median_sharpness": 2.821,
+        "reference_sharpness": 3.351,
+        "blurred_fraction": 0.0,
+        "median_brightness": 162.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 89.0,
+        "marker_fraction": 0.427
+      },
+      "expected_rejection": true
+    },
+    {
+      "video": "degraded/blur_burst_50pct",
+      "accepted": false,
+      "reasons": [
+        "48% of the video is motion-blurred (limit 30%). Move more slowly, with your body and not your wrists, especially at corners and when changing height."
+      ],
+      "frames": 0,
+      "metrics": {
+        "duration_s": 17.77,
+        "windows": 89.0,
+        "median_sharpness": 261.179,
+        "reference_sharpness": 650.963,
+        "blurred_fraction": 0.483,
+        "median_brightness": 162.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 46.0,
+        "marker_fraction": 1.0
+      },
+      "expected_rejection": true
+    },
+    {
+      "video": "degraded/dark",
+      "accepted": false,
+      "reasons": [
+        "The video is too dark: 100% of frames are outside the usable brightness range. Turn on more lights and keep exposure steady."
+      ],
+      "frames": 0,
+      "metrics": {
+        "duration_s": 17.77,
+        "windows": 89.0,
+        "median_sharpness": 7.093,
+        "reference_sharpness": 9.197,
+        "blurred_fraction": 0.0,
+        "median_brightness": 19.0,
+        "bad_exposure_fraction": 1.0,
+        "usable_frames": 0.0,
+        "marker_fraction": 0.0
+      },
+      "expected_rejection": true
+    },
+    {
+      "video": "degraded/overexposed",
+      "accepted": false,
+      "reasons": [
+        "The video is overexposed: 82% of frames are outside the usable brightness range. Reduce glare and light and keep exposure steady."
+      ],
+      "frames": 0,
+      "metrics": {
+        "duration_s": 17.77,
+        "windows": 89.0,
+        "median_sharpness": 157.611,
+        "reference_sharpness": 227.351,
+        "blurred_fraction": 0.0,
+        "median_brightness": 251.0,
+        "bad_exposure_fraction": 0.82,
+        "usable_frames": 16.0,
+        "marker_fraction": 1.0
+      },
+      "expected_rejection": true
+    },
+    {
+      "video": "degraded/marker_hidden",
+      "accepted": false,
+      "reasons": [
+        "The scale marker is visible in only 1% of the usable frames (need 50%). Keep the printed marker in view for most of the video."
+      ],
+      "frames": 0,
+      "metrics": {
+        "duration_s": 17.77,
+        "windows": 89.0,
+        "median_sharpness": 356.147,
+        "reference_sharpness": 521.433,
+        "blurred_fraction": 0.011,
+        "median_brightness": 165.0,
+        "bad_exposure_fraction": 0.0,
+        "usable_frames": 88.0,
+        "marker_fraction": 0.011
+      },
+      "expected_rejection": true
+    }
+  ]
+}
