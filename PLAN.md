@@ -299,6 +299,8 @@ Exit criteria
 
 Evidence: `benchmark/results/p1_world_frame_dev_tag_1003.json` (20 dev videos, 19 accepted, 1 rejected). Dev split only, fixed 3 fps, nominal board layout; see the P1.6 entry for caveats.
 
+Test split (phase-gate run): `benchmark/results/p1_world_frame_test.json` (16 videos from 8 grid scenes, commit 1413958). Registered frames 100% on all 16, max reprojection error 0.72 px (s08 video_a), max up-axis error 1.28 degrees (s15 video_b). Marker-pair distance passes on 15 of 16; s16 video_b fails at 2.53% (limit 2%) and s16 video_a passes at 1.95%. Human decision: the s16 miss is expected, because the marker is badly warped in that footage; both s16 videos carry the `tag_scale_disagree` flag (5.9% and 3.3%). It is an input defect, not a pipeline pass. Without s16 the worst error is 1.54% (s07 video_b). Not run: s10, the only clean-board test scene, because the evaluation script handles grid scenes only; clean-board reconstruction is unevaluated in both splits. Same caveats as P1.6: fixed 3 fps sampling and a nominal board layout.
+
 ## 6. Phase 2: Segmentation, tracking, 3D lifting (weeks 5 to 6)
 
 Goal: every physical object is exactly one instance, with a mask in each frame and a clean
@@ -575,3 +577,4 @@ In order:
 | 2026-10-27 | P1.1 ticked by human decision with the VGGT and MASt3R comparison deferred (section 12, D-016) |
 | 2026-10-27 | P1.4: capture and reconstruction quality gates, saved results in `benchmark/results/` |
 | 2026-10-27 | P1.6: gate evaluated on 20 dev videos with the caliper tag edge (100.26 mm); P1.2 caliper note updated; Phase 1 exit criteria ticked with caveats in the P1.6 entry |
+| 2026-10-27 | P1.6: test-split run on 16 videos; s16 marker-distance miss accepted as a warped-marker input defect by human decision; s10 clean-board not run; results in `benchmark/results/p1_world_frame_test.json` |
