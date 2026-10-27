@@ -266,7 +266,15 @@ Tasks
       10 to 60 s rule would reject benchmark videos that reconstruct fine), wiring the gates
       into the stage runner (P1.5), and a rolling-shutter or autofocus-hunting check.
 
-- [ ] **P1.5** Emit `WorldModel`.
+- [x] **P1.5** Emit `WorldModel`.
+
+      `CaptureStage` and `ReconstructionStage` run through the `Runner`; gate failures raise
+      with the specific messages. Added `WorldModel.flags` for scene-level warnings. Evidence:
+      run `s01_b` (`benchmark/run_stages.py`, local, `runs/` is not in git), summary in
+      `benchmark/results/p1_5_worldmodel_s01_b.json`: 46 of 46 frames registered, 0.54 px, scale
+      from the marker, cameras 0.58 to 0.75 m above the table. Not done: a rejected video run
+      through the real stages (only a synthetic test covers it), more than one video, and
+      cropping the point cloud (stray points lie below the table).
 - [ ] **P1.6** Evaluate the gate on the benchmark (`gates.reconstruction` in the config).
 
 Exit criteria
@@ -547,5 +555,6 @@ In order:
 | 2026-10-26 | P0.9: green CI run confirmed on GitHub; Phase 0 gate passed with the container criterion deferred; Phase 1 is the current focus |
 | 2026-10-26 | D-016: pycolmap on CPU is the MVP reconstruction back end; VGGT, MASt3R and the CUDA build moved to section 12 |
 | 2026-10-27 | P1.2, P1.3: scale from tag edge and world frame on a reference tag pass on 9 dev grid videos; results in `benchmark/results/p1_world_frame_dev.json` |
+| 2026-10-27 | P1.5: `WorldModel` emitted by `ReconstructionStage` after `CaptureStage`; one-video run in `benchmark/results/p1_5_worldmodel_s01_b.json` |
 | 2026-10-27 | P1.1 ticked by human decision with the VGGT and MASt3R comparison deferred (section 12, D-016) |
 | 2026-10-27 | P1.4: capture and reconstruction quality gates, saved results in `benchmark/results/` |
