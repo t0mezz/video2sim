@@ -6,16 +6,19 @@ Output: ``WorldModel``: intrinsics, camera poses, scale, table plane, point clou
 
 Scale comes from the printed marker. Phone depth data is an optional cross-check.
 
-Built so far (P1.1 back end, P1.2 scale, P1.3 world frame); ``WorldModel`` is not emitted yet
-(P1.5):
+Built so far (P1.1 back end, P1.2 scale, P1.3 world frame, P1.5 ``WorldModel``):
 
 * ``extract_frames`` and ``run_sfm``: pycolmap on CPU, decision D-016.
 * ``solve_world_frame``: tag corners -> scale from the tag edge, table plane near the
   reference tag, gravity-aligned frame with the origin on that tag. NumPy only.
+* ``build_world_model`` and ``ReconstructionStage``: everything in meters in the world frame,
+  point cloud written as PLY. A video that fails ``check_reconstruction`` raises
+  ``ReconstructionRejected`` with the specific messages, so the runner records them.
 """
 
 from __future__ import annotations
 
+import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -23,6 +26,16 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
+from video2sim.runner import StageContext
+from video2sim.schemas import (
+    SE3,
+    CameraFrame,
+    CaptureResult,
+    Intrinsics,
+    Plane,
+    StageName,
+    WorldModel,
+)
 from video2sim.stages.marker_detection import (
     TagView,
     detect_tags,
@@ -332,3 +345,141 @@ def check_reconstruction(
                 "so each is seen from several directions."
             )
     return out
+
+
+class ReconstructionRejected(ValueError):
+    """The video failed the reconstruction gate; ``reasons`` holds one message per failed check."""
+
+    def __init__(self, reasons: list[str]) -> None:
+        super().__init__(" ".join(reasons))
+        self.reasons = reasons
+
+
+def _write_ply(path: Path, points: F64) -> None:
+    """Binary little-endian PLY with float32 x y z; float32 is micrometre-exact at table scale."""
+    header = (
+        "ply\nformat binary_little_endian 1.0\n"
+        f"element vertex {len(points)}\n"
+        "property float x\nproperty float y\nproperty float z\nend_header\n"
+    )
+    path.write_bytes(header.encode("ascii") + points.astype("<f4").tobytes())
+
+
+def build_world_model(
+    model: SfmModel,
+    world: WorldFrameResult,
+    frame_paths: list[str],
+    image_size_px: tuple[int, int],
+    out_dir: Path,
+    point_cloud_rel: str,
+    flags: list[str] | None = None,
+) -> WorldModel:
+    """Express the reconstruction in meters in the world frame and write the point cloud.
+
+    ``frame_paths`` are the capture frames (relative to the run folder) in capture order; each
+    SfM image is matched to one by file name, and its position in the list is the frame index.
+    Scale is applied once, to translations and points; poses stay rigid. ``point_cloud_rel`` is
+    where the PLY will sit relative to the run folder once ``out_dir`` is moved into place.
+    """
+    by_name = {Path(p).name: (i, p) for i, p in enumerate(frame_paths)}
+    t_world = world.T_world_from_scaled_recon
+    s = world.scale.scale
+
+    frames = []
+    for im in model.images:
+        if im.name not in by_name:
+            raise ValueError(f"SfM image {im.name} is not one of the capture frames")
+        index, rel = by_name[im.name]
+        pose = im.T_world_from_camera.copy()
+        pose[:3, 3] = apply_scale(pose[:3, 3], s)
+        frames.append(
+            CameraFrame(
+                frame_index=index,
+                image_path=rel,
+                T_world_from_camera=SE3.from_numpy(t_world @ pose),
+            )
+        )
+    frames.sort(key=lambda f: f.frame_index)
+
+    k, width, height = model.images[0].K, *image_size_px
+    intrinsics = Intrinsics(
+        fx=float(k[0, 0]),
+        fy=float(k[1, 1]),
+        cx=float(k[0, 2]),
+        cy=float(k[1, 2]),
+        width_px=width,
+        height_px=height,
+        distortion=[float(d) for d in model.images[0].distortion],
+    )
+
+    pts = apply_scale(model.points_xyz, s)
+    pts_world = pts @ t_world[:3, :3].T + t_world[:3, 3]
+    out_dir.mkdir(parents=True, exist_ok=True)
+    _write_ply(out_dir / Path(point_cloud_rel).name, pts_world)
+
+    return WorldModel(
+        intrinsics=intrinsics,
+        frames=frames,
+        scale_factor=s,
+        scale_source="marker",
+        table_plane=Plane(normal=(0.0, 0.0, 1.0), offset_m=0.0),
+        point_cloud_path=point_cloud_rel,
+        mean_reprojection_error_px=model.mean_reprojection_px,
+        registered_fraction=model.registered_fraction,
+        flags=flags or [],
+    )
+
+
+class ReconstructionStage:
+    """Runner stage: ``CaptureResult`` in, ``WorldModel`` out, gate failures raised.
+
+    Takes the whole default config and the targets because the runner only hands a stage its own
+    config section, and this stage also needs ``capture.marker`` and ``gates.reconstruction``.
+    Warnings that do not reject the video (tags disagree, one tag only, fragmented model) go
+    in ``WorldModel.flags`` for the QA report.
+    """
+
+    name: StageName = "reconstruction"
+    output_type = WorldModel
+    dependencies: tuple[StageName, ...] = ("capture",)
+    extra_inputs: tuple[Path, ...] = ()
+
+    def __init__(self, cfg: dict[str, Any], targets: dict[str, Any]) -> None:
+        self._cfg = cfg
+        self._world_cfg = WorldFrameConfig.from_config(cfg)
+        self._limits = ReconstructionLimits.from_configs(cfg, targets)
+
+    def run(self, ctx: StageContext) -> WorldModel:
+        capture = ctx.load("capture", CaptureResult)
+        if not capture.accepted:
+            raise ValueError("capture was rejected; nothing to reconstruct")
+        frames_dir = ctx.run_dir / Path(capture.frame_paths[0]).parent
+        work = ctx.run_dir / "reconstruction.work"  # outside the hashed stage folder
+        shutil.rmtree(work, ignore_errors=True)
+
+        sfm = run_sfm(frames_dir, work)
+        views = tag_views(sfm, frames_dir, self._cfg["capture"]["marker"]["family"])
+        try:
+            world: WorldFrameResult | None = solve_world_frame(
+                views, sfm.points_xyz, self._world_cfg
+            )
+        except ValueError:  # no marker in 3D; the gate words it
+            world = None
+        reasons = check_reconstruction(sfm, world, self._limits)
+        if reasons or world is None:
+            raise ReconstructionRejected(reasons)
+
+        import cv2
+
+        first = cv2.imread(str(frames_dir / sfm.images[0].name))
+        if first is None:
+            raise ValueError(f"cannot read frame {sfm.images[0].name}")
+        return build_world_model(
+            sfm,
+            world,
+            capture.frame_paths,
+            (int(first.shape[1]), int(first.shape[0])),
+            ctx.out_dir,
+            f"{self.name}/points.ply",
+            world.flags + (["sfm_fragmented"] if sfm.fragmented else []),
+        )

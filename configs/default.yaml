@@ -17,7 +17,7 @@ capture:
     min_usable_frames: 20
   marker:
     family: aruco_4x4_50       # ArUco DICT_4X4_50, ids 0 to 5, see benchmark/make_board.py
-    tag_size_m: 0.100          # printed tag edge length, verified with calipers
+    tag_size_m: 0.1003         # printed tag edge, mean of 5 caliper readings (100.1 to 100.4 mm, mean 100.26, s.e. 0.06)
 
 reconstruction:
   quality:                     # P1.4; registered fraction and reprojection gates are in targets.yaml

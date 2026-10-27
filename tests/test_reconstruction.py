@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 from numpy.typing import NDArray
@@ -10,6 +12,7 @@ from video2sim.stages.reconstruction import (
     SfmImage,
     SfmModel,
     WorldFrameConfig,
+    build_world_model,
     camera_coverage,
     check_reconstruction,
     solve_world_frame,
@@ -177,3 +180,40 @@ def test_narrow_camera_path_is_reported() -> None:
     strict = ReconstructionLimits(0.95, 1.0, min_azimuth_coverage_deg=359)
     reasons = check_reconstruction(model, world, strict)
     assert len(reasons) == 1 and "degrees around the table" in reasons[0]
+
+
+def test_world_model_is_metric_and_gravity_aligned(tmp_path: Path) -> None:
+    unit = 3.0
+    views, points = _scene(unit)
+    world = solve_world_frame(views, points, CFG)
+    model = _model_from(views, len(views), [len(views)])
+    model = SfmModel(model.images, points, 0.4, len(views), [len(views)])
+    paths = [f"capture/frames/{i}.png" for i in range(len(views))][::-1]  # not in sfm order
+    wm = build_world_model(
+        model, world, [p for p in paths], (1920, 1080), tmp_path, "reconstruction/points.ply"
+    )
+
+    assert wm.scale_source == "marker" and wm.scale_factor == pytest.approx(1 / unit, rel=0.01)
+    assert wm.registered_fraction == 1.0 and wm.mean_reprojection_error_px == 0.4
+    assert wm.intrinsics.fx == 1500.0 and wm.intrinsics.width_px == 1920
+    assert wm.table_plane.normal == (0.0, 0.0, 1.0) and wm.table_plane.offset_m == 0.0
+    assert [f.frame_index for f in wm.frames] == sorted(f.frame_index for f in wm.frames)
+
+    # Cameras sit above the table, at the heights the scene used (0.7 to 1.0 m), in meters.
+    heights = sorted(f.T_world_from_camera.to_numpy()[2, 3] for f in wm.frames)
+    assert heights[0] > 0.65 and heights[-1] < 1.05
+
+    ply = (tmp_path / "points.ply").read_bytes()
+    body = ply.split(b"end_header\n", 1)[1]
+    xyz = np.frombuffer(body, dtype="<f4").reshape(-1, 3)
+    assert len(xyz) == len(points)
+    near_table = xyz[np.abs(xyz[:, 2]) < 0.02]
+    assert len(near_table) > 1500  # the table points land on z = 0
+
+
+def test_world_model_rejects_a_frame_capture_does_not_know(tmp_path: Path) -> None:
+    views, points = _scene(3.0)
+    world = solve_world_frame(views, points, CFG)
+    model = _model_from(views, len(views), [len(views)])
+    with pytest.raises(ValueError, match="not one of the capture frames"):
+        build_world_model(model, world, ["capture/frames/other.png"], (10, 10), tmp_path, "r/p.ply")

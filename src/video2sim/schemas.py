@@ -201,6 +201,10 @@ class WorldModel(Model):
     point_cloud_path: RelPath
     mean_reprojection_error_px: float = Field(ge=0)
     registered_fraction: float = Field(ge=0, le=1)
+    flags: list[str] = Field(
+        default_factory=list,
+        description="Scene-level warnings that did not reject the video, for the QA report",
+    )
 
 
 # ---------------------------------------------------------------------------
