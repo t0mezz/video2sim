@@ -550,6 +550,10 @@ In order:
    that `pycolmap-cuda12` runs and how much faster it is on a GPU. Both need a GPU host,
    weight downloads and license decisions (`docs/licenses.md`).
 
+   If VGGT passes the accuracy gates, add it as an opt-in `reconstruction.backend: vggt` (a
+   `run_sfm_vggt` returning `SfmModel`, torch behind an optional extra); expected gain is mainly
+   on long (~190 frame) videos, unmeasured.
+
 ## 13. Changelog
 
 | Date | Change |
