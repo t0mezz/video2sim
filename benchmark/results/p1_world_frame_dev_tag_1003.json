@@ -1,0 +1,973 @@
+{
+  "date": "2026-10-27",
+  "git_commit": "30b3530",
+  "pycolmap": "4.2.1",
+  "board_assumed": "grid scenes: A1 grid, tag edge from capture.marker.tag_size_m",
+  "gates": {
+    "registered_frame_fraction_min": 0.95,
+    "mean_reprojection_error_max_px": 1.0,
+    "marker_distance_error_max": 0.02,
+    "up_axis_error_max_deg": 2.0
+  },
+  "world_frame_config": {
+    "plane_inlier_threshold_m": 0.004,
+    "plane_ransac_iterations": 500,
+    "plane_radius_m": 1.0,
+    "max_tag_reprojection_px": 3.0,
+    "max_tag_scale_spread": 0.03,
+    "max_tag_fit_rms_m": 0.005
+  },
+  "quality_config": {
+    "min_azimuth_coverage_deg": 60
+  },
+  "videos": [
+    {
+      "scene": "s01",
+      "video": "video_a",
+      "board": "grid",
+      "frames": 54,
+      "registered": 54,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        54
+      ],
+      "sfm_reprojection_px": 0.639,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 48,
+        "1": 19,
+        "2": 45,
+        "3": 31,
+        "4": 40,
+        "5": 35
+      },
+      "tag_reprojection_px": 0.875,
+      "scale_m_per_unit": 0.2941990609190867,
+      "scale_spread_pct": 0.31,
+      "reference_tag": 0,
+      "plane_inlier_fraction": 0.512,
+      "plane_rms_mm": 1.56,
+      "flags": [],
+      "azimuth_coverage_deg": 338.9,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 0.68,
+      "board_fit_rms_mm": 1.12,
+      "up_axis_error_deg": 0.041,
+      "max_pair_distance_error_pct": 0.86,
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s01",
+      "video": "video_b",
+      "board": "grid",
+      "frames": 28,
+      "registered": 28,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        28
+      ],
+      "sfm_reprojection_px": 0.543,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 27,
+        "1": 14,
+        "2": 14,
+        "3": 19,
+        "4": 16,
+        "5": 19
+      },
+      "tag_reprojection_px": 0.712,
+      "scale_m_per_unit": 0.21853855689072776,
+      "scale_spread_pct": 0.99,
+      "reference_tag": 0,
+      "plane_inlier_fraction": 0.413,
+      "plane_rms_mm": 1.82,
+      "flags": [],
+      "azimuth_coverage_deg": 138.2,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 0.62,
+      "board_fit_rms_mm": 1.24,
+      "up_axis_error_deg": 0.16,
+      "max_pair_distance_error_pct": 1.07,
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s02",
+      "video": "video_a",
+      "board": "grid",
+      "frames": 108,
+      "registered": 108,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        3,
+        108
+      ],
+      "sfm_reprojection_px": 0.728,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 86,
+        "1": 79,
+        "2": 89,
+        "3": 54,
+        "4": 94,
+        "5": 98
+      },
+      "tag_reprojection_px": 0.797,
+      "scale_m_per_unit": 0.2871360766769651,
+      "scale_spread_pct": 0.32,
+      "reference_tag": 5,
+      "plane_inlier_fraction": 0.537,
+      "plane_rms_mm": 1.53,
+      "flags": [
+        "sfm_fragmented"
+      ],
+      "azimuth_coverage_deg": 345.4,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 0.65,
+      "board_fit_rms_mm": 1.06,
+      "up_axis_error_deg": 0.08,
+      "max_pair_distance_error_pct": 1.06,
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s02",
+      "video": "video_b",
+      "board": "grid",
+      "frames": 30,
+      "registered": 30,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        30
+      ],
+      "sfm_reprojection_px": 0.612,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 17,
+        "1": 14,
+        "2": 15,
+        "3": 20,
+        "4": 30,
+        "5": 25
+      },
+      "tag_reprojection_px": 0.781,
+      "scale_m_per_unit": 0.24632307011833632,
+      "scale_spread_pct": 0.75,
+      "reference_tag": 4,
+      "plane_inlier_fraction": 0.514,
+      "plane_rms_mm": 1.62,
+      "flags": [],
+      "azimuth_coverage_deg": 146.7,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 0.49,
+      "board_fit_rms_mm": 1.27,
+      "up_axis_error_deg": 0.029,
+      "max_pair_distance_error_pct": 1.12,
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s03",
+      "video": "video_a",
+      "board": "grid",
+      "frames": 122,
+      "registered": 122,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        122
+      ],
+      "sfm_reprojection_px": 0.576,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 95,
+        "1": 88,
+        "2": 85,
+        "3": 98,
+        "4": 100,
+        "5": 100
+      },
+      "tag_reprojection_px": 0.794,
+      "scale_m_per_unit": 0.27524121840412985,
+      "scale_spread_pct": 0.25,
+      "reference_tag": 4,
+      "plane_inlier_fraction": 0.796,
+      "plane_rms_mm": 1.55,
+      "flags": [],
+      "azimuth_coverage_deg": 346.2,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 0.43,
+      "board_fit_rms_mm": 1.14,
+      "up_axis_error_deg": 0.032,
+      "max_pair_distance_error_pct": 0.7,
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s03",
+      "video": "video_b",
+      "board": "grid",
+      "frames": 45,
+      "registered": 45,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        45
+      ],
+      "sfm_reprojection_px": 0.553,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 28,
+        "1": 34,
+        "2": 36,
+        "3": 35,
+        "4": 41,
+        "5": 45
+      },
+      "tag_reprojection_px": 0.661,
+      "scale_m_per_unit": 0.2438135368684595,
+      "scale_spread_pct": 0.22,
+      "reference_tag": 5,
+      "plane_inlier_fraction": 0.761,
+      "plane_rms_mm": 1.67,
+      "flags": [],
+      "azimuth_coverage_deg": 125.1,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 0.54,
+      "board_fit_rms_mm": 1.25,
+      "up_axis_error_deg": 0.042,
+      "max_pair_distance_error_pct": 0.73,
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s04",
+      "video": "video_a",
+      "board": "grid",
+      "frames": 149,
+      "registered": 149,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        149
+      ],
+      "sfm_reprojection_px": 0.693,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 76,
+        "1": 93,
+        "2": 104,
+        "3": 102,
+        "4": 101,
+        "5": 88
+      },
+      "tag_reprojection_px": 0.851,
+      "scale_m_per_unit": 0.3239144524450388,
+      "scale_spread_pct": 0.37,
+      "reference_tag": 2,
+      "plane_inlier_fraction": 0.499,
+      "plane_rms_mm": 1.56,
+      "flags": [],
+      "azimuth_coverage_deg": 344.0,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 0.6,
+      "board_fit_rms_mm": 1.2,
+      "up_axis_error_deg": 0.04,
+      "max_pair_distance_error_pct": 0.95,
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s04",
+      "video": "video_b",
+      "board": "grid",
+      "frames": 45,
+      "registered": 45,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        45
+      ],
+      "sfm_reprojection_px": 0.719,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 35,
+        "1": 13,
+        "2": 18,
+        "3": 27,
+        "4": 39,
+        "5": 20
+      },
+      "tag_reprojection_px": 0.596,
+      "scale_m_per_unit": 0.14937873910283334,
+      "scale_spread_pct": 0.23,
+      "reference_tag": 4,
+      "plane_inlier_fraction": 0.482,
+      "plane_rms_mm": 1.59,
+      "flags": [],
+      "azimuth_coverage_deg": 131.2,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 0.46,
+      "board_fit_rms_mm": 1.21,
+      "up_axis_error_deg": 0.047,
+      "max_pair_distance_error_pct": 0.75,
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s06",
+      "video": "video_b",
+      "board": "grid",
+      "frames": 71,
+      "registered": 71,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        71
+      ],
+      "sfm_reprojection_px": 0.621,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 34,
+        "1": 35,
+        "2": 62,
+        "3": 62,
+        "4": 58,
+        "5": 70
+      },
+      "tag_reprojection_px": 0.943,
+      "scale_m_per_unit": 0.13568485328241586,
+      "scale_spread_pct": 0.52,
+      "reference_tag": 5,
+      "plane_inlier_fraction": 0.355,
+      "plane_rms_mm": 1.98,
+      "flags": [],
+      "azimuth_coverage_deg": 87.3,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 0.82,
+      "board_fit_rms_mm": 3.1,
+      "up_axis_error_deg": 0.25,
+      "max_pair_distance_error_pct": 1.13,
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s11",
+      "video": "video_a",
+      "board": "grid",
+      "frames": 117,
+      "registered": 117,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        117
+      ],
+      "sfm_reprojection_px": 0.528,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 58,
+        "1": 87,
+        "2": 64,
+        "3": 73,
+        "4": 85,
+        "5": 111
+      },
+      "tag_reprojection_px": 0.955,
+      "scale_m_per_unit": 0.19921876334932964,
+      "scale_spread_pct": 0.19,
+      "reference_tag": 5,
+      "plane_inlier_fraction": 0.876,
+      "plane_rms_mm": 1.48,
+      "flags": [],
+      "azimuth_coverage_deg": 346.2,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 0.44,
+      "board_fit_rms_mm": 1.05,
+      "up_axis_error_deg": 0.044,
+      "max_pair_distance_error_pct": 0.6,
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s11",
+      "video": "video_b",
+      "board": "grid",
+      "frames": 59,
+      "registered": 59,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        59
+      ],
+      "sfm_reprojection_px": 0.492,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 30,
+        "1": 25,
+        "2": 44,
+        "3": 56,
+        "4": 47,
+        "5": 59
+      },
+      "tag_reprojection_px": 0.632,
+      "scale_m_per_unit": 0.13951591807243646,
+      "scale_spread_pct": 0.71,
+      "reference_tag": 5,
+      "plane_inlier_fraction": 0.886,
+      "plane_rms_mm": 1.49,
+      "flags": [],
+      "azimuth_coverage_deg": 96.0,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 0.34,
+      "board_fit_rms_mm": 1.16,
+      "up_axis_error_deg": 0.017,
+      "max_pair_distance_error_pct": 0.84,
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s12",
+      "video": "video_a",
+      "board": "grid",
+      "frames": 102,
+      "registered": 102,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        102
+      ],
+      "sfm_reprojection_px": 0.654,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 44,
+        "1": 10,
+        "2": 84,
+        "3": 58,
+        "4": 54,
+        "5": 26
+      },
+      "tag_reprojection_px": 1.021,
+      "scale_m_per_unit": 0.2601070247507612,
+      "scale_spread_pct": 16.46,
+      "reference_tag": 2,
+      "plane_inlier_fraction": 0.299,
+      "plane_rms_mm": 1.64,
+      "flags": [
+        "tag_scale_disagree: spread 16.5% between tags"
+      ],
+      "azimuth_coverage_deg": 345.8,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 0.74,
+      "board_fit_rms_mm": 5.92,
+      "up_axis_error_deg": 0.183,
+      "max_pair_distance_error_pct": 1.16,
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s12",
+      "video": "video_b",
+      "board": "grid",
+      "frames": 56,
+      "registered": 56,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        56
+      ],
+      "sfm_reprojection_px": 0.744,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 31,
+        "1": 7,
+        "2": 32,
+        "3": 42,
+        "4": 20,
+        "5": 21
+      },
+      "tag_reprojection_px": 0.957,
+      "scale_m_per_unit": 0.19091599506960624,
+      "scale_spread_pct": 4.2,
+      "reference_tag": 3,
+      "plane_inlier_fraction": 0.306,
+      "plane_rms_mm": 1.74,
+      "flags": [
+        "tag_scale_disagree: spread 4.2% between tags"
+      ],
+      "azimuth_coverage_deg": 141.9,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 1.01,
+      "board_fit_rms_mm": 2.87,
+      "up_axis_error_deg": 0.047,
+      "max_pair_distance_error_pct": 1.35,
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s13",
+      "video": "video_a",
+      "board": "grid",
+      "frames": 157,
+      "registered": 157,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        157
+      ],
+      "sfm_reprojection_px": 0.647,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 110,
+        "1": 103,
+        "2": 136,
+        "3": 128,
+        "4": 142,
+        "5": 118
+      },
+      "tag_reprojection_px": 0.987,
+      "scale_m_per_unit": 0.24629310261746107,
+      "scale_spread_pct": 0.13,
+      "reference_tag": 4,
+      "plane_inlier_fraction": 0.63,
+      "plane_rms_mm": 1.62,
+      "flags": [],
+      "azimuth_coverage_deg": 347.3,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 0.63,
+      "board_fit_rms_mm": 1.17,
+      "up_axis_error_deg": 0.075,
+      "max_pair_distance_error_pct": 0.77,
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s13",
+      "video": "video_b",
+      "board": "grid",
+      "frames": 57,
+      "registered": 57,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        57
+      ],
+      "sfm_reprojection_px": 0.599,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 22,
+        "1": 28,
+        "2": 57,
+        "3": 44,
+        "4": 54,
+        "5": 46
+      },
+      "tag_reprojection_px": 0.762,
+      "scale_m_per_unit": 0.18553747222671182,
+      "scale_spread_pct": 0.87,
+      "reference_tag": 2,
+      "plane_inlier_fraction": 0.63,
+      "plane_rms_mm": 1.71,
+      "flags": [],
+      "azimuth_coverage_deg": 107.2,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 0.59,
+      "board_fit_rms_mm": 1.38,
+      "up_axis_error_deg": 0.085,
+      "max_pair_distance_error_pct": 1.03,
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s17",
+      "video": "video_b",
+      "board": "grid",
+      "frames": 51,
+      "registered": 51,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        51
+      ],
+      "sfm_reprojection_px": 0.708,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 31,
+        "1": 30,
+        "2": 42,
+        "3": 39,
+        "4": 51,
+        "5": 51
+      },
+      "tag_reprojection_px": 0.658,
+      "scale_m_per_unit": 0.18751347692973355,
+      "scale_spread_pct": 0.59,
+      "reference_tag": 4,
+      "plane_inlier_fraction": 0.574,
+      "plane_rms_mm": 1.61,
+      "flags": [],
+      "azimuth_coverage_deg": 133.6,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 0.63,
+      "board_fit_rms_mm": 1.32,
+      "up_axis_error_deg": 0.057,
+      "max_pair_distance_error_pct": 1.1,
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s18",
+      "video": "video_b",
+      "board": "grid",
+      "frames": 51,
+      "registered": 51,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        51
+      ],
+      "sfm_reprojection_px": 0.683,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 26,
+        "1": 30,
+        "2": 27,
+        "3": 48,
+        "4": 50,
+        "5": 24
+      },
+      "tag_reprojection_px": 0.649,
+      "scale_m_per_unit": 0.17383392675112455,
+      "scale_spread_pct": 0.67,
+      "reference_tag": 4,
+      "plane_inlier_fraction": 0.421,
+      "plane_rms_mm": 1.69,
+      "flags": [],
+      "azimuth_coverage_deg": 135.4,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 0.61,
+      "board_fit_rms_mm": 1.34,
+      "up_axis_error_deg": 0.048,
+      "max_pair_distance_error_pct": 0.84,
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s12",
+      "video": "alt_path/s12B",
+      "board": "grid",
+      "frames": 68,
+      "registered": 68,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        68
+      ],
+      "sfm_reprojection_px": 0.773,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "tag_views": {
+        "0": 42,
+        "1": 3,
+        "2": 59,
+        "3": 26,
+        "4": 47
+      },
+      "tag_reprojection_px": 1.055,
+      "scale_m_per_unit": 0.15367363904714573,
+      "scale_spread_pct": 11.39,
+      "reference_tag": 2,
+      "plane_inlier_fraction": 0.285,
+      "plane_rms_mm": 1.88,
+      "flags": [
+        "tag_scale_disagree: spread 11.4% between tags"
+      ],
+      "azimuth_coverage_deg": 86.9,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 1.34,
+      "board_fit_rms_mm": 5.2,
+      "up_axis_error_deg": 0.034,
+      "max_pair_distance_error_pct": 1.56,
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s01",
+      "video": "alt_lighting/s01B",
+      "board": "grid",
+      "frames": 21,
+      "registered": 12,
+      "registered_fraction": 0.5714,
+      "model_sizes": [
+        12
+      ],
+      "sfm_reprojection_px": 0.682,
+      "tags": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "tag_views": {
+        "0": 5,
+        "1": 6,
+        "3": 9,
+        "5": 8
+      },
+      "tag_reprojection_px": 0.887,
+      "scale_m_per_unit": 0.055710431983068284,
+      "scale_spread_pct": 25.31,
+      "reference_tag": 3,
+      "plane_inlier_fraction": 0.305,
+      "plane_rms_mm": 2.05,
+      "flags": [
+        "tag_scale_disagree: spread 25.3% between tags"
+      ],
+      "azimuth_coverage_deg": 49.0,
+      "gate_reasons": [
+        "Only 57% of frames could be placed in 3D (need 95%). Usual causes are fast movement, motion blur, or a plain table with little texture. Film slower, keep the views overlapping, and put some textured items on the table.",
+        "The camera path covers only 49 degrees around the table (need 60). Walk further around the objects so each is seen from several directions."
+      ],
+      "scale_vs_board_pct": 0.75,
+      "board_fit_rms_mm": 23.69,
+      "up_axis_error_deg": 0.474,
+      "max_pair_distance_error_pct": 0.46,
+      "passes_gates": {
+        "registered_fraction": false,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    },
+    {
+      "scene": "s11",
+      "video": "alt_lighting/s11LB2",
+      "board": "grid",
+      "frames": 40,
+      "registered": 40,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        40
+      ],
+      "sfm_reprojection_px": 0.538,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 25,
+        "1": 19,
+        "2": 26,
+        "3": 34,
+        "4": 39,
+        "5": 40
+      },
+      "tag_reprojection_px": 0.579,
+      "scale_m_per_unit": 0.1736351010524158,
+      "scale_spread_pct": 0.85,
+      "reference_tag": 5,
+      "plane_inlier_fraction": 0.855,
+      "plane_rms_mm": 1.49,
+      "flags": [],
+      "azimuth_coverage_deg": 72.7,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 0.54,
+      "board_fit_rms_mm": 1.46,
+      "up_axis_error_deg": 0.077,
+      "max_pair_distance_error_pct": 1.0,
+      "passes_gates": {
+        "registered_fraction": true,
+        "sfm_reprojection_px": true,
+        "marker_distance": true,
+        "up_axis": true
+      }
+    }
+  ]
+}
