@@ -157,3 +157,43 @@ not recorded yet.
 * `thumbnails/` is tracked: about 512 px on the long side, EXIF stripped, neutral background.
   It shows which exact item was measured, since labels alone are ambiguous.
 
+## pycolmap GPU benchmark (experimental, `experiment/pycolmap-gpu-benchmark` branch)
+
+D-016 (PLAN.md) picked pycolmap on CPU for the MVP because there was no NVIDIA GPU
+available at the time. This branch measures `pycolmap-cuda12` on an RTX 3070 to get real
+numbers for a future decision; it does not change the production backend.
+
+Two things make this harder than swapping a flag:
+
+* The CPU wheel (`pycolmap`) and the GPU wheel (`pycolmap-cuda12`) import as the same
+  module name, so they cannot be installed in the same environment. The GPU wheel lives in
+  a separate, gitignored `.venv-gpu/` (`uv venv .venv-gpu && uv pip install --python
+  .venv-gpu pycolmap-cuda12 numpy opencv-python-headless`), not in the project's own `.venv`.
+* Only `pycolmap.extract_features` and `pycolmap.match_exhaustive` take a `device` argument.
+  `pycolmap.incremental_mapping` (bundle adjustment) has no GPU path in either build, so it
+  is CPU-bound regardless of which wheel is installed.
+
+Script: `benchmark/gpu_bench.py`. Run once per environment (see the file's docstring), scene
+frames extracted at the project's current `capture.target_fps` (5), full resolution, no resize.
+
+**Result so far — scene s01 (89 frames), 1 run each, no repeats:**
+
+| Phase | CPU | GPU (RTX 3070) | Speedup |
+| --- | --- | --- | --- |
+| extract_features | 13.68 s | 2.51 s | 5.4x |
+| match_exhaustive | 68.85 s | 56.83 s | 1.2x |
+| incremental_mapping (no GPU path) | 23.39 s | 24.44 s | ~1.0x |
+| **total** | **105.92 s** | **83.78 s** | **1.26x** |
+
+Both runs registered all 89 frames; mean reprojection error was within noise of each other
+(0.653 px CPU vs 0.682 px GPU). Raw numbers: `benchmark/results/gpu_benchmark_cpu.json` and
+`benchmark/results/gpu_benchmark_cuda.json`.
+
+Reading this one scene: feature extraction gets a large win, exhaustive matching a modest
+one (89 frames may not be enough pairs to saturate the GPU), and mapping/bundle adjustment —
+often the larger share of total time on bigger scenes — gets nothing, since it has no GPU
+path. The one-scene total speedup (1.26x) likely understates the win on larger scenes, where
+match_exhaustive's O(n^2) pair count grows faster than map time. A full sweep across the
+dev scenes used as D-016 evidence (s01, s02, s05, s10, s19, s23 — 89 to ~320 frames at 5 fps)
+is planned to check whether that holds; not run yet.
+

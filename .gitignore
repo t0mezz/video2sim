@@ -2,12 +2,16 @@
 __pycache__/
 *.py[cod]
 .venv/
+.venv-*/
 .mypy_cache/
 .pytest_cache/
 .ruff_cache/
 *.egg-info/
 dist/
 build/
+
+# Scratch work dirs for throwaway benchmark scripts
+benchmark/gpu_bench_work/
 
 # Secrets
 .env
