@@ -1,4 +1,4 @@
-"""Check metric scale and the world frame on grid-board benchmark scenes (P1.2, P1.3).
+"""Check metric scale and the world frame on benchmark scenes (P1.2, P1.3).
 
     uv run python benchmark/eval_world_frame.py s01/video_b s02/video_a --out results.json
 
@@ -9,8 +9,10 @@ are compared with the layout, and the table normal is compared with the normal o
 fitted to the tag corners. Results are compared with ``gates.reconstruction`` in
 ``configs/targets.yaml``, which is read and never changed.
 
-Grid scenes only: the clean-board scenes have no known tag spacing. The board is assumed to be
-A1 with the tag edge from ``capture.marker.tag_size_m``. Work files go to ``--work``
+The board comparison runs only for scenes whose ``ground_truth.json`` says ``board: grid``; the
+board is then assumed to be A1 with the tag edge from ``capture.marker.tag_size_m``. For
+``board: clean`` scenes the tag placement is not known, so the board fields and the gates that
+need them (marker distance, up axis) are left out of the row. Work files go to ``--work``
 (default ``data/world_frame_work``, ignored by git). Use dev-split scenes while tuning.
 """
 
@@ -30,6 +32,7 @@ from typing import Any
 import numpy as np
 import yaml
 
+from video2sim.evaluation.scenes import load_scene
 from video2sim.stages.reconstruction import (
     ReconstructionLimits,
     WorldFrameConfig,
@@ -66,6 +69,11 @@ def evaluate(
     layout: BoardLayout,
     limits: ReconstructionLimits,
 ) -> dict[str, Any]:
+    board_kind = load_scene(ROOT / f"benchmark/scenes/{scene}/ground_truth.json").board
+    if board_kind not in ("grid", "clean"):
+        raise ValueError(
+            f"{scene}: ground_truth.json has board {board_kind!r}, expected grid or clean"
+        )
     wf = WorldFrameConfig.from_config(cfg)
     root = work / f"{scene}_{video.replace('/', '_')}"
     frames_dir = root / "frames"
@@ -88,6 +96,30 @@ def evaluate(
             "gate_reasons": check_reconstruction(sfm, None, limits),
         }
 
+    row = {
+        "scene": scene,
+        "video": video,
+        "board": board_kind,
+        "frames": sfm.n_input_frames,
+        "registered": len(sfm.images),
+        "registered_fraction": round(sfm.registered_fraction, 4),
+        "model_sizes": sfm.model_sizes,
+        "sfm_reprojection_px": round(sfm.mean_reprojection_px, 3),
+        "tags": sorted(res.tag_views),
+        "tag_views": {str(k): v for k, v in sorted(res.tag_views.items())},
+        "tag_reprojection_px": round(res.tag_reprojection_px, 3),
+        "scale_m_per_unit": res.scale.scale,
+        "scale_spread_pct": round(100 * res.scale.spread, 2),
+        "reference_tag": res.reference_tag,
+        "plane_inlier_fraction": round(res.table.inlier_fraction, 3),
+        "plane_rms_mm": round(1000 * res.table.rms_m, 2),
+        "flags": res.flags + (["sfm_fragmented"] if sfm.fragmented else []),
+        "azimuth_coverage_deg": round(camera_coverage(sfm, res).azimuth_deg, 1),
+        "gate_reasons": check_reconstruction(sfm, res, limits),
+    }
+    if board_kind == "clean":
+        return row
+
     # Independent check from the known board spacing; the pipeline never sees it.
     board = fit_board(layout, res.tag_corners_recon)
     centers = {i: layout.tag_corners_m[i].mean(axis=0) for i in res.tag_centers_world_m}
@@ -105,30 +137,15 @@ def evaluate(
     n_board = board.R_board_from_recon.T @ np.array([0.0, 0.0, 1.0])
     up = np.asarray(res.table.plane.normal)
     up_err = min(angle_between_deg(up, n_board), angle_between_deg(up, -n_board))
-    return {
-        "scene": scene,
-        "video": video,
-        "frames": sfm.n_input_frames,
-        "registered": len(sfm.images),
-        "registered_fraction": round(sfm.registered_fraction, 4),
-        "model_sizes": sfm.model_sizes,
-        "sfm_reprojection_px": round(sfm.mean_reprojection_px, 3),
-        "tags": sorted(res.tag_views),
-        "tag_views": {str(k): v for k, v in sorted(res.tag_views.items())},
-        "tag_reprojection_px": round(res.tag_reprojection_px, 3),
-        "scale_m_per_unit": res.scale.scale,
-        "scale_spread_pct": round(100 * res.scale.spread, 2),
-        "scale_vs_board_pct": round(100 * (res.scale.scale / board.scale - 1.0), 2),
-        "board_fit_rms_mm": round(1000 * board.rms_m, 2),
-        "reference_tag": res.reference_tag,
-        "plane_inlier_fraction": round(res.table.inlier_fraction, 3),
-        "plane_rms_mm": round(1000 * res.table.rms_m, 2),
-        "up_axis_error_deg": round(up_err, 3),
-        "max_pair_distance_error_pct": round(float(np.max(np.abs(pair_err))), 2),
-        "flags": res.flags + (["sfm_fragmented"] if sfm.fragmented else []),
-        "azimuth_coverage_deg": round(camera_coverage(sfm, res).azimuth_deg, 1),
-        "gate_reasons": check_reconstruction(sfm, res, limits),
-    }
+    row.update(
+        {
+            "scale_vs_board_pct": round(100 * (res.scale.scale / board.scale - 1.0), 2),
+            "board_fit_rms_mm": round(1000 * board.rms_m, 2),
+            "up_axis_error_deg": round(up_err, 3),
+            "max_pair_distance_error_pct": round(float(np.max(np.abs(pair_err))), 2),
+        }
+    )
+    return row
 
 
 def _git_commit() -> str:
@@ -163,16 +180,20 @@ def main() -> None:
             row = evaluate(scene, video, args.work, cfg, layout, limits)
         except ValueError as e:  # a user-facing reconstruction failure, kept in the results
             row = {"scene": scene, "video": video, "error": str(e)}
-        if "error" not in row and "scale_vs_board_pct" in row:
+        if "error" not in row and "registered_fraction" in row and "tags" in row:
             row["passes_gates"] = {
                 "registered_fraction": row["registered_fraction"]
                 >= gates["registered_frame_fraction_min"],
                 "sfm_reprojection_px": row["sfm_reprojection_px"]
                 <= gates["mean_reprojection_error_max_px"],
-                "marker_distance": row["max_pair_distance_error_pct"] / 100.0
-                <= gates["marker_distance_error_max"],
-                "up_axis": row["up_axis_error_deg"] <= gates["up_axis_error_max_deg"],
             }
+            if row["board"] == "grid":  # these two need the known board layout
+                row["passes_gates"]["marker_distance"] = (
+                    row["max_pair_distance_error_pct"] / 100.0 <= gates["marker_distance_error_max"]
+                )
+                row["passes_gates"]["up_axis"] = (
+                    row["up_axis_error_deg"] <= gates["up_axis_error_max_deg"]
+                )
         log.info(json.dumps(row))
         rows.append(row)
 
@@ -182,7 +203,7 @@ def main() -> None:
         "date": date.today().isoformat(),
         "git_commit": _git_commit(),
         "pycolmap": pycolmap.__version__,
-        "board_assumed": "A1 grid, nominal layout, tag edge from capture.marker.tag_size_m",
+        "board_assumed": "grid scenes: A1 grid, tag edge from capture.marker.tag_size_m",
         "gates": gates,
         "world_frame_config": cfg["reconstruction"]["world_frame"],
         "quality_config": cfg["reconstruction"]["quality"],
