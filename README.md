@@ -10,6 +10,10 @@ point for reinforcement learning and robot training.
 **Status:** pre-MVP. The repository holds the contracts between stages and the plan. The
 stages themselves are implemented phase by phase; see [PLAN.md](PLAN.md).
 
+**This branch (`experiment/pycolmap-gpu-benchmark`):** measures `pycolmap-cuda12` vs the
+CPU backend (D-016) on an RTX 3070. One scene so far: 1.26x total, 5.4x on feature
+extraction. See [benchmark/README.md](benchmark/README.md#pycolmap-gpu-benchmark-experimental-experimentpycolmap-gpu-benchmark-branch).
+
 ## Quick start
 
 ```bash
