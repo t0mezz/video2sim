@@ -11,8 +11,8 @@ Last updated: 2026-10-26. Start date: not set (decision D-002).
 | Phase | Weeks | Focus | Status | Gate |
 | --- | --- | --- | --- | --- |
 | 0 | 1 to 2 | Foundations, benchmark, evaluation harness | Done | Passed |
-| 1 | 3 to 4 | Reconstruction, metric scale, world frame | Not started | Open |
-| 2 | 5 to 6 | Segmentation, tracking, 3D lifting | Not started | Open |
+| 1 | 3 to 4 | Reconstruction, metric scale, world frame | Done | Passed |
+| 2 | 5 to 6 | Segmentation, tracking, 3D lifting | Open | Open |
 | 3 | 7 to 8 | Shape completion and pose fusion | Not started | Open |
 | 4 | 9 to 10 | Physics readiness, material properties | Not started | Open |
 | 5 | 11 to 12 | Export, simulator validation, demo | Not started | Open |
@@ -276,6 +276,7 @@ Tasks
       from the marker, cameras 0.58 to 0.75 m above the table. Not done: a rejected video run
       through the real stages (only a synthetic test covers it), more than one video, and
       cropping the point cloud (stray points lie below the table).
+
 - [x] **P1.6** Evaluate the gate on the benchmark (`gates.reconstruction` in the config).
 
       Evidence: `benchmark/results/p1_world_frame_dev_tag_1003.json` (20 dev videos, tag edge 100.3 mm, pycolmap 4.2.1,
@@ -548,6 +549,7 @@ In order:
    replacing the material-class guess.
 
 6. **Reconstruction back ends (from P1.1).** Compare VGGT (and MASt3R) with pycolmap on the
+
    benchmark for tag-scale and up-axis error and on failures on low-texture tables, and check
    that `pycolmap-cuda12` runs and how much faster it is on a GPU. Both need a GPU host,
    weight downloads and license decisions (`docs/licenses.md`).
