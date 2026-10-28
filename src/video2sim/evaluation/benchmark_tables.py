@@ -37,6 +37,9 @@ SCENE_FIELDS = ("tier", "split", "board", "marker_family", "tag_size_mm")
 SIZE_AXES = ("length", "width", "height")
 SAFE_ID = re.compile(r"[A-Za-z0-9_-]+")
 STATION = re.compile(r"([A-Za-z])([0-9]+)")
+# A scenes-sheet note such as "stack 1 (ontop of 2)" puts the object on the ones with a lower
+# number at the same position; "stack 0" is the lowest.
+STACK_NOTE = re.compile(r"\bstack\s+(\d+)\b", re.IGNORECASE)
 # Lattice of the printed board, `benchmark/make_board.py` (STATION_MM). Large stations
 # sit on the lattice, small ones in the middle of each cell.
 STATION_MM = 100.0
@@ -254,6 +257,7 @@ def _build_scene(
         tag_mm = None
 
     objects: list[Scene] = []
+    stacks: dict[tuple[float, float], list[tuple[int, Scene]]] = defaultdict(list)
     seen: set[str] = set()
     for row in rows:
         oid = row.get("object_id", "")
@@ -292,16 +296,22 @@ def _build_scene(
             x, y = position
             # The object rests on the board, so the bounding-box center is half the height
             # up. It differs from the volume centroid for cones and mugs; see the README.
+            # Stacked objects are lifted onto the ones below them after the loop.
             obj["position_m"] = [
                 round(x / 1000.0, 6),
                 round(y / 1000.0, 6),
                 round(size_m[2] / 2.0, 6),
             ]
+        note = STACK_NOTE.search(row.get("notes", ""))
+        if note and position is not None and size_m is not None:
+            stacks[position].append((int(note.group(1)), obj))
         obj["yaw_deg"] = yaw
         obj["incomplete"] = gaps
         if gaps and inv is not None:
             warnings.append(f"{sid}: {oid} ({obj.get('label', '')}) incomplete: {gaps}")
         objects.append(obj)
+
+    warnings.extend(_lift_stacks(sid, stacks))
 
     scene: Scene = {
         "scene_id": sid,
@@ -315,6 +325,31 @@ def _build_scene(
         "objects": objects,
     }
     return scene, warnings
+
+
+def _lift_stacks(sid: str, stacks: dict[tuple[float, float], list[tuple[int, Scene]]]) -> list[str]:
+    """Raise each stacked object by the heights of the objects below it.
+
+    The z of position_m is the bounding-box center, so an object on a stack sits at the
+    summed height of the lower ones plus half its own. Stack numbers at one position must be
+    0, 1, 2, ... without gaps; otherwise the objects stay on the board and a warning says so.
+    """
+    warnings: list[str] = []
+    for (x_mm, y_mm), members in stacks.items():
+        ordered = sorted(members, key=lambda m: m[0])
+        if [n for n, _ in ordered] != list(range(len(ordered))):
+            ids = [str(o["object_id"]) for _, o in ordered]
+            warnings.append(
+                f"{sid}: stack numbers at ({x_mm:g}, {y_mm:g}) mm are not 0, 1, 2, ...: {ids}; "
+                "heights not stacked"
+            )
+            continue
+        base = 0.0
+        for _, obj in ordered:
+            height = obj["size_m"][2]
+            obj["position_m"][2] = round(base + height / 2.0, 6)
+            base += height
+    return warnings
 
 
 def write_scenes(scenes: dict[str, Scene], out_dir: Path) -> list[Path]:
