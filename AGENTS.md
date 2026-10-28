@@ -58,7 +58,10 @@ uv run video2sim eval --baseline constant   # metric report on the dev scenes, s
 `video2sim eval` scores a baseline (`--baseline oracle|constant`) or pipeline runs
 (`--runs DIR`, one run folder per scene id) against `benchmark/scenes/*/ground_truth.json`.
 It defaults to the dev split; `--split test` is for phase gates only, and `--scene ID`
-scores one scene. Scenes with a deformable object are left out (D-014) unless named with `--scene`. It writes `report.json` and `report.html` and exits 0 unless
+scores one scene. `--stage segmentation` scores the point clusters in `segmentation/output.json`
+instead of the shape meshes and adds a Phase 2 section (cluster box error on easy scenes,
+identity switches, flags on s17 to s20; switches stay `no_data` until track masks have a
+loader). Scenes with a deformable object are left out (D-014) unless named with `--scene`. It writes `report.json` and `report.html` and exits 0 unless
 `--fail-on-target` is given. The metric definitions are decision D-012 in `PLAN.md`.
 
 CI (`.github/workflows/ci.yml`) runs ruff check, `ruff format --check`, mypy and the fast

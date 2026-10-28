@@ -16,12 +16,15 @@ from video2sim.evaluation.loader import load_run
 from video2sim.evaluation.metrics import SceneResult, evaluate_scene
 from video2sim.evaluation.report import build_report, write_html, write_json
 from video2sim.evaluation.scenes import GtScene, Prediction, discover_scenes
+from video2sim.evaluation.segmentation import load_instances, summarize_segmentation
 from video2sim.runner import _code_version, sha256_file
 
 SPLIT_CHOICES = {"dev": ["dev"], "test": ["test"], "all": ["dev", "test"]}
 
 
-def _predict(args: argparse.Namespace, scene: GtScene) -> Prediction:
+def _predict(
+    args: argparse.Namespace, scene: GtScene, segmentation_flags: dict[str, dict[str, Any]]
+) -> Prediction:
     if args.baseline == "oracle":
         return baselines.oracle(
             scene,
@@ -33,6 +36,10 @@ def _predict(args: argparse.Namespace, scene: GtScene) -> Prediction:
         )
     if args.baseline == "constant":
         return baselines.constant_box()
+    if args.stage == "segmentation":
+        run = load_instances(args.runs / scene.scene_id)
+        segmentation_flags[scene.scene_id] = dict(run.flags)
+        return run.prediction
     return load_run(args.runs / scene.scene_id)
 
 
@@ -59,6 +66,12 @@ def _build_parser() -> argparse.ArgumentParser:
         default=Path("runs"),
         help="folder holding one run folder per scene id (default: runs)",
     )
+    ev.add_argument(
+        "--stage",
+        choices=["shape", "segmentation"],
+        default="shape",
+        help="which stage output to score for --runs: shape meshes or segmentation clusters",
+    )
     ev.add_argument("--targets", type=Path, default=Path("configs/targets.yaml"))
     ev.add_argument("--config", type=Path, default=Path("configs/default.yaml"))
     ev.add_argument("--out", type=Path, default=Path("eval_out"))
@@ -81,13 +94,14 @@ def run_eval(args: argparse.Namespace) -> int:
     scenes, missing = discover_scenes(args.benchmark, SPLIT_CHOICES[args.split], args.scene)
 
     results: list[SceneResult] = []
+    segmentation_flags: dict[str, dict[str, Any]] = {}
     unpredicted: list[str] = []
     deformable = [s.scene_id for s in scenes if s.has_deformable and args.scene is None]
     for scene in scenes:
         if scene.scene_id in deformable:
             continue
         try:
-            prediction = _predict(args, scene)
+            prediction = _predict(args, scene, segmentation_flags)
         except (OSError, ValueError) as error:
             print(f"{scene.scene_id}: no usable prediction ({error})", file=sys.stderr)
             unpredicted.append(scene.scene_id)
@@ -105,6 +119,15 @@ def run_eval(args: argparse.Namespace) -> int:
         "scenes_excluded_deformable": ", ".join(deformable) or None,
     }
     report = build_report(results, targets, header, missing)
+    if args.stage == "segmentation" or (args.baseline and args.baseline != "constant"):
+        # Identity switches need track masks, which no loader reads yet (P2.2): no_data.
+        report["segmentation"] = summarize_segmentation(
+            results,
+            {k: {o: tuple(f) for o, f in v.items()} for k, v in segmentation_flags.items()},
+            {},
+            targets.get("gates", {}).get("segmentation", {}),
+            targets["targets"].get("object_recall_min"),
+        )
     args.out.mkdir(parents=True, exist_ok=True)
     write_json(report, args.out / "report.json")
     write_html(report, args.out / "report.html")
