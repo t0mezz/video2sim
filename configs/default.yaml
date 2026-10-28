@@ -71,6 +71,18 @@ segmentation:
     min_points: 8              # the sparse-point variant: fewer voted SfM points drop the track
     table_margin_m: 0.003      # sparse points this close to the table plane are the table, not the object
   keyframes_per_object: 5
+  keyframes:                   # P2.4; per-frame quality is the product of four scores, see stages/keyframes.py
+    min_mask_px: 400           # smaller masks are not candidates
+    border_band_frac: 0.02     # band at the image edge, share of the short side; mask pixels in it count as cut off
+    occluder_ring_px: 6        # ring around the mask checked for other tracks' masks
+    weight_area: 1.0           # exponent of each score; 0 switches it off
+    weight_border: 1.0
+    weight_occlusion: 1.0
+    weight_sharpness: 0.5
+    diversity_weight: 0.8      # a frame at the same viewing angle as a chosen one keeps 1 - this of its quality
+    diversity_sigma_deg: 25.0  # viewing angle at which the penalty falls to 61%
+    min_quality: 0.15          # a frame whose own quality is lower is never chosen, so fewer than the count may result
+    min_separation_deg: 5.0    # a frame this close in viewing angle to a chosen one adds nothing and is skipped
 
 shape:
   backend: null                # TODO(P3.3): chosen in the Phase 3 bake-off

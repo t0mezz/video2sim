@@ -1,0 +1,673 @@
+{
+  "summary": {
+    "diverse": {
+      "mean_quality": 0.53,
+      "mean_pair_angle_deg": 41.3,
+      "mean_min_pair_angle_deg": 13.96
+    },
+    "quality_only": {
+      "mean_quality": 0.58,
+      "mean_pair_angle_deg": 26.55,
+      "mean_min_pair_angle_deg": 6.16
+    }
+  },
+  "scenes": [
+    {
+      "run": "s01_b",
+      "tracks": 5,
+      "with_tracks_centered": 5,
+      "diverse": {
+        "frames": 25,
+        "mean_quality": 0.353,
+        "mean_pair_angle_deg": 44.6,
+        "mean_min_pair_angle_deg": 10.3
+      },
+      "quality_only": {
+        "frames": 25,
+        "mean_quality": 0.374,
+        "mean_pair_angle_deg": 34.6,
+        "mean_min_pair_angle_deg": 6.4
+      },
+      "notes": {},
+      "frames": {
+        "0": [
+          13,
+          41,
+          20,
+          6,
+          16
+        ],
+        "1": [
+          24,
+          13,
+          2,
+          19,
+          29
+        ],
+        "2": [
+          22,
+          8,
+          37,
+          14,
+          11
+        ],
+        "3": [
+          37,
+          13,
+          22,
+          19,
+          27
+        ],
+        "4": [
+          13,
+          26,
+          20,
+          0,
+          16
+        ]
+      }
+    },
+    {
+      "run": "s02_b",
+      "tracks": 5,
+      "with_tracks_centered": 5,
+      "diverse": {
+        "frames": 25,
+        "mean_quality": 0.507,
+        "mean_pair_angle_deg": 43.8,
+        "mean_min_pair_angle_deg": 15.3
+      },
+      "quality_only": {
+        "frames": 25,
+        "mean_quality": 0.558,
+        "mean_pair_angle_deg": 29.7,
+        "mean_min_pair_angle_deg": 6.8
+      },
+      "notes": {},
+      "frames": {
+        "0": [
+          29,
+          6,
+          19,
+          33,
+          24
+        ],
+        "1": [
+          34,
+          21,
+          26,
+          30,
+          4
+        ],
+        "2": [
+          26,
+          17,
+          34,
+          23,
+          30
+        ],
+        "3": [
+          34,
+          21,
+          28,
+          47,
+          24
+        ],
+        "4": [
+          23,
+          37,
+          28,
+          12,
+          31
+        ]
+      }
+    },
+    {
+      "run": "s03_b",
+      "tracks": 1,
+      "with_tracks_centered": 1,
+      "diverse": {
+        "frames": 5,
+        "mean_quality": 0.381,
+        "mean_pair_angle_deg": 50.7,
+        "mean_min_pair_angle_deg": 15.0
+      },
+      "quality_only": {
+        "frames": 5,
+        "mean_quality": 0.419,
+        "mean_pair_angle_deg": 31.8,
+        "mean_min_pair_angle_deg": 5.1
+      },
+      "notes": {},
+      "frames": {
+        "0": [
+          30,
+          50,
+          74,
+          37,
+          17
+        ]
+      }
+    },
+    {
+      "run": "s04_b",
+      "tracks": 5,
+      "with_tracks_centered": 5,
+      "diverse": {
+        "frames": 25,
+        "mean_quality": 0.542,
+        "mean_pair_angle_deg": 45.0,
+        "mean_min_pair_angle_deg": 18.3
+      },
+      "quality_only": {
+        "frames": 25,
+        "mean_quality": 0.619,
+        "mean_pair_angle_deg": 27.6,
+        "mean_min_pair_angle_deg": 6.6
+      },
+      "notes": {},
+      "frames": {
+        "0": [
+          26,
+          54,
+          32,
+          0,
+          40
+        ],
+        "1": [
+          32,
+          9,
+          52,
+          59,
+          28
+        ],
+        "2": [
+          61,
+          5,
+          28,
+          31,
+          13
+        ],
+        "3": [
+          24,
+          51,
+          34,
+          43,
+          1
+        ],
+        "4": [
+          40,
+          27,
+          34,
+          51,
+          30
+        ]
+      }
+    },
+    {
+      "run": "s05_b",
+      "tracks": 0,
+      "with_tracks_centered": 0,
+      "diverse": {
+        "frames": 0,
+        "mean_quality": null,
+        "mean_pair_angle_deg": null,
+        "mean_min_pair_angle_deg": null
+      },
+      "quality_only": {
+        "frames": 0,
+        "mean_quality": null,
+        "mean_pair_angle_deg": null,
+        "mean_min_pair_angle_deg": null
+      },
+      "notes": {},
+      "frames": {}
+    },
+    {
+      "run": "s06_b",
+      "tracks": 4,
+      "with_tracks_centered": 4,
+      "diverse": {
+        "frames": 20,
+        "mean_quality": 0.698,
+        "mean_pair_angle_deg": 31.1,
+        "mean_min_pair_angle_deg": 8.4
+      },
+      "quality_only": {
+        "frames": 20,
+        "mean_quality": 0.776,
+        "mean_pair_angle_deg": 13.8,
+        "mean_min_pair_angle_deg": 5.5
+      },
+      "notes": {},
+      "frames": {
+        "0": [
+          47,
+          17,
+          117,
+          39,
+          53
+        ],
+        "1": [
+          16,
+          8,
+          97,
+          13,
+          66
+        ],
+        "2": [
+          42,
+          17,
+          30,
+          35,
+          68
+        ],
+        "3": [
+          44,
+          53,
+          29,
+          74,
+          48
+        ]
+      }
+    },
+    {
+      "run": "s11_b",
+      "tracks": 7,
+      "with_tracks_centered": 7,
+      "diverse": {
+        "frames": 35,
+        "mean_quality": 0.566,
+        "mean_pair_angle_deg": 32.2,
+        "mean_min_pair_angle_deg": 12.0
+      },
+      "quality_only": {
+        "frames": 35,
+        "mean_quality": 0.638,
+        "mean_pair_angle_deg": 17.4,
+        "mean_min_pair_angle_deg": 6.1
+      },
+      "notes": {},
+      "frames": {
+        "0": [
+          38,
+          19,
+          83,
+          66,
+          76
+        ],
+        "1": [
+          21,
+          42,
+          25,
+          6,
+          85
+        ],
+        "2": [
+          44,
+          23,
+          82,
+          64,
+          9
+        ],
+        "3": [
+          26,
+          54,
+          18,
+          44,
+          23
+        ],
+        "4": [
+          32,
+          91,
+          85,
+          66,
+          26
+        ],
+        "5": [
+          44,
+          22,
+          59,
+          27,
+          32
+        ],
+        "6": [
+          42,
+          64,
+          86,
+          82,
+          46
+        ]
+      }
+    },
+    {
+      "run": "s12_b",
+      "tracks": 10,
+      "with_tracks_centered": 9,
+      "diverse": {
+        "frames": 45,
+        "mean_quality": 0.642,
+        "mean_pair_angle_deg": 51.1,
+        "mean_min_pair_angle_deg": 16.2
+      },
+      "quality_only": {
+        "frames": 45,
+        "mean_quality": 0.715,
+        "mean_pair_angle_deg": 30.6,
+        "mean_min_pair_angle_deg": 6.2
+      },
+      "notes": {
+        "3": "no point cluster, so no viewing direction"
+      },
+      "frames": {
+        "0": [
+          9,
+          48,
+          25,
+          71,
+          55
+        ],
+        "1": [
+          42,
+          4,
+          80,
+          18,
+          41
+        ],
+        "2": [
+          42,
+          31,
+          7,
+          19,
+          54
+        ],
+        "4": [
+          18,
+          75,
+          43,
+          33,
+          39
+        ],
+        "5": [
+          57,
+          0,
+          51,
+          29,
+          80
+        ],
+        "6": [
+          17,
+          31,
+          42,
+          73,
+          60
+        ],
+        "7": [
+          39,
+          13,
+          34,
+          58,
+          73
+        ],
+        "8": [
+          20,
+          9,
+          45,
+          31,
+          54
+        ],
+        "9": [
+          51,
+          72,
+          35,
+          14,
+          38
+        ]
+      }
+    },
+    {
+      "run": "s13_b",
+      "tracks": 2,
+      "with_tracks_centered": 2,
+      "diverse": {
+        "frames": 10,
+        "mean_quality": 0.215,
+        "mean_pair_angle_deg": 46.6,
+        "mean_min_pair_angle_deg": 18.7
+      },
+      "quality_only": {
+        "frames": 10,
+        "mean_quality": 0.232,
+        "mean_pair_angle_deg": 29.0,
+        "mean_min_pair_angle_deg": 7.0
+      },
+      "notes": {},
+      "frames": {
+        "0": [
+          39,
+          72,
+          8,
+          30,
+          57
+        ],
+        "1": [
+          16,
+          61,
+          36,
+          72,
+          8
+        ]
+      }
+    },
+    {
+      "run": "s14_b",
+      "tracks": 6,
+      "with_tracks_centered": 6,
+      "diverse": {
+        "frames": 26,
+        "mean_quality": 0.705,
+        "mean_pair_angle_deg": 26.7,
+        "mean_min_pair_angle_deg": 7.5
+      },
+      "quality_only": {
+        "frames": 26,
+        "mean_quality": 0.726,
+        "mean_pair_angle_deg": 22.5,
+        "mean_min_pair_angle_deg": 6.4
+      },
+      "notes": {
+        "5": "1 of 5 keyframes: the rest are weak or repeat a view"
+      },
+      "frames": {
+        "0": [
+          15,
+          50,
+          3,
+          34,
+          9
+        ],
+        "1": [
+          10,
+          4,
+          8,
+          34,
+          14
+        ],
+        "2": [
+          11,
+          49,
+          14,
+          40,
+          8
+        ],
+        "3": [
+          50,
+          34,
+          39,
+          45,
+          4
+        ],
+        "4": [
+          45,
+          14,
+          36,
+          40,
+          50
+        ],
+        "5": [
+          45
+        ]
+      }
+    },
+    {
+      "run": "s17_b",
+      "tracks": 5,
+      "with_tracks_centered": 5,
+      "diverse": {
+        "frames": 25,
+        "mean_quality": 0.545,
+        "mean_pair_angle_deg": 46.9,
+        "mean_min_pair_angle_deg": 18.5
+      },
+      "quality_only": {
+        "frames": 25,
+        "mean_quality": 0.607,
+        "mean_pair_angle_deg": 33.7,
+        "mean_min_pair_angle_deg": 5.7
+      },
+      "notes": {},
+      "frames": {
+        "0": [
+          44,
+          17,
+          57,
+          23,
+          36
+        ],
+        "1": [
+          31,
+          72,
+          20,
+          41,
+          81
+        ],
+        "2": [
+          33,
+          8,
+          22,
+          66,
+          27
+        ],
+        "3": [
+          40,
+          12,
+          26,
+          54,
+          83
+        ],
+        "4": [
+          25,
+          46,
+          79,
+          33,
+          20
+        ]
+      }
+    },
+    {
+      "run": "s18_b",
+      "tracks": 8,
+      "with_tracks_centered": 8,
+      "diverse": {
+        "frames": 40,
+        "mean_quality": 0.656,
+        "mean_pair_angle_deg": 35.6,
+        "mean_min_pair_angle_deg": 13.4
+      },
+      "quality_only": {
+        "frames": 40,
+        "mean_quality": 0.735,
+        "mean_pair_angle_deg": 21.3,
+        "mean_min_pair_angle_deg": 6.0
+      },
+      "notes": {},
+      "frames": {
+        "0": [
+          37,
+          76,
+          71,
+          73,
+          55
+        ],
+        "1": [
+          43,
+          29,
+          35,
+          65,
+          32
+        ],
+        "2": [
+          74,
+          37,
+          31,
+          84,
+          77
+        ],
+        "3": [
+          29,
+          42,
+          68,
+          84,
+          38
+        ],
+        "4": [
+          37,
+          76,
+          31,
+          58,
+          42
+        ],
+        "5": [
+          43,
+          77,
+          32,
+          38,
+          56
+        ],
+        "6": [
+          69,
+          50,
+          83,
+          39,
+          27
+        ],
+        "7": [
+          29,
+          43,
+          36,
+          83,
+          32
+        ]
+      }
+    },
+    {
+      "run": "s24_b",
+      "tracks": 0,
+      "with_tracks_centered": 0,
+      "diverse": {
+        "frames": 0,
+        "mean_quality": null,
+        "mean_pair_angle_deg": null,
+        "mean_min_pair_angle_deg": null
+      },
+      "quality_only": {
+        "frames": 0,
+        "mean_quality": null,
+        "mean_pair_angle_deg": null,
+        "mean_min_pair_angle_deg": null
+      },
+      "notes": {},
+      "frames": {}
+    }
+  ]
+}

@@ -322,9 +322,10 @@ Tasks
 
       outliers, hands and arms.
 
-- [ ] **P2.4** Keyframe selection per object: score mask area, occlusion, border contact and
+- [x] **P2.4** Keyframe selection per object: score mask area, occlusion, border contact and
 
-      sharpness. Store the top 3 to 5.
+      sharpness. Store the top 3 to 5. Evidence: `benchmark/results/p2_4_dev.json`, see the
+      P2.4 entry below. Frames from similar camera poses are penalised.
 
 - [ ] **P2.5** Failure flags: unstable depth (likely transparent or reflective), thin, tiny,
 
@@ -377,6 +378,19 @@ Evidence:
   - Hands and arms are not detected as such. They move between views, so their masks agree on almost no voxels and the track is dropped with a reason. None of the 13 scenes has a hand track, so this is untested. `video_a` orbits were not run except s16_a; the `_b` paths of the other scenes are short arcs, and whether a fuller `video_a` orbit tightens the hull is untested.
   - Dev scenes were used to choose `min_agreement` (0.9); s16_a was not.
   - **Decision for Phase 3 (human, 2026-10-28):** keep both clusters and compare them as registration targets in P3.2. The fit compares observed surface points with the mesh surface, which favours the points; the hull gives a filled volume and seeds position. Mass scales with size cubed (AGENTS.md), so a 35% size bias matters. The 10% criterion stays unticked until that comparison or a human change to it.
+- P2.4 keyframes: `benchmark/results/p2_4_dev.json`, made by `benchmark/run_keyframes.py` from the existing dev runs (13 runs, 11 with tracks, 58 tracks); code in `stages/keyframes.py`, config `segmentation.keyframes`. Contact sheets of the picks were checked by eye for s01_b and s13_b (`--preview`). Not yet wired into `Instances` (P2.6).
+  - **Score.** Per frame, a product of four scores in [0, 1]: mask area against the object's 90th percentile, one minus the mask share in a 2% border band, one minus the share of a 6 px ring around the mask that lies in another track's mask, and Laplacian sharpness inside the mask against its 90th percentile (exponent 0.5). A frame below quality 0.15 is never chosen.
+  - **Pose penalty.** Greedy: after the best frame, each candidate keeps `1 - 0.8 * s` of its quality, where `s` is the largest Gaussian (sigma 25 deg) of the angle between its viewing direction and a chosen one. The direction is object centre (median of the point cluster, else the hull) to camera centre, so roll does not count. Frames within 5 deg of a chosen one are skipped. The penalty only reorders, so a short arc still fills the slots.
+  - **Effect** (mean over the 11 runs, all picks up to 5 per track; the baseline is the same scores and 5 deg floor with no penalty):
+
+    | | with penalty | quality only |
+    |---|---|---|
+    | mean frame quality | 0.53 | 0.58 |
+    | mean angle between chosen views | 41 deg | 27 deg |
+    | mean smallest angle between chosen views | 14 deg | 6 deg |
+
+    The penalty costs 0.05 of mean quality for about 2.3 times the smallest view spacing. Without the 5 deg floor the quality-only pick took frames at about 1 deg from each other (s01_b: 1.0 deg mean smallest angle).
+  - **Not covered.** Occlusion counts only other tracks, so a hand or an untracked item in front of an object is not seen. Quality weights, sigma and the penalty weight are guesses, not tuned, and nothing yet measures whether the chosen frames give better meshes; that is a Phase 3 question. s13_b scores low (0.22) because its two tracks are a stack that occlude each other. s12_b track 3 has no cluster (dropped by the lift), so it gets no keyframes, and s14_b track 5 gets 1 of 5 frames. s05_b has no tracks and s24_b has none on disk.
 
 ## 7. Phase 3: Shape completion and pose fusion (weeks 7 to 8)
 
@@ -813,3 +827,4 @@ In order:
 | 2026-10-28 | Section 12 item 6: P1.1 experiment closed; VGGT added as a post-MVP opt-in fast mode with automatic pycolmap fallback; item 6b added for pycolmap optimisation |
 | 2026-10-28 | Section 12 item 6b step 1: local pycolmap profile on five videos; exhaustive matching is 59 to 80% of the time above 28 frames |
 | 2026-10-28 | Section 12 item 6b steps 2 to 5: sequential matching is 1.3 to 4.2x faster on five videos with quality inside the proposed limits and is the new default (`reconstruction.sfm.matcher`); global mapper, fewer frames, smaller images, fewer features and lighter BA tried and not adopted |
+| 2026-10-28 | P2.4: keyframe selection per object with a camera-pose diversity penalty, `benchmark/results/p2_4_dev.json` |
