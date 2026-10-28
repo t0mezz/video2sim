@@ -1,0 +1,113 @@
+{
+  "gates": {
+    "registered_frame_fraction_min": 0.95,
+    "mean_reprojection_error_max_px": 1.0,
+    "marker_distance_error_max": 0.02,
+    "up_axis_error_max_deg": 2.0
+  },
+  "runs": [
+    {
+      "scene": "s01",
+      "video": "video_b",
+      "board": "grid",
+      "frames": 28,
+      "registered": 28,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        28
+      ],
+      "sfm_reprojection_px": 0.515,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 27,
+        "1": 14,
+        "2": 14,
+        "3": 19,
+        "4": 16,
+        "5": 17
+      },
+      "tag_reprojection_px": 0.718,
+      "scale_m_per_unit": 0.2197886999500403,
+      "scale_spread_pct": 1.04,
+      "reference_tag": 0,
+      "plane_inlier_fraction": 0.405,
+      "plane_rms_mm": 1.85,
+      "flags": [],
+      "azimuth_coverage_deg": 138.4,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 0.63,
+      "board_fit_rms_mm": 1.25,
+      "up_axis_error_deg": 0.19,
+      "max_pair_distance_error_pct": 1.12,
+      "variant": "seq10",
+      "fps": 3.0,
+      "options": {
+        "matcher": "sequential"
+      },
+      "extract_s": 8.5,
+      "match_s": 4.2,
+      "map_s": 2.7,
+      "sfm_total_s": 15.5,
+      "wall_s": 17.6
+    },
+    {
+      "scene": "s01",
+      "video": "video_b",
+      "board": "grid",
+      "frames": 28,
+      "registered": 28,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        28
+      ],
+      "sfm_reprojection_px": 0.576,
+      "tags": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tag_views": {
+        "0": 27,
+        "1": 14,
+        "2": 14,
+        "3": 19,
+        "4": 16,
+        "5": 17
+      },
+      "tag_reprojection_px": 0.729,
+      "scale_m_per_unit": 0.21915858890782353,
+      "scale_spread_pct": 1.07,
+      "reference_tag": 0,
+      "plane_inlier_fraction": 0.393,
+      "plane_rms_mm": 1.85,
+      "flags": [],
+      "azimuth_coverage_deg": 138.5,
+      "gate_reasons": [],
+      "scale_vs_board_pct": 0.62,
+      "board_fit_rms_mm": 1.27,
+      "up_axis_error_deg": 0.266,
+      "max_pair_distance_error_pct": 1.13,
+      "variant": "global_seq",
+      "fps": 3.0,
+      "options": {
+        "matcher": "sequential",
+        "mapper": "global"
+      },
+      "extract_s": 8.8,
+      "match_s": 4.2,
+      "map_s": 4.1,
+      "sfm_total_s": 17.1,
+      "wall_s": 19.1
+    }
+  ]
+}

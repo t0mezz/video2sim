@@ -1,0 +1,91 @@
+{
+  "host": {
+    "machine": "arm64",
+    "platform": "macOS-27.2-arm64-arm-64bit-Mach-O",
+    "cpu_count": 10,
+    "pycolmap": "4.2.1",
+    "has_cuda": false
+  },
+  "runs": [
+    {
+      "video": "s01/video_b",
+      "fps": 3.0,
+      "frames": 28,
+      "registered": 28,
+      "model_sizes": [
+        28
+      ],
+      "points": 5843,
+      "mean_reprojection_px": 0.531,
+      "decode_s": 1.3,
+      "extract_s": 7.0,
+      "match_s": 7.2,
+      "map_s": 4.0,
+      "total_s": 19.5
+    },
+    {
+      "video": "s02/video_a",
+      "fps": 3.0,
+      "frames": 108,
+      "registered": 108,
+      "model_sizes": [
+        108
+      ],
+      "points": 15844,
+      "mean_reprojection_px": 0.734,
+      "decode_s": 5.2,
+      "extract_s": 23.9,
+      "match_s": 83.2,
+      "map_s": 18.3,
+      "total_s": 130.6
+    },
+    {
+      "video": "s16/video_a",
+      "fps": 3.0,
+      "frames": 160,
+      "registered": 160,
+      "model_sizes": [
+        160
+      ],
+      "points": 110718,
+      "mean_reprojection_px": 0.404,
+      "decode_s": 6.8,
+      "extract_s": 36.9,
+      "match_s": 488.4,
+      "map_s": 136.4,
+      "total_s": 668.6
+    },
+    {
+      "video": "s10/video_a",
+      "fps": 3.0,
+      "frames": 187,
+      "registered": 187,
+      "model_sizes": [
+        187
+      ],
+      "points": 173245,
+      "mean_reprojection_px": 0.376,
+      "decode_s": 9.1,
+      "extract_s": 60.6,
+      "match_s": 777.3,
+      "map_s": 466.4,
+      "total_s": 1313.4
+    },
+    {
+      "video": "s19/video_a",
+      "fps": 3.0,
+      "frames": 193,
+      "registered": 193,
+      "model_sizes": [
+        193
+      ],
+      "points": 34491,
+      "mean_reprojection_px": 0.661,
+      "decode_s": 8.1,
+      "extract_s": 55.1,
+      "match_s": 479.3,
+      "map_s": 55.0,
+      "total_s": 597.4
+    }
+  ]
+}

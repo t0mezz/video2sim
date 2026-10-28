@@ -35,6 +35,7 @@ import yaml
 from video2sim.evaluation.scenes import load_scene
 from video2sim.stages.reconstruction import (
     ReconstructionLimits,
+    SfmOptions,
     WorldFrameConfig,
     camera_coverage,
     check_reconstruction,
@@ -68,6 +69,9 @@ def evaluate(
     cfg: dict[str, Any],
     layout: BoardLayout,
     limits: ReconstructionLimits,
+    options: SfmOptions | None = None,
+    fps: float = 3.0,
+    timings: dict[str, float] | None = None,
 ) -> dict[str, Any]:
     board_kind = load_scene(ROOT / f"benchmark/scenes/{scene}/ground_truth.json").board
     if board_kind not in ("grid", "clean"):
@@ -78,8 +82,8 @@ def evaluate(
     root = work / f"{scene}_{video.replace('/', '_')}"
     frames_dir = root / "frames"
     if not frames_dir.exists():
-        extract_frames(ROOT / f"benchmark/scenes/{scene}/{video}.mp4", frames_dir, 3.0)
-    sfm = run_sfm(frames_dir, root / "sfm")
+        extract_frames(ROOT / f"benchmark/scenes/{scene}/{video}.mp4", frames_dir, fps)
+    sfm = run_sfm(frames_dir, root / "sfm", timings, options)
     views = tag_views(sfm, frames_dir, cfg["capture"]["marker"]["family"])
     try:
         res = solve_world_frame(views, sfm.points_xyz, wf)

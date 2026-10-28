@@ -11,6 +11,7 @@ from video2sim.stages.reconstruction import (
     ReconstructionLimits,
     SfmImage,
     SfmModel,
+    SfmOptions,
     WorldFrameConfig,
     build_world_model,
     camera_coverage,
@@ -217,3 +218,14 @@ def test_world_model_rejects_a_frame_capture_does_not_know(tmp_path: Path) -> No
     model = _model_from(views, len(views), [len(views)])
     with pytest.raises(ValueError, match="not one of the capture frames"):
         build_world_model(model, world, ["capture/frames/other.png"], (10, 10), tmp_path, "r/p.ply")
+
+
+def test_sfm_options_from_config() -> None:
+    assert SfmOptions.from_config(None) == SfmOptions()
+    assert SfmOptions.from_config({"matcher": "sequential", "loop_stride": 8}).loop_stride == 8
+    with pytest.raises(ValueError, match="unknown"):
+        SfmOptions.from_config({"matchr": "sequential"})
+    with pytest.raises(ValueError, match="matcher"):
+        SfmOptions.from_config({"matcher": "vocab"})
+    with pytest.raises(ValueError, match="mapper"):
+        SfmOptions.from_config({"mapper": "glomap"})

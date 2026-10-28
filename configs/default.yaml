@@ -23,6 +23,17 @@ reconstruction:
   quality:                     # P1.4; registered fraction and reprojection gates are in targets.yaml
     min_azimuth_coverage_deg: 60    # TODO(P1.6): guess from the capture protocol's "three different directions"; tune in Phase 3
   backend: pycolmap            # CPU SfM, decision D-016; VGGT and CUDA build deferred past the MVP
+  sfm:                         # PLAN.md item 6b; sequential matching is 2 to 4x faster than exhaustive on long videos
+    matcher: sequential        # exhaustive or sequential; frames must be in video order
+    sequential_overlap: 10
+    loop_stride: 0             # sequential only: also match every n-th frame with all others
+    mapper: incremental        # incremental or global
+    max_image_size: -1         # -1 keeps pycolmap's default
+    max_num_features: 8192
+    ba_global_frames_ratio: 1.1
+    ba_local_max_iterations: -1
+    ba_global_max_iterations: -1
+    num_threads: -1
   world_frame:
     plane_inlier_threshold_m: 0.004   # TODO(P1.6): tune on dev scenes; a guess, not yet measured
     plane_ransac_iterations: 500      # TODO(P1.6): tune on dev scenes

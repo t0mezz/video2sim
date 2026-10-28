@@ -108,16 +108,70 @@ def extract_frames(video: Path, out_dir: Path, target_fps: float) -> int:
     return written
 
 
-def run_sfm(frames_dir: Path, work_dir: Path) -> SfmModel:
-    """Run pycolmap on a folder of frames (one shared camera, exhaustive matching).
+@dataclass(frozen=True)
+class SfmOptions:
+    """Speed knobs of ``run_sfm``, from ``reconstruction.sfm`` in ``default.yaml``.
+
+    The defaults are what pycolmap does when given nothing: exhaustive matching and the
+    incremental mapper, so a missing section changes no result.
+    """
+
+    matcher: str = "exhaustive"  # "exhaustive" or "sequential"
+    sequential_overlap: int = 10  # sequential: each frame is matched with this many successors
+    loop_stride: int = 0  # sequential: also match every loop_stride-th frame with all the others
+    mapper: str = "incremental"  # "incremental" or "global" (GLOMAP)
+    max_image_size: int = -1  # longer image side for features; -1 keeps pycolmap's own default
+    max_num_features: int = 8192  # SIFT features per image; pycolmap's own default
+    ba_global_frames_ratio: float = 1.1  # incremental: global BA when frames grow by this ratio
+    ba_local_max_iterations: int = -1  # incremental: local BA iterations; -1 keeps the default
+    ba_global_max_iterations: int = -1  # incremental: global BA iterations; -1 keeps the default
+    num_threads: int = -1  # -1 means all cores
+
+    @classmethod
+    def from_config(cls, section: dict[str, Any] | None) -> SfmOptions:
+        raw = dict(section or {})
+        unknown = set(raw) - set(cls.__dataclass_fields__)
+        if unknown:
+            raise ValueError(f"unknown reconstruction.sfm keys: {sorted(unknown)}")
+        opts = cls(**raw)
+        if opts.matcher not in ("exhaustive", "sequential"):
+            raise ValueError(f"reconstruction.sfm.matcher {opts.matcher!r}")
+        if opts.mapper not in ("incremental", "global"):
+            raise ValueError(f"reconstruction.sfm.mapper {opts.mapper!r}")
+        return opts
+
+
+def _loop_pairs(names: list[str], stride: int, path: Path) -> bool:
+    """Write pairs among every ``stride``-th frame (loop closure without a vocabulary tree)."""
+    keys = names[::stride]
+    pairs = [(a, b) for i, a in enumerate(keys) for b in keys[i + 1 :]]
+    if not pairs:
+        return False
+    path.write_text("".join(f"{a} {b}\n" for a, b in pairs), encoding="utf-8")
+    return True
+
+
+def run_sfm(
+    frames_dir: Path,
+    work_dir: Path,
+    timings: dict[str, float] | None = None,
+    options: SfmOptions | None = None,
+) -> SfmModel:
+    """Run pycolmap on a folder of frames (one shared camera).
 
     pycolmap can return several models for one video, for example a 3-image fragment next to
     the full reconstruction. The largest is used and ``fragmented`` is set so the caller can
-    flag it. Raises if nothing could be reconstructed.
+    flag it. Raises if nothing could be reconstructed. When ``timings`` is given, the seconds
+    spent in ``extract``, ``match`` and ``map`` are written into it (not set on a cached run).
+    ``options`` picks the matcher and mapper and their speed settings, see ``SfmOptions``.
     """
+    import time
+
     import pycolmap
 
-    n_input = len(list(frames_dir.glob("*.png")))
+    opt = options or SfmOptions()
+    frames = sorted(frames_dir.glob("*.png"))
+    n_input = len(frames)
     if n_input < 2:
         raise ValueError(f"need at least 2 frames in {frames_dir}, found {n_input}")
     work_dir.mkdir(parents=True, exist_ok=True)
@@ -125,9 +179,51 @@ def run_sfm(frames_dir: Path, work_dir: Path) -> SfmModel:
     if not sparse.exists() or not any(sparse.iterdir()):
         sparse.mkdir(exist_ok=True)
         db = work_dir / "database.db"
-        pycolmap.extract_features(db, frames_dir, camera_mode=pycolmap.CameraMode.SINGLE)
-        pycolmap.match_exhaustive(db)
-        pycolmap.incremental_mapping(db, frames_dir, sparse)
+        t0 = time.perf_counter()
+        extraction = pycolmap.FeatureExtractionOptions()
+        if opt.max_image_size > 0:
+            extraction.max_image_size = opt.max_image_size
+        extraction.sift.max_num_features = opt.max_num_features
+        extraction.num_threads = opt.num_threads
+        pycolmap.extract_features(
+            db,
+            frames_dir,
+            camera_mode=pycolmap.CameraMode.SINGLE,
+            extraction_options=extraction,
+        )
+        t1 = time.perf_counter()
+        matching = pycolmap.FeatureMatchingOptions()
+        matching.num_threads = opt.num_threads
+        if opt.matcher == "exhaustive":
+            pycolmap.match_exhaustive(db, matching_options=matching)
+        else:
+            pairing = pycolmap.SequentialPairingOptions()
+            pairing.overlap = opt.sequential_overlap
+            pycolmap.match_sequential(db, matching_options=matching, pairing_options=pairing)
+            pair_file = work_dir / "loop_pairs.txt"
+            if opt.loop_stride > 0 and _loop_pairs(
+                [f.name for f in frames], opt.loop_stride, pair_file
+            ):
+                imported = pycolmap.ImportedPairingOptions()
+                imported.match_list_path = str(pair_file)
+                pycolmap.match_image_pairs(db, matching_options=matching, pairing_options=imported)
+        t2 = time.perf_counter()
+        if opt.mapper == "global":
+            glob = pycolmap.GlobalPipelineOptions()
+            glob.num_threads = opt.num_threads
+            pycolmap.global_mapping(db, frames_dir, sparse, glob)
+        else:
+            inc = pycolmap.IncrementalPipelineOptions()
+            inc.num_threads = opt.num_threads
+            inc.ba_global_frames_ratio = opt.ba_global_frames_ratio
+            if opt.ba_local_max_iterations > 0:
+                inc.ba_local_max_num_iterations = opt.ba_local_max_iterations
+            if opt.ba_global_max_iterations > 0:
+                inc.ba_global_max_num_iterations = opt.ba_global_max_iterations
+            pycolmap.incremental_mapping(db, frames_dir, sparse, inc)
+        t3 = time.perf_counter()
+        if timings is not None:
+            timings.update(extract=t1 - t0, match=t2 - t1, map=t3 - t2)
     models = [pycolmap.Reconstruction(str(m)) for m in sorted(sparse.iterdir())]
     if not models:
         raise ValueError("pycolmap could not reconstruct this video")
@@ -471,7 +567,7 @@ class ReconstructionStage:
         work = ctx.run_dir / "reconstruction.work"  # outside the hashed stage folder
         shutil.rmtree(work, ignore_errors=True)
 
-        sfm = run_sfm(frames_dir, work)
+        sfm = run_sfm(frames_dir, work, options=SfmOptions.from_config(sec.get("sfm")))
         views = tag_views(sfm, frames_dir, sec["marker"]["family"])
         try:
             world: WorldFrameResult | None = solve_world_frame(views, sfm.points_xyz, world_cfg)
