@@ -82,7 +82,7 @@ def _image_data_url(path: Path) -> str:
 _RETRIES = 4
 
 
-def _post_json(url: str, key: str, body: dict[str, Any]) -> bytes:
+def _post_json(url: str, key: str, body: dict[str, Any], timeout_s: float = 120.0) -> bytes:
     request = urllib.request.Request(
         url,
         data=json.dumps(body).encode(),
@@ -90,7 +90,7 @@ def _post_json(url: str, key: str, body: dict[str, Any]) -> bytes:
     )
     for attempt in range(_RETRIES):
         try:
-            with urllib.request.urlopen(request, timeout=120) as response:
+            with urllib.request.urlopen(request, timeout=timeout_s) as response:
                 data: bytes = response.read()
             return data
         except urllib.error.HTTPError as e:

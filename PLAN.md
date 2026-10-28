@@ -314,7 +314,7 @@ Tasks
       frames, then SAM 3.1 is prompted per noun. Compare with automatic mask proposals on
       recall and keep the better one.
 
-- [ ] **P2.2** Tracking with SAM 3.1 tracks. Repair identity errors with 3D consistency:
+- [x] **P2.2** Tracking with SAM 3.1 tracks. Repair identity errors with 3D consistency:
 
       merge tracks that project onto the same cluster, split tracks that cover two.
 
@@ -335,7 +335,7 @@ Tasks
 Exit criteria
 
 - [x] Object recall 90% or more on the benchmark
-- [ ] At most one identity switch per scene on average
+- [x] At most one identity switch per scene on average
 - [ ] Point clusters on the easy scenes have bounding boxes within 10% of measured size
 - [ ] Failure flags raised on all four hard scenes
 
@@ -349,6 +349,14 @@ Evidence:
   | `vlm_sam` | 62 of 63 | 98.4% | 99.0% | 100% / 100% / 92.9% | 112 |
 
   Both clear the 90% recall exit criterion. `vlm_sam` finds one more object (the glossy s24 stove cube) but sends about 10 times as many hosted calls and returns 5.6 times as many false positives, so `sam_generic` stays the default in `configs/default.yaml`. Both miss s18 obj_045 (pliers). The hybrid (generic first, noun prompts to fill gaps) is deferred. The criterion was measured on discovery masks only, not on tracked instances; the dev-split scenes were also used to choose the method, and s16 is the only test-split scene.
+
+- P2.2 tracking: `benchmark/results/p2_2_dev.json` (12 dev scenes) and `benchmark/results/p2_2_test.json` (s16_a, the only test-split scene). One SAM 3.1 video request per scene with "objects on a table", direction `both`, the registered frames sent as a 5 fps clip (`stages/tracking.py`), then 3D repair (`stages/track_repair.py`). Identity is scored against ground truth by projecting the aligned boxes into each frame and assigning each track mask to the box it overlaps most (`evaluation/segmentation.py:score_tracks`); occlusion and lens distortion are ignored, so the count is approximate.
+  - Identity switches: 0 in every one of the 13 scored scenes (mean 0.0 against a limit of 1.0), both before and after repair.
+  - Fragments: one scene (s12) had an object split over two tracks; the repair merged them. No track was split. The thresholds (merge 5 cm, split 10 cm, 3 frames) were guesses and were not tuned.
+  - Objects tracked: 60 of 63 rigid objects have a track. Missing: one object of the s13 stack (2 tracks for 3 objects), s18 obj_045 (pliers), and the s24 glossy cube (0 tracks). These are the same misses as discovery, so the generic prompt limits tracking recall too.
+  - Stray tracks (no ground-truth object under them): s14 1, s18 1, s16_a 1.
+  - Cost: video is billed per frame, at least 50 per request. The 13 scenes have 1,144 frames in total, about $0.23 at $0.20 per 1,000 frames; the billed count was read from the response only for s01 (46 frames billed as 50). s05 was not run.
+  - Caveat: the API alone already gave 0 switches, so the benchmark does not exercise the repair; it merged one pair and split none. Whether it fixes real switches in harder footage is untested. The criterion says nothing about missed objects, which is why the recall figure above is reported next to it.
 
 ## 7. Phase 3: Shape completion and pose fusion (weeks 7 to 8)
 

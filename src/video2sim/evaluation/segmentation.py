@@ -172,6 +172,55 @@ def count_id_switches(assignments: Mapping[str, Sequence[str | None]]) -> int:
     return total
 
 
+@dataclass(frozen=True)
+class TrackScore:
+    """Identity quality of tracks against ground truth (P2.2)."""
+
+    switches: int
+    tracks_per_object: Mapping[str, int]  # tracks that mostly follow each ground-truth object
+    unassigned_tracks: int  # tracks that never overlap a ground-truth object (false positives)
+
+    @property
+    def fragmented(self) -> int:
+        """Extra tracks beyond one per object: a perfect tracking gives 0."""
+        return sum(n - 1 for n in self.tracks_per_object.values())
+
+
+def score_tracks(
+    objects: Sequence[GtObject],
+    intrinsics: Intrinsics,
+    poses_in_board: Mapping[int, SE3],
+    tracks: Mapping[int, Mapping[int, BoolMask]],
+) -> TrackScore:
+    """Assign each track mask to a ground-truth box (``assign_mask``) and count switches.
+
+    ``tracks`` maps a track id to its masks by frame index; ``poses_in_board`` gives the camera
+    pose of every frame in the ground-truth frame.
+    """
+    rigid = [o for o in objects if not o.deformable]
+    gt_masks: dict[int, dict[str, BoolMask]] = {}
+
+    def gt_in(frame: int) -> dict[str, BoolMask]:
+        if frame not in gt_masks:
+            gt_masks[frame] = {
+                o.object_id: project_box_mask(o, intrinsics, poses_in_board[frame]) for o in rigid
+            }
+        return gt_masks[frame]
+
+    assignments: dict[str, list[str | None]] = {}
+    owner: dict[str, str] = {}
+    for track_id, masks in tracks.items():
+        sequence = [assign_mask(masks[f], gt_in(f)) for f in sorted(masks)]
+        assignments[str(track_id)] = sequence
+        votes = [a for a in sequence if a is not None]
+        if votes:
+            owner[str(track_id)] = max(set(votes), key=votes.count)
+    per_object: dict[str, int] = {}
+    for object_id in owner.values():
+        per_object[object_id] = per_object.get(object_id, 0) + 1
+    return TrackScore(count_id_switches(assignments), per_object, len(assignments) - len(owner))
+
+
 def _row(name: str, value: float | None, n: int, target: float | None, kind: str) -> dict[str, Any]:
     passed = None
     if value is not None and target is not None:

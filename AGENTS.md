@@ -60,8 +60,8 @@ uv run video2sim eval --baseline constant   # metric report on the dev scenes, s
 It defaults to the dev split; `--split test` is for phase gates only, and `--scene ID`
 scores one scene. `--stage segmentation` scores the point clusters in `segmentation/output.json`
 instead of the shape meshes and adds a Phase 2 section (cluster box error on easy scenes,
-identity switches, flags on s17 to s20; switches stay `no_data` until track masks have a
-loader). Scenes with a deformable object are left out (D-014) unless named with `--scene`. It writes `report.json` and `report.html` and exits 0 unless
+identity switches, flags on s17 to s20; switches stay `no_data` in the report until the
+`--stage segmentation` path reads `segmentation/tracks/`, see `benchmark/run_tracking.py`). Scenes with a deformable object are left out (D-014) unless named with `--scene`. It writes `report.json` and `report.html` and exits 0 unless
 `--fail-on-target` is given. The metric definitions are decision D-012 in `PLAN.md`.
 
 CI (`.github/workflows/ci.yml`) runs ruff check, `ruff format --check`, mypy and the fast
@@ -72,6 +72,9 @@ touches dependencies commits the updated `uv.lock`. To reproduce the 3.10 run lo
 `python benchmark/eval_world_frame.py scene/video ... --out results.json` runs pycolmap, tag
 scale and the world frame on grid-board scenes and checks them against the printed board and
 `gates.reconstruction` (P1.2, P1.3). Results are in `benchmark/results/`.
+`python benchmark/run_tracking.py RUN_ID ... --score` tracks all registered frames with one SAM 3.1 video request per run
+and scores identity switches before and after the 3D repair (P2.2). It sends the sampled frames to the Meta
+Model API and caches the answer in the run folder.
 `python benchmark/eval_capture_gate.py --out results.json` runs the capture quality gate on the
 dev videos and on degraded copies of one good video (P1.4).
 

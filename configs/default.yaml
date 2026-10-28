@@ -38,6 +38,15 @@ segmentation:
     generic_prompt: objects on a table   # the one SAM 3.1 prompt of method "sam_generic"
     n_sample_frames: 6         # frames shown to discovery, spread evenly over the registered frames
     max_workers: 8             # parallel hosted calls; they are independent and cached by key
+  tracking:                    # P2.2: one SAM 3.1 video request per scene
+    prompt: objects on a table # same concept prompt as discovery; the video API takes one concept
+    fps: 5                     # frame rate of the clip sent; billed per frame, at least 50 (dev.meta.ai pricing)
+    direction: both            # propagation_direction: "both", "forward" or "backward"
+    timeout_s: 600             # a long clip can take minutes to answer
+    repair:                    # 3D identity repair; thresholds are guesses until tuned on dev scenes
+      merge_radius_m: 0.05     # tracks with no shared frame whose table footprints are this close are one object
+      split_gap_m: 0.10        # a track whose footprints fall into groups this far apart is two objects
+      min_frames: 3            # smallest group that counts as an object when splitting
   keyframes_per_object: 5
 
 shape:
