@@ -5,6 +5,7 @@ description = "Convert a smartphone video of a tabletop workspace into a physics
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "meta-sam-parser>=0.1.0",
     "numpy>=1.26",
     "opencv-python-headless>=5.0.0.93",
     "pycolmap>=4.2.1",

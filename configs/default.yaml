@@ -33,6 +33,11 @@ reconstruction:
 
 segmentation:
   sam_backend: null            # "api" or "self_hosted", see PLAN.md decision D-004
+  discovery:
+    method: sam_generic        # P2.1: "sam_generic" (default), "vlm_sam" or "auto_proposals" (not built)
+    generic_prompt: objects on a table   # the one SAM 3.1 prompt of method "sam_generic"
+    n_sample_frames: 6         # frames shown to discovery, spread evenly over the registered frames
+    max_workers: 8             # parallel hosted calls; they are independent and cached by key
   keyframes_per_object: 5
 
 shape:
