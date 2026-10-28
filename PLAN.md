@@ -318,7 +318,7 @@ Tasks
 
       merge tracks that project onto the same cluster, split tracks that cover two.
 
-- [ ] **P2.3** Lift masks to 3D. A point is kept only when several views agree. Remove
+- [x] **P2.3** Lift masks to 3D. A point is kept only when several views agree. Remove
 
       outliers, hands and arms.
 
@@ -357,6 +357,14 @@ Evidence:
   - Stray tracks (no ground-truth object under them): s14 1, s18 1, s16_a 1.
   - Cost: video is billed per frame, at least 50 per request. The 13 scenes have 1,144 frames in total, about $0.23 at $0.20 per 1,000 frames; the billed count was read from the response only for s01 (46 frames billed as 50). s05 was not run.
   - Caveat: the API alone already gave 0 switches, so the benchmark does not exercise the repair; it merged one pair and split none. Whether it fixes real switches in harder footage is untested. The criterion says nothing about missed objects, which is why the recall figure above is reported next to it.
+- P2.3 lifting: `benchmark/results/p2_3_dev.json` (12 dev scenes) and `benchmark/results/p2_3_test.json` (s16_a). No depth maps exist, so a cluster is a visual hull by voting (`stages/lift.py`): a 5 mm voxel grid on the table is projected into 40 frames, and a voxel goes to the track whose mask holds it in at least 90% of the views that see it (at least 5). A view where a track has no mask is skipped for that track. A voxel claimed twice goes to the higher agreement; only the largest connected group is kept; a track with under 20 voxels or one reaching the 35 cm grid top is dropped and listed in `segmentation/lift.json`. Viewer: `benchmark/view_instances.py`.
+  - Clusters matched to ground-truth objects: 53 of 59 on the 12 dev scenes (89.8%), 3 of 4 on s16_a. One cluster per track except s12 (1 dropped) and s14 (1 dropped as reaching the top, a marker-sheet track). Runtime 0.4 to 9 s per scene on CPU.
+  - Cluster box size error, the exit criterion: **not met.** Median 36% on the easy tier and 35% over all matched objects (limit 10%). Per object the error runs from 3% (s03 ball) to over 100% (s06, s12, s14).
+  - Cause, checked on s01: feeding perfect ground-truth silhouettes through the same code gives a 0.074 m hull for a 0.055 m cube. The hand-held video covers only about 127 degrees of azimuth (24 to 44 degrees elevation), and a silhouette-only hull is loose in the directions that are never viewed. The SAM masks are not the problem (IoU 0.96 with the projected ground-truth box on that cube). Lens distortion is modelled; erosion of masks and a stricter agreement gave 27 to 43% on the first five dev scenes and were not kept.
+  - Tried and not adopted: voting the sparse SfM points through the masks gave a median 20% at 90% agreement on s01 to s06, but the s03 ball got no points and one s06 object under 25; sparse points are thin on glossy and plain surfaces.
+  - Hands and arms: not detected as such. They move between views, so their masks agree on almost no voxels and the track is dropped with a reason. None of the 13 scenes has a hand track, so this is untested.
+  - Dev scenes were used to choose `min_agreement` (0.9); s16_a was not.
+  - Options for a human: accept hull-plus-shape-completion (Phase 3 fills the unseen sides), add a prior such as box fitting to the voxel cloud for the size check, or move the 10% criterion to after shape completion.
 
 ## 7. Phase 3: Shape completion and pose fusion (weeks 7 to 8)
 
@@ -574,6 +582,24 @@ In order:
    If VGGT passes the accuracy gates, add it as an opt-in `reconstruction.backend: vggt` (a
    `run_sfm_vggt` returning `SfmModel`, torch behind an optional extra); expected gain is mainly
    on long (~190 frame) videos, unmeasured.
+
+7. **VGGT geometry for SAM 3D (from P2.3 and the shape stage).** Experiment: improve SAM 3D
+   output by giving it a pointmap and by registering its mesh against dense geometry, instead
+   of the sparse pycolmap cloud (10k to 26k points, weak on glossy surfaces).
+
+   Idea: run VGGT on the registered frames for per-frame dense depth and pointmaps with a
+   confidence per pixel. Pass the pointmap of each object keyframe to SAM 3D (its optional
+   pointmap input, format to be checked in its docs). Keep the pycolmap poses and the marker
+   scale as the reference: fit the VGGT geometry to them so the metric scale and the world
+   frame do not change. Dense surface points would also replace the visual hull of P2.3,
+   whose boxes read about 35% too large from a 127 degree handheld arc even with perfect
+   silhouettes.
+
+   Measure against the MVP, with the same benchmark scenes: SAM 3D mesh size and pose error
+   with and without the pointmap, cluster box error with dense points, VGGT pose and scale
+   error against pycolmap, and runtime and memory per video. Pass only if the metrics gain
+   without breaking the reconstruction gates. Needs a GPU host, weights and a license check
+   (`docs/licenses.md`); `benchmark/modal_vggt.py` is an untracked first attempt.
 
 ## 13. Changelog
 
