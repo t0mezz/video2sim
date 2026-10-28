@@ -2,16 +2,19 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from numpy.typing import NDArray
 
 from video2sim.evaluation.alignment import align_views, board_from_tag_view
 from video2sim.stages.marker_detection import TagView
 from video2sim.stages.world_frame import BoardLayout
 
+F64 = NDArray[np.float64]
+
 K = np.array([[800.0, 0.0, 320.0], [0.0, 800.0, 240.0], [0.0, 0.0, 1.0]])
 FLIP = np.array([[1.0, 0, 0], [0, -1.0, 0], [0, 0, -1.0]])  # camera looking straight down
 
 
-def _tag(x: float, y: float, edge: float = 0.1) -> np.ndarray:
+def _tag(x: float, y: float, edge: float = 0.1) -> F64:
     return np.array(
         [[x, y, 0.0], [x + edge, y, 0.0], [x + edge, y + edge, 0.0], [x, y + edge, 0.0]]
     )
@@ -20,7 +23,7 @@ def _tag(x: float, y: float, edge: float = 0.1) -> np.ndarray:
 LAYOUT = BoardLayout({0: _tag(0.0, 0.0), 1: _tag(0.5, 0.0), 2: _tag(0.0, 0.4)})
 
 
-def _yaw(deg: float, shift: tuple[float, float]) -> np.ndarray:
+def _yaw(deg: float, shift: tuple[float, float]) -> F64:
     a = np.radians(deg)
     t = np.eye(4)
     t[:2, :2] = [[np.cos(a), -np.sin(a)], [np.sin(a), np.cos(a)]]
@@ -28,7 +31,7 @@ def _yaw(deg: float, shift: tuple[float, float]) -> np.ndarray:
     return t
 
 
-def _views(t_world_from_board: np.ndarray, scale: float = 1.0) -> list[TagView]:
+def _views(t_world_from_board: F64, scale: float = 1.0) -> list[TagView]:
     views = []
     for cx, cy in [(0.1, 0.1), (0.4, 0.1), (0.1, 0.3), (0.4, 0.3), (0.25, 0.2)]:
         cam_board = np.eye(4)
@@ -59,7 +62,7 @@ def test_alignment_rejects_a_wrong_scale() -> None:
         align_views(_views(_yaw(0.0, (0.0, 0.0)), scale=1.3), LAYOUT)
 
 
-def _project_down(points: np.ndarray) -> np.ndarray:
+def _project_down(points: F64) -> F64:
     """Pixels of world points seen by a camera 0.6 m above the origin looking straight down."""
     cam = (FLIP @ (points - [0.0, 0.0, 0.6]).T).T
     uv = (K @ cam.T).T
