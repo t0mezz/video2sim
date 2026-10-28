@@ -1,0 +1,801 @@
+{
+  "summary": {
+    "method": "vlm_sam",
+    "n_sample_frames": 6,
+    "objects_visible": 63,
+    "objects_found": 62,
+    "recall_micro": 0.9841269841269841,
+    "recall_macro": 0.9903846153846154,
+    "recall_by_tier": {
+      "easy": 1.0,
+      "hard": 0.9285714285714286,
+      "medium": 1.0
+    },
+    "false_positives": 112,
+    "scenes_scored": [
+      "s01",
+      "s02",
+      "s03",
+      "s04",
+      "s06",
+      "s11",
+      "s12",
+      "s13",
+      "s14",
+      "s16",
+      "s17",
+      "s18",
+      "s24"
+    ],
+    "scenes_unscored": []
+  },
+  "scenes": [
+    {
+      "run": "s01_b",
+      "scene": "s01",
+      "tier": "easy",
+      "frames": [
+        0,
+        9,
+        18,
+        27,
+        36,
+        45
+      ],
+      "labels": [
+        "box",
+        "can",
+        "cube",
+        "gray box",
+        "rubiks cube",
+        "small rubiks cube",
+        "white box",
+        "yellow can"
+      ],
+      "masks_per_frame": [
+        16,
+        14,
+        13,
+        12,
+        11,
+        12
+      ],
+      "gt_objects": 5,
+      "alignment": {
+        "scale": 0.994,
+        "rms_mm": 1.36,
+        "tags": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "visible": [
+        "obj_007",
+        "obj_021",
+        "obj_029",
+        "obj_004",
+        "obj_003"
+      ],
+      "found": [
+        "obj_007",
+        "obj_021",
+        "obj_029",
+        "obj_004",
+        "obj_003"
+      ],
+      "missed": [],
+      "false_positives": 0,
+      "recall": 1.0
+    },
+    {
+      "run": "s02_b",
+      "scene": "s02",
+      "tier": "easy",
+      "frames": [
+        0,
+        10,
+        20,
+        29,
+        39,
+        49
+      ],
+      "labels": [
+        "black device",
+        "blue box",
+        "box",
+        "eraser",
+        "mug",
+        "purple cap"
+      ],
+      "masks_per_frame": [
+        5,
+        5,
+        6,
+        6,
+        7,
+        5
+      ],
+      "gt_objects": 5,
+      "alignment": {
+        "scale": 0.9943,
+        "rms_mm": 1.21,
+        "tags": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "visible": [
+        "obj_041",
+        "obj_046",
+        "obj_039",
+        "obj_060",
+        "obj_014"
+      ],
+      "found": [
+        "obj_041",
+        "obj_046",
+        "obj_039",
+        "obj_060",
+        "obj_014"
+      ],
+      "missed": [],
+      "false_positives": 0,
+      "recall": 1.0
+    },
+    {
+      "run": "s03_b",
+      "scene": "s03",
+      "tier": "easy",
+      "frames": [
+        0,
+        15,
+        30,
+        44,
+        59,
+        74
+      ],
+      "labels": [
+        "ball",
+        "basketball",
+        "tape"
+      ],
+      "masks_per_frame": [
+        2,
+        2,
+        2,
+        2,
+        11,
+        2
+      ],
+      "gt_objects": 1,
+      "alignment": {
+        "scale": 0.9949,
+        "rms_mm": 1.29,
+        "tags": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "visible": [
+        "obj_027"
+      ],
+      "found": [
+        "obj_027"
+      ],
+      "missed": [],
+      "false_positives": 9,
+      "recall": 1.0
+    },
+    {
+      "run": "s04_b",
+      "scene": "s04",
+      "tier": "easy",
+      "frames": [
+        0,
+        15,
+        30,
+        44,
+        59,
+        74
+      ],
+      "labels": [
+        "basketball",
+        "blue box",
+        "bottle",
+        "box",
+        "cube",
+        "rubiks cube",
+        "water bottle",
+        "white box"
+      ],
+      "masks_per_frame": [
+        10,
+        10,
+        9,
+        10,
+        7,
+        10
+      ],
+      "gt_objects": 5,
+      "alignment": {
+        "scale": 0.9959,
+        "rms_mm": 1.18,
+        "tags": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "visible": [
+        "obj_027",
+        "obj_022",
+        "obj_014",
+        "obj_021",
+        "obj_003"
+      ],
+      "found": [
+        "obj_027",
+        "obj_022",
+        "obj_014",
+        "obj_021",
+        "obj_003"
+      ],
+      "missed": [],
+      "false_positives": 1,
+      "recall": 1.0
+    },
+    {
+      "run": "s06_b",
+      "scene": "s06",
+      "tier": "easy",
+      "frames": [
+        0,
+        23,
+        47,
+        70,
+        94,
+        117
+      ],
+      "labels": [
+        "block",
+        "box",
+        "can",
+        "car",
+        "car shell",
+        "cube",
+        "toy car"
+      ],
+      "masks_per_frame": [
+        6,
+        6,
+        7,
+        9,
+        7,
+        6
+      ],
+      "gt_objects": 4,
+      "alignment": {
+        "scale": 0.9926,
+        "rms_mm": 3.16,
+        "tags": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "visible": [
+        "obj_029",
+        "obj_004",
+        "obj_040",
+        "obj_018"
+      ],
+      "found": [
+        "obj_029",
+        "obj_004",
+        "obj_040",
+        "obj_018"
+      ],
+      "missed": [],
+      "false_positives": 8,
+      "recall": 1.0
+    },
+    {
+      "run": "s11_b",
+      "scene": "s11",
+      "tier": "medium",
+      "frames": [
+        0,
+        19,
+        39,
+        58,
+        78,
+        97
+      ],
+      "labels": [
+        "black block",
+        "black cube",
+        "black cylinder",
+        "black hexagonal prism",
+        "black prism",
+        "black pyramid",
+        "black triangular prism",
+        "white cube"
+      ],
+      "masks_per_frame": [
+        14,
+        25,
+        25,
+        25,
+        24,
+        26
+      ],
+      "gt_objects": 7,
+      "alignment": {
+        "scale": 0.997,
+        "rms_mm": 1.16,
+        "tags": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "visible": [
+        "obj_047",
+        "obj_040",
+        "obj_048",
+        "obj_049",
+        "obj_056",
+        "obj_050",
+        "obj_052"
+      ],
+      "found": [
+        "obj_047",
+        "obj_040",
+        "obj_048",
+        "obj_049",
+        "obj_056",
+        "obj_050",
+        "obj_052"
+      ],
+      "missed": [],
+      "false_positives": 1,
+      "recall": 1.0
+    },
+    {
+      "run": "s12_b",
+      "scene": "s12",
+      "tier": "medium",
+      "frames": [
+        0,
+        16,
+        32,
+        48,
+        64,
+        80
+      ],
+      "labels": [
+        "black box",
+        "black spray can",
+        "blue box",
+        "can",
+        "green box",
+        "large rubiks cube",
+        "purple cap",
+        "small camera",
+        "small rubiks cube",
+        "spray can",
+        "white box",
+        "yellow can"
+      ],
+      "masks_per_frame": [
+        14,
+        18,
+        16,
+        15,
+        13,
+        16
+      ],
+      "gt_objects": 10,
+      "alignment": {
+        "scale": 0.9859,
+        "rms_mm": 16.0,
+        "tags": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "visible": [
+        "obj_004",
+        "obj_029",
+        "obj_001",
+        "obj_014",
+        "obj_002",
+        "obj_060",
+        "obj_039",
+        "obj_003",
+        "obj_021",
+        "obj_007"
+      ],
+      "found": [
+        "obj_004",
+        "obj_029",
+        "obj_001",
+        "obj_014",
+        "obj_002",
+        "obj_060",
+        "obj_039",
+        "obj_003",
+        "obj_021",
+        "obj_007"
+      ],
+      "missed": [],
+      "false_positives": 2,
+      "recall": 1.0
+    },
+    {
+      "run": "s13_b",
+      "scene": "s13",
+      "tier": "medium",
+      "frames": [
+        0,
+        18,
+        35,
+        53,
+        70,
+        88
+      ],
+      "labels": [
+        "blue box",
+        "green box",
+        "white cube"
+      ],
+      "masks_per_frame": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "gt_objects": 3,
+      "alignment": {
+        "scale": 0.9942,
+        "rms_mm": 1.33,
+        "tags": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "visible": [
+        "obj_002",
+        "obj_014",
+        "obj_040"
+      ],
+      "found": [
+        "obj_002",
+        "obj_014",
+        "obj_040"
+      ],
+      "missed": [],
+      "false_positives": 0,
+      "recall": 1.0
+    },
+    {
+      "run": "s14_b",
+      "scene": "s14",
+      "tier": "medium",
+      "frames": [
+        0,
+        10,
+        20,
+        30,
+        40,
+        50
+      ],
+      "labels": [
+        "block",
+        "box",
+        "breadboard",
+        "can",
+        "controller",
+        "cube"
+      ],
+      "masks_per_frame": [
+        7,
+        5,
+        3,
+        4,
+        4,
+        4
+      ],
+      "gt_objects": 5,
+      "alignment": {
+        "scale": 1.0,
+        "rms_mm": 0.0,
+        "tags": [
+          0
+        ]
+      },
+      "visible": [
+        "obj_004",
+        "obj_036",
+        "obj_040",
+        "obj_006",
+        "obj_002"
+      ],
+      "found": [
+        "obj_004",
+        "obj_036",
+        "obj_040",
+        "obj_006",
+        "obj_002"
+      ],
+      "missed": [],
+      "false_positives": 2,
+      "recall": 1.0
+    },
+    {
+      "run": "s16_a",
+      "scene": "s16",
+      "tier": "medium",
+      "frames": [
+        0,
+        48,
+        96,
+        144,
+        192,
+        240
+      ],
+      "labels": [
+        "black box",
+        "block",
+        "box",
+        "can",
+        "coffee can",
+        "cube",
+        "placemat",
+        "rubik's cube",
+        "white block",
+        "white box"
+      ],
+      "masks_per_frame": [
+        18,
+        42,
+        13,
+        14,
+        31,
+        27
+      ],
+      "gt_objects": 4,
+      "alignment": {
+        "scale": 0.997,
+        "rms_mm": 4.05,
+        "tags": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "visible": [
+        "obj_003",
+        "obj_004",
+        "obj_021",
+        "obj_029"
+      ],
+      "found": [
+        "obj_003",
+        "obj_004",
+        "obj_021",
+        "obj_029"
+      ],
+      "missed": [],
+      "false_positives": 81,
+      "recall": 1.0
+    },
+    {
+      "run": "s17_b",
+      "scene": "s17",
+      "tier": "hard",
+      "frames": [
+        0,
+        17,
+        33,
+        50,
+        66,
+        83
+      ],
+      "labels": [
+        "ball",
+        "bottle",
+        "can",
+        "cube",
+        "egg",
+        "small bottle"
+      ],
+      "masks_per_frame": [
+        7,
+        6,
+        7,
+        6,
+        8,
+        8
+      ],
+      "gt_objects": 5,
+      "alignment": {
+        "scale": 0.9938,
+        "rms_mm": 1.31,
+        "tags": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "visible": [
+        "obj_026",
+        "obj_019",
+        "obj_059",
+        "obj_035",
+        "obj_015"
+      ],
+      "found": [
+        "obj_026",
+        "obj_019",
+        "obj_059",
+        "obj_035",
+        "obj_015"
+      ],
+      "missed": [],
+      "false_positives": 1,
+      "recall": 1.0
+    },
+    {
+      "run": "s18_b",
+      "scene": "s18",
+      "tier": "hard",
+      "frames": [
+        0,
+        17,
+        34,
+        50,
+        67,
+        84
+      ],
+      "labels": [
+        "brush",
+        "car",
+        "car body",
+        "car shell",
+        "controller",
+        "figurine",
+        "game controller",
+        "hairbrush",
+        "hole punch",
+        "jar",
+        "pliers",
+        "toy car"
+      ],
+      "masks_per_frame": [
+        13,
+        16,
+        15,
+        15,
+        15,
+        16
+      ],
+      "gt_objects": 8,
+      "alignment": {
+        "scale": 0.9938,
+        "rms_mm": 1.36,
+        "tags": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "visible": [
+        "obj_006",
+        "obj_032",
+        "obj_008",
+        "obj_000",
+        "obj_018",
+        "obj_024",
+        "obj_012",
+        "obj_045"
+      ],
+      "found": [
+        "obj_006",
+        "obj_032",
+        "obj_008",
+        "obj_000",
+        "obj_018",
+        "obj_024",
+        "obj_012"
+      ],
+      "missed": [
+        "obj_045"
+      ],
+      "false_positives": 6,
+      "recall": 0.875
+    },
+    {
+      "run": "s24_b",
+      "scene": "s24",
+      "tier": "hard",
+      "frames": [
+        0,
+        10,
+        20,
+        30,
+        40,
+        50
+      ],
+      "labels": [
+        "cube",
+        "laptop"
+      ],
+      "masks_per_frame": [
+        1,
+        1,
+        0,
+        1,
+        1,
+        2
+      ],
+      "gt_objects": 1,
+      "alignment": {
+        "scale": 1.0,
+        "rms_mm": 0.0,
+        "tags": [
+          0
+        ]
+      },
+      "visible": [
+        "obj_040"
+      ],
+      "found": [
+        "obj_040"
+      ],
+      "missed": [],
+      "false_positives": 1,
+      "recall": 1.0
+    }
+  ]
+}

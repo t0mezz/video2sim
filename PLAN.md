@@ -309,7 +309,7 @@ point cluster in the world frame.
 
 Tasks
 
-- [ ] **P2.1** Object discovery. A vision-language model lists the objects on a few sampled
+- [x] **P2.1** Object discovery. A vision-language model lists the objects on a few sampled
 
       frames, then SAM 3.1 is prompted per noun. Compare with automatic mask proposals on
       recall and keep the better one.
@@ -334,12 +334,21 @@ Tasks
 
 Exit criteria
 
-- [ ] Object recall 90% or more on the benchmark
+- [x] Object recall 90% or more on the benchmark
 - [ ] At most one identity switch per scene on average
 - [ ] Point clusters on the easy scenes have bounding boxes within 10% of measured size
 - [ ] Failure flags raised on all four hard scenes
 
 Evidence:
+
+- P2.1 discovery comparison: `benchmark/results/p2_1_sam_generic.json` and `benchmark/results/p2_1_vlm_sam.json`. 13 scenes (12 scored dev scenes plus s16 from the test split), 63 visible objects, 6 sampled frames per scene, ground truth aligned to the world frame (`evaluation/alignment.py`), recall counted over objects found in any of the 6 frames, rerun from cached responses with no new API calls. s05 is unscored (origin unexplained).
+
+  | method | objects found | recall (micro) | recall (macro) | easy / medium / hard | false positives |
+  |---|---|---|---|---|---|
+  | `sam_generic` | 61 of 63 | 96.8% | 91.3% | 100% / 100% / 85.7% | 20 |
+  | `vlm_sam` | 62 of 63 | 98.4% | 99.0% | 100% / 100% / 92.9% | 112 |
+
+  Both clear the 90% recall exit criterion. `vlm_sam` finds one more object (the glossy s24 stove cube) but sends about 10 times as many hosted calls and returns 5.6 times as many false positives, so `sam_generic` stays the default in `configs/default.yaml`. Both miss s18 obj_045 (pliers). The hybrid (generic first, noun prompts to fill gaps) is deferred. The criterion was measured on discovery masks only, not on tracked instances; the dev-split scenes were also used to choose the method, and s16 is the only test-split scene.
 
 ## 7. Phase 3: Shape completion and pose fusion (weeks 7 to 8)
 
