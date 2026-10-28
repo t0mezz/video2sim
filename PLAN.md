@@ -595,6 +595,48 @@ In order:
    `run_sfm_vggt` returning `SfmModel`, torch behind an optional extra); expected gain is mainly
    on long (~190 frame) videos, unmeasured.
 
+   Status 2026-10-28, s16 video_a (160 frames, 3 fps, tag edge 100.26 mm) on three back ends.
+   Results are on branches `experiment/colmap-cuda-modal` (`benchmark/results/p1_colmap_cuda_s16_*.json`)
+   and `experiment/vggt-modal` (`p1_vggt_s16.json`, `p1_vggt_refined_s16.json`); neither is merged
+   here. One run per cell. D-016 stays.
+
+   | | pycolmap (Modal CPU) | pycolmap (Modal A10G) | VGGT (A10G) | VGGT + tag refine (A10G) |
+   | --- | --- | --- | --- | --- |
+   | Frames registered | 160/160 | 160/160 | 160/160 | 160/160 |
+   | SfM reprojection | 0.40 px | 0.42 px | n/a | n/a |
+   | Tag reprojection | 0.92 px | 0.92 px | 1.72 px | 0.61 px |
+   | Tag distance error (gate 2%) | 0.76% pass | 0.76% pass | 1.71% pass | 2.20% **miss** |
+   | Up-axis error (gate 2 deg) | 0.09 deg | 0.08 deg | 0.30 deg | 0.38 deg |
+   | Tag scale spread | 7.3% | 7.3% | 6.7% | 5.9% |
+   | Board fit RMS | 4.05 mm | 4.05 mm | 4.02 mm | 4.52 mm |
+   | Extract / feature step | 75 s | 187 s | n/a | n/a |
+   | Match | 215 s | 198 s | n/a | n/a |
+   | Map / forward pass | 421 s | 349 s | 33 s | 33 s |
+   | Refine | n/a | n/a | n/a | 1.3 s |
+   | Model load | n/a | n/a | 13 s | 13 s |
+   | Total | 711 s | 734 s | 37 s (71 s wall incl. Modal overhead) | 38 s (96 s wall) |
+   | Peak GPU memory | n/a | n/a | 15.4 GB | 15.4 GB |
+
+   Findings:
+
+   * pycolmap is the most accurate on s16 video_a on every metric (tag distance, up-axis, tag
+     reprojection) and is the only one with a low SfM reprojection error. VGGT is about 20x
+     faster on the GPU (37 s against about 12 min), but its tag distance error is 2x and its
+     up-axis error 3 to 4x pycolmap's, though both pass the gates.
+   * Tag refinement cuts tag reprojection from 1.7 to 0.6 px, but this is the fitted quantity,
+     not an independent check. It made tag distance worse (1.71% to 2.20%, now over the gate)
+     and up-axis slightly worse, so it does not help on this video.
+   * The earlier note that the s16 video_a miss is specific to VGGT is only true for the refined
+     variant: plain VGGT passes the tag distance gate on video_a (1.71%). video_b: pycolmap
+     2.66% and plain VGGT 2.35% both miss, consistent with the warped marker accepted in P1.6.
+   * Timings are not like for like: the pycolmap rows are CPU-bound per-stage times on a
+     Modal host, the VGGT rows a single GPU forward pass; the 71 s and 96 s wall times differ
+     only by Modal overhead for the same 37 s of server time. Local M4 CPU took about 30 min
+     (human-reported).
+   * Recommendation unchanged: keep pycolmap (D-016). VGGT is a viable fast option for long
+     videos if its accuracy margin is acceptable, but its license is non-commercial and it was
+     measured on one video here.
+
 7. **VGGT geometry for SAM 3D (from P2.3 and the shape stage).** Experiment: improve SAM 3D
    output by giving it a pointmap and by registering its mesh against dense geometry, instead
    of the sparse pycolmap cloud (10k to 26k points, weak on glossy surfaces).
@@ -635,3 +677,4 @@ In order:
 | 2026-10-27 | P1.4: capture and reconstruction quality gates, saved results in `benchmark/results/` |
 | 2026-10-27 | P1.6: gate evaluated on 20 dev videos with the caliper tag edge (100.26 mm); P1.2 caliper note updated; Phase 1 exit criteria ticked with caveats in the P1.6 entry |
 | 2026-10-27 | P1.6: test-split run on 16 videos; s16 marker-distance miss accepted as a warped-marker input defect by human decision; s10 clean-board not run; results in `benchmark/results/p1_world_frame_test.json` |
+| 2026-10-28 | Section 12 item 6: s16 video_a table of pycolmap (CPU, GPU), VGGT and VGGT with tag refinement, accuracy and process times, gathered from the two experiment branches |
