@@ -357,14 +357,26 @@ Evidence:
   - Stray tracks (no ground-truth object under them): s14 1, s18 1, s16_a 1.
   - Cost: video is billed per frame, at least 50 per request. The 13 scenes have 1,144 frames in total, about $0.23 at $0.20 per 1,000 frames; the billed count was read from the response only for s01 (46 frames billed as 50). s05 was not run.
   - Caveat: the API alone already gave 0 switches, so the benchmark does not exercise the repair; it merged one pair and split none. Whether it fixes real switches in harder footage is untested. The criterion says nothing about missed objects, which is why the recall figure above is reported next to it.
-- P2.3 lifting: `benchmark/results/p2_3_dev.json` (12 dev scenes) and `benchmark/results/p2_3_test.json` (s16_a). No depth maps exist, so a cluster is a visual hull by voting (`stages/lift.py`): a 5 mm voxel grid on the table is projected into 40 frames, and a voxel goes to the track whose mask holds it in at least 90% of the views that see it (at least 5). A view where a track has no mask is skipped for that track. A voxel claimed twice goes to the higher agreement; only the largest connected group is kept; a track with under 20 voxels or one reaching the 35 cm grid top is dropped and listed in `segmentation/lift.json`. Viewer: `benchmark/view_instances.py`.
-  - Clusters matched to ground-truth objects: 53 of 59 on the 12 dev scenes (89.8%), 3 of 4 on s16_a. One cluster per track except s12 (1 dropped) and s14 (1 dropped as reaching the top, a marker-sheet track). Runtime 0.4 to 9 s per scene on CPU.
-  - Cluster box size error, the exit criterion: **not met.** Median 36% on the easy tier and 35% over all matched objects (limit 10%). Per object the error runs from 3% (s03 ball) to over 100% (s06, s12, s14).
-  - Cause, checked on s01: feeding perfect ground-truth silhouettes through the same code gives a 0.074 m hull for a 0.055 m cube. The hand-held video covers only about 127 degrees of azimuth (24 to 44 degrees elevation), and a silhouette-only hull is loose in the directions that are never viewed. The SAM masks are not the problem (IoU 0.96 with the projected ground-truth box on that cube). Lens distortion is modelled; erosion of masks and a stricter agreement gave 27 to 43% on the first five dev scenes and were not kept.
-  - Tried and not adopted: voting the sparse SfM points through the masks gave a median 20% at 90% agreement on s01 to s06, but the s03 ball got no points and one s06 object under 25; sparse points are thin on glossy and plain surfaces.
-  - Hands and arms: not detected as such. They move between views, so their masks agree on almost no voxels and the track is dropped with a reason. None of the 13 scenes has a hand track, so this is untested.
+- P2.3 lifting: `benchmark/results/p2_3_dev.json` (12 dev scenes) and `benchmark/results/p2_3_test.json` (s16_a), made by `benchmark/run_lift.py`. No depth maps exist, so there are two independent lifts of the same tracks, kept apart on purpose (decision for Phase 3 below). Viewer: `benchmark/view_instances.py RUN_ID --gt` (hull, points or both).
+  - **hull** (`stages/lift.py:lift_tracks`): a visual hull by voting. A 5 mm voxel grid on the table is projected into 40 frames; a voxel goes to the track whose mask holds it in at least 90% of the views that see it (at least 5). A view where a track has no mask is skipped for that track. Overlaps go to the higher agreement, only the largest connected group is kept, and a track with under 20 voxels or one reaching the 35 cm grid top is dropped and listed in `segmentation/lift.json`.
+  - **points** (`lift_points`): the sparse SfM points (10k to 26k per scene) with the same vote and the same view rules, minus points within 3 mm of the table plane; at least 8 points to keep a track.
+
+  | 12 dev scenes, 59 objects | hull | points |
+  |---|---|---|
+  | clusters matched to ground truth | 53 | 54 |
+  | median box size error, easy tier | 36.4% | 18.7% |
+  | median box size error, all matched | 34.7% | 20.2% |
+  | objects within the 10% gate | 5 of 53 | 16 of 54 |
+  | time per scene | 0.4 to 7 s | 0.1 s or less |
+
+  s16_a (test split, run once, not tuned on): both match 3 of 4 objects. Box errors hull 6%, 46%, 37%; points 2%, 23%, 20%.
+  - **Exit criterion (cluster box within 10%): not met by either.** Hull 36% and points 19% median on the easy tier.
+  - Why the hull is loose, checked on s01: perfect ground-truth silhouettes through the same code still give a 0.074 m hull for a 0.055 m cube. The `_b` camera paths cover only 45 to 130 degrees of azimuth (s16_a covers 353), and a silhouette-only hull is loose in directions no camera viewed. The SAM masks are not the cause (IoU 0.96 with the projected ground-truth box). Lens distortion is modelled; erosion and stricter agreement gave 27 to 43% on five dev scenes and were not kept.
+  - Why points are tighter but not tight: they lie on visible surfaces, so a box never grows past the object, but plain or glossy objects have few (two s16_a tracks have no agreeing point) and there is no occlusion test, so a point in front of an object's edge can pass the vote. s12 loses two tracks (the hull loses one), and s13 matches 2 of 3 objects (the hull 1).
+  - Tried in a scratch script, not adopted: keeping only the points inside the hull changed nothing (both come from the same mask votes). Clipping the hull to the box of its points, with the hull alone under 30 points, gave a 26% median and 10 objects within 10%, with 54 matched.
+  - Hands and arms are not detected as such. They move between views, so their masks agree on almost no voxels and the track is dropped with a reason. None of the 13 scenes has a hand track, so this is untested. `video_a` orbits were not run except s16_a; the `_b` paths of the other scenes are short arcs, and whether a fuller `video_a` orbit tightens the hull is untested.
   - Dev scenes were used to choose `min_agreement` (0.9); s16_a was not.
-  - Options for a human: accept hull-plus-shape-completion (Phase 3 fills the unseen sides), add a prior such as box fitting to the voxel cloud for the size check, or move the 10% criterion to after shape completion.
+  - **Decision for Phase 3 (human, 2026-10-28):** keep both clusters and compare them as registration targets in P3.2. The fit compares observed surface points with the mesh surface, which favours the points; the hull gives a filled volume and seeds position. Mass scales with size cubed (AGENTS.md), so a 35% size bias matters. The 10% criterion stays unticked until that comparison or a human change to it.
 
 ## 7. Phase 3: Shape completion and pose fusion (weeks 7 to 8)
 

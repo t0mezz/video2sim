@@ -75,6 +75,8 @@ scale and the world frame on grid-board scenes and checks them against the print
 `python benchmark/run_tracking.py RUN_ID ... --score` tracks all registered frames with one SAM 3.1 video request per run
 and scores identity switches before and after the 3D repair (P2.2). It sends the sampled frames to the Meta
 Model API and caches the answer in the run folder.
+`python benchmark/run_lift.py RUN_ID ... --score` lifts the tracks of finished runs to two kinds of point cluster (P2.3, visual
+hull and voted sparse points) and scores their box sizes; it makes no hosted call. `python benchmark/view_instances.py RUN_ID [--gt]` shows the clusters in 3D.
 `python benchmark/eval_capture_gate.py --out results.json` runs the capture quality gate on the
 dev videos and on degraded copies of one good video (P1.4).
 

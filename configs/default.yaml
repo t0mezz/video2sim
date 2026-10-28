@@ -47,6 +47,18 @@ segmentation:
       merge_radius_m: 0.05     # tracks with no shared frame whose table footprints are this close are one object
       split_gap_m: 0.10        # a track whose footprints fall into groups this far apart is two objects
       min_frames: 3            # smallest group that counts as an object when splitting
+  lift:                        # P2.3: masks to point clusters by voting over views (visual hull)
+    voxel_m: 0.005             # grid resolution; a cluster point is a voxel centre
+    max_height_m: 0.35         # grid top above the table plane; objects taller than this are cut off
+    margin_m: 0.10             # grid extends this far beyond the track footprints
+    max_extent_m: 1.5          # refuse a grid wider than this (a stray track far from the others)
+    max_views: 40              # frames used, spread evenly; cost is voxels x views x tracks
+    mask_downscale: 2          # masks are shrunk by this factor before lookup
+    min_views: 5               # a voxel needs this many views that see it
+    min_agreement: 0.9         # share of those views whose mask must contain it; the slack is occlusion
+    min_voxels: 20             # smaller clusters are dropped and listed in the lift report
+    min_points: 8              # the sparse-point variant: fewer voted SfM points drop the track
+    table_margin_m: 0.003      # sparse points this close to the table plane are the table, not the object
   keyframes_per_object: 5
 
 shape:

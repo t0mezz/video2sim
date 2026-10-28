@@ -18,7 +18,6 @@ import statistics
 from pathlib import Path
 from typing import Any
 
-import numpy as np
 import yaml
 from run_discovery import CLEAN_ALIGNED, board_layout
 
@@ -29,7 +28,13 @@ from video2sim.runner import OUTPUT_FILE
 from video2sim.schemas import WorldModel
 from video2sim.stages.discovery_vlm_sam import ResponseCache, read_secret
 from video2sim.stages.track_repair import RepairConfig, repair_tracks
-from video2sim.stages.tracking import MetaVideoSamClient, Track, TrackingConfig, track_objects
+from video2sim.stages.tracking import (
+    MetaVideoSamClient,
+    Track,
+    TrackingConfig,
+    save_tracks,
+    track_objects,
+)
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -69,14 +74,7 @@ def main() -> None:
         poses = {f.frame_index: f.T_world_from_camera for f in world.frames}
         repaired, report = repair_tracks(raw, poses, world.intrinsics, world.table_plane, rcfg)
         out_dir = seg_dir / "tracks"
-        out_dir.mkdir(parents=True, exist_ok=True)
-        for track in repaired:
-            frames = sorted(track.masks)
-            np.savez_compressed(
-                out_dir / f"track_{track.track_id:03d}.npz",
-                frames=np.array(frames),
-                masks=np.array([track.masks[f] for f in frames], dtype=bool),
-            )
+        save_tracks(repaired, out_dir)
         row: dict[str, Any] = {
             "run": run_id,
             "scene": scene_id,

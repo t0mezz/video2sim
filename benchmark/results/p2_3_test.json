@@ -1,0 +1,76 @@
+{
+  "summary": {
+    "scenes_scored": [
+      "s16"
+    ],
+    "gate": 0.1,
+    "hull": {
+      "objects": 4,
+      "matched": 3,
+      "size_error_median_easy": null,
+      "size_error_median_all": 0.367,
+      "within_gate": 1,
+      "measured": 3
+    },
+    "points": {
+      "objects": 4,
+      "matched": 3,
+      "size_error_median_easy": null,
+      "size_error_median_all": 0.199,
+      "within_gate": 1,
+      "measured": 3
+    }
+  },
+  "scenes": [
+    {
+      "run": "s16_a",
+      "scene": "s16",
+      "tracks": 5,
+      "hull": {
+        "seconds": 9.1,
+        "clusters": 3,
+        "dropped": {
+          "1": "no voxel is inside the mask in enough views",
+          "4": "no voxel is inside the mask in enough views"
+        },
+        "gt_objects": 4,
+        "matched": 3,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_003": null,
+          "obj_004": 0.058,
+          "obj_021": 0.455,
+          "obj_029": 0.367
+        },
+        "position_errors_mm": {
+          "obj_004": 28,
+          "obj_021": 6,
+          "obj_029": 12
+        }
+      },
+      "points": {
+        "seconds": 0.3,
+        "clusters": 3,
+        "dropped": {
+          "1": "only 0 sparse points agree",
+          "4": "only 0 sparse points agree"
+        },
+        "gt_objects": 4,
+        "matched": 3,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_003": null,
+          "obj_004": 0.022,
+          "obj_021": 0.231,
+          "obj_029": 0.199
+        },
+        "position_errors_mm": {
+          "obj_004": 31,
+          "obj_021": 4,
+          "obj_029": 8
+        }
+      },
+      "tier": "medium"
+    }
+  ]
+}

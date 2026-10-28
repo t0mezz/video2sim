@@ -169,3 +169,34 @@ def track_objects(
         ["sam_video", SAM_MODEL, cfg.prompt, cfg.direction, f"{cfg.fps}", digest], call
     )
     return tracks_from_text(text, [f.frame_index for f in world.frames], decode)
+
+
+def save_tracks(tracks: list[Track], out_dir: Path) -> None:
+    """One ``track_NNN.npz`` per track with its frame indices and stacked masks."""
+    import numpy as np
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for track in tracks:
+        frames = sorted(track.masks)
+        np.savez_compressed(
+            out_dir / f"track_{track.track_id:03d}.npz",
+            frames=np.array(frames),
+            masks=np.array([track.masks[f] for f in frames], dtype=bool),
+        )
+
+
+def load_tracks(directory: Path) -> list[Track]:
+    """Tracks written by ``save_tracks``, in id order."""
+    import numpy as np
+
+    tracks = []
+    for path in sorted(directory.glob("track_*.npz")):
+        with np.load(path) as data:
+            frames, masks = data["frames"], data["masks"]
+        tracks.append(
+            Track(
+                int(path.stem.split("_")[1]),
+                {int(f): m for f, m in zip(frames, masks, strict=True)},
+            )
+        )
+    return tracks

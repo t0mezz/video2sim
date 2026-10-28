@@ -1,0 +1,627 @@
+{
+  "summary": {
+    "scenes_scored": [
+      "s01",
+      "s02",
+      "s03",
+      "s04",
+      "s06",
+      "s11",
+      "s12",
+      "s13",
+      "s14",
+      "s17",
+      "s18",
+      "s24"
+    ],
+    "gate": 0.1,
+    "hull": {
+      "objects": 59,
+      "matched": 53,
+      "size_error_median_easy": 0.364,
+      "size_error_median_all": 0.347,
+      "within_gate": 5,
+      "measured": 53
+    },
+    "points": {
+      "objects": 59,
+      "matched": 54,
+      "size_error_median_easy": 0.187,
+      "size_error_median_all": 0.2015,
+      "within_gate": 16,
+      "measured": 54
+    }
+  },
+  "scenes": [
+    {
+      "run": "s01_b",
+      "scene": "s01",
+      "tracks": 5,
+      "hull": {
+        "seconds": 2.6,
+        "clusters": 5,
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_007": 0.417,
+          "obj_021": 0.347,
+          "obj_029": 0.529,
+          "obj_004": 0.133,
+          "obj_003": 0.45
+        },
+        "position_errors_mm": {
+          "obj_007": 11,
+          "obj_021": 7,
+          "obj_029": 18,
+          "obj_004": 13,
+          "obj_003": 13
+        }
+      },
+      "points": {
+        "seconds": 0.1,
+        "clusters": 5,
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_007": 0.187,
+          "obj_021": 0.221,
+          "obj_029": 0.247,
+          "obj_004": 0.056,
+          "obj_003": 0.413
+        },
+        "position_errors_mm": {
+          "obj_007": 10,
+          "obj_021": 6,
+          "obj_029": 10,
+          "obj_004": 8,
+          "obj_003": 17
+        }
+      },
+      "tier": "easy"
+    },
+    {
+      "run": "s02_b",
+      "scene": "s02",
+      "tracks": 5,
+      "hull": {
+        "seconds": 2.7,
+        "clusters": 5,
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_041": 0.146,
+          "obj_046": 0.094,
+          "obj_039": 0.162,
+          "obj_060": 0.106,
+          "obj_014": 0.455
+        },
+        "position_errors_mm": {
+          "obj_041": 16,
+          "obj_046": 12,
+          "obj_039": 8,
+          "obj_060": 8,
+          "obj_014": 16
+        }
+      },
+      "points": {
+        "seconds": 0.0,
+        "clusters": 5,
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_041": 0.103,
+          "obj_046": 0.122,
+          "obj_039": 0.028,
+          "obj_060": 0.329,
+          "obj_014": 0.095
+        },
+        "position_errors_mm": {
+          "obj_041": 14,
+          "obj_046": 7,
+          "obj_039": 7,
+          "obj_060": 6,
+          "obj_014": 9
+        }
+      },
+      "tier": "easy"
+    },
+    {
+      "run": "s03_b",
+      "scene": "s03",
+      "tracks": 1,
+      "hull": {
+        "seconds": 0.4,
+        "clusters": 1,
+        "dropped": {},
+        "gt_objects": 1,
+        "matched": 1,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_027": 0.033
+        },
+        "position_errors_mm": {
+          "obj_027": 12
+        }
+      },
+      "points": {
+        "seconds": 0.0,
+        "clusters": 1,
+        "dropped": {},
+        "gt_objects": 1,
+        "matched": 1,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_027": 0.04
+        },
+        "position_errors_mm": {
+          "obj_027": 13
+        }
+      },
+      "tier": "easy"
+    },
+    {
+      "run": "s04_b",
+      "scene": "s04",
+      "tracks": 5,
+      "hull": {
+        "seconds": 3.6,
+        "clusters": 5,
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_027": 0.067,
+          "obj_022": 0.336,
+          "obj_014": 0.728,
+          "obj_021": 0.364,
+          "obj_003": 0.778
+        },
+        "position_errors_mm": {
+          "obj_027": 16,
+          "obj_022": 16,
+          "obj_014": 23,
+          "obj_021": 12,
+          "obj_003": 20
+        }
+      },
+      "points": {
+        "seconds": 0.0,
+        "clusters": 5,
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_027": 0.024,
+          "obj_022": 0.252,
+          "obj_014": 0.405,
+          "obj_021": 0.216,
+          "obj_003": 0.423
+        },
+        "position_errors_mm": {
+          "obj_027": 7,
+          "obj_022": 14,
+          "obj_014": 19,
+          "obj_021": 9,
+          "obj_003": 13
+        }
+      },
+      "tier": "easy"
+    },
+    {
+      "run": "s06_b",
+      "scene": "s06",
+      "tracks": 4,
+      "hull": {
+        "seconds": 4.2,
+        "clusters": 4,
+        "dropped": {},
+        "gt_objects": 4,
+        "matched": 3,
+        "false_positives": 1,
+        "size_errors": {
+          "obj_029": 1.048,
+          "obj_004": 0.4,
+          "obj_040": null,
+          "obj_018": 1.086
+        },
+        "position_errors_mm": {
+          "obj_029": 27,
+          "obj_004": 22,
+          "obj_018": 36
+        }
+      },
+      "points": {
+        "seconds": 0.1,
+        "clusters": 4,
+        "dropped": {},
+        "gt_objects": 4,
+        "matched": 3,
+        "false_positives": 1,
+        "size_errors": {
+          "obj_029": 0.725,
+          "obj_004": 0.058,
+          "obj_040": null,
+          "obj_018": 0.083
+        },
+        "position_errors_mm": {
+          "obj_029": 22,
+          "obj_004": 7,
+          "obj_018": 30
+        }
+      },
+      "tier": "easy"
+    },
+    {
+      "run": "s11_b",
+      "scene": "s11",
+      "tracks": 7,
+      "hull": {
+        "seconds": 4.6,
+        "clusters": 7,
+        "dropped": {},
+        "gt_objects": 7,
+        "matched": 7,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_047": 0.415,
+          "obj_040": 0.801,
+          "obj_048": 0.333,
+          "obj_049": 0.334,
+          "obj_056": 0.167,
+          "obj_050": 0.5,
+          "obj_052": 0.167
+        },
+        "position_errors_mm": {
+          "obj_047": 5,
+          "obj_040": 5,
+          "obj_048": 4,
+          "obj_049": 2,
+          "obj_056": 5,
+          "obj_050": 7,
+          "obj_052": 5
+        }
+      },
+      "points": {
+        "seconds": 0.0,
+        "clusters": 7,
+        "dropped": {},
+        "gt_objects": 7,
+        "matched": 7,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_047": 0.152,
+          "obj_040": 0.521,
+          "obj_048": 0.555,
+          "obj_049": 0.258,
+          "obj_056": 0.122,
+          "obj_050": 0.223,
+          "obj_052": 0.089
+        },
+        "position_errors_mm": {
+          "obj_047": 5,
+          "obj_040": 3,
+          "obj_048": 13,
+          "obj_049": 1,
+          "obj_056": 2,
+          "obj_050": 3,
+          "obj_052": 4
+        }
+      },
+      "tier": "medium"
+    },
+    {
+      "run": "s12_b",
+      "scene": "s12",
+      "tracks": 10,
+      "hull": {
+        "seconds": 7.0,
+        "clusters": 9,
+        "dropped": {
+          "3": "no voxel is inside the mask in enough views"
+        },
+        "gt_objects": 10,
+        "matched": 9,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_004": 0.163,
+          "obj_029": 0.412,
+          "obj_001": 0.04,
+          "obj_014": 0.931,
+          "obj_002": 1.845,
+          "obj_060": 0.267,
+          "obj_039": null,
+          "obj_003": 0.686,
+          "obj_021": 0.285,
+          "obj_007": 0.299
+        },
+        "position_errors_mm": {
+          "obj_004": 14,
+          "obj_029": 37,
+          "obj_001": 10,
+          "obj_014": 45,
+          "obj_002": 35,
+          "obj_060": 9,
+          "obj_003": 12,
+          "obj_021": 10,
+          "obj_007": 8
+        }
+      },
+      "points": {
+        "seconds": 0.1,
+        "clusters": 8,
+        "dropped": {
+          "3": "only 0 sparse points agree",
+          "6": "only 2 sparse points agree"
+        },
+        "gt_objects": 10,
+        "matched": 8,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_004": 0.294,
+          "obj_029": 0.683,
+          "obj_001": 0.02,
+          "obj_014": null,
+          "obj_002": 1.244,
+          "obj_060": 0.259,
+          "obj_039": null,
+          "obj_003": 0.183,
+          "obj_021": 0.109,
+          "obj_007": 0.231
+        },
+        "position_errors_mm": {
+          "obj_004": 14,
+          "obj_029": 38,
+          "obj_001": 9,
+          "obj_002": 25,
+          "obj_060": 7,
+          "obj_003": 7,
+          "obj_021": 8,
+          "obj_007": 8
+        }
+      },
+      "tier": "medium"
+    },
+    {
+      "run": "s13_b",
+      "scene": "s13",
+      "tracks": 2,
+      "hull": {
+        "seconds": 1.0,
+        "clusters": 2,
+        "dropped": {},
+        "gt_objects": 3,
+        "matched": 1,
+        "false_positives": 1,
+        "size_errors": {
+          "obj_002": null,
+          "obj_014": 1.364,
+          "obj_040": null
+        },
+        "position_errors_mm": {
+          "obj_014": 8
+        }
+      },
+      "points": {
+        "seconds": 0.0,
+        "clusters": 2,
+        "dropped": {},
+        "gt_objects": 3,
+        "matched": 2,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_002": 0.52,
+          "obj_014": 0.633,
+          "obj_040": null
+        },
+        "position_errors_mm": {
+          "obj_002": 63,
+          "obj_014": 15
+        }
+      },
+      "tier": "medium"
+    },
+    {
+      "run": "s14_b",
+      "scene": "s14",
+      "tracks": 6,
+      "hull": {
+        "seconds": 3.1,
+        "clusters": 5,
+        "dropped": {
+          "5": "reaches the top of the grid (not a tabletop object)"
+        },
+        "gt_objects": 5,
+        "matched": 4,
+        "false_positives": 1,
+        "size_errors": {
+          "obj_004": 0.478,
+          "obj_036": null,
+          "obj_040": 0.5,
+          "obj_006": 0.406,
+          "obj_002": 2.205
+        },
+        "position_errors_mm": {
+          "obj_004": 44,
+          "obj_040": 13,
+          "obj_006": 40,
+          "obj_002": 51
+        }
+      },
+      "points": {
+        "seconds": 0.1,
+        "clusters": 6,
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 1,
+        "size_errors": {
+          "obj_004": 0.121,
+          "obj_036": 2.893,
+          "obj_040": 0.782,
+          "obj_006": 0.379,
+          "obj_002": 1.584
+        },
+        "position_errors_mm": {
+          "obj_004": 19,
+          "obj_036": 28,
+          "obj_040": 27,
+          "obj_006": 30,
+          "obj_002": 42
+        }
+      },
+      "tier": "medium"
+    },
+    {
+      "run": "s17_b",
+      "scene": "s17",
+      "tracks": 5,
+      "hull": {
+        "seconds": 3.5,
+        "clusters": 5,
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_026": 0.049,
+          "obj_019": 0.214,
+          "obj_059": 0.158,
+          "obj_035": 0.448,
+          "obj_015": 0.462
+        },
+        "position_errors_mm": {
+          "obj_026": 4,
+          "obj_019": 10,
+          "obj_059": 3,
+          "obj_035": 6,
+          "obj_015": 9
+        }
+      },
+      "points": {
+        "seconds": 0.0,
+        "clusters": 5,
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_026": 0.045,
+          "obj_019": 0.127,
+          "obj_059": 0.05,
+          "obj_035": 0.307,
+          "obj_015": 0.615
+        },
+        "position_errors_mm": {
+          "obj_026": 5,
+          "obj_019": 7,
+          "obj_059": 3,
+          "obj_035": 7,
+          "obj_015": 5
+        }
+      },
+      "tier": "hard"
+    },
+    {
+      "run": "s18_b",
+      "scene": "s18",
+      "tracks": 8,
+      "hull": {
+        "seconds": 5.3,
+        "clusters": 8,
+        "dropped": {},
+        "gt_objects": 8,
+        "matched": 8,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_006": 0.251,
+          "obj_032": 0.22,
+          "obj_008": 0.171,
+          "obj_000": 0.163,
+          "obj_018": 0.254,
+          "obj_024": 0.332,
+          "obj_012": 0.359,
+          "obj_045": 0.597
+        },
+        "position_errors_mm": {
+          "obj_006": 11,
+          "obj_032": 7,
+          "obj_008": 7,
+          "obj_000": 6,
+          "obj_018": 8,
+          "obj_024": 13,
+          "obj_012": 12,
+          "obj_045": 8
+        }
+      },
+      "points": {
+        "seconds": 0.1,
+        "clusters": 8,
+        "dropped": {},
+        "gt_objects": 8,
+        "matched": 8,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_006": 0.136,
+          "obj_032": 0.028,
+          "obj_008": 0.022,
+          "obj_000": 0.057,
+          "obj_018": 0.051,
+          "obj_024": 0.092,
+          "obj_012": 0.239,
+          "obj_045": 0.11
+        },
+        "position_errors_mm": {
+          "obj_006": 9,
+          "obj_032": 5,
+          "obj_008": 4,
+          "obj_000": 8,
+          "obj_018": 5,
+          "obj_024": 9,
+          "obj_012": 14,
+          "obj_045": 5
+        }
+      },
+      "tier": "hard"
+    },
+    {
+      "run": "s24_b",
+      "scene": "s24",
+      "tracks": 0,
+      "hull": {
+        "seconds": 0.0,
+        "clusters": 0,
+        "dropped": {},
+        "gt_objects": 1,
+        "matched": 0,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_040": null
+        },
+        "position_errors_mm": {}
+      },
+      "points": {
+        "seconds": 0.0,
+        "clusters": 0,
+        "dropped": {},
+        "gt_objects": 1,
+        "matched": 0,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_040": null
+        },
+        "position_errors_mm": {}
+      },
+      "tier": "hard"
+    }
+  ]
+}
