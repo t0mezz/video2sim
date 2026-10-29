@@ -10,10 +10,14 @@ Clean-board scenes have no known tag layout. Their ground truth is measured from
 corner of the reference tag as seen in the first frame where it is visible (human note,
 2026-10-28), with X to the right along the tag's lower edge and Y up the tag, so ``align_clean``
 rebuilds that frame from the tag alone.
+
+``align_scene`` picks between the two for a benchmark scene, and returns None for a clean-board
+scene whose origin is not established (s05), so that scene is reported as unscored.
 """
 
 from __future__ import annotations
 
+import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -29,6 +33,15 @@ F64 = NDArray[np.float64]
 
 # World units are meters, so a fit far from scale 1 means a wrong tag match, not a real scale.
 MAX_SCALE_DEVIATION = 0.05
+# Clean-board scenes whose ground truth lines up with the tag-0 corner frame (human note,
+# 2026-10-28), checked by overlaying the ground-truth boxes on the frames. s05 does not line up
+# under that rule or its three 90-degree rotations, so it stays unscored until its origin is known.
+CLEAN_ALIGNED = ("s14", "s24")
+# The A1 benchmark grid board as ``benchmark/make_board.py`` draws it (page, printer margin and
+# grid pitch in mm); ``tests/test_eval_alignment.py`` checks the tag positions against that script.
+_A1_PAGE_MM = (841.0, 594.0)
+_PAGE_MARGIN_MM = 10.0
+_GRID_MM = 50.0
 
 
 @dataclass(frozen=True)
@@ -40,6 +53,26 @@ class BoardAlignment:
 
     def pose_in_board(self, T_world_from_camera: SE3) -> SE3:
         return SE3.from_numpy(self.T_board_from_world @ T_world_from_camera.to_numpy())
+
+
+def grid_board_layout(tag_edge_m: float) -> BoardLayout:
+    """Tag corners of the A1 grid board, ids 0 to 5, in the board frame (origin at the grid corner).
+
+    The positions follow ``make_board.build("A1", tag_edge_m * 1000, False)``, as the benchmark
+    scripts have always built them: the measured edge sets the quiet zone, so the positions move
+    by under 0.1 mm against the 100 mm print, well under the board fit's millimetre residual.
+    """
+    tag_mm = tag_edge_m * 1000.0
+    quiet = max(tag_mm / 6.0, 5.0)
+    grid_w = math.floor((_A1_PAGE_MM[0] - 2 * _PAGE_MARGIN_MM) / _GRID_MM) * _GRID_MM
+    grid_h = math.floor((_A1_PAGE_MM[1] - 2 * _PAGE_MARGIN_MM) / _GRID_MM) * _GRID_MM
+    left, right = quiet, grid_w - quiet - tag_mm
+    bottom, top = quiet, grid_h - quiet - tag_mm
+    mid = (grid_h - tag_mm) / 2.0
+    lower_left = {0: (left, bottom), 1: (right, bottom), 2: (left, top), 3: (right, top),
+                  4: (left, mid), 5: (right, mid)}  # fmt: skip
+    centers = {i: (x + tag_mm / 2.0, y + tag_mm / 2.0) for i, (x, y) in lower_left.items()}
+    return BoardLayout.from_tag_centers(centers, tag_edge_m)
 
 
 def align_views(views: Sequence[TagView], layout: BoardLayout) -> BoardAlignment:
@@ -143,3 +176,20 @@ def align_clean(
     first = next(v for v in views if ref in v.corners_px)
     t = board_from_tag_view(tri.corners[ref], first.corners_px[ref])
     return BoardAlignment(t, 1.0, 0.0, (ref,))
+
+
+def align_scene(
+    world: WorldModel,
+    run_dir: Path,
+    scene_id: str,
+    board: str,
+    tag_edge_m: float,
+    family: str = "aruco_4x4_50",
+) -> BoardAlignment | None:
+    """``T_board_from_world`` for a benchmark scene: the board fit on a grid board, the tag-0
+    frame on a clean board listed in ``CLEAN_ALIGNED``, None for any other clean board."""
+    if board == "grid":
+        return align_run(world, run_dir, grid_board_layout(tag_edge_m), family)
+    if scene_id in CLEAN_ALIGNED:
+        return align_clean(world, run_dir, family)
+    return None

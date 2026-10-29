@@ -9,15 +9,19 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import yaml
+from numpy.typing import NDArray
 
 from video2sim.evaluation import baselines
+from video2sim.evaluation.alignment import align_scene
 from video2sim.evaluation.loader import load_run
 from video2sim.evaluation.metrics import SceneResult, evaluate_scene
 from video2sim.evaluation.report import build_report, write_html, write_json
 from video2sim.evaluation.scenes import GtScene, Prediction, discover_scenes
 from video2sim.evaluation.segmentation import load_instances, summarize_segmentation
-from video2sim.runner import _code_version, sha256_file
+from video2sim.runner import OUTPUT_FILE, _code_version, sha256_file
+from video2sim.schemas import WorldModel
 
 SPLIT_CHOICES = {"dev": ["dev"], "test": ["test"], "all": ["dev", "test"]}
 
@@ -37,10 +41,30 @@ def _predict(
     if args.baseline == "constant":
         return baselines.constant_box()
     if args.stage == "segmentation":
-        run = load_instances(args.runs / scene.scene_id)
+        run_dir = args.runs / scene.scene_id
+        run = load_instances(run_dir, _board_from_world(args, scene, run_dir))
         segmentation_flags[scene.scene_id] = dict(run.flags)
         return run.prediction
     return load_run(args.runs / scene.scene_id)
+
+
+def _board_from_world(
+    args: argparse.Namespace, scene: GtScene, run_dir: Path
+) -> NDArray[np.float64]:
+    """``T_board_from_world`` of a run, so its clusters meet the board-frame ground truth.
+
+    Raises ``ValueError`` for a clean-board scene whose origin is not established, which the
+    caller reports as a scene without a usable prediction."""
+    marker = yaml.safe_load(args.config.read_text(encoding="utf-8"))["capture"]["marker"]
+    world = WorldModel.model_validate_json(
+        (run_dir / "reconstruction" / OUTPUT_FILE).read_text(encoding="utf-8")
+    )
+    alignment = align_scene(
+        world, run_dir, scene.scene_id, scene.board, float(marker["tag_size_m"]), marker["family"]
+    )
+    if alignment is None:
+        raise ValueError("clean board: origin of the ground truth is not established")
+    return alignment.T_board_from_world
 
 
 def _build_parser() -> argparse.ArgumentParser:

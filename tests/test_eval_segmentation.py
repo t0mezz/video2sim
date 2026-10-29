@@ -4,8 +4,11 @@ import json
 from pathlib import Path
 
 import numpy as np
+import pytest
 
+from video2sim import cli
 from video2sim.cli import main
+from video2sim.evaluation.alignment import BoardAlignment
 from video2sim.evaluation.baselines import oracle
 from video2sim.evaluation.metrics import evaluate_scene
 from video2sim.evaluation.scenes import GtObject, GtScene
@@ -18,7 +21,7 @@ from video2sim.evaluation.segmentation import (
     summarize_segmentation,
 )
 from video2sim.runner import OUTPUT_FILE
-from video2sim.schemas import SE3, Intrinsics
+from video2sim.schemas import SE3, Intrinsics, Plane, WorldModel
 
 GATES = {"id_switches_per_scene_max": 1.0, "cluster_bbox_error_max": 0.10}
 
@@ -188,3 +191,87 @@ def test_cli_reports_phase_2_section_for_the_oracle(tmp_path: Path) -> None:
     assert code == 0
     assert report["segmentation"]["rows"][0]["value"] == 1.0
     assert "Phase 2 exit criteria" in (out / "report.html").read_text()
+
+
+def test_load_instances_moves_clusters_into_the_board_frame(tmp_path: Path) -> None:
+    t = np.eye(4)
+    t[:3, :3] = [[0.0, -1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 1.0]]  # 90 degrees about +Z
+    t[:3, 3] = [0.3, 0.2, 0.0]
+    run = load_instances(_write_run(tmp_path), t)
+    assert np.allclose(run.prediction.objects[0].vertices, [[0.3, 0.2, 0.0], [0.2, 0.3, 0.1]])
+
+
+def _gt_scene(root: Path, scene_id: str, board: str) -> None:
+    (root / scene_id).mkdir(parents=True)
+    (root / scene_id / "ground_truth.json").write_text(
+        json.dumps(
+            {
+                "scene_id": scene_id,
+                "tier": "easy",
+                "split": "dev",
+                "board": board,
+                "objects": [
+                    {
+                        "object_id": "o1",
+                        "label": "cube",
+                        "size_m": [0.1, 0.1, 0.1],
+                        "position_m": [0.35, 0.25, 0.05],
+                        "yaw_deg": 0.0,
+                        "mass_kg": 0.1,
+                        "incomplete": [],
+                    }
+                ],
+            }
+        )
+    )
+
+
+def _world_json(run: Path) -> None:
+    (run / "reconstruction").mkdir(parents=True)
+    world = WorldModel(
+        intrinsics=Intrinsics(fx=500, fy=500, cx=320, cy=240, width_px=640, height_px=480),
+        frames=[],
+        scale_factor=1.0,
+        scale_source="marker",
+        table_plane=Plane(normal=(0.0, 0.0, 1.0), offset_m=0.0),
+        point_cloud_path="reconstruction/points.ply",
+        mean_reprojection_error_px=0.5,
+        registered_fraction=1.0,
+    )
+    (run / "reconstruction" / OUTPUT_FILE).write_text(world.model_dump_json())
+
+
+def test_cli_scores_segmentation_clusters_in_the_board_frame(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root, runs = tmp_path / "scenes", tmp_path / "runs"
+    _gt_scene(root, "s01", "grid")
+    _gt_scene(root, "s05", "clean")
+    _write_run(runs)
+    cube = np.array([[x, y, z] for x in (0, 0.1) for y in (0, 0.1) for z in (0, 0.1)])
+    np.save(runs / "s01" / "segmentation" / "obj_0.npy", cube)  # a 0.1 m cube at the origin
+    _world_json(runs / "s01")
+    (runs / "s05").symlink_to(runs / "s01", target_is_directory=True)
+    shift = np.eye(4)
+    shift[:3, 3] = [0.3, 0.2, 0.0]  # the board corner is 0.3 m and 0.2 m from the world origin
+    seen: list[tuple[str, str]] = []
+
+    def fake_align(
+        world: WorldModel, run_dir: Path, scene_id: str, board: str, edge: float, family: str
+    ) -> BoardAlignment | None:
+        seen.append((scene_id, board))
+        return BoardAlignment(shift, 1.0, 0.0, (0,)) if board == "grid" else None
+
+    monkeypatch.setattr(cli, "align_scene", fake_align)
+    out = tmp_path / "out"
+    code = main(
+        ["eval", "--benchmark", str(root), "--runs", str(runs), "--stage", "segmentation",
+         "--out", str(out)]
+    )  # fmt: skip
+    report = json.loads((out / "report.json").read_text())
+    assert code == 0 and sorted(seen) == [("s01", "grid"), ("s05", "clean")]
+    recall, bbox = report["segmentation"]["rows"][:2]
+    # Unshifted, the cluster centre (0.05, 0.05) is 0.36 m from the cube and would not match.
+    assert recall["value"] == 1.0 and recall["n"] == 1  # s05 cannot be aligned: not scored
+    assert bbox["value"] < 1e-9
+    assert "s05" in report["header"]["scenes_without_prediction"]

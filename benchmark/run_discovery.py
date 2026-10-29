@@ -16,17 +16,20 @@ environment or ``.env`` and are never printed. Prints and writes recall per scen
 from __future__ import annotations
 
 import argparse
-import importlib.util
 import json
 import statistics
-import tempfile
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import yaml
 
-from video2sim.evaluation.alignment import align_clean, align_run
+from video2sim.evaluation.alignment import (
+    CLEAN_ALIGNED,
+    align_clean,
+    align_run,
+    grid_board_layout,
+)
 from video2sim.evaluation.scenes import load_scene
 from video2sim.evaluation.segmentation import mask_recall
 from video2sim.runner import OUTPUT_FILE
@@ -43,23 +46,11 @@ from video2sim.stages.segmentation import DiscoveryBackend, DiscoveryConfig, dis
 from video2sim.stages.world_frame import BoardLayout
 
 ROOT = Path(__file__).resolve().parent.parent
-# Clean-board scenes whose ground truth lines up with the tag-0 corner frame (human note,
-# 2026-10-28), checked by overlaying the ground-truth boxes on the frames. s05 does not line up
-# under that rule or its three 90-degree rotations, so it stays unscored until its origin is known.
-CLEAN_ALIGNED = ("s14", "s24")
 
 
 def board_layout(tag_edge_m: float) -> BoardLayout:
-    """The A1 grid board, as ``benchmark/eval_world_frame.py`` builds it."""
-    spec = importlib.util.spec_from_file_location("make_board", ROOT / "benchmark/make_board.py")
-    assert spec is not None and spec.loader is not None
-    make_board = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(make_board)
-    layout = make_board.build("A1", tag_edge_m * 1000.0, False)[1]
-    with tempfile.TemporaryDirectory() as tmp:
-        path = Path(tmp) / "layout.json"
-        path.write_text(json.dumps(layout), encoding="utf-8")
-        return BoardLayout.from_make_board_json(path, tag_edge_m=tag_edge_m)
+    """The A1 grid board; kept as a name for the benchmark scripts that import it from here."""
+    return grid_board_layout(tag_edge_m)
 
 
 def main() -> None:

@@ -1,10 +1,18 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from video2sim.evaluation.alignment import align_views, board_from_tag_view
+from video2sim.evaluation.alignment import (
+    CLEAN_ALIGNED,
+    align_scene,
+    align_views,
+    board_from_tag_view,
+    grid_board_layout,
+)
 from video2sim.stages.marker_detection import TagView
 from video2sim.stages.world_frame import BoardLayout
 
@@ -87,3 +95,39 @@ def test_clean_board_alignment_rejects_a_mirrored_view() -> None:
     mirrored[:, 0] = 640.0 - mirrored[:, 0]
     with pytest.raises(ValueError, match="mirrored"):
         board_from_tag_view(corners, mirrored)
+
+
+def test_grid_layout_matches_the_board_script(tmp_path: Path) -> None:
+    import importlib.util
+    import json
+
+    root = Path(__file__).resolve().parent.parent
+    spec = importlib.util.spec_from_file_location("make_board", root / "benchmark/make_board.py")
+    assert spec is not None and spec.loader is not None
+    make_board = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(make_board)
+    edge = 0.1003
+    path = tmp_path / "layout.json"
+    path.write_text(json.dumps(make_board.build("A1", edge * 1000.0, False)[1]))
+    want = BoardLayout.from_make_board_json(path, tag_edge_m=edge).tag_corners_m
+    got = grid_board_layout(edge).tag_corners_m
+    assert sorted(got) == sorted(want) == [0, 1, 2, 3, 4, 5]
+    for tag_id, corners in want.items():
+        assert np.allclose(got[tag_id], corners, atol=1e-12)
+
+
+def test_align_scene_leaves_an_unestablished_clean_board_unaligned(tmp_path: Path) -> None:
+    from video2sim.schemas import Intrinsics, Plane, WorldModel
+
+    world = WorldModel(
+        intrinsics=Intrinsics(fx=500, fy=500, cx=320, cy=240, width_px=640, height_px=480),
+        frames=[],
+        scale_factor=1.0,
+        scale_source="marker",
+        table_plane=Plane(normal=(0.0, 0.0, 1.0), offset_m=0.0),
+        point_cloud_path="reconstruction/points.ply",
+        mean_reprojection_error_px=0.5,
+        registered_fraction=1.0,
+    )
+    assert "s05" not in CLEAN_ALIGNED
+    assert align_scene(world, tmp_path, "s05", "clean", 0.1003) is None

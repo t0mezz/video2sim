@@ -58,13 +58,23 @@ def _load_points(path: Path) -> NDArray[np.float64]:
     return np.asarray(cloud.vertices, dtype=np.float64)
 
 
-def load_instances(run_dir: Path) -> SegmentationRun:
-    """Read ``segmentation/output.json`` and the point clusters of a run folder."""
+def load_instances(
+    run_dir: Path, T_board_from_world: NDArray[np.float64] | None = None
+) -> SegmentationRun:
+    """Read ``segmentation/output.json`` and the point clusters of a run folder.
+
+    Clusters are in the world frame (origin on the pipeline's reference tag) and ground truth is
+    in the board frame, so the scorer passes ``T_board_from_world`` from
+    ``evaluation.alignment.align_scene``; without it the clusters stay in the world frame.
+    """
     instances = Instances.model_validate_json(
         (run_dir / "segmentation" / OUTPUT_FILE).read_text(encoding="utf-8")
     )
+    t = np.eye(4) if T_board_from_world is None else T_board_from_world
     objects = [
-        PredObject(o.object_id, _load_points(run_dir / o.point_cluster_path))
+        PredObject(
+            o.object_id, _load_points(run_dir / o.point_cluster_path) @ t[:3, :3].T + t[:3, 3]
+        )
         for o in instances.objects
     ]
     flags = {o.object_id: tuple(f.value for f in o.flags) for o in instances.objects}
