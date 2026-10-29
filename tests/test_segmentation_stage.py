@@ -53,7 +53,8 @@ def test_files_are_written_and_the_paths_are_relative(tmp_path: Path) -> None:
     mask[2:4, 3:6] = True
     track = Track(5, {10: mask, 12: mask})
     cluster = np.array([[0.0, 0.0, 0.01], [0.1, 0.0, 0.02]])
-    mask_dir, cluster_path = write_object_files(tmp_path, "obj_005", track, cluster)
+    hull = cluster + 1.0
+    mask_dir, cluster_path = write_object_files(tmp_path, "obj_005", track, cluster, {"hull": hull})
     assert mask_dir == "segmentation/masks/obj_005"
     assert cluster_path == "segmentation/clusters/obj_005.npy"
     assert sorted(p.name for p in (tmp_path / "masks" / "obj_005").iterdir()) == [
@@ -61,6 +62,7 @@ def test_files_are_written_and_the_paths_are_relative(tmp_path: Path) -> None:
         "00012.png",
     ]
     assert np.array_equal(np.load(tmp_path / "clusters" / "obj_005.npy"), cluster)
+    assert np.array_equal(np.load(tmp_path / "clusters" / "obj_005_hull.npy"), hull)
 
 
 def test_object_without_a_material_answer_gets_a_generic_label() -> None:

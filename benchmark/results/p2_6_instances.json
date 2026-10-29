@@ -11,7 +11,7 @@
       ],
       "segmentation": [
         "done",
-        17.7
+        18.0
       ],
       "shape": [
         "pending",
@@ -147,7 +147,7 @@
       ],
       "segmentation": [
         "done",
-        37.5
+        17.9
       ],
       "shape": [
         "pending",
@@ -289,7 +289,7 @@
       ],
       "segmentation": [
         "done",
-        19.9
+        9.5
       ],
       "shape": [
         "pending",
@@ -345,7 +345,7 @@
       ],
       "segmentation": [
         "done",
-        66.7
+        39.2
       ],
       "shape": [
         "pending",
@@ -489,7 +489,7 @@
       ],
       "segmentation": [
         "done",
-        42.5
+        47.3
       ],
       "shape": [
         "pending",
@@ -612,7 +612,7 @@
       ],
       "segmentation": [
         "done",
-        44.1
+        25.0
       ],
       "shape": [
         "pending",
@@ -816,7 +816,7 @@
       ],
       "segmentation": [
         "done",
-        85.7
+        67.6
       ],
       "shape": [
         "pending",
@@ -967,7 +967,8 @@
         ],
         "flag_reasons": [
           "largest extent 52 mm",
-          "smallest extent 13 mm, 0.25 of the largest"
+          "smallest extent 13 mm, 0.25 of the largest",
+          "no sparse points agree with the masks: the hull is the cluster"
         ],
         "category": "box",
         "material_class": "cardboard",
@@ -1057,7 +1058,7 @@
       ],
       "segmentation": [
         "done",
-        46.3
+        29.5
       ],
       "shape": [
         "pending",
@@ -1140,7 +1141,7 @@
       ],
       "segmentation": [
         "done",
-        47.6
+        51.7
       ],
       "shape": [
         "pending",
@@ -1286,7 +1287,7 @@
       ],
       "segmentation": [
         "done",
-        104.3
+        86.6
       ],
       "shape": [
         "pending",
@@ -1388,7 +1389,7 @@
       ],
       "segmentation": [
         "done",
-        23.0
+        25.0
       ],
       "shape": [
         "pending",
@@ -1544,7 +1545,7 @@
       ],
       "segmentation": [
         "done",
-        49.6
+        55.4
       ],
       "shape": [
         "pending",
@@ -1757,7 +1758,7 @@
       ],
       "segmentation": [
         "done",
-        22.0
+        4.6
       ],
       "shape": [
         "pending",
@@ -1813,7 +1814,7 @@
       ],
       "segmentation": [
         "done",
-        40.7
+        44.3
       ],
       "shape": [
         "pending",
@@ -1978,7 +1979,7 @@
       ],
       "segmentation": [
         "done",
-        64.6
+        61.6
       ],
       "shape": [
         "pending",
@@ -2149,7 +2150,7 @@
       ],
       "segmentation": [
         "done",
-        3.9
+        4.6
       ],
       "shape": [
         "pending",
@@ -2207,7 +2208,7 @@
       ],
       "segmentation": [
         "done",
-        15.4
+        16.9
       ],
       "shape": [
         "pending",
@@ -2266,7 +2267,7 @@
       ],
       "segmentation": [
         "done",
-        15.2
+        14.7
       ],
       "shape": [
         "pending",

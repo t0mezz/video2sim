@@ -4,13 +4,15 @@ The pieces are the ones built in P2.1 to P2.5, in this order:
 
 1. ``scene_router``: one VLM request picks the SAM prompt from the pool and lists the objects.
 2. ``tracking`` and ``track_repair``: one SAM 3.1 video request, then identity repair in 3D.
-3. ``lift``: visual-hull clusters (the cluster written to ``point_cluster_path``) and the SfM
-   points that the masks agree on (written beside it, outside the typed output).
+3. ``lift``: the SfM points that the masks agree on (the cluster written to
+   ``point_cluster_path``, 18.7% median box error on the easy tier) and the visual hull (beside it
+   as ``obj_NNN_hull.npy``, outside the typed output). A track with no sparse points falls back to
+   its hull, with a reason. The shape flags use the hull, which has a volume.
 4. ``keyframes``: the best frames per object.
 5. ``depth_flags``, ``material_pass`` and ``shape_flags``: the failure flags and the material
    answer per object.
 
-A track with no point cluster is dropped and named in ``Instances.flags``, so the objects in the
+A track with no hull is dropped and named in ``Instances.flags``, so the objects in the
 output all have geometry; an object the router listed but no track covers is named there too.
 Hosted answers are cached in ``segmentation.work/`` (outside the hashed stage folder, like
 ``reconstruction.work/``), so a rerun with the same inputs makes no call. Hosted clients are
@@ -19,7 +21,7 @@ built by ``clients`` and can be replaced in tests.
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
@@ -108,9 +110,15 @@ def object_flags(
 
 
 def write_object_files(
-    out_dir: Path, object_id: str, track: Track, cluster: F64
+    out_dir: Path,
+    object_id: str,
+    track: Track,
+    cluster: F64,
+    extra: Mapping[str, F64] | None = None,
 ) -> tuple[str, str]:
-    """Masks as one PNG per frame and the cluster as ``.npy``; relative paths of both."""
+    """Masks as one PNG per frame and the cluster as ``.npy``; relative paths of both. Each entry
+    of ``extra`` is written beside the cluster as ``<object_id>_<name>.npy``, outside the typed
+    output."""
     import cv2
 
     mask_dir = out_dir / "masks" / object_id
@@ -120,6 +128,8 @@ def write_object_files(
     cluster_dir = out_dir / "clusters"
     cluster_dir.mkdir(parents=True, exist_ok=True)
     np.save(cluster_dir / f"{object_id}.npy", cluster)
+    for name, points in (extra or {}).items():
+        np.save(cluster_dir / f"{object_id}_{name}.npy", points)
     return f"segmentation/masks/{object_id}", f"segmentation/clusters/{object_id}.npy"
 
 
@@ -262,11 +272,13 @@ class SegmentationStage:
                 reasons.append("track produced by an identity split or merge")
             if t.track_id in kf_report.notes:
                 reasons.append(f"keyframes: {kf_report.notes[t.track_id]}")
-            mask_dir, cluster_path = write_object_files(
-                ctx.out_dir, object_id, t, hulls[t.track_id]
+            hull = hulls[t.track_id]
+            cluster, extra = (
+                (sparse[t.track_id], {"hull": hull}) if t.track_id in sparse else (hull, {})
             )
-            if t.track_id in sparse:
-                np.save(ctx.out_dir / "clusters" / f"{object_id}_sparse.npy", sparse[t.track_id])
+            if t.track_id not in sparse:
+                reasons.append("no sparse points agree with the masks: the hull is the cluster")
+            mask_dir, cluster_path = write_object_files(ctx.out_dir, object_id, t, cluster, extra)
             objects.append(
                 build_object(
                     object_id,
