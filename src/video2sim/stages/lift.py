@@ -287,7 +287,8 @@ def trim_extremes(points: F64, per_side: int, min_left: int) -> F64:
         order = np.argsort(coord, kind="stable")
         keep[order[:per_side]] = False
         keep[order[-per_side:]] = False
-    return points[keep]
+    out: F64 = points[keep]
+    return out
 
 
 def load_points(path: Path) -> F64:

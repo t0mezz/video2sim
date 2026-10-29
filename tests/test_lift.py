@@ -64,7 +64,7 @@ def _box_masks(
     import cv2
 
     corners = box_vertices(size, (xy[0], xy[1], size[2] / 2), 0.0)
-    masks = {}
+    masks: dict[int, BoolMask] = {}
     for frame in world.frames:
         cam = (np.linalg.inv(frame.T_world_from_camera.to_numpy()) @ np.c_[corners, np.ones(8)].T).T
         u = K.fx * cam[:, 0] / cam[:, 2] + K.cx

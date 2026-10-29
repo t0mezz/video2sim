@@ -84,7 +84,7 @@ def _masks(world: WorldModel, solid: np.ndarray[Any, Any]) -> dict[int, BoolMask
     """Masks of a convex solid given by dense samples (N, 3), one per view."""
     import cv2
 
-    masks = {}
+    masks: dict[int, BoolMask] = {}
     for frame in world.frames:
         pose = frame.T_world_from_camera.to_numpy()
         cam = (solid - pose[:3, 3]) @ pose[:3, :3]

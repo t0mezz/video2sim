@@ -4,6 +4,7 @@ import json
 from collections.abc import Sequence
 from dataclasses import replace
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pytest
@@ -123,7 +124,7 @@ def test_missing_unreadable_or_low_confidence_answers_stay_flagged() -> None:
 
 
 def test_pick_frames_prefers_keyframes_then_largest_masks() -> None:
-    def mask(n: int) -> np.ndarray:
+    def mask(n: int) -> np.ndarray[Any, np.dtype[np.bool_]]:
         m = np.zeros((10, 10), dtype=bool)
         m.flat[:n] = True
         return m
