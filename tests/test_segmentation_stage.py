@@ -8,8 +8,11 @@ from video2sim.schemas import Flag, Instances
 from video2sim.stages.depth_flags import Verdict
 from video2sim.stages.keyframes import KeyframeChoice
 from video2sim.stages.material_pass import MaterialAnswer, MaterialDecision
+from video2sim.stages.primitive_fit import FitResult, Primitive
 from video2sim.stages.segmentation_stage import (
     build_object,
+    choose_cluster,
+    fit_report,
     object_flags,
     repaired_ids,
     write_object_files,
@@ -83,3 +86,43 @@ def test_material_answer_fills_the_instance_fields() -> None:
         0.9,
     )
     Instances(objects=[obj], flags=["note"])  # validates, scene flags are plain strings
+
+
+def test_fit_report_names_the_source_and_the_primitive() -> None:
+    prim = Primitive("box", (0.1, 0.2), 0.5, (0.08, 0.05, 0.04), 0.0, 0.03, 12)
+    fits = {
+        3: FitResult(prim.outline(), prim, "primitive", "box, mask cost 0.030"),
+        7: FitResult(np.zeros((9, 3)), None, "points", "only 2 whole masks"),
+    }
+    report = fit_report(fits)
+    assert list(report) == ["obj_003", "obj_007"]
+    assert report["obj_003"]["kind"] == "box" and report["obj_003"]["size_m"] == [0.08, 0.05, 0.04]
+    assert report["obj_007"] == {
+        "source": "points",
+        "reason": "only 2 whole masks",
+        "kind": None,
+        "size_m": None,
+        "center_xy_m": None,
+        "yaw_rad": None,
+        "mask_cost": None,
+        "views": None,
+    }
+
+
+def test_the_fitted_cluster_is_the_cluster_and_the_points_go_beside_it() -> None:
+    prim = Primitive("cylinder", (0.0, 0.0), 0.0, (0.08, 0.08, 0.1), 0.0, 0.02, 30)
+    points, hull = np.ones((20, 3)), np.zeros((50, 3))
+    fit = FitResult(prim.outline(), prim, "primitive", "cylinder, mask cost 0.020")
+    cluster, extra, note = choose_cluster(fit, points, hull)
+    assert np.array_equal(cluster, prim.outline()) and note is None
+    assert set(extra) == {"points", "hull"} and extra["points"] is points
+
+
+def test_a_union_or_points_cluster_carries_a_note() -> None:
+    prim = Primitive("box", (0.0, 0.0), 0.0, (0.1, 0.05, 0.05), 0.0, 0.3, 30)
+    points, hull = np.ones((20, 3)), np.zeros((50, 3))
+    union = FitResult(np.vstack([prim.outline(), points]), prim, "union", "best fit box ... union")
+    _, _, note = choose_cluster(union, points, hull)
+    assert note == "cluster: best fit box ... union"
+    cluster, extra, note = choose_cluster(None, None, hull)
+    assert cluster is hull and extra == {} and note is not None and "hull" in note

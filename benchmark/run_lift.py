@@ -7,7 +7,10 @@ call. Two clusters per track, kept separately so Phase 3 can compare them as reg
 targets (see ``stages/lift.py``):
 
 * ``hull``: a visual hull by voting, in ``segmentation/clusters/track_NNN.npy``;
-* ``points``: the sparse SfM points the masks agree on, in ``segmentation/points/track_NNN.npy``.
+* ``points``: the sparse SfM points the masks agree on, minus the outermost strays, in
+  ``segmentation/points/track_NNN.npy``;
+* ``fitted``: a box, cylinder or sphere fitted to the masks from those points
+  (``stages/primitive_fit.py``), in ``segmentation/fitted/track_NNN.npy``, with ``fit.json``.
 
 Both are in the world frame, metres. ``segmentation/lift.json`` lists what each kept and
 dropped. ``--score`` moves the clusters to the ground-truth frame (as in ``run_discovery.py``)
@@ -39,8 +42,8 @@ from video2sim.stages.lift import LiftReport, lift_points, lift_tracks, load_poi
 from video2sim.stages.tracking import load_tracks
 
 ROOT = Path(__file__).resolve().parent.parent
-METHODS = ("hull", "points")
-FOLDERS = {"hull": "clusters", "points": "points"}
+METHODS = ("hull", "points", "fitted")
+FOLDERS = {"hull": "clusters", "points": "points", "fitted": "fitted"}
 
 
 def save_clusters(directory: Path, clusters: Mapping[int, NDArray[np.float64]]) -> None:
@@ -92,11 +95,14 @@ def main() -> None:
     args = parser.parse_args()
 
     from video2sim.stages.lift import LiftConfig
+    from video2sim.stages.primitive_fit import PrimitiveConfig, fit_clusters
+    from video2sim.stages.segmentation_stage import fit_report
 
     cfg: dict[str, Any] = yaml.safe_load(
         (ROOT / "configs/default.yaml").read_text(encoding="utf-8")
     )
     lcfg = LiftConfig.from_config(cfg)
+    pcfg = PrimitiveConfig.from_config(cfg)
     gate = float(
         yaml.safe_load((ROOT / "configs/targets.yaml").read_text(encoding="utf-8"))["gates"][
             "segmentation"
@@ -121,7 +127,11 @@ def main() -> None:
         cloud = load_points(run_dir / world.point_cloud_path)
         points, points_report = lift_points(tracks, world, cloud, lcfg)
         points_s = time.perf_counter() - started
-        found = {"hull": hull, "points": points}
+        started = time.perf_counter()
+        fits = fit_clusters(tracks, points, world, lcfg, pcfg)
+        fitted_s = time.perf_counter() - started
+        (seg_dir / "fit.json").write_text(json.dumps(fit_report(fits), indent=2) + "\n")
+        found = {"hull": hull, "points": points, "fitted": {i: f.cluster for i, f in fits.items()}}
         for method in METHODS:
             save_clusters(seg_dir / FOLDERS[method], found[method])
         (seg_dir / "lift.json").write_text(
@@ -136,9 +146,15 @@ def main() -> None:
             "tracks": len(tracks),
             "hull": {"seconds": round(hull_s, 1), "clusters": len(hull)},
             "points": {"seconds": round(points_s, 1), "clusters": len(points)},
+            "fitted": {
+                "seconds": round(fitted_s, 1),
+                "clusters": len(fits),
+                "sources": {str(i): f.source for i, f in fits.items()},
+            },
         }
         row["hull"]["dropped"] = report_json(hull_report)["dropped"]
         row["points"]["dropped"] = report_json(points_report)["dropped"]
+        row["fitted"]["dropped"] = row["points"]["dropped"]
         if args.score:
             gt = load_scene(ROOT / "benchmark/scenes" / scene_id / "ground_truth.json")
             alignment = None

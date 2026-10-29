@@ -4,10 +4,15 @@ The pieces are the ones built in P2.1 to P2.5, in this order:
 
 1. ``scene_router``: one VLM request picks the SAM prompt from the pool and lists the objects.
 2. ``tracking`` and ``track_repair``: one SAM 3.1 video request, then identity repair in 3D.
-3. ``lift``: the SfM points that the masks agree on (the cluster written to
-   ``point_cluster_path``, 18.7% median box error on the easy tier) and the visual hull (beside it
-   as ``obj_NNN_hull.npy``, outside the typed output). A track with no sparse points falls back to
-   its hull, with a reason. The shape flags use the hull, which has a volume.
+3. ``lift`` and ``primitive_fit``: the SfM points that the masks agree on, without the outermost
+   strays, and a box, cylinder or sphere fitted to the masks from those points. The fitted
+   cluster is written to ``point_cluster_path`` (4.3% median box error on the easy tier, human
+   decision 2026-10-29): the primitive's outline points, or their union with the voted points
+   when no primitive fits the masks well (with a reason), or the points alone when too few
+   masks are whole (with a reason). ``fit.json`` records the kind, size and mask cost. The voted
+   points (``obj_NNN_points.npy``) and the visual hull (``obj_NNN_hull.npy``) are written beside
+   it, outside the typed output. A track with no sparse points falls back to its hull, with a
+   reason. The shape flags use the hull, which has a volume.
 4. ``keyframes``: the best frames per object.
 5. ``depth_flags``, ``material_pass`` and ``shape_flags``: the failure flags and the material
    answer per object.
@@ -21,6 +26,7 @@ built by ``clients`` and can be replaced in tests.
 
 from __future__ import annotations
 
+import json
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -44,6 +50,7 @@ from video2sim.stages.material_pass import (
     decide_all,
     pick_frames,
 )
+from video2sim.stages.primitive_fit import FitResult, PrimitiveConfig, fit_clusters
 from video2sim.stages.scene_router import (
     RouterClient,
     RouterConfig,
@@ -133,6 +140,35 @@ def write_object_files(
     return f"segmentation/masks/{object_id}", f"segmentation/clusters/{object_id}.npy"
 
 
+def fit_report(fits: Mapping[int, FitResult]) -> dict[str, Any]:
+    """``fit.json``: how each fitted cluster was made, by object id."""
+    out: dict[str, Any] = {}
+    for track_id, fit in sorted(fits.items()):
+        p = fit.primitive
+        out[f"obj_{track_id:03d}"] = {
+            "source": fit.source,
+            "reason": fit.reason,
+            "kind": p.kind if p else None,
+            "size_m": list(p.size_m) if p else None,
+            "center_xy_m": list(p.center_xy_m) if p else None,
+            "yaw_rad": p.yaw_rad if p else None,
+            "mask_cost": p.cost if p else None,
+            "views": p.views if p else None,
+        }
+    return out
+
+
+def choose_cluster(
+    fit: FitResult | None, points: F64 | None, hull: F64
+) -> tuple[F64, dict[str, F64], str | None]:
+    """The cluster for ``point_cluster_path``, the files written beside it, and a note for the
+    QA report when the cluster is not a clean primitive fit."""
+    if fit is None or points is None:
+        return hull, {}, "no sparse points agree with the masks: the hull is the cluster"
+    note = None if fit.source == "primitive" else f"cluster: {fit.reason}"
+    return fit.cluster, {"points": points, "hull": hull}, note
+
+
 def build_object(
     object_id: str,
     mask_dir: str,
@@ -217,6 +253,11 @@ class SegmentationStage:
 
         cloud = load_points(ctx.run_dir / world.point_cloud_path)
         sparse, _ = lift_points(kept, world, cloud, lift_cfg)
+        fits = fit_clusters(kept, sparse, world, lift_cfg, PrimitiveConfig.from_config(cfg))
+        ctx.out_dir.mkdir(parents=True, exist_ok=True)
+        (ctx.out_dir / "fit.json").write_text(
+            json.dumps(fit_report(fits), indent=2) + "\n", encoding="utf-8"
+        )
         centers = {i: np.median(p, axis=0) for i, p in hulls.items() if len(p)}
         keyframes, kf_report = keyframes_for_tracks(
             kept, world, ctx.run_dir, centers, KeyframeConfig.from_config(cfg)
@@ -272,12 +313,11 @@ class SegmentationStage:
                 reasons.append("track produced by an identity split or merge")
             if t.track_id in kf_report.notes:
                 reasons.append(f"keyframes: {kf_report.notes[t.track_id]}")
-            hull = hulls[t.track_id]
-            cluster, extra = (
-                (sparse[t.track_id], {"hull": hull}) if t.track_id in sparse else (hull, {})
+            cluster, extra, note = choose_cluster(
+                fits.get(t.track_id), sparse.get(t.track_id), hulls[t.track_id]
             )
-            if t.track_id not in sparse:
-                reasons.append("no sparse points agree with the masks: the hull is the cluster")
+            if note is not None:
+                reasons.append(note)
             mask_dir, cluster_path = write_object_files(ctx.out_dir, object_id, t, cluster, extra)
             objects.append(
                 build_object(
