@@ -32,15 +32,15 @@ from typing import Any, Protocol
 
 import numpy as np
 
-from video2sim.schemas import Flag, WorldModel
-from video2sim.stages.depth_flags import DepthSignals, Verdict
-from video2sim.stages.discovery_vlm_sam import (
+from video2sim.models.hosted import (
     BASETEN_MODEL,
     BASETEN_URL,
     ResponseCache,
-    _image_data_url,
-    _post_json,
+    image_data_url,
+    post_json,
 )
+from video2sim.schemas import Flag, WorldModel
+from video2sim.stages.depth_flags import DepthSignals, Verdict
 from video2sim.stages.tracking import Track
 
 HOLLOW_VALUES = ("solid", "hollow", "unknown")
@@ -163,14 +163,14 @@ class BasetenMaterialClient:
     def ask(self, prompt: str, images: Sequence[Path]) -> str:
         content: list[dict[str, Any]] = [{"type": "text", "text": prompt}]
         content += [
-            {"type": "image_url", "image_url": {"url": _image_data_url(path)}} for path in images
+            {"type": "image_url", "image_url": {"url": image_data_url(path)}} for path in images
         ]
         body = {
             "model": BASETEN_MODEL,
             "temperature": 0,
             "messages": [{"role": "user", "content": content}],
         }
-        reply = json.loads(_post_json(BASETEN_URL, self._key, body, self._timeout_s, self._retries))
+        reply = json.loads(post_json(BASETEN_URL, self._key, body, self._timeout_s, self._retries))
         return str(reply["choices"][0]["message"]["content"])
 
 
@@ -275,7 +275,7 @@ def ask_for_track(
         called = True
         return client.ask(prompt, images)
 
-    key = [prompt, BASETEN_MODEL, *(_image_data_url(p) for p in images)]
+    key = [prompt, BASETEN_MODEL, *(image_data_url(p) for p in images)]
     return cache.get_or_call(key, call), not called
 
 

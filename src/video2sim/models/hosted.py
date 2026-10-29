@@ -1,15 +1,11 @@
-"""Discovery method A (P2.1): a vision-language model names the objects, SAM 3.1 segments each.
+"""Hosted model APIs shared by the segmentation stage: Baseten (Muse Spark) and the Meta Model API
+(SAM 3.1).
 
-Muse Spark Open on Baseten lists object nouns per sampled frame (OpenAI-compatible chat
-completions). SAM 3.1 on the Meta Model API is then prompted once per noun and frame. Every
-hosted response is cached on disk under the key of what was sent, so reruns cost nothing.
-
-Standard library only: HTTP goes through ``urllib``. Both clients sit behind small protocols so
-tests replace them. Keys come from the environment or ``.env``, never from code or config.
-
-Not yet confirmed against the live APIs (see PLAN.md P2.1): how a local frame is passed to
-SAM 3.1. The docs only show a public URL; a data URL is tried here. Masks are decoded with
-``meta_sam_parser`` (SAM License, see docs/licenses.md).
+Standard library only for HTTP (``urllib``), with retries on rate limits and server errors.
+Every hosted response is cached on disk under the key of what was sent, so reruns cost nothing.
+Keys come from the environment or ``.env``, never from code or config. SAM 3.1 answers are
+special-token text; masks in them are decoded with ``meta_sam_parser`` (SAM License, see
+docs/licenses.md).
 """
 
 from __future__ import annotations
@@ -23,25 +19,17 @@ import time
 import urllib.error
 import urllib.request
 from collections.abc import Callable, Sequence
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
-from functools import partial
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any
 
-from video2sim.stages.segmentation import BoolMask, DiscoveredMask, FrameDiscovery
+import numpy as np
+from numpy.typing import NDArray
 
 BASETEN_URL = "https://inference.baseten.co/v1/chat/completions"
 BASETEN_MODEL = "meta-models/muse-spark-open-1026"
 META_URL = "https://api.meta.ai/v1/responses"
 SAM_MODEL = "sam-3.1"
-
-VLM_PROMPT = (
-    "List every distinct physical object lying on the table in this photo, as short singular "
-    "nouns a segmentation model can find (for example 'mug', 'red cube'). Leave out the table, "
-    "the printed board or sheet, printed markers, shadows, hands and arms. Answer with a JSON "
-    "array of strings and nothing else."
-)
 
 
 def read_secret(name: str, env_file: Path = Path(".env")) -> str:
@@ -74,7 +62,7 @@ class ResponseCache:
         return text
 
 
-def _image_data_url(path: Path) -> str:
+def image_data_url(path: Path) -> str:
     mime = "image/png" if path.suffix.lower() == ".png" else "image/jpeg"
     return f"data:{mime};base64,{base64.b64encode(path.read_bytes()).decode()}"
 
@@ -82,7 +70,7 @@ def _image_data_url(path: Path) -> str:
 _RETRIES = 4
 
 
-def _post_json(
+def post_json(
     url: str, key: str, body: dict[str, Any], timeout_s: float = 120.0, retries: int = _RETRIES
 ) -> bytes:
     request = urllib.request.Request(
@@ -102,64 +90,7 @@ def _post_json(
     raise AssertionError("unreachable")
 
 
-class ObjectLister(Protocol):
-    def list_objects(self, image: Path) -> str:
-        """Raw model answer for one frame: a JSON array of nouns."""
-        ...
-
-
-class SamClient(Protocol):
-    def segment(self, image: Path, noun: str) -> str:
-        """SAM 3.1 special-token text for one frame and one noun."""
-        ...
-
-
-class BasetenLister:
-    def __init__(self, key: str) -> None:
-        self._key = key
-
-    def list_objects(self, image: Path) -> str:
-        body = {
-            "model": BASETEN_MODEL,
-            "temperature": 0,
-            "messages": [
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": VLM_PROMPT},
-                        {"type": "image_url", "image_url": {"url": _image_data_url(image)}},
-                    ],
-                }
-            ],
-        }
-        reply = json.loads(_post_json(BASETEN_URL, self._key, body))
-        return str(reply["choices"][0]["message"]["content"])
-
-
-class MetaSamClient:
-    def __init__(self, key: str) -> None:
-        self._key = key
-
-    def segment(self, image: Path, noun: str) -> str:
-        body = {
-            "model": SAM_MODEL,
-            "stream": True,
-            "input": [
-                {
-                    "type": "message",
-                    "role": "user",
-                    "content": [
-                        {"type": "input_text", "text": noun},
-                        {"type": "input_image", "image_url": _image_data_url(image)},
-                    ],
-                }
-            ],
-        }
-        raw = _post_json(META_URL, self._key, body).decode()
-        return "\n".join(_sse_deltas(raw))
-
-
-def _sse_deltas(raw: str) -> list[str]:
+def sse_deltas(raw: str) -> list[str]:
     """Delta strings of ``response.output_text.delta`` events in a server-sent-event stream."""
     deltas: list[str] = []
     for line in raw.splitlines():
@@ -172,22 +103,6 @@ def _sse_deltas(raw: str) -> list[str]:
         if isinstance(event, dict) and event.get("type") == "response.output_text.delta":
             deltas.append(str(event.get("delta", "")))
     return deltas
-
-
-def parse_nouns(answer: str, limit: int) -> list[str]:
-    """Nouns from a model answer, lower-cased and deduplicated, in order; junk gives []."""
-    match = re.search(r"\[.*\]", answer, flags=re.DOTALL)
-    if match is None:
-        return []
-    try:
-        items = json.loads(match.group(0))
-    except json.JSONDecodeError:
-        return []
-    seen: dict[str, None] = {}
-    for item in items if isinstance(items, list) else []:
-        if isinstance(item, str) and item.strip():
-            seen.setdefault(item.strip().lower(), None)
-    return list(seen)[:limit]
 
 
 @dataclass(frozen=True)
@@ -235,10 +150,10 @@ def parse_sam_text(text: str) -> list[SamRecord]:
     return records
 
 
-MaskDecoder = Callable[[SamRecord], BoolMask]
+MaskDecoder = Callable[[SamRecord], NDArray[np.bool_]]
 
 
-def decode_sam_mask(record: SamRecord) -> BoolMask:
+def decode_sam_mask(record: SamRecord) -> NDArray[np.bool_]:
     """Full-frame boolean mask of a record.
 
     The wire raster is box-local and smaller than the box: it covers the half-open bounds
@@ -246,7 +161,6 @@ def decode_sam_mask(record: SamRecord) -> BoolMask:
     ``meta_sam_parser`` and stretched to the box with nearest-neighbour sampling.
     """
     import cv2  # heavy import, kept out of module import time
-    import numpy as np
     from meta_sam_parser import SegmentationMask, decode_mask_to_raster
 
     rows, cols = record.mask_shape
@@ -263,53 +177,6 @@ def decode_sam_mask(record: SamRecord) -> BoolMask:
     full = np.zeros((height, width), dtype=bool)
     full[top:bottom, left:right] = box_mask.astype(bool)
     return full
-
-
-class VlmSamBackend:
-    """Nouns from the VLM over all sampled frames, then SAM 3.1 per noun and frame."""
-
-    def __init__(
-        self,
-        lister: ObjectLister,
-        sam: SamClient,
-        cache: ResponseCache,
-        decode: MaskDecoder = decode_sam_mask,
-        max_nouns: int = 12,
-        max_workers: int = 1,
-    ) -> None:
-        self._lister, self._sam, self._cache = lister, sam, cache
-        self._decode, self._max_nouns, self._max_workers = decode, max_nouns, max_workers
-
-    def discover(self, frames: Sequence[tuple[int, Path]]) -> list[FrameDiscovery]:
-        with ThreadPoolExecutor(max_workers=self._max_workers) as pool:
-            answers = list(pool.map(self._ask_nouns, [path for _, path in frames]))
-            nouns: dict[str, None] = {}
-            for answer in answers:
-                for noun in parse_nouns(answer, self._max_nouns):
-                    nouns.setdefault(noun, None)
-            wanted = list(nouns)[: self._max_nouns]
-            jobs = [(path, noun) for _, path in frames for noun in wanted]
-            texts = iter(pool.map(lambda job: self._segment(*job), jobs))
-        results: list[FrameDiscovery] = []
-        for index, _ in frames:
-            masks: list[DiscoveredMask] = []
-            for noun in wanted:
-                masks.extend(
-                    DiscoveredMask(noun, self._decode(r)) for r in parse_sam_text(next(texts))
-                )
-            results.append(FrameDiscovery(index, tuple(masks)))
-        return results
-
-    def _ask_nouns(self, path: Path) -> str:
-        return self._cache.get_or_call(
-            ["vlm", BASETEN_MODEL, VLM_PROMPT, file_digest(path)],
-            partial(self._lister.list_objects, path),
-        )
-
-    def _segment(self, path: Path, noun: str) -> str:
-        return self._cache.get_or_call(
-            ["sam", SAM_MODEL, noun, file_digest(path)], partial(self._sam.segment, path, noun)
-        )
 
 
 def file_digest(path: Path) -> str:

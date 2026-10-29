@@ -13,7 +13,7 @@ targets (see ``stages/lift.py``):
   (``stages/primitive_fit.py``), in ``segmentation/fitted/track_NNN.npy``, with ``fit.json``.
 
 Both are in the world frame, metres. ``segmentation/lift.json`` lists what each kept and
-dropped. ``--score`` moves the clusters to the ground-truth frame (as in ``run_discovery.py``)
+dropped. ``--score`` moves the clusters to the ground-truth frame (``evaluation/alignment.py``)
 and reports the bounding-box size error per object: the Phase 2 exit criterion is a median of at
 most ``gates.segmentation.cluster_bbox_error_max`` on the easy tier.
 """
@@ -31,9 +31,14 @@ from typing import Any
 import numpy as np
 import yaml
 from numpy.typing import NDArray
-from run_discovery import CLEAN_ALIGNED, board_layout
 
-from video2sim.evaluation.alignment import BoardAlignment, align_clean, align_run
+from video2sim.evaluation.alignment import (
+    CLEAN_ALIGNED,
+    BoardAlignment,
+    align_clean,
+    align_run,
+    grid_board_layout,
+)
 from video2sim.evaluation.metrics import evaluate_scene
 from video2sim.evaluation.scenes import GtScene, Prediction, PredObject, load_scene
 from video2sim.runner import OUTPUT_FILE
@@ -108,7 +113,7 @@ def main() -> None:
             "segmentation"
         ]["cluster_bbox_error_max"]
     )
-    layout = board_layout(float(cfg["capture"]["marker"]["tag_size_m"]))
+    layout = grid_board_layout(float(cfg["capture"]["marker"]["tag_size_m"]))
     family = str(cfg["capture"]["marker"]["family"])
 
     rows: list[dict[str, Any]] = []

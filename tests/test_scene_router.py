@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from video2sim.stages.discovery_vlm_sam import ResponseCache
+from video2sim.models.hosted import ResponseCache
 from video2sim.stages.scene_router import (
     RouterConfig,
     compare_counts,

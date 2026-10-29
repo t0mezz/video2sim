@@ -113,16 +113,19 @@ fetch("model.json").then(r=>r.json()).then(m=>{
 
 def _ground_truth(run_dir: Path, scene_id: str, world: Any, cfg: dict[str, Any]) -> list[Any]:
     """Ground-truth box corners in the world frame, or [] for an unaligned scene."""
-    from run_discovery import CLEAN_ALIGNED, board_layout
-
-    from video2sim.evaluation.alignment import align_clean, align_run
+    from video2sim.evaluation.alignment import (
+        CLEAN_ALIGNED,
+        align_clean,
+        align_run,
+        grid_board_layout,
+    )
     from video2sim.evaluation.geometry import box_vertices
     from video2sim.evaluation.scenes import load_scene
 
     gt = load_scene(ROOT / "benchmark/scenes" / scene_id / "ground_truth.json")
     family = str(cfg["capture"]["marker"]["family"])
     if gt.board == "grid":
-        layout = board_layout(float(cfg["capture"]["marker"]["tag_size_m"]))
+        layout = grid_board_layout(float(cfg["capture"]["marker"]["tag_size_m"]))
         alignment = align_run(world, run_dir, layout, family)
     elif scene_id in CLEAN_ALIGNED:
         alignment = align_clean(world, run_dir, family)

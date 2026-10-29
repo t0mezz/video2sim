@@ -1,6 +1,6 @@
 """Tracking (P2.2): one SAM 3.1 video request per scene, then identity repair in 3D.
 
-The registered frames are encoded as a clip and sent with the concept prompt of discovery.
+The registered frames are encoded as a clip and sent with one concept prompt.
 The API answers with one line per frame and a stable integer id per object (16 objects per
 frame at most). Ids hold only while an object stays in view (dev.meta.ai/docs/sam), so the
 tracks are repaired afterwards in ``track_repair``.
@@ -19,18 +19,18 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal, Protocol
 
-from video2sim.schemas import WorldModel
-from video2sim.stages.discovery_vlm_sam import (
+from video2sim.models.hosted import (
     META_URL,
     SAM_MODEL,
     MaskDecoder,
     ResponseCache,
-    _post_json,
-    _sse_deltas,
     decode_sam_mask,
     file_digest,
     parse_sam_text,
+    post_json,
+    sse_deltas,
 )
+from video2sim.schemas import WorldModel
 from video2sim.stages.segmentation import BoolMask
 
 Direction = Literal["both", "forward", "backward"]
@@ -99,8 +99,8 @@ class MetaVideoSamClient:
                 }
             ],
         }
-        raw = _post_json(META_URL, self._key, body, self._timeout_s).decode()
-        return "\n".join(_sse_deltas(raw))
+        raw = post_json(META_URL, self._key, body, self._timeout_s).decode()
+        return "\n".join(sse_deltas(raw))
 
 
 class FakeVideoSamClient:

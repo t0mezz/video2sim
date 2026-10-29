@@ -6,8 +6,8 @@ One SAM 3.1 video request per run (billed per frame, at least 50), cached in
 ``runs/<id>/segmentation/tracking_cache`` so a rerun makes no call. Tracks are repaired with
 3D consistency, and ``--score`` counts identity switches and fragments before and after the
 repair against ground truth (grid scenes and the aligned clean-board scenes, as in
-``run_discovery.py``). Tracks go to ``runs/<id>/segmentation/tracks/``. The key comes from the
-environment or ``.env`` and is never printed.
+``evaluation/alignment.py``). Tracks go to ``runs/<id>/segmentation/tracks/``. The key comes
+from the environment or ``.env`` and is never printed.
 """
 
 from __future__ import annotations
@@ -20,14 +20,13 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from run_discovery import CLEAN_ALIGNED, board_layout
 
-from video2sim.evaluation.alignment import align_clean, align_run
+from video2sim.evaluation.alignment import CLEAN_ALIGNED, align_clean, align_run, grid_board_layout
 from video2sim.evaluation.scenes import load_scene
 from video2sim.evaluation.segmentation import score_tracks
+from video2sim.models.hosted import ResponseCache, read_secret
 from video2sim.runner import OUTPUT_FILE
 from video2sim.schemas import WorldModel
-from video2sim.stages.discovery_vlm_sam import ResponseCache, read_secret
 from video2sim.stages.material_pass import BasetenMaterialClient
 from video2sim.stages.scene_router import RouterConfig, route_scene, tracking_prompt
 from video2sim.stages.track_repair import RepairConfig, repair_tracks
@@ -68,7 +67,7 @@ def main() -> None:
         )
     )
     client = MetaVideoSamClient(read_secret("META_MODEL_API_KEY"), tcfg.timeout_s)
-    layout = board_layout(float(cfg["capture"]["marker"]["tag_size_m"]))
+    layout = grid_board_layout(float(cfg["capture"]["marker"]["tag_size_m"]))
     family = str(cfg["capture"]["marker"]["family"])
 
     rows: list[dict[str, Any]] = []

@@ -9,9 +9,9 @@ import numpy as np
 import pytest
 import yaml
 
+from video2sim.models.hosted import ResponseCache
 from video2sim.schemas import Flag
 from video2sim.stages.depth_flags import DepthSignals, Verdict
-from video2sim.stages.discovery_vlm_sam import ResponseCache
 from video2sim.stages.material_pass import (
     MaterialConfig,
     decide,

@@ -35,10 +35,10 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
+from video2sim.models.hosted import ResponseCache, read_secret
 from video2sim.runner import StageContext
 from video2sim.schemas import Flag, Instances, ObjectInstance, StageName, WorldModel
 from video2sim.stages.depth_flags import DepthConfig, depth_signals, judge
-from video2sim.stages.discovery_vlm_sam import ResponseCache, read_secret
 from video2sim.stages.keyframes import KeyframeChoice, KeyframeConfig, keyframes_for_tracks
 from video2sim.stages.lift import LiftConfig, lift_points, lift_tracks, load_points
 from video2sim.stages.material_pass import (

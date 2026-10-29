@@ -7,8 +7,8 @@ import pytest
 
 from video2sim.evaluation.scenes import GtObject
 from video2sim.evaluation.segmentation import project_box_mask, score_tracks
+from video2sim.models.hosted import SamRecord
 from video2sim.schemas import SE3, Intrinsics, Plane
-from video2sim.stages.discovery_vlm_sam import SamRecord
 from video2sim.stages.segmentation import BoolMask
 from video2sim.stages.track_repair import RepairConfig, mask_footprint, repair_tracks
 from video2sim.stages.tracking import Track, TrackingConfig, tracks_from_text

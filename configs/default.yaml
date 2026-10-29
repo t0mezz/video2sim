@@ -44,11 +44,6 @@ reconstruction:
 
 segmentation:
   sam_backend: null            # "api" or "self_hosted", see PLAN.md decision D-004
-  discovery:
-    method: sam_generic        # P2.1: "sam_generic" (default), "vlm_sam" or "auto_proposals" (not built)
-    generic_prompt: objects on a table   # the one SAM 3.1 prompt of method "sam_generic"
-    n_sample_frames: 6         # frames shown to discovery, spread evenly over the registered frames
-    max_workers: 8             # parallel hosted calls; they are independent and cached by key
   router:                      # P2.1/P2.2: one VLM request per scene picks the SAM prompt and lists the objects
     n_frames: 3                # frames sent, spread evenly over the registered frames
     max_objects: 30            # longer lists are cut
@@ -65,7 +60,7 @@ segmentation:
         description: a glossy or reflective surface that mirrors its surroundings, such as a glass stove top, polished counter or mirror; a matte counter, floor or shelf is not this
         prompt: object on a surface
   tracking:                    # P2.2: one SAM 3.1 video request per scene
-    prompt: objects on a table # same concept prompt as discovery; the video API takes one concept
+    prompt: objects on a table # the SAM 3.1 concept prompt when the router keeps the default surface; the video API takes one concept
     fps: 5                     # frame rate of the clip sent; billed per frame, at least 50 (dev.meta.ai pricing)
     direction: both            # propagation_direction: "both", "forward" or "backward"
     timeout_s: 600             # a long clip can take minutes to answer
