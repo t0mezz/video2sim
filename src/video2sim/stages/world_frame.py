@@ -51,12 +51,23 @@ class BoardLayout:
         edge_mm = (
             tag_edge_m * 1000.0 if tag_edge_m is not None else float(data["tag_edge_mm_nominal"])
         )
+        centers = {
+            int(tag_id): (float(entry["center_mm"][0]), float(entry["center_mm"][1]))
+            for tag_id, entry in data["tags"].items()
+        }
+        return cls.from_tag_centers(centers, edge_mm / 1000.0)
+
+    @classmethod
+    def from_tag_centers(
+        cls, centers_mm: dict[int, tuple[float, float]], tag_edge_m: float
+    ) -> BoardLayout:
+        """Tag corners from tag centres in board millimetres and the tag edge in meters."""
+        edge_mm = tag_edge_m * 1000.0
         corners: dict[int, F64] = {}
-        for tag_id, entry in data["tags"].items():
-            cx, cy = (float(v) for v in entry["center_mm"])
+        for tag_id, (cx, cy) in centers_mm.items():
             lower_left = np.array([cx - edge_mm / 2.0, cy - edge_mm / 2.0])
             xy = lower_left + _CORNER_SIGNS * edge_mm
-            corners[int(tag_id)] = np.column_stack([xy, np.zeros(4)]) / 1000.0
+            corners[tag_id] = np.column_stack([xy, np.zeros(4)]) / 1000.0
         return cls(tag_corners_m=corners)
 
 

@@ -1,0 +1,89 @@
+{
+  "gates": {
+    "registered_frame_fraction_min": 0.95,
+    "mean_reprojection_error_max_px": 1.0,
+    "marker_distance_error_max": 0.02,
+    "up_axis_error_max_deg": 2.0
+  },
+  "runs": [
+    {
+      "scene": "s10",
+      "video": "video_a",
+      "board": "clean",
+      "frames": 187,
+      "registered": 187,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        187
+      ],
+      "sfm_reprojection_px": 0.311,
+      "tags": [
+        0,
+        1
+      ],
+      "tag_views": {
+        "0": 187,
+        "1": 187
+      },
+      "tag_reprojection_px": 0.878,
+      "scale_m_per_unit": 0.2953512871825036,
+      "scale_spread_pct": 0.31,
+      "reference_tag": 0,
+      "plane_inlier_fraction": 0.807,
+      "plane_rms_mm": 1.69,
+      "flags": [],
+      "azimuth_coverage_deg": 350.7,
+      "gate_reasons": [],
+      "variant": "seq10",
+      "fps": 3.0,
+      "options": {
+        "matcher": "sequential"
+      },
+      "extract_s": 66.0,
+      "match_s": 94.1,
+      "map_s": 280.1,
+      "sfm_total_s": 440.2,
+      "wall_s": 456.1
+    },
+    {
+      "scene": "s10",
+      "video": "video_a",
+      "board": "clean",
+      "frames": 187,
+      "registered": 187,
+      "registered_fraction": 1.0,
+      "model_sizes": [
+        187
+      ],
+      "sfm_reprojection_px": 0.311,
+      "tags": [
+        0,
+        1
+      ],
+      "tag_views": {
+        "0": 187,
+        "1": 187
+      },
+      "tag_reprojection_px": 0.924,
+      "scale_m_per_unit": 0.2840344403878091,
+      "scale_spread_pct": 0.32,
+      "reference_tag": 0,
+      "plane_inlier_fraction": 0.804,
+      "plane_rms_mm": 1.68,
+      "flags": [],
+      "azimuth_coverage_deg": 350.7,
+      "gate_reasons": [],
+      "variant": "global_seq",
+      "fps": 3.0,
+      "options": {
+        "matcher": "sequential",
+        "mapper": "global"
+      },
+      "extract_s": 69.9,
+      "match_s": 97.9,
+      "map_s": 148.3,
+      "sfm_total_s": 316.0,
+      "wall_s": 331.9
+    }
+  ]
+}

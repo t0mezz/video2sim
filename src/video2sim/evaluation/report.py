@@ -100,6 +100,24 @@ def render_html(report: dict[str, Any]) -> str:
     parts.append(
         _table(["metric", "value", "N", "target", "result"], _metric_rows(summary["pooled"], True))
     )
+    seg = report.get("segmentation")
+    if seg:
+        parts.append("<h2>Phase 2 exit criteria</h2>")
+        parts.append(
+            _table(["metric", "value", "N", "target", "result"], _metric_rows(seg["rows"], True))
+        )
+        if seg["flag_scenes_missing"]:
+            parts.append(
+                '<p class="warn">Flag scenes not scored: '
+                f"{html.escape(', '.join(seg['flag_scenes_missing']))}</p>"
+            )
+        flag_rows = [
+            [html.escape(f"{s}/{o}"), html.escape(", ".join(f) or "none")]
+            for s, objs in seg["flags_by_object"].items()
+            for o, f in objs.items()
+        ]
+        if flag_rows:
+            parts.append(_table(["object", "flags"], flag_rows))
     for tier, metrics in summary["per_tier"].items():
         parts.append(f"<h2>Tier: {html.escape(tier)}</h2>")
         parts.append(_table(["metric", "value", "N"], _metric_rows(metrics, False)))

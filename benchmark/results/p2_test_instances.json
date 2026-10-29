@@ -1,0 +1,471 @@
+{
+  "s07_b": {
+    "status": {
+      "capture": [
+        "done",
+        4.6
+      ],
+      "reconstruction": [
+        "done",
+        44.9
+      ],
+      "segmentation": [
+        "done",
+        91.5
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "rubik's cube",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          35,
+          13,
+          63,
+          30,
+          19
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "rubik's cube",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.93
+      },
+      {
+        "object_id": "obj_001",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_001",
+        "point_cluster_path": "segmentation/clusters/obj_001.npy",
+        "keyframes": [
+          35,
+          74,
+          7,
+          30,
+          16
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      },
+      {
+        "object_id": "obj_002",
+        "label": "can",
+        "mask_dir": "segmentation/masks/obj_002",
+        "point_cluster_path": "segmentation/clusters/obj_002.npy",
+        "keyframes": [
+          21,
+          41,
+          10,
+          31,
+          28
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "can",
+        "material_class": "metal_steel",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.92
+      },
+      {
+        "object_id": "obj_003",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_003",
+        "point_cluster_path": "segmentation/clusters/obj_003.npy",
+        "keyframes": [
+          24,
+          35,
+          6,
+          61,
+          16
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.98
+      },
+      {
+        "object_id": "obj_004",
+        "label": "Rubik's cube",
+        "mask_dir": "segmentation/masks/obj_004",
+        "point_cluster_path": "segmentation/clusters/obj_004.npy",
+        "keyframes": [
+          25,
+          46,
+          7,
+          16,
+          28
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "Rubik's cube",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      }
+    ]
+  },
+  "s08_b": {
+    "status": {
+      "capture": [
+        "done",
+        4.1
+      ],
+      "reconstruction": [
+        "done",
+        25.9
+      ],
+      "segmentation": [
+        "done",
+        78.6
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "mug",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          33,
+          12,
+          23,
+          27,
+          17
+        ],
+        "flags": [],
+        "flag_reasons": [
+          "cluster: best fit cylinder has mask cost 0.206 above 0.1: union with the points"
+        ],
+        "category": "mug",
+        "material_class": "ceramic",
+        "finish": "glossy",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      },
+      {
+        "object_id": "obj_001",
+        "label": "toy",
+        "mask_dir": "segmentation/masks/obj_001",
+        "point_cluster_path": "segmentation/clusters/obj_001.npy",
+        "keyframes": [
+          14,
+          26,
+          21,
+          3,
+          17
+        ],
+        "flags": [
+          "small",
+          "transparent_or_reflective"
+        ],
+        "flag_reasons": [
+          "largest extent 41 mm",
+          "VLM confidence 0.58 is low",
+          "cluster: best fit cylinder has mask cost 0.134 above 0.1: union with the points"
+        ],
+        "category": "toy",
+        "material_class": "rubber",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "semi_rigid",
+        "material_confidence": 0.58
+      },
+      {
+        "object_id": "obj_002",
+        "label": "mug",
+        "mask_dir": "segmentation/masks/obj_002",
+        "point_cluster_path": "segmentation/clusters/obj_002.npy",
+        "keyframes": [
+          37,
+          17,
+          24,
+          29,
+          33
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "mug",
+        "material_class": "ceramic",
+        "finish": "glossy",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.97
+      },
+      {
+        "object_id": "obj_003",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_003",
+        "point_cluster_path": "segmentation/clusters/obj_003.npy",
+        "keyframes": [
+          26,
+          14,
+          1,
+          54,
+          30
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.98
+      },
+      {
+        "object_id": "obj_004",
+        "label": "action camera",
+        "mask_dir": "segmentation/masks/obj_004",
+        "point_cluster_path": "segmentation/clusters/obj_004.npy",
+        "keyframes": [
+          13,
+          30,
+          22,
+          21,
+          48
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "action camera",
+        "material_class": "electronics_mixed",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      }
+    ]
+  },
+  "s09_b": {
+    "status": {
+      "capture": [
+        "done",
+        5.5
+      ],
+      "reconstruction": [
+        "done",
+        60.5
+      ],
+      "segmentation": [
+        "done",
+        96.0
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "Rubik's cube",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          21,
+          56,
+          43,
+          5,
+          77
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "Rubik's cube",
+        "material_class": "plastic_hard",
+        "finish": "glossy",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      },
+      {
+        "object_id": "obj_001",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_001",
+        "point_cluster_path": "segmentation/clusters/obj_001.npy",
+        "keyframes": [
+          56,
+          34,
+          44,
+          77,
+          40
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.98
+      },
+      {
+        "object_id": "obj_002",
+        "label": "plate",
+        "mask_dir": "segmentation/masks/obj_002",
+        "point_cluster_path": "segmentation/clusters/obj_002.npy",
+        "keyframes": [
+          53,
+          39,
+          46,
+          76,
+          51
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "plate",
+        "material_class": "plastic_hard",
+        "finish": "glossy",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      }
+    ]
+  },
+  "s10_b": {
+    "status": {
+      "capture": [
+        "done",
+        5.6
+      ],
+      "reconstruction": [
+        "done",
+        104.2
+      ],
+      "segmentation": [
+        "done",
+        94.0
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          40,
+          80,
+          57,
+          16,
+          70
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.98
+      },
+      {
+        "object_id": "obj_001",
+        "label": "Rubik's cube",
+        "mask_dir": "segmentation/masks/obj_001",
+        "point_cluster_path": "segmentation/clusters/obj_001.npy",
+        "keyframes": [
+          44,
+          5,
+          63,
+          21,
+          35
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "Rubik's cube",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.93
+      },
+      {
+        "object_id": "obj_002",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_002",
+        "point_cluster_path": "segmentation/clusters/obj_002.npy",
+        "keyframes": [
+          64,
+          17,
+          40,
+          55,
+          28
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.98
+      }
+    ]
+  }
+}

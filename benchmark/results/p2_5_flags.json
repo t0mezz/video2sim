@@ -1,0 +1,1163 @@
+{
+  "s01_b": {
+    "tracks": 5,
+    "expected": {
+      "rigid": 5,
+      "deformable": 0,
+      "small": 0,
+      "thin": 0
+    },
+    "flagged": {
+      "small": 0,
+      "thin": 0,
+      "occluded": 0,
+      "transparent_or_reflective": 0,
+      "non_rigid": 0
+    },
+    "objects": [
+      {
+        "track": 0,
+        "category": "can",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 1,
+        "category": "rubik's cube",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 2,
+        "category": "Rubik's cube",
+        "finish": "glossy",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 3,
+        "category": "box",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 4,
+        "category": "box",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      }
+    ]
+  },
+  "s02_b": {
+    "tracks": 5,
+    "expected": {
+      "rigid": 5,
+      "deformable": 0,
+      "small": 1,
+      "thin": 0
+    },
+    "flagged": {
+      "small": 1,
+      "thin": 0,
+      "occluded": 0,
+      "transparent_or_reflective": 0,
+      "non_rigid": 1
+    },
+    "objects": [
+      {
+        "track": 0,
+        "category": "camera",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 1,
+        "category": "mug",
+        "finish": "glossy",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 2,
+        "category": "mug",
+        "finish": "glossy",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 3,
+        "category": "box",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 4,
+        "category": "earplug",
+        "finish": "matte",
+        "rigidity": "deformable",
+        "flags": [
+          "small",
+          "non_rigid"
+        ],
+        "reasons": [
+          "largest extent 45 mm",
+          "VLM rigidity deformable (earplug)"
+        ]
+      }
+    ]
+  },
+  "s03_b": {
+    "tracks": 1,
+    "expected": {
+      "rigid": 1,
+      "deformable": 0,
+      "small": 0,
+      "thin": 0
+    },
+    "flagged": {
+      "small": 0,
+      "thin": 0,
+      "occluded": 0,
+      "transparent_or_reflective": 0,
+      "non_rigid": 1
+    },
+    "objects": [
+      {
+        "track": 0,
+        "category": "basketball",
+        "finish": "matte",
+        "rigidity": "semi_rigid",
+        "flags": [
+          "non_rigid"
+        ],
+        "reasons": [
+          "VLM rigidity semi_rigid (basketball)"
+        ]
+      }
+    ]
+  },
+  "s04_b": {
+    "tracks": 5,
+    "expected": {
+      "rigid": 5,
+      "deformable": 0,
+      "small": 0,
+      "thin": 0
+    },
+    "flagged": {
+      "small": 0,
+      "thin": 0,
+      "occluded": 0,
+      "transparent_or_reflective": 1,
+      "non_rigid": 1
+    },
+    "objects": [
+      {
+        "track": 0,
+        "category": "basketball",
+        "finish": "matte",
+        "rigidity": "semi_rigid",
+        "flags": [
+          "non_rigid"
+        ],
+        "reasons": [
+          "VLM rigidity semi_rigid (basketball)"
+        ]
+      },
+      {
+        "track": 1,
+        "category": "box",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 2,
+        "category": "Rubik's cube",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 3,
+        "category": "bottle",
+        "finish": "metallic",
+        "rigidity": "rigid",
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "reasons": [
+          "VLM finish metallic (metal_steel)"
+        ]
+      },
+      {
+        "track": 4,
+        "category": "box",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      }
+    ]
+  },
+  "s06_b": {
+    "tracks": 4,
+    "expected": {
+      "rigid": 4,
+      "deformable": 0,
+      "small": 0,
+      "thin": 0
+    },
+    "flagged": {
+      "small": 0,
+      "thin": 0,
+      "occluded": 0,
+      "transparent_or_reflective": 2,
+      "non_rigid": 0
+    },
+    "objects": [
+      {
+        "track": 0,
+        "category": "box",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 1,
+        "category": "model car",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "reasons": [
+          "VLM confidence 0.58 is low"
+        ]
+      },
+      {
+        "track": 2,
+        "category": "can",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 3,
+        "category": "block",
+        "finish": "matte",
+        "rigidity": "deformable",
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "reasons": [
+          "VLM confidence 0.58 is low"
+        ]
+      }
+    ]
+  },
+  "s11_b": {
+    "tracks": 7,
+    "expected": {
+      "rigid": 7,
+      "deformable": 0,
+      "small": 6,
+      "thin": 0
+    },
+    "flagged": {
+      "small": 5,
+      "thin": 0,
+      "occluded": 0,
+      "transparent_or_reflective": 1,
+      "non_rigid": 1
+    },
+    "objects": [
+      {
+        "track": 0,
+        "category": "cube",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [
+          "small",
+          "transparent_or_reflective"
+        ],
+        "reasons": [
+          "largest extent 51 mm",
+          "VLM confidence 0.58 is low"
+        ]
+      },
+      {
+        "track": 1,
+        "category": "pyramid",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [
+          "small"
+        ],
+        "reasons": [
+          "largest extent 41 mm"
+        ]
+      },
+      {
+        "track": 2,
+        "category": "pyramid",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [
+          "small"
+        ],
+        "reasons": [
+          "largest extent 45 mm"
+        ]
+      },
+      {
+        "track": 3,
+        "category": "cube",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 4,
+        "category": "game piece",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [
+          "small"
+        ],
+        "reasons": [
+          "largest extent 45 mm"
+        ]
+      },
+      {
+        "track": 5,
+        "category": "cube",
+        "finish": "matte",
+        "rigidity": "semi_rigid",
+        "flags": [
+          "non_rigid"
+        ],
+        "reasons": [
+          "VLM rigidity semi_rigid (cube)"
+        ]
+      },
+      {
+        "track": 6,
+        "category": "knob",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [
+          "small"
+        ],
+        "reasons": [
+          "largest extent 44 mm"
+        ]
+      }
+    ]
+  },
+  "s12_b": {
+    "tracks": 10,
+    "expected": {
+      "rigid": 10,
+      "deformable": 0,
+      "small": 1,
+      "thin": 0
+    },
+    "flagged": {
+      "small": 2,
+      "thin": 1,
+      "occluded": 2,
+      "transparent_or_reflective": 1,
+      "non_rigid": 0
+    },
+    "objects": [
+      {
+        "track": 0,
+        "category": "Rubik's cube",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 1,
+        "category": "can",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [
+          "occluded"
+        ],
+        "reasons": [
+          "65% of frames have over 25% of the mask outline on other objects"
+        ]
+      },
+      {
+        "track": 2,
+        "category": "box",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 3,
+        "category": "clip",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "reasons": [
+          "no point cluster: size and thinness not measured",
+          "VLM confidence 0.32 is low"
+        ]
+      },
+      {
+        "track": 4,
+        "category": "box",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 5,
+        "category": "aerosol can",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [
+          "occluded"
+        ],
+        "reasons": [
+          "68% of frames have over 25% of the mask outline on other objects"
+        ]
+      },
+      {
+        "track": 6,
+        "category": "box",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [
+          "small",
+          "thin"
+        ],
+        "reasons": [
+          "largest extent 52 mm",
+          "smallest extent 13 mm, 0.25 of the largest"
+        ]
+      },
+      {
+        "track": 7,
+        "category": "box",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 8,
+        "category": "Rubik's cube",
+        "finish": "glossy",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 9,
+        "category": "pawn",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [
+          "small"
+        ],
+        "reasons": [
+          "largest extent 42 mm"
+        ]
+      }
+    ]
+  },
+  "s13_b": {
+    "tracks": 2,
+    "expected": {
+      "rigid": 3,
+      "deformable": 0,
+      "small": 0,
+      "thin": 0
+    },
+    "flagged": {
+      "small": 0,
+      "thin": 0,
+      "occluded": 2,
+      "transparent_or_reflective": 0,
+      "non_rigid": 0
+    },
+    "objects": [
+      {
+        "track": 0,
+        "category": "box",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [
+          "occluded"
+        ],
+        "reasons": [
+          "67% of frames have over 25% of the mask outline on other objects"
+        ]
+      },
+      {
+        "track": 1,
+        "category": "box",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [
+          "occluded"
+        ],
+        "reasons": [
+          "100% of frames have over 25% of the mask outline on other objects"
+        ]
+      }
+    ]
+  },
+  "s14_b": {
+    "tracks": 6,
+    "expected": {
+      "rigid": 5,
+      "deformable": 0,
+      "small": 0,
+      "thin": 1
+    },
+    "flagged": {
+      "small": 0,
+      "thin": 2,
+      "occluded": 0,
+      "transparent_or_reflective": 0,
+      "non_rigid": 1
+    },
+    "objects": [
+      {
+        "track": 0,
+        "category": "cube",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [
+          "thin"
+        ],
+        "reasons": [
+          "smallest extent 30 mm, 0.28 of the largest"
+        ]
+      },
+      {
+        "track": 1,
+        "category": "breadboard",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [
+          "thin"
+        ],
+        "reasons": [
+          "smallest extent 35 mm, 0.26 of the largest"
+        ]
+      },
+      {
+        "track": 2,
+        "category": "controller",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 3,
+        "category": "can",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 4,
+        "category": "box",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 5,
+        "category": "paper sheet",
+        "finish": "matte",
+        "rigidity": "deformable",
+        "flags": [
+          "non_rigid"
+        ],
+        "reasons": [
+          "no point cluster: size and thinness not measured",
+          "VLM rigidity deformable (paper sheet)"
+        ]
+      }
+    ]
+  },
+  "s16_a": {
+    "tracks": 5,
+    "expected": {
+      "rigid": 4,
+      "deformable": 0,
+      "small": 0,
+      "thin": 0
+    },
+    "flagged": {
+      "small": 0,
+      "thin": 0,
+      "occluded": 3,
+      "transparent_or_reflective": 1,
+      "non_rigid": 0
+    },
+    "objects": [
+      {
+        "track": 0,
+        "category": "box",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 1,
+        "category": "box",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [
+          "occluded"
+        ],
+        "reasons": [
+          "no point cluster: size and thinness not measured",
+          "95% of frames have over 25% of the mask outline on other objects"
+        ]
+      },
+      {
+        "track": 2,
+        "category": "cube",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [
+          "occluded"
+        ],
+        "reasons": [
+          "94% of frames have over 25% of the mask outline on other objects"
+        ]
+      },
+      {
+        "track": 3,
+        "category": "can",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [
+          "occluded"
+        ],
+        "reasons": [
+          "100% of frames have over 25% of the mask outline on other objects"
+        ]
+      },
+      {
+        "track": 4,
+        "category": "shoe",
+        "finish": "matte",
+        "rigidity": "semi_rigid",
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "reasons": [
+          "no point cluster: size and thinness not measured",
+          "VLM confidence 0.58 is low"
+        ]
+      }
+    ]
+  },
+  "s17_b": {
+    "tracks": 5,
+    "expected": {
+      "rigid": 5,
+      "deformable": 0,
+      "small": 1,
+      "thin": 0
+    },
+    "flagged": {
+      "small": 0,
+      "thin": 0,
+      "occluded": 0,
+      "transparent_or_reflective": 5,
+      "non_rigid": 0
+    },
+    "objects": [
+      {
+        "track": 0,
+        "category": "bottle",
+        "finish": "transparent",
+        "rigidity": "rigid",
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "reasons": [
+          "VLM finish transparent (plastic_hard)"
+        ]
+      },
+      {
+        "track": 1,
+        "category": "cube",
+        "finish": "mirror",
+        "rigidity": "rigid",
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "reasons": [
+          "VLM finish mirror (plastic_hard)"
+        ]
+      },
+      {
+        "track": 2,
+        "category": "can",
+        "finish": "metallic",
+        "rigidity": "rigid",
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "reasons": [
+          "VLM finish metallic (metal_steel)"
+        ]
+      },
+      {
+        "track": 3,
+        "category": "bottle",
+        "finish": "transparent",
+        "rigidity": "rigid",
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "reasons": [
+          "VLM finish transparent (glass); geometry: point error 2.35x the table's and 51% short-lived points"
+        ]
+      },
+      {
+        "track": 4,
+        "category": "chocolate egg",
+        "finish": "metallic",
+        "rigidity": "rigid",
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "reasons": [
+          "VLM finish metallic (foil_wrapped_food)"
+        ]
+      }
+    ]
+  },
+  "s18_b": {
+    "tracks": 8,
+    "expected": {
+      "rigid": 8,
+      "deformable": 0,
+      "small": 0,
+      "thin": 1
+    },
+    "flagged": {
+      "small": 0,
+      "thin": 1,
+      "occluded": 0,
+      "transparent_or_reflective": 2,
+      "non_rigid": 1
+    },
+    "objects": [
+      {
+        "track": 0,
+        "category": "hairbrush",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 1,
+        "category": "pliers",
+        "finish": "metallic",
+        "rigidity": "rigid",
+        "flags": [
+          "thin",
+          "transparent_or_reflective"
+        ],
+        "reasons": [
+          "smallest extent 22 mm, 0.16 of the largest",
+          "VLM finish metallic (metal_steel)"
+        ]
+      },
+      {
+        "track": 2,
+        "category": "model car",
+        "finish": "matte",
+        "rigidity": "deformable",
+        "flags": [
+          "non_rigid"
+        ],
+        "reasons": [
+          "VLM rigidity deformable (model car)"
+        ]
+      },
+      {
+        "track": 3,
+        "category": "hole punch",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 4,
+        "category": "controller",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 5,
+        "category": "toy car",
+        "finish": "glossy",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 6,
+        "category": "jar",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 7,
+        "category": "chocolate figure",
+        "finish": "metallic",
+        "rigidity": "rigid",
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "reasons": [
+          "VLM finish metallic (foil_wrapped_food)"
+        ]
+      }
+    ]
+  },
+  "s24_b": {
+    "tracks": 1,
+    "expected": {
+      "rigid": 1,
+      "deformable": 0,
+      "small": 0,
+      "thin": 0
+    },
+    "flagged": {
+      "small": 0,
+      "thin": 0,
+      "occluded": 0,
+      "transparent_or_reflective": 0,
+      "non_rigid": 0
+    },
+    "objects": [
+      {
+        "track": 0,
+        "category": "cube",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": [
+          "no point cluster: size and thinness not measured"
+        ]
+      }
+    ]
+  },
+  "s19_b": {
+    "tracks": 6,
+    "expected": {
+      "rigid": 5,
+      "deformable": 0,
+      "small": 0,
+      "thin": 1
+    },
+    "flagged": {
+      "small": 1,
+      "thin": 0,
+      "occluded": 0,
+      "transparent_or_reflective": 0,
+      "non_rigid": 1
+    },
+    "objects": [
+      {
+        "track": 0,
+        "category": "controller",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 1,
+        "category": "tape roll",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [
+          "small"
+        ],
+        "reasons": [
+          "largest extent 53 mm"
+        ]
+      },
+      {
+        "track": 2,
+        "category": "breadboard",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 3,
+        "category": "block",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 4,
+        "category": "tool roll",
+        "finish": "matte",
+        "rigidity": "deformable",
+        "flags": [
+          "non_rigid"
+        ],
+        "reasons": [
+          "VLM rigidity deformable (tool roll)"
+        ]
+      },
+      {
+        "track": 5,
+        "category": "clock",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      }
+    ]
+  },
+  "s20_b": {
+    "tracks": 6,
+    "expected": {
+      "rigid": 6,
+      "deformable": 0,
+      "small": 1,
+      "thin": 2
+    },
+    "flagged": {
+      "small": 0,
+      "thin": 0,
+      "occluded": 0,
+      "transparent_or_reflective": 3,
+      "non_rigid": 1
+    },
+    "objects": [
+      {
+        "track": 0,
+        "category": "cube",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 1,
+        "category": "deodorant stick",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 2,
+        "category": "digital clock",
+        "finish": "glossy",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": []
+      },
+      {
+        "track": 3,
+        "category": "bottle",
+        "finish": "transparent",
+        "rigidity": "semi_rigid",
+        "flags": [
+          "transparent_or_reflective",
+          "non_rigid"
+        ],
+        "reasons": [
+          "VLM finish transparent (plastic_hard)",
+          "VLM rigidity semi_rigid (bottle)"
+        ]
+      },
+      {
+        "track": 4,
+        "category": "scissors",
+        "finish": "metallic",
+        "rigidity": "rigid",
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "reasons": [
+          "VLM finish metallic (metal_steel)"
+        ]
+      },
+      {
+        "track": 5,
+        "category": "container",
+        "finish": "transparent",
+        "rigidity": "rigid",
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "reasons": [
+          "VLM finish transparent (plastic_hard)"
+        ]
+      }
+    ]
+  },
+  "s21_b": {
+    "tracks": 1,
+    "expected": {
+      "rigid": 1,
+      "deformable": 1,
+      "small": 0,
+      "thin": 0
+    },
+    "flagged": {
+      "small": 0,
+      "thin": 0,
+      "occluded": 0,
+      "transparent_or_reflective": 0,
+      "non_rigid": 1
+    },
+    "objects": [
+      {
+        "track": 0,
+        "category": "basketball",
+        "finish": "matte",
+        "rigidity": "semi_rigid",
+        "flags": [
+          "non_rigid"
+        ],
+        "reasons": [
+          "VLM rigidity semi_rigid (basketball)"
+        ]
+      }
+    ]
+  },
+  "s22_a": {
+    "tracks": 3,
+    "expected": {
+      "rigid": 0,
+      "deformable": 1,
+      "small": 0,
+      "thin": 0
+    },
+    "flagged": {
+      "small": 0,
+      "thin": 0,
+      "occluded": 0,
+      "transparent_or_reflective": 0,
+      "non_rigid": 1
+    },
+    "objects": [
+      {
+        "track": 0,
+        "category": "pouch",
+        "finish": "matte",
+        "rigidity": "deformable",
+        "flags": [
+          "non_rigid"
+        ],
+        "reasons": [
+          "VLM rigidity deformable (pouch)"
+        ]
+      },
+      {
+        "track": 1,
+        "category": "desk organizer",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": [
+          "no point cluster: size and thinness not measured"
+        ]
+      },
+      {
+        "track": 2,
+        "category": "pen holder",
+        "finish": "matte",
+        "rigidity": "rigid",
+        "flags": [],
+        "reasons": [
+          "no point cluster: size and thinness not measured",
+          "only 3 usable frames: occlusion not measured"
+        ]
+      }
+    ]
+  },
+  "s23_a": {
+    "tracks": 1,
+    "expected": {
+      "rigid": 0,
+      "deformable": 1,
+      "small": 0,
+      "thin": 0
+    },
+    "flagged": {
+      "small": 0,
+      "thin": 0,
+      "occluded": 0,
+      "transparent_or_reflective": 0,
+      "non_rigid": 1
+    },
+    "objects": [
+      {
+        "track": 0,
+        "category": "bath pouf",
+        "finish": "matte",
+        "rigidity": "deformable",
+        "flags": [
+          "non_rigid"
+        ],
+        "reasons": [
+          "VLM rigidity deformable (bath pouf)"
+        ]
+      }
+    ]
+  }
+}

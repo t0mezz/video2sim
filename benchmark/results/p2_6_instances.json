@@ -1,0 +1,2314 @@
+{
+  "s01_b": {
+    "status": {
+      "capture": [
+        "done",
+        2.8
+      ],
+      "reconstruction": [
+        "done",
+        39.6
+      ],
+      "segmentation": [
+        "done",
+        18.0
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "can",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          13,
+          41,
+          20,
+          6,
+          16
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "can",
+        "material_class": "metal_steel",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      },
+      {
+        "object_id": "obj_001",
+        "label": "rubik's cube",
+        "mask_dir": "segmentation/masks/obj_001",
+        "point_cluster_path": "segmentation/clusters/obj_001.npy",
+        "keyframes": [
+          24,
+          13,
+          2,
+          19,
+          29
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "rubik's cube",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      },
+      {
+        "object_id": "obj_002",
+        "label": "Rubik's cube",
+        "mask_dir": "segmentation/masks/obj_002",
+        "point_cluster_path": "segmentation/clusters/obj_002.npy",
+        "keyframes": [
+          22,
+          8,
+          37,
+          14,
+          11
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "Rubik's cube",
+        "material_class": "plastic_hard",
+        "finish": "glossy",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.92
+      },
+      {
+        "object_id": "obj_003",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_003",
+        "point_cluster_path": "segmentation/clusters/obj_003.npy",
+        "keyframes": [
+          37,
+          13,
+          22,
+          19,
+          27
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.97
+      },
+      {
+        "object_id": "obj_004",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_004",
+        "point_cluster_path": "segmentation/clusters/obj_004.npy",
+        "keyframes": [
+          13,
+          26,
+          20,
+          0,
+          16
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.97
+      }
+    ]
+  },
+  "s02_b": {
+    "status": {
+      "capture": [
+        "done",
+        3.6
+      ],
+      "reconstruction": [
+        "done",
+        44.4
+      ],
+      "segmentation": [
+        "done",
+        17.9
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "camera",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          29,
+          6,
+          19,
+          33,
+          24
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "camera",
+        "material_class": "electronics_mixed",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      },
+      {
+        "object_id": "obj_001",
+        "label": "mug",
+        "mask_dir": "segmentation/masks/obj_001",
+        "point_cluster_path": "segmentation/clusters/obj_001.npy",
+        "keyframes": [
+          34,
+          21,
+          26,
+          30,
+          4
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "mug",
+        "material_class": "ceramic",
+        "finish": "glossy",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.98
+      },
+      {
+        "object_id": "obj_002",
+        "label": "mug",
+        "mask_dir": "segmentation/masks/obj_002",
+        "point_cluster_path": "segmentation/clusters/obj_002.npy",
+        "keyframes": [
+          26,
+          17,
+          34,
+          23,
+          30
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "mug",
+        "material_class": "ceramic",
+        "finish": "glossy",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.98
+      },
+      {
+        "object_id": "obj_003",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_003",
+        "point_cluster_path": "segmentation/clusters/obj_003.npy",
+        "keyframes": [
+          34,
+          21,
+          28,
+          47,
+          24
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.98
+      },
+      {
+        "object_id": "obj_004",
+        "label": "earplug",
+        "mask_dir": "segmentation/masks/obj_004",
+        "point_cluster_path": "segmentation/clusters/obj_004.npy",
+        "keyframes": [
+          23,
+          37,
+          28,
+          12,
+          31
+        ],
+        "flags": [
+          "small",
+          "non_rigid"
+        ],
+        "flag_reasons": [
+          "largest extent 45 mm",
+          "VLM rigidity deformable (earplug)"
+        ],
+        "category": "earplug",
+        "material_class": "foam",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "deformable",
+        "material_confidence": 0.72
+      }
+    ]
+  },
+  "s03_b": {
+    "status": {
+      "capture": [
+        "done",
+        4.0
+      ],
+      "reconstruction": [
+        "done",
+        86.2
+      ],
+      "segmentation": [
+        "done",
+        9.5
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "basketball",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          30,
+          56,
+          39,
+          46,
+          17
+        ],
+        "flags": [
+          "non_rigid"
+        ],
+        "flag_reasons": [
+          "VLM rigidity semi_rigid (basketball)"
+        ],
+        "category": "basketball",
+        "material_class": "rubber",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "semi_rigid",
+        "material_confidence": 0.68
+      }
+    ]
+  },
+  "s04_b": {
+    "status": {
+      "capture": [
+        "done",
+        4.3
+      ],
+      "reconstruction": [
+        "done",
+        91.9
+      ],
+      "segmentation": [
+        "done",
+        39.2
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "basketball",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          26,
+          40,
+          58,
+          0,
+          30
+        ],
+        "flags": [
+          "non_rigid"
+        ],
+        "flag_reasons": [
+          "VLM rigidity semi_rigid (basketball)"
+        ],
+        "category": "basketball",
+        "material_class": "rubber",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "semi_rigid",
+        "material_confidence": 0.92
+      },
+      {
+        "object_id": "obj_001",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_001",
+        "point_cluster_path": "segmentation/clusters/obj_001.npy",
+        "keyframes": [
+          32,
+          9,
+          52,
+          59,
+          28
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.98
+      },
+      {
+        "object_id": "obj_002",
+        "label": "Rubik's cube",
+        "mask_dir": "segmentation/masks/obj_002",
+        "point_cluster_path": "segmentation/clusters/obj_002.npy",
+        "keyframes": [
+          61,
+          5,
+          28,
+          31,
+          13
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "Rubik's cube",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      },
+      {
+        "object_id": "obj_003",
+        "label": "bottle",
+        "mask_dir": "segmentation/masks/obj_003",
+        "point_cluster_path": "segmentation/clusters/obj_003.npy",
+        "keyframes": [
+          24,
+          51,
+          33,
+          43,
+          1
+        ],
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "flag_reasons": [
+          "VLM finish metallic (metal_steel)"
+        ],
+        "category": "bottle",
+        "material_class": "metal_steel",
+        "finish": "metallic",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      },
+      {
+        "object_id": "obj_004",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_004",
+        "point_cluster_path": "segmentation/clusters/obj_004.npy",
+        "keyframes": [
+          40,
+          27,
+          34,
+          51,
+          54
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.97
+      }
+    ]
+  },
+  "s06_b": {
+    "status": {
+      "capture": [
+        "done",
+        8.1
+      ],
+      "reconstruction": [
+        "done",
+        240.3
+      ],
+      "segmentation": [
+        "done",
+        47.3
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          47,
+          17,
+          117,
+          39,
+          53
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.97
+      },
+      {
+        "object_id": "obj_001",
+        "label": "model car",
+        "mask_dir": "segmentation/masks/obj_001",
+        "point_cluster_path": "segmentation/clusters/obj_001.npy",
+        "keyframes": [
+          16,
+          8,
+          97,
+          13,
+          66
+        ],
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "flag_reasons": [
+          "VLM confidence 0.58 is low"
+        ],
+        "category": "model car",
+        "material_class": "wood",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.58
+      },
+      {
+        "object_id": "obj_002",
+        "label": "can",
+        "mask_dir": "segmentation/masks/obj_002",
+        "point_cluster_path": "segmentation/clusters/obj_002.npy",
+        "keyframes": [
+          42,
+          17,
+          30,
+          35,
+          68
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "can",
+        "material_class": "metal_steel",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.94
+      },
+      {
+        "object_id": "obj_003",
+        "label": "block",
+        "mask_dir": "segmentation/masks/obj_003",
+        "point_cluster_path": "segmentation/clusters/obj_003.npy",
+        "keyframes": [
+          44,
+          53,
+          29,
+          74,
+          48
+        ],
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "flag_reasons": [
+          "VLM confidence 0.58 is low"
+        ],
+        "category": "block",
+        "material_class": "foam",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "deformable",
+        "material_confidence": 0.58
+      }
+    ]
+  },
+  "s11_b": {
+    "status": {
+      "capture": [
+        "done",
+        6.4
+      ],
+      "reconstruction": [
+        "done",
+        118.5
+      ],
+      "segmentation": [
+        "done",
+        25.0
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "cube",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          38,
+          19,
+          83,
+          66,
+          76
+        ],
+        "flags": [
+          "small",
+          "transparent_or_reflective"
+        ],
+        "flag_reasons": [
+          "largest extent 51 mm",
+          "VLM confidence 0.58 is low"
+        ],
+        "category": "cube",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.58
+      },
+      {
+        "object_id": "obj_001",
+        "label": "pyramid",
+        "mask_dir": "segmentation/masks/obj_001",
+        "point_cluster_path": "segmentation/clusters/obj_001.npy",
+        "keyframes": [
+          21,
+          42,
+          25,
+          6,
+          85
+        ],
+        "flags": [
+          "small"
+        ],
+        "flag_reasons": [
+          "largest extent 41 mm"
+        ],
+        "category": "pyramid",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.62
+      },
+      {
+        "object_id": "obj_002",
+        "label": "pyramid",
+        "mask_dir": "segmentation/masks/obj_002",
+        "point_cluster_path": "segmentation/clusters/obj_002.npy",
+        "keyframes": [
+          44,
+          23,
+          82,
+          64,
+          9
+        ],
+        "flags": [
+          "small"
+        ],
+        "flag_reasons": [
+          "largest extent 45 mm"
+        ],
+        "category": "pyramid",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.62
+      },
+      {
+        "object_id": "obj_003",
+        "label": "cube",
+        "mask_dir": "segmentation/masks/obj_003",
+        "point_cluster_path": "segmentation/clusters/obj_003.npy",
+        "keyframes": [
+          26,
+          54,
+          18,
+          44,
+          23
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "cube",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.62
+      },
+      {
+        "object_id": "obj_004",
+        "label": "game piece",
+        "mask_dir": "segmentation/masks/obj_004",
+        "point_cluster_path": "segmentation/clusters/obj_004.npy",
+        "keyframes": [
+          32,
+          91,
+          85,
+          66,
+          26
+        ],
+        "flags": [
+          "small"
+        ],
+        "flag_reasons": [
+          "largest extent 45 mm"
+        ],
+        "category": "game piece",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.62
+      },
+      {
+        "object_id": "obj_005",
+        "label": "cube",
+        "mask_dir": "segmentation/masks/obj_005",
+        "point_cluster_path": "segmentation/clusters/obj_005.npy",
+        "keyframes": [
+          44,
+          22,
+          59,
+          27,
+          32
+        ],
+        "flags": [
+          "non_rigid"
+        ],
+        "flag_reasons": [
+          "VLM rigidity semi_rigid (cube)"
+        ],
+        "category": "cube",
+        "material_class": "foam",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "semi_rigid",
+        "material_confidence": 0.78
+      },
+      {
+        "object_id": "obj_006",
+        "label": "knob",
+        "mask_dir": "segmentation/masks/obj_006",
+        "point_cluster_path": "segmentation/clusters/obj_006.npy",
+        "keyframes": [
+          42,
+          64,
+          86,
+          82,
+          46
+        ],
+        "flags": [
+          "small"
+        ],
+        "flag_reasons": [
+          "largest extent 44 mm"
+        ],
+        "category": "knob",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.88
+      }
+    ]
+  },
+  "s12_b": {
+    "status": {
+      "capture": [
+        "done",
+        5.0
+      ],
+      "reconstruction": [
+        "done",
+        112.3
+      ],
+      "segmentation": [
+        "done",
+        67.6
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [
+      "track 3 dropped: no voxel is inside the mask in enough views",
+      "possible missing object: 10 objects listed but 9 tracks"
+    ],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "Rubik's cube",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          9,
+          48,
+          25,
+          71,
+          55
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "Rubik's cube",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      },
+      {
+        "object_id": "obj_001",
+        "label": "can",
+        "mask_dir": "segmentation/masks/obj_001",
+        "point_cluster_path": "segmentation/clusters/obj_001.npy",
+        "keyframes": [
+          4,
+          42,
+          80,
+          18,
+          41
+        ],
+        "flags": [
+          "occluded"
+        ],
+        "flag_reasons": [
+          "56% of frames have over 25% of the mask outline on other objects"
+        ],
+        "category": "can",
+        "material_class": "metal_steel",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.93
+      },
+      {
+        "object_id": "obj_002",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_002",
+        "point_cluster_path": "segmentation/clusters/obj_002.npy",
+        "keyframes": [
+          42,
+          31,
+          7,
+          19,
+          54
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      },
+      {
+        "object_id": "obj_004",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_004",
+        "point_cluster_path": "segmentation/clusters/obj_004.npy",
+        "keyframes": [
+          18,
+          75,
+          43,
+          33,
+          39
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.97
+      },
+      {
+        "object_id": "obj_005",
+        "label": "aerosol can",
+        "mask_dir": "segmentation/masks/obj_005",
+        "point_cluster_path": "segmentation/clusters/obj_005.npy",
+        "keyframes": [
+          57,
+          0,
+          51,
+          29,
+          54
+        ],
+        "flags": [
+          "occluded"
+        ],
+        "flag_reasons": [
+          "53% of frames have over 25% of the mask outline on other objects"
+        ],
+        "category": "aerosol can",
+        "material_class": "metal_aluminium",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.97
+      },
+      {
+        "object_id": "obj_006",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_006",
+        "point_cluster_path": "segmentation/clusters/obj_006.npy",
+        "keyframes": [
+          17,
+          31,
+          42,
+          73,
+          60
+        ],
+        "flags": [
+          "small",
+          "thin"
+        ],
+        "flag_reasons": [
+          "largest extent 52 mm",
+          "smallest extent 13 mm, 0.25 of the largest",
+          "no sparse points agree with the masks: the hull is the cluster"
+        ],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.98
+      },
+      {
+        "object_id": "obj_007",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_007",
+        "point_cluster_path": "segmentation/clusters/obj_007.npy",
+        "keyframes": [
+          39,
+          13,
+          34,
+          58,
+          73
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.97
+      },
+      {
+        "object_id": "obj_008",
+        "label": "Rubik's cube",
+        "mask_dir": "segmentation/masks/obj_008",
+        "point_cluster_path": "segmentation/clusters/obj_008.npy",
+        "keyframes": [
+          20,
+          9,
+          45,
+          31,
+          54
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "Rubik's cube",
+        "material_class": "plastic_hard",
+        "finish": "glossy",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.98
+      },
+      {
+        "object_id": "obj_009",
+        "label": "pawn",
+        "mask_dir": "segmentation/masks/obj_009",
+        "point_cluster_path": "segmentation/clusters/obj_009.npy",
+        "keyframes": [
+          51,
+          72,
+          35,
+          14,
+          38
+        ],
+        "flags": [
+          "small"
+        ],
+        "flag_reasons": [
+          "largest extent 42 mm"
+        ],
+        "category": "pawn",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.72
+      }
+    ]
+  },
+  "s13_b": {
+    "status": {
+      "capture": [
+        "done",
+        5.0
+      ],
+      "reconstruction": [
+        "done",
+        149.6
+      ],
+      "segmentation": [
+        "done",
+        29.5
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [
+      "possible missing object: 3 objects listed but 2 tracks"
+    ],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          39,
+          72,
+          8,
+          30,
+          57
+        ],
+        "flags": [
+          "occluded"
+        ],
+        "flag_reasons": [
+          "67% of frames have over 25% of the mask outline on other objects"
+        ],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.97
+      },
+      {
+        "object_id": "obj_001",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_001",
+        "point_cluster_path": "segmentation/clusters/obj_001.npy",
+        "keyframes": [
+          16,
+          61,
+          36,
+          72,
+          8
+        ],
+        "flags": [
+          "occluded"
+        ],
+        "flag_reasons": [
+          "100% of frames have over 25% of the mask outline on other objects"
+        ],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      }
+    ]
+  },
+  "s14_b": {
+    "status": {
+      "capture": [
+        "done",
+        3.5
+      ],
+      "reconstruction": [
+        "done",
+        88.7
+      ],
+      "segmentation": [
+        "done",
+        51.7
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [
+      "track 5 dropped: reaches the top of the grid (not a tabletop object)"
+    ],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "cube",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          15,
+          50,
+          3,
+          34,
+          9
+        ],
+        "flags": [
+          "thin"
+        ],
+        "flag_reasons": [
+          "smallest extent 30 mm, 0.28 of the largest"
+        ],
+        "category": "cube",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.78
+      },
+      {
+        "object_id": "obj_001",
+        "label": "breadboard",
+        "mask_dir": "segmentation/masks/obj_001",
+        "point_cluster_path": "segmentation/clusters/obj_001.npy",
+        "keyframes": [
+          10,
+          4,
+          8,
+          34,
+          14
+        ],
+        "flags": [
+          "thin"
+        ],
+        "flag_reasons": [
+          "smallest extent 35 mm, 0.26 of the largest"
+        ],
+        "category": "breadboard",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.97
+      },
+      {
+        "object_id": "obj_002",
+        "label": "controller",
+        "mask_dir": "segmentation/masks/obj_002",
+        "point_cluster_path": "segmentation/clusters/obj_002.npy",
+        "keyframes": [
+          11,
+          49,
+          14,
+          40,
+          8
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "controller",
+        "material_class": "electronics_mixed",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.98
+      },
+      {
+        "object_id": "obj_003",
+        "label": "can",
+        "mask_dir": "segmentation/masks/obj_003",
+        "point_cluster_path": "segmentation/clusters/obj_003.npy",
+        "keyframes": [
+          50,
+          34,
+          39,
+          45,
+          4
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "can",
+        "material_class": "metal_steel",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      },
+      {
+        "object_id": "obj_004",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_004",
+        "point_cluster_path": "segmentation/clusters/obj_004.npy",
+        "keyframes": [
+          45,
+          14,
+          21,
+          39,
+          42
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.98
+      }
+    ]
+  },
+  "s16_a": {
+    "status": {
+      "capture": [
+        "done",
+        16.5
+      ],
+      "reconstruction": [
+        "done",
+        1960.6
+      ],
+      "segmentation": [
+        "done",
+        86.6
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [
+      "track 1 dropped: no voxel is inside the mask in enough views",
+      "track 4 dropped: no voxel is inside the mask in enough views",
+      "possible missing object: 4 objects listed but 3 tracks"
+    ],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "box",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          1,
+          211,
+          148,
+          14,
+          164
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "box",
+        "material_class": "cardboard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.97
+      },
+      {
+        "object_id": "obj_002",
+        "label": "cube",
+        "mask_dir": "segmentation/masks/obj_002",
+        "point_cluster_path": "segmentation/clusters/obj_002.npy",
+        "keyframes": [
+          0,
+          34,
+          123,
+          92,
+          209
+        ],
+        "flags": [
+          "occluded"
+        ],
+        "flag_reasons": [
+          "94% of frames have over 25% of the mask outline on other objects"
+        ],
+        "category": "cube",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      },
+      {
+        "object_id": "obj_003",
+        "label": "can",
+        "mask_dir": "segmentation/masks/obj_003",
+        "point_cluster_path": "segmentation/clusters/obj_003.npy",
+        "keyframes": [
+          112,
+          215,
+          132,
+          172,
+          93
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "can",
+        "material_class": "metal_steel",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.97
+      }
+    ]
+  },
+  "s17_b": {
+    "status": {
+      "capture": [
+        "done",
+        5.3
+      ],
+      "reconstruction": [
+        "done",
+        126.4
+      ],
+      "segmentation": [
+        "done",
+        25.0
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "bottle",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          44,
+          17,
+          57,
+          23,
+          36
+        ],
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "flag_reasons": [
+          "VLM finish transparent (plastic_hard)"
+        ],
+        "category": "bottle",
+        "material_class": "plastic_hard",
+        "finish": "transparent",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.93
+      },
+      {
+        "object_id": "obj_001",
+        "label": "cube",
+        "mask_dir": "segmentation/masks/obj_001",
+        "point_cluster_path": "segmentation/clusters/obj_001.npy",
+        "keyframes": [
+          31,
+          72,
+          20,
+          41,
+          81
+        ],
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "flag_reasons": [
+          "VLM finish mirror (plastic_hard)"
+        ],
+        "category": "cube",
+        "material_class": "plastic_hard",
+        "finish": "mirror",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.88
+      },
+      {
+        "object_id": "obj_002",
+        "label": "can",
+        "mask_dir": "segmentation/masks/obj_002",
+        "point_cluster_path": "segmentation/clusters/obj_002.npy",
+        "keyframes": [
+          33,
+          8,
+          22,
+          66,
+          27
+        ],
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "flag_reasons": [
+          "VLM finish metallic (metal_steel)"
+        ],
+        "category": "can",
+        "material_class": "metal_steel",
+        "finish": "metallic",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      },
+      {
+        "object_id": "obj_003",
+        "label": "bottle",
+        "mask_dir": "segmentation/masks/obj_003",
+        "point_cluster_path": "segmentation/clusters/obj_003.npy",
+        "keyframes": [
+          40,
+          12,
+          26,
+          54,
+          83
+        ],
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "flag_reasons": [
+          "VLM finish transparent (glass); geometry: point error 2.35x the table's and 51% short-lived points"
+        ],
+        "category": "bottle",
+        "material_class": "glass",
+        "finish": "transparent",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.98
+      },
+      {
+        "object_id": "obj_004",
+        "label": "chocolate egg",
+        "mask_dir": "segmentation/masks/obj_004",
+        "point_cluster_path": "segmentation/clusters/obj_004.npy",
+        "keyframes": [
+          25,
+          46,
+          79,
+          33,
+          20
+        ],
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "flag_reasons": [
+          "VLM finish metallic (foil_wrapped_food)"
+        ],
+        "category": "chocolate egg",
+        "material_class": "foil_wrapped_food",
+        "finish": "metallic",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.97
+      }
+    ]
+  },
+  "s18_b": {
+    "status": {
+      "capture": [
+        "done",
+        4.9
+      ],
+      "reconstruction": [
+        "done",
+        115.6
+      ],
+      "segmentation": [
+        "done",
+        55.4
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "hairbrush",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          37,
+          76,
+          71,
+          73,
+          55
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "hairbrush",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      },
+      {
+        "object_id": "obj_001",
+        "label": "pliers",
+        "mask_dir": "segmentation/masks/obj_001",
+        "point_cluster_path": "segmentation/clusters/obj_001.npy",
+        "keyframes": [
+          43,
+          29,
+          35,
+          81,
+          65
+        ],
+        "flags": [
+          "thin",
+          "transparent_or_reflective"
+        ],
+        "flag_reasons": [
+          "smallest extent 22 mm, 0.16 of the largest",
+          "VLM finish metallic (metal_steel)"
+        ],
+        "category": "pliers",
+        "material_class": "metal_steel",
+        "finish": "metallic",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.98
+      },
+      {
+        "object_id": "obj_002",
+        "label": "model car",
+        "mask_dir": "segmentation/masks/obj_002",
+        "point_cluster_path": "segmentation/clusters/obj_002.npy",
+        "keyframes": [
+          74,
+          37,
+          31,
+          84,
+          77
+        ],
+        "flags": [
+          "non_rigid"
+        ],
+        "flag_reasons": [
+          "VLM rigidity deformable (model car)"
+        ],
+        "category": "model car",
+        "material_class": "other",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "deformable",
+        "material_confidence": 0.71
+      },
+      {
+        "object_id": "obj_003",
+        "label": "hole punch",
+        "mask_dir": "segmentation/masks/obj_003",
+        "point_cluster_path": "segmentation/clusters/obj_003.npy",
+        "keyframes": [
+          29,
+          42,
+          68,
+          84,
+          38
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "hole punch",
+        "material_class": "metal_steel",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.88
+      },
+      {
+        "object_id": "obj_004",
+        "label": "controller",
+        "mask_dir": "segmentation/masks/obj_004",
+        "point_cluster_path": "segmentation/clusters/obj_004.npy",
+        "keyframes": [
+          37,
+          76,
+          31,
+          58,
+          42
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "controller",
+        "material_class": "electronics_mixed",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.98
+      },
+      {
+        "object_id": "obj_005",
+        "label": "toy car",
+        "mask_dir": "segmentation/masks/obj_005",
+        "point_cluster_path": "segmentation/clusters/obj_005.npy",
+        "keyframes": [
+          43,
+          77,
+          32,
+          56,
+          38
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "toy car",
+        "material_class": "plastic_hard",
+        "finish": "glossy",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      },
+      {
+        "object_id": "obj_006",
+        "label": "jar",
+        "mask_dir": "segmentation/masks/obj_006",
+        "point_cluster_path": "segmentation/clusters/obj_006.npy",
+        "keyframes": [
+          69,
+          50,
+          83,
+          39,
+          27
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "jar",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.94
+      },
+      {
+        "object_id": "obj_007",
+        "label": "chocolate figure",
+        "mask_dir": "segmentation/masks/obj_007",
+        "point_cluster_path": "segmentation/clusters/obj_007.npy",
+        "keyframes": [
+          29,
+          43,
+          36,
+          83,
+          32
+        ],
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "flag_reasons": [
+          "VLM finish metallic (foil_wrapped_food)"
+        ],
+        "category": "chocolate figure",
+        "material_class": "foil_wrapped_food",
+        "finish": "metallic",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.96
+      }
+    ]
+  },
+  "s24_b": {
+    "status": {
+      "capture": [
+        "done",
+        3.5
+      ],
+      "reconstruction": [
+        "done",
+        62.4
+      ],
+      "segmentation": [
+        "done",
+        4.6
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "cube",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          22,
+          4,
+          39,
+          19,
+          44
+        ],
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "flag_reasons": [
+          "VLM confidence 0.48 is low"
+        ],
+        "category": "cube",
+        "material_class": "foam",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.48
+      }
+    ]
+  },
+  "s19_b": {
+    "status": {
+      "capture": [
+        "done",
+        5.1
+      ],
+      "reconstruction": [
+        "done",
+        49.9
+      ],
+      "segmentation": [
+        "done",
+        44.3
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "controller",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          31,
+          12,
+          76,
+          38,
+          17
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "controller",
+        "material_class": "electronics_mixed",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.98
+      },
+      {
+        "object_id": "obj_001",
+        "label": "tape roll",
+        "mask_dir": "segmentation/masks/obj_001",
+        "point_cluster_path": "segmentation/clusters/obj_001.npy",
+        "keyframes": [
+          15,
+          70,
+          26,
+          77,
+          33
+        ],
+        "flags": [
+          "small"
+        ],
+        "flag_reasons": [
+          "largest extent 53 mm"
+        ],
+        "category": "tape roll",
+        "material_class": "paper",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.92
+      },
+      {
+        "object_id": "obj_002",
+        "label": "breadboard",
+        "mask_dir": "segmentation/masks/obj_002",
+        "point_cluster_path": "segmentation/clusters/obj_002.npy",
+        "keyframes": [
+          14,
+          74,
+          9,
+          19,
+          11
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "breadboard",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.97
+      },
+      {
+        "object_id": "obj_003",
+        "label": "block",
+        "mask_dir": "segmentation/masks/obj_003",
+        "point_cluster_path": "segmentation/clusters/obj_003.npy",
+        "keyframes": [
+          34,
+          19,
+          44,
+          39,
+          25
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "block",
+        "material_class": "wood",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.97
+      },
+      {
+        "object_id": "obj_004",
+        "label": "tool roll",
+        "mask_dir": "segmentation/masks/obj_004",
+        "point_cluster_path": "segmentation/clusters/obj_004.npy",
+        "keyframes": [
+          13,
+          38,
+          22,
+          73,
+          19
+        ],
+        "flags": [
+          "non_rigid"
+        ],
+        "flag_reasons": [
+          "VLM rigidity deformable (tool roll)"
+        ],
+        "category": "tool roll",
+        "material_class": "textile",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "deformable",
+        "material_confidence": 0.96
+      },
+      {
+        "object_id": "obj_005",
+        "label": "clock",
+        "mask_dir": "segmentation/masks/obj_005",
+        "point_cluster_path": "segmentation/clusters/obj_005.npy",
+        "keyframes": [
+          12,
+          72,
+          76,
+          74,
+          64
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "clock",
+        "material_class": "electronics_mixed",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.92
+      }
+    ]
+  },
+  "s20_b": {
+    "status": {
+      "capture": [
+        "done",
+        8.6
+      ],
+      "reconstruction": [
+        "done",
+        82.4
+      ],
+      "segmentation": [
+        "done",
+        61.6
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "cube",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          112,
+          50,
+          83,
+          13,
+          135
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "cube",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.88
+      },
+      {
+        "object_id": "obj_001",
+        "label": "deodorant stick",
+        "mask_dir": "segmentation/masks/obj_001",
+        "point_cluster_path": "segmentation/clusters/obj_001.npy",
+        "keyframes": [
+          77,
+          112,
+          84,
+          59,
+          118
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "deodorant stick",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.89
+      },
+      {
+        "object_id": "obj_002",
+        "label": "digital clock",
+        "mask_dir": "segmentation/masks/obj_002",
+        "point_cluster_path": "segmentation/clusters/obj_002.npy",
+        "keyframes": [
+          84,
+          60,
+          95,
+          136,
+          112
+        ],
+        "flags": [],
+        "flag_reasons": [],
+        "category": "digital clock",
+        "material_class": "electronics_mixed",
+        "finish": "glossy",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.88
+      },
+      {
+        "object_id": "obj_003",
+        "label": "bottle",
+        "mask_dir": "segmentation/masks/obj_003",
+        "point_cluster_path": "segmentation/clusters/obj_003.npy",
+        "keyframes": [
+          77,
+          87,
+          82,
+          14,
+          54
+        ],
+        "flags": [
+          "transparent_or_reflective",
+          "non_rigid"
+        ],
+        "flag_reasons": [
+          "VLM finish transparent (plastic_hard)",
+          "VLM rigidity semi_rigid (bottle)"
+        ],
+        "category": "bottle",
+        "material_class": "plastic_hard",
+        "finish": "transparent",
+        "hollow": "hollow",
+        "rigidity": "semi_rigid",
+        "material_confidence": 0.91
+      },
+      {
+        "object_id": "obj_004",
+        "label": "scissors",
+        "mask_dir": "segmentation/masks/obj_004",
+        "point_cluster_path": "segmentation/clusters/obj_004.npy",
+        "keyframes": [
+          130,
+          112,
+          40,
+          43,
+          45
+        ],
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "flag_reasons": [
+          "VLM finish metallic (metal_steel)"
+        ],
+        "category": "scissors",
+        "material_class": "metal_steel",
+        "finish": "metallic",
+        "hollow": "solid",
+        "rigidity": "rigid",
+        "material_confidence": 0.98
+      },
+      {
+        "object_id": "obj_005",
+        "label": "container",
+        "mask_dir": "segmentation/masks/obj_005",
+        "point_cluster_path": "segmentation/clusters/obj_005.npy",
+        "keyframes": [
+          50,
+          37,
+          44,
+          77,
+          59
+        ],
+        "flags": [
+          "transparent_or_reflective"
+        ],
+        "flag_reasons": [
+          "VLM finish transparent (plastic_hard)"
+        ],
+        "category": "container",
+        "material_class": "plastic_hard",
+        "finish": "transparent",
+        "hollow": "hollow",
+        "rigidity": "rigid",
+        "material_confidence": 0.88
+      }
+    ]
+  },
+  "s21_b": {
+    "status": {
+      "capture": [
+        "done",
+        1.7
+      ],
+      "reconstruction": [
+        "done",
+        17.6
+      ],
+      "segmentation": [
+        "done",
+        4.6
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [
+      "possible missing object: 2 objects listed but 1 tracks"
+    ],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "basketball",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          18,
+          10,
+          29,
+          14,
+          21
+        ],
+        "flags": [
+          "non_rigid"
+        ],
+        "flag_reasons": [
+          "VLM rigidity semi_rigid (basketball)"
+        ],
+        "category": "basketball",
+        "material_class": "rubber",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "semi_rigid",
+        "material_confidence": 0.62
+      }
+    ]
+  },
+  "s22_a": {
+    "status": {
+      "capture": [
+        "done",
+        4.4
+      ],
+      "reconstruction": [
+        "done",
+        44.5
+      ],
+      "segmentation": [
+        "done",
+        16.9
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [
+      "track 1 dropped: no voxel is inside the mask in enough views",
+      "track 2 dropped: no voxel is inside the mask in enough views"
+    ],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "pouch",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          18,
+          52,
+          43,
+          77,
+          26
+        ],
+        "flags": [
+          "non_rigid"
+        ],
+        "flag_reasons": [
+          "VLM rigidity deformable (pouch)"
+        ],
+        "category": "pouch",
+        "material_class": "textile",
+        "finish": "matte",
+        "hollow": "hollow",
+        "rigidity": "deformable",
+        "material_confidence": 0.98
+      }
+    ]
+  },
+  "s23_a": {
+    "status": {
+      "capture": [
+        "done",
+        5.3
+      ],
+      "reconstruction": [
+        "done",
+        50.4
+      ],
+      "segmentation": [
+        "done",
+        14.7
+      ],
+      "shape": [
+        "pending",
+        0
+      ],
+      "physics": [
+        "pending",
+        0
+      ],
+      "export": [
+        "pending",
+        0
+      ]
+    },
+    "scene_flags": [],
+    "objects": [
+      {
+        "object_id": "obj_000",
+        "label": "bath pouf",
+        "mask_dir": "segmentation/masks/obj_000",
+        "point_cluster_path": "segmentation/clusters/obj_000.npy",
+        "keyframes": [
+          75,
+          84,
+          79,
+          50
+        ],
+        "flags": [
+          "non_rigid"
+        ],
+        "flag_reasons": [
+          "VLM rigidity deformable (bath pouf)",
+          "keyframes: 4 of 5 keyframes: the rest are weak or repeat a view"
+        ],
+        "category": "bath pouf",
+        "material_class": "plastic_hard",
+        "finish": "matte",
+        "hollow": "solid",
+        "rigidity": "deformable",
+        "material_confidence": 0.96
+      }
+    ]
+  }
+}

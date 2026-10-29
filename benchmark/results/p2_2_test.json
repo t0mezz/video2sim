@@ -1,0 +1,50 @@
+{
+  "summary": {
+    "scenes_scored": [
+      "s16"
+    ],
+    "raw": {
+      "switches_per_scene": 0.0,
+      "fragmented_total": 0,
+      "unassigned_tracks_total": 1
+    },
+    "repaired": {
+      "switches_per_scene": 0.0,
+      "fragmented_total": 0,
+      "unassigned_tracks_total": 1
+    }
+  },
+  "scenes": [
+    {
+      "run": "s16_a",
+      "scene": "s16",
+      "frames": 241,
+      "tracks_raw": 5,
+      "tracks_repaired": 5,
+      "splits": [],
+      "merges": [],
+      "raw": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_029": 1,
+          "obj_003": 1,
+          "obj_021": 1,
+          "obj_004": 1
+        },
+        "unassigned_tracks": 1
+      },
+      "repaired": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_029": 1,
+          "obj_003": 1,
+          "obj_021": 1,
+          "obj_004": 1
+        },
+        "unassigned_tracks": 1
+      }
+    }
+  ]
+}

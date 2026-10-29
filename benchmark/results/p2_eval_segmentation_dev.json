@@ -1,0 +1,1244 @@
+{
+  "header": {
+    "created_utc": "2026-10-29T11:34:23+00:00",
+    "split": "dev",
+    "source": "runs in /private/tmp/claude-501/-Users-tomkorbmacher--claude-spares-spare-JmzmEr/a1d7014b-7458-4321-8c3e-ccb2f98d913e/scratchpad/evalruns",
+    "code_version": "1e68a1c58be3c0c1a9a2676e51551f53458163cc",
+    "config_sha256": "0ce5ed59dd2e2b24633ef71093daf3e1eaefca56551031c2a3d3430602ab9c9a",
+    "scenes_scored": 12,
+    "scenes_without_prediction": "s05",
+    "scenes_excluded_deformable": "s21, s22",
+    "targets_status": "provisional",
+    "scenes_without_ground_truth": []
+  },
+  "summary": {
+    "pooled": [
+      {
+        "name": "object_recall",
+        "status": "measured",
+        "value": 0.9491525423728814,
+        "n": 59,
+        "target": 0.9,
+        "passed": true
+      },
+      {
+        "name": "size_error_median",
+        "status": "measured",
+        "value": 0.07537775660759376,
+        "n": 56,
+        "target": 0.05,
+        "passed": false
+      },
+      {
+        "name": "position_error_median_m",
+        "status": "measured",
+        "value": 0.00597959403489518,
+        "n": 56,
+        "target": 0.015,
+        "passed": true
+      },
+      {
+        "name": "orientation_error_median_deg",
+        "status": "measured",
+        "value": 1.4983734449381814,
+        "n": 28,
+        "target": 10.0,
+        "passed": true
+      },
+      {
+        "name": "mass_within_tolerance_fraction",
+        "status": "measured",
+        "value": 0.0,
+        "n": 56,
+        "target": 0.7,
+        "passed": false
+      },
+      {
+        "name": "runtime_max_minutes",
+        "status": "no_data",
+        "value": null,
+        "n": 0,
+        "target": 60,
+        "passed": null
+      },
+      {
+        "name": "stability_pass_fraction",
+        "status": "not_measured",
+        "value": null,
+        "n": 0,
+        "target": null,
+        "passed": null,
+        "reason": "needs the simulator (Phase 5)"
+      },
+      {
+        "name": "asset_validity_fraction",
+        "status": "not_measured",
+        "value": null,
+        "n": 0,
+        "target": null,
+        "passed": null,
+        "reason": "needs the export validators (Phase 5)"
+      },
+      {
+        "name": "manual_steps",
+        "status": "not_measured",
+        "value": null,
+        "n": 0,
+        "target": null,
+        "passed": null,
+        "reason": "needs run logs of the full pipeline (Phase 5)"
+      }
+    ],
+    "per_tier": {
+      "easy": [
+        {
+          "name": "object_recall",
+          "status": "measured",
+          "value": 0.95,
+          "n": 20,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "size_error_median",
+          "status": "measured",
+          "value": 0.04327736546322915,
+          "n": 19,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "position_error_median_m",
+          "status": "measured",
+          "value": 0.005851552397938551,
+          "n": 19,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "orientation_error_median_deg",
+          "status": "measured",
+          "value": 1.425562552090239,
+          "n": 10,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "mass_within_tolerance_fraction",
+          "status": "measured",
+          "value": 0.0,
+          "n": 19,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "runtime_max_minutes",
+          "status": "no_data",
+          "value": null,
+          "n": 0,
+          "target": null,
+          "passed": null
+        }
+      ],
+      "medium": [
+        {
+          "name": "object_recall",
+          "status": "measured",
+          "value": 0.92,
+          "n": 25,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "size_error_median",
+          "status": "measured",
+          "value": 0.14746644611602241,
+          "n": 23,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "position_error_median_m",
+          "status": "measured",
+          "value": 0.008321898965377385,
+          "n": 23,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "orientation_error_median_deg",
+          "status": "measured",
+          "value": 1.0067105511176635,
+          "n": 11,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "mass_within_tolerance_fraction",
+          "status": "measured",
+          "value": 0.0,
+          "n": 23,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "runtime_max_minutes",
+          "status": "no_data",
+          "value": null,
+          "n": 0,
+          "target": null,
+          "passed": null
+        }
+      ],
+      "hard": [
+        {
+          "name": "object_recall",
+          "status": "measured",
+          "value": 1.0,
+          "n": 14,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "size_error_median",
+          "status": "measured",
+          "value": 0.08392479241806039,
+          "n": 14,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "position_error_median_m",
+          "status": "measured",
+          "value": 0.004338109780200679,
+          "n": 14,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "orientation_error_median_deg",
+          "status": "measured",
+          "value": 4.5909577777690345,
+          "n": 7,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "mass_within_tolerance_fraction",
+          "status": "measured",
+          "value": 0.0,
+          "n": 14,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "runtime_max_minutes",
+          "status": "no_data",
+          "value": null,
+          "n": 0,
+          "target": null,
+          "passed": null
+        }
+      ]
+    },
+    "n_scenes": 12,
+    "n_evaluable_objects": 59,
+    "n_excluded_objects": 0,
+    "n_false_positives": 1
+  },
+  "scenes": [
+    {
+      "scene_id": "s01",
+      "tier": "easy",
+      "split": "dev",
+      "n_evaluable": 5,
+      "n_excluded": 0,
+      "n_matched": 5,
+      "n_false_positive": 0,
+      "runtime_s": null,
+      "objects": [
+        {
+          "scene_id": "s01",
+          "tier": "easy",
+          "object_id": "obj_007",
+          "label": "rubiks cube",
+          "matched": true,
+          "pred_id": "obj_002",
+          "size_error": 0.057479229747198206,
+          "position_error_m": 0.004479342514061866,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s01",
+          "tier": "easy",
+          "object_id": "obj_021",
+          "label": "rubiks cube smaller",
+          "matched": true,
+          "pred_id": "obj_001",
+          "size_error": 0.04327736546322915,
+          "position_error_m": 0.0018095493761233641,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s01",
+          "tier": "easy",
+          "object_id": "obj_029",
+          "label": "empty phone packaging",
+          "matched": true,
+          "pred_id": "obj_004",
+          "size_error": 0.036898188369015573,
+          "position_error_m": 0.005855599215628978,
+          "orientation_error_deg": 0.3970997803191878,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s01",
+          "tier": "easy",
+          "object_id": "obj_004",
+          "label": "coffee powder can",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.02604922852661753,
+          "position_error_m": 0.006444338763871236,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s01",
+          "tier": "easy",
+          "object_id": "obj_003",
+          "label": "packaging for in ear headphones",
+          "matched": true,
+          "pred_id": "obj_003",
+          "size_error": 0.14771364059765774,
+          "position_error_m": 0.006025391794280095,
+          "orientation_error_deg": 89.89009966283125,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        }
+      ]
+    },
+    {
+      "scene_id": "s02",
+      "tier": "easy",
+      "split": "dev",
+      "n_evaluable": 5,
+      "n_excluded": 0,
+      "n_matched": 5,
+      "n_false_positive": 0,
+      "runtime_s": null,
+      "objects": [
+        {
+          "scene_id": "s02",
+          "tier": "easy",
+          "object_id": "obj_041",
+          "label": "mug",
+          "matched": true,
+          "pred_id": "obj_002",
+          "size_error": 0.32246613132039015,
+          "position_error_m": 0.0033558747683051105,
+          "orientation_error_deg": 88.42274027207704,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s02",
+          "tier": "easy",
+          "object_id": "obj_046",
+          "label": "mug",
+          "matched": true,
+          "pred_id": "obj_001",
+          "size_error": 0.13214100161152442,
+          "position_error_m": 0.005851552397938551,
+          "orientation_error_deg": 35.70565441541655,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s02",
+          "tier": "easy",
+          "object_id": "obj_039",
+          "label": "action camera",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.03273942189222852,
+          "position_error_m": 0.006755024857416409,
+          "orientation_error_deg": 1.5821987601413525,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s02",
+          "tier": "easy",
+          "object_id": "obj_060",
+          "label": "deodorant cap",
+          "matched": true,
+          "pred_id": "obj_004",
+          "size_error": 0.044922259503573946,
+          "position_error_m": 0.007159935337911539,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s02",
+          "tier": "easy",
+          "object_id": "obj_014",
+          "label": "packaging for electronics",
+          "matched": true,
+          "pred_id": "obj_003",
+          "size_error": 0.030300233981536542,
+          "position_error_m": 0.0022115439087203557,
+          "orientation_error_deg": 0.8305875977913786,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        }
+      ]
+    },
+    {
+      "scene_id": "s03",
+      "tier": "easy",
+      "split": "dev",
+      "n_evaluable": 1,
+      "n_excluded": 0,
+      "n_matched": 1,
+      "n_false_positive": 0,
+      "runtime_s": null,
+      "objects": [
+        {
+          "scene_id": "s03",
+          "tier": "easy",
+          "object_id": "obj_027",
+          "label": "toy air basketball",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.03925423558157448,
+          "position_error_m": 0.01036959676977078,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        }
+      ]
+    },
+    {
+      "scene_id": "s04",
+      "tier": "easy",
+      "split": "dev",
+      "n_evaluable": 5,
+      "n_excluded": 0,
+      "n_matched": 5,
+      "n_false_positive": 0,
+      "runtime_s": null,
+      "objects": [
+        {
+          "scene_id": "s04",
+          "tier": "easy",
+          "object_id": "obj_027",
+          "label": "toy air basketball",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.03866009270057443,
+          "position_error_m": 0.01083908602736528,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s04",
+          "tier": "easy",
+          "object_id": "obj_022",
+          "label": "metal insulated water bottle",
+          "matched": true,
+          "pred_id": "obj_003",
+          "size_error": 0.07322927816041697,
+          "position_error_m": 0.011038517204061463,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s04",
+          "tier": "easy",
+          "object_id": "obj_014",
+          "label": "packaging for electronics",
+          "matched": true,
+          "pred_id": "obj_001",
+          "size_error": 0.09485317999871623,
+          "position_error_m": 0.004836706634288625,
+          "orientation_error_deg": 1.2689263440391254,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s04",
+          "tier": "easy",
+          "object_id": "obj_021",
+          "label": "rubiks cube smaller",
+          "matched": true,
+          "pred_id": "obj_002",
+          "size_error": 0.028817040242454493,
+          "position_error_m": 0.002257394444246965,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s04",
+          "tier": "easy",
+          "object_id": "obj_003",
+          "label": "packaging for in ear headphones",
+          "matched": true,
+          "pred_id": "obj_004",
+          "size_error": 0.16329303359005137,
+          "position_error_m": 0.004598215180724196,
+          "orientation_error_deg": 0.1386508414607306,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        }
+      ]
+    },
+    {
+      "scene_id": "s06",
+      "tier": "easy",
+      "split": "dev",
+      "n_evaluable": 4,
+      "n_excluded": 0,
+      "n_matched": 3,
+      "n_false_positive": 1,
+      "runtime_s": null,
+      "objects": [
+        {
+          "scene_id": "s06",
+          "tier": "easy",
+          "object_id": "obj_029",
+          "label": "empty phone packaging",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.017152082316930575,
+          "position_error_m": 0.003344425319505965,
+          "orientation_error_deg": 0.45960455799036026,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s06",
+          "tier": "easy",
+          "object_id": "obj_004",
+          "label": "coffee powder can",
+          "matched": true,
+          "pred_id": "obj_002",
+          "size_error": 0.02185398253436729,
+          "position_error_m": 0.001963281104598494,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s06",
+          "tier": "easy",
+          "object_id": "obj_040",
+          "label": "white 3d print cuboid",
+          "matched": false,
+          "pred_id": null,
+          "size_error": null,
+          "position_error_m": null,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": null
+        },
+        {
+          "scene_id": "s06",
+          "tier": "easy",
+          "object_id": "obj_018",
+          "label": "3d printed car body",
+          "matched": true,
+          "pred_id": "obj_001",
+          "size_error": 0.06254532398251855,
+          "position_error_m": 0.03081402324383641,
+          "orientation_error_deg": 5.10281774417561,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        }
+      ]
+    },
+    {
+      "scene_id": "s11",
+      "tier": "medium",
+      "split": "dev",
+      "n_evaluable": 7,
+      "n_excluded": 0,
+      "n_matched": 7,
+      "n_false_positive": 0,
+      "runtime_s": null,
+      "objects": [
+        {
+          "scene_id": "s11",
+          "tier": "medium",
+          "object_id": "obj_047",
+          "label": "cube",
+          "matched": true,
+          "pred_id": "obj_003",
+          "size_error": 0.10252956658938425,
+          "position_error_m": 0.002712141681191871,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s11",
+          "tier": "medium",
+          "object_id": "obj_040",
+          "label": "white 3d print cuboid",
+          "matched": true,
+          "pred_id": "obj_005",
+          "size_error": 0.40427609116068086,
+          "position_error_m": 0.008321898965377385,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s11",
+          "tier": "medium",
+          "object_id": "obj_048",
+          "label": "square pyramid",
+          "matched": true,
+          "pred_id": "obj_001",
+          "size_error": 0.22252191857995302,
+          "position_error_m": 0.007851141740820189,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s11",
+          "tier": "medium",
+          "object_id": "obj_049",
+          "label": "triangular prism",
+          "matched": true,
+          "pred_id": "obj_002",
+          "size_error": 0.23819266585025922,
+          "position_error_m": 0.00241838211686017,
+          "orientation_error_deg": 2.426550786649898,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s11",
+          "tier": "medium",
+          "object_id": "obj_056",
+          "label": "hexagonal prism",
+          "matched": true,
+          "pred_id": "obj_004",
+          "size_error": 0.1379000783855709,
+          "position_error_m": 0.002993682987560546,
+          "orientation_error_deg": 64.036393015819,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s11",
+          "tier": "medium",
+          "object_id": "obj_050",
+          "label": "cuboid",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.14746644611602241,
+          "position_error_m": 0.00220509558151535,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s11",
+          "tier": "medium",
+          "object_id": "obj_052",
+          "label": "cylinder",
+          "matched": true,
+          "pred_id": "obj_006",
+          "size_error": 0.08144435986207159,
+          "position_error_m": 0.002117152589889716,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        }
+      ]
+    },
+    {
+      "scene_id": "s12",
+      "tier": "medium",
+      "split": "dev",
+      "n_evaluable": 10,
+      "n_excluded": 0,
+      "n_matched": 9,
+      "n_false_positive": 0,
+      "runtime_s": null,
+      "objects": [
+        {
+          "scene_id": "s12",
+          "tier": "medium",
+          "object_id": "obj_004",
+          "label": "coffee powder can",
+          "matched": true,
+          "pred_id": "obj_001",
+          "size_error": 0.021276787783832605,
+          "position_error_m": 0.009652477407955854,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s12",
+          "tier": "medium",
+          "object_id": "obj_029",
+          "label": "empty phone packaging",
+          "matched": true,
+          "pred_id": "obj_004",
+          "size_error": 0.011201012854786516,
+          "position_error_m": 0.006878475691050728,
+          "orientation_error_deg": 0.6425904233352355,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s12",
+          "tier": "medium",
+          "object_id": "obj_001",
+          "label": "spray can",
+          "matched": true,
+          "pred_id": "obj_005",
+          "size_error": 0.043592672626783444,
+          "position_error_m": 0.012439656851897359,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s12",
+          "tier": "medium",
+          "object_id": "obj_014",
+          "label": "packaging for electronics",
+          "matched": true,
+          "pred_id": "obj_006",
+          "size_error": 0.9314661187462182,
+          "position_error_m": 0.0450470731420479,
+          "orientation_error_deg": 39.11152735287089,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s12",
+          "tier": "medium",
+          "object_id": "obj_002",
+          "label": "packaging for breakfast bags",
+          "matched": true,
+          "pred_id": "obj_007",
+          "size_error": 0.034846314007718565,
+          "position_error_m": 0.010066529496096677,
+          "orientation_error_deg": 0.19120392233833172,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s12",
+          "tier": "medium",
+          "object_id": "obj_060",
+          "label": "deodorant cap",
+          "matched": true,
+          "pred_id": "obj_009",
+          "size_error": 0.1874841189996652,
+          "position_error_m": 0.0072784081463310195,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s12",
+          "tier": "medium",
+          "object_id": "obj_039",
+          "label": "action camera",
+          "matched": false,
+          "pred_id": null,
+          "size_error": null,
+          "position_error_m": null,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": null
+        },
+        {
+          "scene_id": "s12",
+          "tier": "medium",
+          "object_id": "obj_003",
+          "label": "packaging for in ear headphones",
+          "matched": true,
+          "pred_id": "obj_002",
+          "size_error": 0.15537188056954665,
+          "position_error_m": 0.01149913037487161,
+          "orientation_error_deg": 1.4145481297350102,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s12",
+          "tier": "medium",
+          "object_id": "obj_021",
+          "label": "rubiks cube smaller",
+          "matched": true,
+          "pred_id": "obj_008",
+          "size_error": 0.017145446919366515,
+          "position_error_m": 0.009734391406400714,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s12",
+          "tier": "medium",
+          "object_id": "obj_007",
+          "label": "rubiks cube",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.014888763437649014,
+          "position_error_m": 0.011291686681108647,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        }
+      ]
+    },
+    {
+      "scene_id": "s13",
+      "tier": "medium",
+      "split": "dev",
+      "n_evaluable": 3,
+      "n_excluded": 0,
+      "n_matched": 2,
+      "n_false_positive": 0,
+      "runtime_s": null,
+      "objects": [
+        {
+          "scene_id": "s13",
+          "tier": "medium",
+          "object_id": "obj_002",
+          "label": "packaging for breakfast bags",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.20501525558692055,
+          "position_error_m": 0.012768566920639289,
+          "orientation_error_deg": 1.0067105511176635,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s13",
+          "tier": "medium",
+          "object_id": "obj_014",
+          "label": "packaging for electronics",
+          "matched": true,
+          "pred_id": "obj_001",
+          "size_error": 0.6615474720983574,
+          "position_error_m": 0.02309755147453838,
+          "orientation_error_deg": 0.9943328783353991,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s13",
+          "tier": "medium",
+          "object_id": "obj_040",
+          "label": "white 3d print cuboid",
+          "matched": false,
+          "pred_id": null,
+          "size_error": null,
+          "position_error_m": null,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": null
+        }
+      ]
+    },
+    {
+      "scene_id": "s14",
+      "tier": "medium",
+      "split": "dev",
+      "n_evaluable": 5,
+      "n_excluded": 0,
+      "n_matched": 5,
+      "n_false_positive": 0,
+      "runtime_s": null,
+      "objects": [
+        {
+          "scene_id": "s14",
+          "tier": "medium",
+          "object_id": "obj_004",
+          "label": "coffee powder can",
+          "matched": true,
+          "pred_id": "obj_003",
+          "size_error": 0.03028246085267129,
+          "position_error_m": 0.012885205799104823,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s14",
+          "tier": "medium",
+          "object_id": "obj_036",
+          "label": "single breadboard module",
+          "matched": true,
+          "pred_id": "obj_001",
+          "size_error": 0.6218601148397082,
+          "position_error_m": 0.005453661630479464,
+          "orientation_error_deg": 0.13409369478289335,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s14",
+          "tier": "medium",
+          "object_id": "obj_040",
+          "label": "white 3d print cuboid",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.22604712130778748,
+          "position_error_m": 0.00516541756576011,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s14",
+          "tier": "medium",
+          "object_id": "obj_006",
+          "label": "gamepad controller",
+          "matched": true,
+          "pred_id": "obj_002",
+          "size_error": 0.23081741580800355,
+          "position_error_m": 0.0056698590526106825,
+          "orientation_error_deg": 3.4031934850800667,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s14",
+          "tier": "medium",
+          "object_id": "obj_002",
+          "label": "packaging for breakfast bags",
+          "matched": true,
+          "pred_id": "obj_004",
+          "size_error": 0.05918058018437208,
+          "position_error_m": 0.02583490456515087,
+          "orientation_error_deg": 0.7986499739032524,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        }
+      ]
+    },
+    {
+      "scene_id": "s17",
+      "tier": "hard",
+      "split": "dev",
+      "n_evaluable": 5,
+      "n_excluded": 0,
+      "n_matched": 5,
+      "n_false_positive": 0,
+      "runtime_s": null,
+      "objects": [
+        {
+          "scene_id": "s17",
+          "tier": "hard",
+          "object_id": "obj_026",
+          "label": "glass water bottle",
+          "matched": true,
+          "pred_id": "obj_003",
+          "size_error": 0.05750621990634003,
+          "position_error_m": 0.003713472365542019,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s17",
+          "tier": "hard",
+          "object_id": "obj_019",
+          "label": "small paint can",
+          "matched": true,
+          "pred_id": "obj_002",
+          "size_error": 0.05600329835212843,
+          "position_error_m": 0.0022864870396506433,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s17",
+          "tier": "hard",
+          "object_id": "obj_059",
+          "label": "deodorant spray, no cap",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.04181201356100949,
+          "position_error_m": 0.004290095251047228,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s17",
+          "tier": "hard",
+          "object_id": "obj_035",
+          "label": "reflective puzzle toy",
+          "matched": true,
+          "pred_id": "obj_001",
+          "size_error": 0.07163443872050443,
+          "position_error_m": 0.003342566852768553,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s17",
+          "tier": "hard",
+          "object_id": "obj_015",
+          "label": "chocolate egg",
+          "matched": true,
+          "pred_id": "obj_004",
+          "size_error": 0.4431711693195087,
+          "position_error_m": 0.00438612430935413,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        }
+      ]
+    },
+    {
+      "scene_id": "s18",
+      "tier": "hard",
+      "split": "dev",
+      "n_evaluable": 8,
+      "n_excluded": 0,
+      "n_matched": 8,
+      "n_false_positive": 0,
+      "runtime_s": null,
+      "objects": [
+        {
+          "scene_id": "s18",
+          "tier": "hard",
+          "object_id": "obj_006",
+          "label": "gamepad controller",
+          "matched": true,
+          "pred_id": "obj_004",
+          "size_error": 0.09032334978135023,
+          "position_error_m": 0.007292330407045308,
+          "orientation_error_deg": 7.750619470163935,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s18",
+          "tier": "hard",
+          "object_id": "obj_032",
+          "label": "round hair brush",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.07752623505477055,
+          "position_error_m": 0.0036343449103795195,
+          "orientation_error_deg": 4.5909577777690345,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s18",
+          "tier": "hard",
+          "object_id": "obj_008",
+          "label": "round tube, packaging for cold medicine rub",
+          "matched": true,
+          "pred_id": "obj_006",
+          "size_error": 0.06999612341223922,
+          "position_error_m": 0.004003592747993453,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s18",
+          "tier": "hard",
+          "object_id": "obj_000",
+          "label": "lego toy car",
+          "matched": true,
+          "pred_id": "obj_005",
+          "size_error": 0.4674892597837015,
+          "position_error_m": 0.011815250372714733,
+          "orientation_error_deg": 0.8004824823510006,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s18",
+          "tier": "hard",
+          "object_id": "obj_018",
+          "label": "3d printed car body",
+          "matched": true,
+          "pred_id": "obj_002",
+          "size_error": 0.052537521107304655,
+          "position_error_m": 0.0032001092807240304,
+          "orientation_error_deg": 1.2188269840177952,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s18",
+          "tier": "hard",
+          "object_id": "obj_024",
+          "label": "hole punch",
+          "matched": true,
+          "pred_id": "obj_003",
+          "size_error": 0.09050406032587922,
+          "position_error_m": 0.005933796275510265,
+          "orientation_error_deg": 3.0647119582458515,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s18",
+          "tier": "hard",
+          "object_id": "obj_012",
+          "label": "chocolate santa blue",
+          "matched": true,
+          "pred_id": "obj_007",
+          "size_error": 0.35634163654187245,
+          "position_error_m": 0.008062854053535245,
+          "orientation_error_deg": 63.4713865257785,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s18",
+          "tier": "hard",
+          "object_id": "obj_045",
+          "label": "plier",
+          "matched": true,
+          "pred_id": "obj_001",
+          "size_error": 0.1529588197818127,
+          "position_error_m": 0.0071920658243918665,
+          "orientation_error_deg": 6.722828859784501,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        }
+      ]
+    },
+    {
+      "scene_id": "s24",
+      "tier": "hard",
+      "split": "dev",
+      "n_evaluable": 1,
+      "n_excluded": 0,
+      "n_matched": 1,
+      "n_false_positive": 0,
+      "runtime_s": null,
+      "objects": [
+        {
+          "scene_id": "s24",
+          "tier": "hard",
+          "object_id": "obj_040",
+          "label": "white 3d print cuboid",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.21910489997662394,
+          "position_error_m": 0.015479010246816367,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        }
+      ]
+    }
+  ],
+  "segmentation": {
+    "rows": [
+      {
+        "name": "object_recall",
+        "status": "measured",
+        "value": 0.9491525423728814,
+        "n": 59,
+        "target": 0.9,
+        "passed": true
+      },
+      {
+        "name": "cluster_bbox_error_median_easy",
+        "status": "measured",
+        "value": 0.04327736546322915,
+        "n": 19,
+        "target": 0.1,
+        "passed": true
+      },
+      {
+        "name": "id_switches_per_scene",
+        "status": "no_data",
+        "value": null,
+        "n": 0,
+        "target": 1.0,
+        "passed": null
+      },
+      {
+        "name": "hard_scenes_flagged_fraction",
+        "status": "partial",
+        "value": 1.0,
+        "n": 2,
+        "target": 1.0,
+        "passed": null
+      }
+    ],
+    "flag_scenes": [
+      "s17",
+      "s18",
+      "s19",
+      "s20"
+    ],
+    "flag_scenes_missing": [
+      "s19",
+      "s20"
+    ],
+    "flags_by_object": {
+      "s17": {
+        "obj_000": [
+          "transparent_or_reflective"
+        ],
+        "obj_001": [
+          "transparent_or_reflective"
+        ],
+        "obj_002": [
+          "transparent_or_reflective"
+        ],
+        "obj_003": [
+          "transparent_or_reflective"
+        ],
+        "obj_004": [
+          "transparent_or_reflective"
+        ]
+      },
+      "s18": {
+        "obj_000": [],
+        "obj_001": [
+          "thin",
+          "transparent_or_reflective"
+        ],
+        "obj_002": [
+          "non_rigid"
+        ],
+        "obj_003": [],
+        "obj_004": [],
+        "obj_005": [],
+        "obj_006": [],
+        "obj_007": [
+          "transparent_or_reflective"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,1004 @@
+{
+  "summary": {
+    "scenes_scored": [
+      "s01",
+      "s02",
+      "s03",
+      "s04",
+      "s06",
+      "s11",
+      "s12",
+      "s13",
+      "s14",
+      "s17",
+      "s18",
+      "s24"
+    ],
+    "gate": 0.1,
+    "hull": {
+      "objects": 59,
+      "matched": 54,
+      "size_error_median_easy": 0.364,
+      "size_error_median_all": 0.353,
+      "within_gate": 5,
+      "measured": 54
+    },
+    "points": {
+      "objects": 59,
+      "matched": 55,
+      "size_error_median_easy": 0.089,
+      "size_error_median_all": 0.132,
+      "within_gate": 21,
+      "measured": 55
+    },
+    "fitted": {
+      "objects": 59,
+      "matched": 55,
+      "size_error_median_easy": 0.043,
+      "size_error_median_all": 0.073,
+      "within_gate": 33,
+      "measured": 55
+    }
+  },
+  "scenes": [
+    {
+      "run": "s01_b",
+      "scene": "s01",
+      "tracks": 5,
+      "hull": {
+        "seconds": 2.6,
+        "clusters": 5,
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_007": 0.417,
+          "obj_021": 0.347,
+          "obj_029": 0.529,
+          "obj_004": 0.133,
+          "obj_003": 0.45
+        },
+        "position_errors_mm": {
+          "obj_007": 11,
+          "obj_021": 7,
+          "obj_029": 18,
+          "obj_004": 13,
+          "obj_003": 13
+        }
+      },
+      "points": {
+        "seconds": 0.1,
+        "clusters": 5,
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_007": 0.089,
+          "obj_021": 0.075,
+          "obj_029": 0.151,
+          "obj_004": 0.024,
+          "obj_003": 0.123
+        },
+        "position_errors_mm": {
+          "obj_007": 6,
+          "obj_021": 3,
+          "obj_029": 9,
+          "obj_004": 7,
+          "obj_003": 10
+        }
+      },
+      "fitted": {
+        "seconds": 7.2,
+        "clusters": 5,
+        "sources": {
+          "0": "primitive",
+          "1": "primitive",
+          "2": "primitive",
+          "3": "primitive",
+          "4": "primitive"
+        },
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_007": 0.057,
+          "obj_021": 0.043,
+          "obj_029": 0.037,
+          "obj_004": 0.026,
+          "obj_003": 0.148
+        },
+        "position_errors_mm": {
+          "obj_007": 4,
+          "obj_021": 2,
+          "obj_029": 6,
+          "obj_004": 6,
+          "obj_003": 6
+        }
+      },
+      "tier": "easy"
+    },
+    {
+      "run": "s02_b",
+      "scene": "s02",
+      "tracks": 5,
+      "hull": {
+        "seconds": 2.7,
+        "clusters": 5,
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_041": 0.146,
+          "obj_046": 0.094,
+          "obj_039": 0.162,
+          "obj_060": 0.106,
+          "obj_014": 0.455
+        },
+        "position_errors_mm": {
+          "obj_041": 16,
+          "obj_046": 12,
+          "obj_039": 8,
+          "obj_060": 8,
+          "obj_014": 16
+        }
+      },
+      "points": {
+        "seconds": 0.0,
+        "clusters": 5,
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_041": 0.116,
+          "obj_046": 0.132,
+          "obj_039": 0.105,
+          "obj_060": 0.329,
+          "obj_014": 0.08
+        },
+        "position_errors_mm": {
+          "obj_041": 13,
+          "obj_046": 6,
+          "obj_039": 7,
+          "obj_060": 6,
+          "obj_014": 7
+        }
+      },
+      "fitted": {
+        "seconds": 7.4,
+        "clusters": 5,
+        "sources": {
+          "0": "union",
+          "1": "union",
+          "2": "primitive",
+          "3": "primitive",
+          "4": "union"
+        },
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_041": 0.322,
+          "obj_046": 0.132,
+          "obj_039": 0.033,
+          "obj_060": 0.045,
+          "obj_014": 0.03
+        },
+        "position_errors_mm": {
+          "obj_041": 3,
+          "obj_046": 6,
+          "obj_039": 7,
+          "obj_060": 7,
+          "obj_014": 2
+        }
+      },
+      "tier": "easy"
+    },
+    {
+      "run": "s03_b",
+      "scene": "s03",
+      "tracks": 1,
+      "hull": {
+        "seconds": 0.4,
+        "clusters": 1,
+        "dropped": {},
+        "gt_objects": 1,
+        "matched": 1,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_027": 0.033
+        },
+        "position_errors_mm": {
+          "obj_027": 12
+        }
+      },
+      "points": {
+        "seconds": 0.0,
+        "clusters": 1,
+        "dropped": {},
+        "gt_objects": 1,
+        "matched": 1,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_027": 0.07
+        },
+        "position_errors_mm": {
+          "obj_027": 13
+        }
+      },
+      "fitted": {
+        "seconds": 1.1,
+        "clusters": 1,
+        "sources": {
+          "0": "primitive"
+        },
+        "dropped": {},
+        "gt_objects": 1,
+        "matched": 1,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_027": 0.039
+        },
+        "position_errors_mm": {
+          "obj_027": 10
+        }
+      },
+      "tier": "easy"
+    },
+    {
+      "run": "s04_b",
+      "scene": "s04",
+      "tracks": 5,
+      "hull": {
+        "seconds": 3.6,
+        "clusters": 5,
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_027": 0.067,
+          "obj_022": 0.336,
+          "obj_014": 0.728,
+          "obj_021": 0.364,
+          "obj_003": 0.778
+        },
+        "position_errors_mm": {
+          "obj_027": 16,
+          "obj_022": 16,
+          "obj_014": 23,
+          "obj_021": 12,
+          "obj_003": 20
+        }
+      },
+      "points": {
+        "seconds": 0.0,
+        "clusters": 5,
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_027": 0.044,
+          "obj_022": 0.227,
+          "obj_014": 0.069,
+          "obj_021": 0.068,
+          "obj_003": 0.069
+        },
+        "position_errors_mm": {
+          "obj_027": 8,
+          "obj_022": 13,
+          "obj_014": 13,
+          "obj_021": 4,
+          "obj_003": 6
+        }
+      },
+      "fitted": {
+        "seconds": 6.5,
+        "clusters": 5,
+        "sources": {
+          "0": "primitive",
+          "1": "primitive",
+          "2": "primitive",
+          "3": "primitive",
+          "4": "primitive"
+        },
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_027": 0.039,
+          "obj_022": 0.073,
+          "obj_014": 0.095,
+          "obj_021": 0.029,
+          "obj_003": 0.163
+        },
+        "position_errors_mm": {
+          "obj_027": 11,
+          "obj_022": 11,
+          "obj_014": 5,
+          "obj_021": 2,
+          "obj_003": 5
+        }
+      },
+      "tier": "easy"
+    },
+    {
+      "run": "s05_b",
+      "scene": "s05",
+      "tracks": 0,
+      "hull": {
+        "seconds": 0.0,
+        "clusters": 0,
+        "dropped": {}
+      },
+      "points": {
+        "seconds": 0.0,
+        "clusters": 0,
+        "dropped": {}
+      },
+      "fitted": {
+        "seconds": 0.0,
+        "clusters": 0,
+        "sources": {},
+        "dropped": {}
+      },
+      "tier": "easy",
+      "unscored": "clean board: origin of the ground truth is not established"
+    },
+    {
+      "run": "s06_b",
+      "scene": "s06",
+      "tracks": 4,
+      "hull": {
+        "seconds": 4.2,
+        "clusters": 4,
+        "dropped": {},
+        "gt_objects": 4,
+        "matched": 3,
+        "false_positives": 1,
+        "size_errors": {
+          "obj_029": 1.048,
+          "obj_004": 0.4,
+          "obj_040": null,
+          "obj_018": 1.086
+        },
+        "position_errors_mm": {
+          "obj_029": 27,
+          "obj_004": 22,
+          "obj_018": 36
+        }
+      },
+      "points": {
+        "seconds": 0.1,
+        "clusters": 4,
+        "dropped": {},
+        "gt_objects": 4,
+        "matched": 3,
+        "false_positives": 1,
+        "size_errors": {
+          "obj_029": 0.587,
+          "obj_004": 0.029,
+          "obj_040": null,
+          "obj_018": 0.145
+        },
+        "position_errors_mm": {
+          "obj_029": 17,
+          "obj_004": 5,
+          "obj_018": 31
+        }
+      },
+      "fitted": {
+        "seconds": 3.6,
+        "clusters": 4,
+        "sources": {
+          "0": "primitive",
+          "1": "union",
+          "2": "primitive",
+          "3": "primitive"
+        },
+        "dropped": {},
+        "gt_objects": 4,
+        "matched": 3,
+        "false_positives": 1,
+        "size_errors": {
+          "obj_029": 0.017,
+          "obj_004": 0.022,
+          "obj_040": null,
+          "obj_018": 0.063
+        },
+        "position_errors_mm": {
+          "obj_029": 3,
+          "obj_004": 2,
+          "obj_018": 31
+        }
+      },
+      "tier": "easy"
+    },
+    {
+      "run": "s11_b",
+      "scene": "s11",
+      "tracks": 7,
+      "hull": {
+        "seconds": 4.7,
+        "clusters": 7,
+        "dropped": {},
+        "gt_objects": 7,
+        "matched": 7,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_047": 0.415,
+          "obj_040": 0.801,
+          "obj_048": 0.333,
+          "obj_049": 0.334,
+          "obj_056": 0.167,
+          "obj_050": 0.5,
+          "obj_052": 0.167
+        },
+        "position_errors_mm": {
+          "obj_047": 5,
+          "obj_040": 5,
+          "obj_048": 4,
+          "obj_049": 2,
+          "obj_056": 5,
+          "obj_050": 7,
+          "obj_052": 5
+        }
+      },
+      "points": {
+        "seconds": 0.0,
+        "clusters": 7,
+        "dropped": {},
+        "gt_objects": 7,
+        "matched": 7,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_047": 0.222,
+          "obj_040": 0.398,
+          "obj_048": 0.555,
+          "obj_049": 0.465,
+          "obj_056": 0.472,
+          "obj_050": 0.265,
+          "obj_052": 0.142
+        },
+        "position_errors_mm": {
+          "obj_047": 2,
+          "obj_040": 5,
+          "obj_048": 13,
+          "obj_049": 2,
+          "obj_056": 5,
+          "obj_050": 3,
+          "obj_052": 4
+        }
+      },
+      "fitted": {
+        "seconds": 10.2,
+        "clusters": 7,
+        "sources": {
+          "0": "union",
+          "1": "union",
+          "2": "union",
+          "3": "primitive",
+          "4": "primitive",
+          "5": "primitive",
+          "6": "primitive"
+        },
+        "dropped": {},
+        "gt_objects": 7,
+        "matched": 7,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_047": 0.103,
+          "obj_040": 0.404,
+          "obj_048": 0.223,
+          "obj_049": 0.238,
+          "obj_056": 0.138,
+          "obj_050": 0.147,
+          "obj_052": 0.081
+        },
+        "position_errors_mm": {
+          "obj_047": 3,
+          "obj_040": 8,
+          "obj_048": 8,
+          "obj_049": 2,
+          "obj_056": 3,
+          "obj_050": 2,
+          "obj_052": 2
+        }
+      },
+      "tier": "medium"
+    },
+    {
+      "run": "s12_b",
+      "scene": "s12",
+      "tracks": 10,
+      "hull": {
+        "seconds": 7.4,
+        "clusters": 9,
+        "dropped": {
+          "3": "no voxel is inside the mask in enough views"
+        },
+        "gt_objects": 10,
+        "matched": 9,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_004": 0.163,
+          "obj_029": 0.412,
+          "obj_001": 0.04,
+          "obj_014": 0.931,
+          "obj_002": 1.845,
+          "obj_060": 0.267,
+          "obj_039": null,
+          "obj_003": 0.686,
+          "obj_021": 0.285,
+          "obj_007": 0.299
+        },
+        "position_errors_mm": {
+          "obj_004": 14,
+          "obj_029": 37,
+          "obj_001": 10,
+          "obj_014": 45,
+          "obj_002": 35,
+          "obj_060": 9,
+          "obj_003": 12,
+          "obj_021": 10,
+          "obj_007": 8
+        }
+      },
+      "points": {
+        "seconds": 0.1,
+        "clusters": 8,
+        "dropped": {
+          "3": "only 0 sparse points agree",
+          "6": "only 2 sparse points agree"
+        },
+        "gt_objects": 10,
+        "matched": 8,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_004": 0.385,
+          "obj_029": 0.764,
+          "obj_001": 0.016,
+          "obj_014": null,
+          "obj_002": 0.342,
+          "obj_060": 0.259,
+          "obj_039": null,
+          "obj_003": 0.078,
+          "obj_021": 0.083,
+          "obj_007": 0.091
+        },
+        "position_errors_mm": {
+          "obj_004": 18,
+          "obj_029": 38,
+          "obj_001": 10,
+          "obj_002": 12,
+          "obj_060": 7,
+          "obj_003": 7,
+          "obj_021": 8,
+          "obj_007": 8
+        }
+      },
+      "fitted": {
+        "seconds": 11.6,
+        "clusters": 8,
+        "sources": {
+          "0": "primitive",
+          "1": "primitive",
+          "2": "primitive",
+          "4": "primitive",
+          "5": "primitive",
+          "7": "primitive",
+          "8": "primitive",
+          "9": "primitive"
+        },
+        "dropped": {
+          "3": "only 0 sparse points agree",
+          "6": "only 2 sparse points agree"
+        },
+        "gt_objects": 10,
+        "matched": 8,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_004": 0.021,
+          "obj_029": 0.011,
+          "obj_001": 0.033,
+          "obj_014": null,
+          "obj_002": 0.035,
+          "obj_060": 0.187,
+          "obj_039": null,
+          "obj_003": 0.155,
+          "obj_021": 0.017,
+          "obj_007": 0.015
+        },
+        "position_errors_mm": {
+          "obj_004": 10,
+          "obj_029": 7,
+          "obj_001": 13,
+          "obj_002": 10,
+          "obj_060": 7,
+          "obj_003": 11,
+          "obj_021": 10,
+          "obj_007": 11
+        }
+      },
+      "tier": "medium"
+    },
+    {
+      "run": "s13_b",
+      "scene": "s13",
+      "tracks": 2,
+      "hull": {
+        "seconds": 1.0,
+        "clusters": 2,
+        "dropped": {},
+        "gt_objects": 3,
+        "matched": 1,
+        "false_positives": 1,
+        "size_errors": {
+          "obj_002": null,
+          "obj_014": 1.364,
+          "obj_040": null
+        },
+        "position_errors_mm": {
+          "obj_014": 8
+        }
+      },
+      "points": {
+        "seconds": 0.0,
+        "clusters": 2,
+        "dropped": {},
+        "gt_objects": 3,
+        "matched": 2,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_002": 0.506,
+          "obj_014": 0.598,
+          "obj_040": null
+        },
+        "position_errors_mm": {
+          "obj_002": 55,
+          "obj_014": 16
+        }
+      },
+      "fitted": {
+        "seconds": 3.0,
+        "clusters": 2,
+        "sources": {
+          "0": "primitive",
+          "1": "primitive"
+        },
+        "dropped": {},
+        "gt_objects": 3,
+        "matched": 2,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_002": 0.205,
+          "obj_014": 0.662,
+          "obj_040": null
+        },
+        "position_errors_mm": {
+          "obj_002": 13,
+          "obj_014": 23
+        }
+      },
+      "tier": "medium"
+    },
+    {
+      "run": "s14_b",
+      "scene": "s14",
+      "tracks": 6,
+      "hull": {
+        "seconds": 3.1,
+        "clusters": 5,
+        "dropped": {
+          "5": "reaches the top of the grid (not a tabletop object)"
+        },
+        "gt_objects": 5,
+        "matched": 4,
+        "false_positives": 1,
+        "size_errors": {
+          "obj_004": 0.478,
+          "obj_036": null,
+          "obj_040": 0.5,
+          "obj_006": 0.406,
+          "obj_002": 2.205
+        },
+        "position_errors_mm": {
+          "obj_004": 44,
+          "obj_040": 13,
+          "obj_006": 40,
+          "obj_002": 51
+        }
+      },
+      "points": {
+        "seconds": 0.1,
+        "clusters": 6,
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 1,
+        "size_errors": {
+          "obj_004": 0.09,
+          "obj_036": 0.499,
+          "obj_040": 0.782,
+          "obj_006": 0.507,
+          "obj_002": 1.285
+        },
+        "position_errors_mm": {
+          "obj_004": 18,
+          "obj_036": 28,
+          "obj_040": 27,
+          "obj_006": 30,
+          "obj_002": 37
+        }
+      },
+      "fitted": {
+        "seconds": 5.0,
+        "clusters": 6,
+        "sources": {
+          "0": "primitive",
+          "1": "primitive",
+          "2": "union",
+          "3": "primitive",
+          "4": "primitive",
+          "5": "points"
+        },
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 1,
+        "size_errors": {
+          "obj_004": 0.03,
+          "obj_036": 0.622,
+          "obj_040": 0.226,
+          "obj_006": 0.231,
+          "obj_002": 0.059
+        },
+        "position_errors_mm": {
+          "obj_004": 13,
+          "obj_036": 5,
+          "obj_040": 5,
+          "obj_006": 6,
+          "obj_002": 26
+        }
+      },
+      "tier": "medium"
+    },
+    {
+      "run": "s17_b",
+      "scene": "s17",
+      "tracks": 5,
+      "hull": {
+        "seconds": 3.5,
+        "clusters": 5,
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_026": 0.049,
+          "obj_019": 0.214,
+          "obj_059": 0.158,
+          "obj_035": 0.448,
+          "obj_015": 0.462
+        },
+        "position_errors_mm": {
+          "obj_026": 4,
+          "obj_019": 10,
+          "obj_059": 3,
+          "obj_035": 6,
+          "obj_015": 9
+        }
+      },
+      "points": {
+        "seconds": 0.0,
+        "clusters": 5,
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_026": 0.058,
+          "obj_019": 0.114,
+          "obj_059": 0.072,
+          "obj_035": 0.155,
+          "obj_015": 0.71
+        },
+        "position_errors_mm": {
+          "obj_026": 5,
+          "obj_019": 7,
+          "obj_059": 4,
+          "obj_035": 5,
+          "obj_015": 17
+        }
+      },
+      "fitted": {
+        "seconds": 7.3,
+        "clusters": 5,
+        "sources": {
+          "0": "union",
+          "1": "primitive",
+          "2": "primitive",
+          "3": "union",
+          "4": "union"
+        },
+        "dropped": {},
+        "gt_objects": 5,
+        "matched": 5,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_026": 0.058,
+          "obj_019": 0.056,
+          "obj_059": 0.042,
+          "obj_035": 0.072,
+          "obj_015": 0.443
+        },
+        "position_errors_mm": {
+          "obj_026": 4,
+          "obj_019": 2,
+          "obj_059": 4,
+          "obj_035": 3,
+          "obj_015": 4
+        }
+      },
+      "tier": "hard"
+    },
+    {
+      "run": "s18_b",
+      "scene": "s18",
+      "tracks": 8,
+      "hull": {
+        "seconds": 5.3,
+        "clusters": 8,
+        "dropped": {},
+        "gt_objects": 8,
+        "matched": 8,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_006": 0.251,
+          "obj_032": 0.22,
+          "obj_008": 0.171,
+          "obj_000": 0.163,
+          "obj_018": 0.254,
+          "obj_024": 0.332,
+          "obj_012": 0.359,
+          "obj_045": 0.597
+        },
+        "position_errors_mm": {
+          "obj_006": 11,
+          "obj_032": 7,
+          "obj_008": 7,
+          "obj_000": 6,
+          "obj_018": 8,
+          "obj_024": 13,
+          "obj_012": 12,
+          "obj_045": 8
+        }
+      },
+      "points": {
+        "seconds": 0.1,
+        "clusters": 8,
+        "dropped": {},
+        "gt_objects": 8,
+        "matched": 8,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_006": 0.09,
+          "obj_032": 0.021,
+          "obj_008": 0.101,
+          "obj_000": 0.085,
+          "obj_018": 0.121,
+          "obj_024": 0.096,
+          "obj_012": 0.225,
+          "obj_045": 0.279
+        },
+        "position_errors_mm": {
+          "obj_006": 8,
+          "obj_032": 4,
+          "obj_008": 3,
+          "obj_000": 8,
+          "obj_018": 3,
+          "obj_024": 6,
+          "obj_012": 14,
+          "obj_045": 7
+        }
+      },
+      "fitted": {
+        "seconds": 11.4,
+        "clusters": 8,
+        "sources": {
+          "0": "union",
+          "1": "union",
+          "2": "union",
+          "3": "union",
+          "4": "union",
+          "5": "primitive",
+          "6": "primitive",
+          "7": "union"
+        },
+        "dropped": {},
+        "gt_objects": 8,
+        "matched": 8,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_006": 0.09,
+          "obj_032": 0.078,
+          "obj_008": 0.07,
+          "obj_000": 0.467,
+          "obj_018": 0.053,
+          "obj_024": 0.091,
+          "obj_012": 0.356,
+          "obj_045": 0.153
+        },
+        "position_errors_mm": {
+          "obj_006": 7,
+          "obj_032": 4,
+          "obj_008": 4,
+          "obj_000": 12,
+          "obj_018": 3,
+          "obj_024": 6,
+          "obj_012": 8,
+          "obj_045": 7
+        }
+      },
+      "tier": "hard"
+    },
+    {
+      "run": "s24_b",
+      "scene": "s24",
+      "tracks": 1,
+      "hull": {
+        "seconds": 0.3,
+        "clusters": 1,
+        "dropped": {},
+        "gt_objects": 1,
+        "matched": 1,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_040": 1.471
+        },
+        "position_errors_mm": {
+          "obj_040": 18
+        }
+      },
+      "points": {
+        "seconds": 0.0,
+        "clusters": 1,
+        "dropped": {},
+        "gt_objects": 1,
+        "matched": 1,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_040": 0.267
+        },
+        "position_errors_mm": {
+          "obj_040": 16
+        }
+      },
+      "fitted": {
+        "seconds": 1.5,
+        "clusters": 1,
+        "sources": {
+          "0": "primitive"
+        },
+        "dropped": {},
+        "gt_objects": 1,
+        "matched": 1,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_040": 0.219
+        },
+        "position_errors_mm": {
+          "obj_040": 15
+        }
+      },
+      "tier": "hard"
+    }
+  ]
+}

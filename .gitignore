@@ -20,6 +20,7 @@ benchmark/scenes/*
 # Full-size object photos: large, with EXIF data and room backgrounds. Thumbnails are tracked.
 benchmark/inventory_images/originals/
 runs/
+runs_instances/
 *.mp4
 *.mov
 *.ckpt

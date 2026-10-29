@@ -1,0 +1,129 @@
+[
+  {
+    "run": "s19_b",
+    "surface": "table",
+    "prompt": "objects on a table",
+    "fell_back": false,
+    "reason": "VLM surface table (0.98)",
+    "objects": [
+      "controller",
+      "pouch",
+      "block",
+      "tape",
+      "breadboard",
+      "clock"
+    ],
+    "listed": 6,
+    "tracks": 6,
+    "gt_rigid": 5,
+    "gt_deformable": 0,
+    "missing_suspected": false
+  },
+  {
+    "run": "s20_b",
+    "surface": "table",
+    "prompt": "objects on a table",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "objects": [
+      "bottle",
+      "cube",
+      "clock",
+      "deodorant",
+      "scissors",
+      "dish"
+    ],
+    "listed": 6,
+    "tracks": 6,
+    "gt_rigid": 6,
+    "gt_deformable": 0,
+    "missing_suspected": false
+  },
+  {
+    "run": "s21_b",
+    "surface": "table",
+    "prompt": "objects on a table",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "objects": [
+      "ball",
+      "towel"
+    ],
+    "listed": 2,
+    "tracks": 1,
+    "gt_rigid": 1,
+    "gt_deformable": 1,
+    "missing_suspected": true
+  },
+  {
+    "run": "s22_a",
+    "surface": "table",
+    "prompt": "objects on a table",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "objects": [
+      "pouch"
+    ],
+    "listed": 1,
+    "tracks": 3,
+    "gt_rigid": 0,
+    "gt_deformable": 1,
+    "missing_suspected": false
+  },
+  {
+    "run": "s23_a",
+    "surface": "table",
+    "prompt": "objects on a table",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "objects": [
+      "sponge"
+    ],
+    "listed": 1,
+    "tracks": 1,
+    "gt_rigid": 0,
+    "gt_deformable": 1,
+    "missing_suspected": false
+  },
+  {
+    "run": "s17_b",
+    "surface": "table",
+    "prompt": "objects on a table",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "objects": [
+      "bottle",
+      "bottle",
+      "can",
+      "cube",
+      "egg"
+    ],
+    "listed": 5,
+    "tracks": 5,
+    "gt_rigid": 5,
+    "gt_deformable": 0,
+    "missing_suspected": false
+  },
+  {
+    "run": "s18_b",
+    "surface": "table",
+    "prompt": "objects on a table",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "objects": [
+      "car",
+      "car",
+      "controller",
+      "punch",
+      "figurine",
+      "jar",
+      "pliers",
+      "brush"
+    ],
+    "listed": 8,
+    "tracks": 8,
+    "gt_rigid": 8,
+    "gt_deformable": 0,
+    "missing_suspected": false
+  }
+]

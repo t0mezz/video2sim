@@ -179,6 +179,48 @@ def test_millimeters_still_work_on_a_grid_board() -> None:
     assert obj["position_m"] == [0.1235, 0.04, 0.01]
 
 
+def _stack_rows(notes: list[str]) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
+    heights = {"a": "20", "b": "50", "c": "40"}
+    inventory = [
+        {"object_id": k, "length_mm_1": "100", "width_mm_1": "50", "height_mm_1": h}
+        for k, h in heights.items()
+    ]
+    rows = [
+        {
+            "scene_id": "s",
+            "object_id": k,
+            "board": "grid",
+            "station": "B2",
+            "yaw_deg": "0",
+            "notes": n,
+        }
+        for k, n in zip(heights, notes, strict=True)
+    ]
+    return inventory, rows
+
+
+def test_stacked_objects_sit_on_the_ones_below() -> None:
+    inventory, rows = _stack_rows(["stack 0 (lowest)", "stack 1 (ontop of a)", "stack 2"])
+    scenes, warnings = build_scenes(inventory, rows)
+    z = [o["position_m"][2] for o in scenes["s"]["objects"]]
+    assert z == [0.01, 0.045, 0.09]  # 20 / 2, 20 + 50 / 2, 20 + 50 + 40 / 2 (mm)
+    assert not [w for w in warnings if "stack" in w]
+
+
+def test_stack_order_follows_the_numbers_not_the_row_order() -> None:
+    inventory, rows = _stack_rows(["stack 2", "stack 0", "stack 1"])
+    scenes, _ = build_scenes(inventory, rows)
+    z = {o["object_id"]: o["position_m"][2] for o in scenes["s"]["objects"]}
+    assert z == {"a": 0.1, "b": 0.025, "c": 0.07}  # b 0-50 mm, c 50-90, a 90-110
+
+
+def test_a_stack_with_a_gap_is_flagged_and_left_on_the_board() -> None:
+    inventory, rows = _stack_rows(["stack 0", "stack 2", "stack 3"])
+    scenes, warnings = build_scenes(inventory, rows)
+    assert [o["position_m"][2] for o in scenes["s"]["objects"]] == [0.01, 0.025, 0.02]
+    assert any("not 0, 1, 2" in w for w in warnings)
+
+
 def test_station_and_millimeters_together_is_a_conflict() -> None:
     obj, warnings = _one_object({"station": "B2", "x_mm": "200", "y_mm": "200"})
     assert "position_m" in obj["incomplete"]

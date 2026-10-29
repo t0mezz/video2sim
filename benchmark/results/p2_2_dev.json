@@ -1,0 +1,421 @@
+{
+  "summary": {
+    "scenes_scored": [
+      "s01",
+      "s02",
+      "s03",
+      "s04",
+      "s06",
+      "s11",
+      "s12",
+      "s13",
+      "s14",
+      "s17",
+      "s18",
+      "s24"
+    ],
+    "raw": {
+      "switches_per_scene": 0.0,
+      "fragmented_total": 1,
+      "unassigned_tracks_total": 2
+    },
+    "repaired": {
+      "switches_per_scene": 0.0,
+      "fragmented_total": 0,
+      "unassigned_tracks_total": 2
+    }
+  },
+  "scenes": [
+    {
+      "run": "s01_b",
+      "scene": "s01",
+      "frames": 46,
+      "tracks_raw": 5,
+      "tracks_repaired": 5,
+      "splits": [],
+      "merges": [],
+      "raw": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_004": 1,
+          "obj_021": 1,
+          "obj_007": 1,
+          "obj_003": 1,
+          "obj_029": 1
+        },
+        "unassigned_tracks": 0
+      },
+      "repaired": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_004": 1,
+          "obj_021": 1,
+          "obj_007": 1,
+          "obj_003": 1,
+          "obj_029": 1
+        },
+        "unassigned_tracks": 0
+      }
+    },
+    {
+      "run": "s02_b",
+      "scene": "s02",
+      "frames": 50,
+      "tracks_raw": 5,
+      "tracks_repaired": 5,
+      "splits": [],
+      "merges": [],
+      "raw": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_039": 1,
+          "obj_046": 1,
+          "obj_041": 1,
+          "obj_014": 1,
+          "obj_060": 1
+        },
+        "unassigned_tracks": 0
+      },
+      "repaired": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_039": 1,
+          "obj_046": 1,
+          "obj_041": 1,
+          "obj_014": 1,
+          "obj_060": 1
+        },
+        "unassigned_tracks": 0
+      }
+    },
+    {
+      "run": "s03_b",
+      "scene": "s03",
+      "frames": 75,
+      "tracks_raw": 1,
+      "tracks_repaired": 1,
+      "splits": [],
+      "merges": [],
+      "raw": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_027": 1
+        },
+        "unassigned_tracks": 0
+      },
+      "repaired": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_027": 1
+        },
+        "unassigned_tracks": 0
+      }
+    },
+    {
+      "run": "s04_b",
+      "scene": "s04",
+      "frames": 75,
+      "tracks_raw": 5,
+      "tracks_repaired": 5,
+      "splits": [],
+      "merges": [],
+      "raw": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_027": 1,
+          "obj_014": 1,
+          "obj_021": 1,
+          "obj_022": 1,
+          "obj_003": 1
+        },
+        "unassigned_tracks": 0
+      },
+      "repaired": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_027": 1,
+          "obj_014": 1,
+          "obj_021": 1,
+          "obj_022": 1,
+          "obj_003": 1
+        },
+        "unassigned_tracks": 0
+      }
+    },
+    {
+      "run": "s06_b",
+      "scene": "s06",
+      "frames": 118,
+      "tracks_raw": 4,
+      "tracks_repaired": 4,
+      "splits": [],
+      "merges": [],
+      "raw": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_029": 1,
+          "obj_018": 1,
+          "obj_004": 1,
+          "obj_040": 1
+        },
+        "unassigned_tracks": 0
+      },
+      "repaired": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_029": 1,
+          "obj_018": 1,
+          "obj_004": 1,
+          "obj_040": 1
+        },
+        "unassigned_tracks": 0
+      }
+    },
+    {
+      "run": "s11_b",
+      "scene": "s11",
+      "frames": 98,
+      "tracks_raw": 7,
+      "tracks_repaired": 7,
+      "splits": [],
+      "merges": [],
+      "raw": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_050": 1,
+          "obj_048": 1,
+          "obj_049": 1,
+          "obj_047": 1,
+          "obj_056": 1,
+          "obj_040": 1,
+          "obj_052": 1
+        },
+        "unassigned_tracks": 0
+      },
+      "repaired": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_050": 1,
+          "obj_048": 1,
+          "obj_049": 1,
+          "obj_047": 1,
+          "obj_056": 1,
+          "obj_040": 1,
+          "obj_052": 1
+        },
+        "unassigned_tracks": 0
+      }
+    },
+    {
+      "run": "s12_b",
+      "scene": "s12",
+      "frames": 81,
+      "tracks_raw": 11,
+      "tracks_repaired": 10,
+      "splits": [],
+      "merges": [
+        [
+          3,
+          10
+        ]
+      ],
+      "raw": {
+        "switches": 0,
+        "fragmented": 1,
+        "tracks_per_object": {
+          "obj_007": 1,
+          "obj_004": 1,
+          "obj_003": 1,
+          "obj_039": 2,
+          "obj_029": 1,
+          "obj_001": 1,
+          "obj_014": 1,
+          "obj_002": 1,
+          "obj_021": 1,
+          "obj_060": 1
+        },
+        "unassigned_tracks": 0
+      },
+      "repaired": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_007": 1,
+          "obj_004": 1,
+          "obj_003": 1,
+          "obj_039": 1,
+          "obj_029": 1,
+          "obj_001": 1,
+          "obj_014": 1,
+          "obj_002": 1,
+          "obj_021": 1,
+          "obj_060": 1
+        },
+        "unassigned_tracks": 0
+      }
+    },
+    {
+      "run": "s13_b",
+      "scene": "s13",
+      "frames": 89,
+      "tracks_raw": 2,
+      "tracks_repaired": 2,
+      "splits": [],
+      "merges": [],
+      "raw": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_002": 1,
+          "obj_014": 1
+        },
+        "unassigned_tracks": 0
+      },
+      "repaired": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_002": 1,
+          "obj_014": 1
+        },
+        "unassigned_tracks": 0
+      }
+    },
+    {
+      "run": "s14_b",
+      "scene": "s14",
+      "frames": 51,
+      "tracks_raw": 6,
+      "tracks_repaired": 6,
+      "splits": [],
+      "merges": [],
+      "raw": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_040": 1,
+          "obj_036": 1,
+          "obj_006": 1,
+          "obj_004": 1,
+          "obj_002": 1
+        },
+        "unassigned_tracks": 1
+      },
+      "repaired": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_040": 1,
+          "obj_036": 1,
+          "obj_006": 1,
+          "obj_004": 1,
+          "obj_002": 1
+        },
+        "unassigned_tracks": 1
+      }
+    },
+    {
+      "run": "s17_b",
+      "scene": "s17",
+      "frames": 84,
+      "tracks_raw": 5,
+      "tracks_repaired": 5,
+      "splits": [],
+      "merges": [],
+      "raw": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_059": 1,
+          "obj_035": 1,
+          "obj_019": 1,
+          "obj_026": 1,
+          "obj_015": 1
+        },
+        "unassigned_tracks": 0
+      },
+      "repaired": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_059": 1,
+          "obj_035": 1,
+          "obj_019": 1,
+          "obj_026": 1,
+          "obj_015": 1
+        },
+        "unassigned_tracks": 0
+      }
+    },
+    {
+      "run": "s18_b",
+      "scene": "s18",
+      "frames": 85,
+      "tracks_raw": 8,
+      "tracks_repaired": 8,
+      "splits": [],
+      "merges": [],
+      "raw": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_032": 1,
+          "obj_018": 1,
+          "obj_024": 1,
+          "obj_006": 1,
+          "obj_000": 1,
+          "obj_008": 1,
+          "obj_012": 1
+        },
+        "unassigned_tracks": 1
+      },
+      "repaired": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_032": 1,
+          "obj_018": 1,
+          "obj_024": 1,
+          "obj_006": 1,
+          "obj_000": 1,
+          "obj_008": 1,
+          "obj_012": 1
+        },
+        "unassigned_tracks": 1
+      }
+    },
+    {
+      "run": "s24_b",
+      "scene": "s24",
+      "frames": 51,
+      "tracks_raw": 0,
+      "tracks_repaired": 0,
+      "splits": [],
+      "merges": [],
+      "raw": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {},
+        "unassigned_tracks": 0
+      },
+      "repaired": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {},
+        "unassigned_tracks": 0
+      }
+    }
+  ]
+}

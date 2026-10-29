@@ -1,0 +1,1356 @@
+{
+  "verdicts": {
+    "clear": 26,
+    "uncertain": 36,
+    "flag": 1
+  },
+  "scenes": {
+    "s01_b": [
+      {
+        "track": 0,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 0,
+          "sfm_points": 1285,
+          "err_ratio": 0.9760648327751322,
+          "short_frac": 0.20276497695852536,
+          "outside_hull_frac": 0.0006583278472679366,
+          "hull_iou": 0.960336416871441,
+          "err_med": 0.3617331289916732,
+          "len_med": 6.0,
+          "table_err_med": 0.3706035878407782,
+          "hull_surface_cm2": 1033.999949492512,
+          "points_per_100cm2": 124.27466757911148
+        }
+      },
+      {
+        "track": 1,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 1,
+          "sfm_points": 301,
+          "err_ratio": 1.4047004815601358,
+          "short_frac": 0.25271739130434784,
+          "outside_hull_frac": 0.0027173913043477826,
+          "hull_iou": 0.9115026921194322,
+          "err_med": 0.5205870383078552,
+          "len_med": 6.0,
+          "table_err_med": 0.3706035878407782,
+          "hull_surface_cm2": 335.50002020597486,
+          "points_per_100cm2": 89.71683513318594
+        }
+      },
+      {
+        "track": 2,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 2,
+          "sfm_points": 1116,
+          "err_ratio": 0.6984533632713291,
+          "short_frac": 0.2771565495207668,
+          "outside_hull_frac": 0.0023961661341852514,
+          "hull_iou": 0.9268998123208534,
+          "err_med": 0.258849322367813,
+          "len_med": 5.0,
+          "table_err_med": 0.3706035878407782,
+          "hull_surface_cm2": 552.4999834503973,
+          "points_per_100cm2": 201.99095627668794
+        }
+      },
+      {
+        "track": 3,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 3,
+          "sfm_points": 339,
+          "err_ratio": 1.3760325563954865,
+          "short_frac": 0.2185929648241206,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.9436958874458874,
+          "err_med": 0.5099626023858852,
+          "len_med": 6.0,
+          "table_err_med": 0.3706035878407782,
+          "hull_surface_cm2": 624.9999093823147,
+          "points_per_100cm2": 54.24000786416634
+        }
+      },
+      {
+        "track": 4,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 4,
+          "sfm_points": 529,
+          "err_ratio": 1.2835430133366732,
+          "short_frac": 0.24921135646687698,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.9027924195320353,
+          "err_med": 0.47568564589053486,
+          "len_med": 6.0,
+          "table_err_med": 0.3706035878407782,
+          "hull_surface_cm2": 1304.4999570045622,
+          "points_per_100cm2": 40.55193694407687
+        }
+      }
+    ],
+    "s02_b": [
+      {
+        "track": 0,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 0,
+          "sfm_points": 120,
+          "err_ratio": 1.4302107910088562,
+          "short_frac": 0.3375796178343949,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.9072140294938222,
+          "err_med": 0.6022347558586869,
+          "len_med": 4.0,
+          "table_err_med": 0.42108111590591246,
+          "hull_surface_cm2": 184.49999612942315,
+          "points_per_100cm2": 65.04065177097475
+        }
+      },
+      {
+        "track": 1,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 1,
+          "sfm_points": 612,
+          "err_ratio": 1.3460741966287422,
+          "short_frac": 0.25095541401273885,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.9399862525776417,
+          "err_med": 0.5668064248085853,
+          "len_med": 5.0,
+          "table_err_med": 0.42108111590591246,
+          "hull_surface_cm2": 652.0000267326834,
+          "points_per_100cm2": 93.86502682628213
+        }
+      },
+      {
+        "track": 2,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 2,
+          "sfm_points": 657,
+          "err_ratio": 1.2547727527075263,
+          "short_frac": 0.28335056876938985,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.9238165599638033,
+          "err_med": 0.5283611109184188,
+          "len_med": 5.0,
+          "table_err_med": 0.42108111590591246,
+          "hull_surface_cm2": 677.9999591670936,
+          "points_per_100cm2": 96.90266070327031
+        }
+      },
+      {
+        "track": 3,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 3,
+          "sfm_points": 980,
+          "err_ratio": 0.8486865707289619,
+          "short_frac": 0.23765144454799628,
+          "outside_hull_frac": 0.002795899347623476,
+          "hull_iou": 0.94659196070023,
+          "err_med": 0.3573658882569134,
+          "len_med": 5.0,
+          "table_err_med": 0.42108111590591246,
+          "hull_surface_cm2": 879.9999501369892,
+          "points_per_100cm2": 111.36364267378013
+        }
+      },
+      {
+        "track": 4,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "only 20 usable sparse points or no hull to compare; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 4,
+          "sfm_points": 20,
+          "err_ratio": 1.447988405589561,
+          "short_frac": 0.275,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.8111702127659575,
+          "err_med": 0.6097205736444754,
+          "len_med": 4.5,
+          "table_err_med": 0.42108111590591246,
+          "hull_surface_cm2": 58.999950842936606,
+          "points_per_100cm2": 33.898333327839325
+        }
+      }
+    ],
+    "s03_b": [
+      {
+        "track": 0,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 0,
+          "sfm_points": 917,
+          "err_ratio": 1.2424599113930905,
+          "short_frac": 0.3006872852233677,
+          "outside_hull_frac": 0.0017182130584192379,
+          "hull_iou": 0.9690054495912807,
+          "err_med": 0.4469617982217854,
+          "len_med": 5.0,
+          "table_err_med": 0.3597394122122104,
+          "hull_surface_cm2": 1532.5000364985317,
+          "points_per_100cm2": 59.836866437874214
+        }
+      }
+    ],
+    "s04_b": [
+      {
+        "track": 0,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "signals between the clear and flag limits; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 0,
+          "sfm_points": 2006,
+          "err_ratio": 1.095739593526156,
+          "short_frac": 0.3702366626554352,
+          "outside_hull_frac": 0.00040112314480544864,
+          "hull_iou": 0.9720865472288622,
+          "err_med": 0.5713992500390502,
+          "len_med": 4.0,
+          "table_err_med": 0.5214735813280718,
+          "hull_surface_cm2": 1565.0000292714678,
+          "points_per_100cm2": 128.17891134058473
+        }
+      },
+      {
+        "track": 1,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 1,
+          "sfm_points": 924,
+          "err_ratio": 1.2146002939844556,
+          "short_frac": 0.29612961296129614,
+          "outside_hull_frac": 0.0018001800180017513,
+          "hull_iou": 0.8644216348510958,
+          "err_med": 0.6333819651862028,
+          "len_med": 6.0,
+          "table_err_med": 0.5214735813280718,
+          "hull_surface_cm2": 963.4999205134825,
+          "points_per_100cm2": 95.90037117051016
+        }
+      },
+      {
+        "track": 2,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 2,
+          "sfm_points": 539,
+          "err_ratio": 1.2765366900483885,
+          "short_frac": 0.25273010920436817,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.9035561377167283,
+          "err_med": 0.6656801594562158,
+          "len_med": 6.0,
+          "table_err_med": 0.5214735813280718,
+          "hull_surface_cm2": 293.5000165421513,
+          "points_per_100cm2": 183.64564552676643
+        }
+      },
+      {
+        "track": 3,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "signals between the clear and flag limits; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 3,
+          "sfm_points": 762,
+          "err_ratio": 1.5982516387544257,
+          "short_frac": 0.31142857142857144,
+          "outside_hull_frac": 0.0028571428571428914,
+          "hull_iou": 0.9597268543639506,
+          "err_med": 0.83344600592473,
+          "len_med": 5.0,
+          "table_err_med": 0.5214735813280718,
+          "hull_surface_cm2": 1269.9999344255775,
+          "points_per_100cm2": 60.00000309800437
+        }
+      },
+      {
+        "track": 4,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 4,
+          "sfm_points": 550,
+          "err_ratio": 1.2849206739331447,
+          "short_frac": 0.23578595317725753,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.9230974137362274,
+          "err_med": 0.6700521855583965,
+          "len_med": 6.0,
+          "table_err_med": 0.5214735813280718,
+          "hull_surface_cm2": 676.9998685475425,
+          "points_per_100cm2": 81.24078386898181
+        }
+      }
+    ],
+    "s06_b": [
+      {
+        "track": 0,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "signals between the clear and flag limits; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 0,
+          "sfm_points": 938,
+          "err_ratio": 1.8559068899725388,
+          "short_frac": 0.21094439541041482,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.9480691313639594,
+          "err_med": 0.9249491079048997,
+          "len_med": 7.0,
+          "table_err_med": 0.4983812026898536,
+          "hull_surface_cm2": 1533.5001062564565,
+          "points_per_100cm2": 61.1672601894905
+        }
+      },
+      {
+        "track": 1,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 1,
+          "sfm_points": 425,
+          "err_ratio": 1.4576992664142945,
+          "short_frac": 0.2099009900990099,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.9132827194627378,
+          "err_med": 0.7264899135556734,
+          "len_med": 7.0,
+          "table_err_med": 0.4983812026898536,
+          "hull_surface_cm2": 1569.999980753054,
+          "points_per_100cm2": 27.070064026124882
+        }
+      },
+      {
+        "track": 2,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "signals between the clear and flag limits; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 2,
+          "sfm_points": 1793,
+          "err_ratio": 1.6084682318365027,
+          "short_frac": 0.16238317757009346,
+          "outside_hull_frac": 0.015965732087227402,
+          "hull_iou": 0.9588239187073682,
+          "err_med": 0.8016303318710984,
+          "len_med": 11.0,
+          "table_err_med": 0.4983812026898536,
+          "hull_surface_cm2": 1299.9998259358126,
+          "points_per_100cm2": 137.9230953903627
+        }
+      },
+      {
+        "track": 3,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "only 20 usable sparse points or no hull to compare; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 3,
+          "sfm_points": 20,
+          "err_ratio": 2.5865512203406134,
+          "short_frac": 0.20689655172413793,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.8456642800318218,
+          "err_med": 1.2890885080122634,
+          "len_med": 8.0,
+          "table_err_med": 0.4983812026898536,
+          "hull_surface_cm2": 275.4999915084336,
+          "points_per_100cm2": 7.2595283544274665
+        }
+      }
+    ],
+    "s11_b": [
+      {
+        "track": 0,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "only 59 usable sparse points or no hull to compare; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 0,
+          "sfm_points": 59,
+          "err_ratio": 1.733319465373468,
+          "short_frac": 0.42105263157894735,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.8534948498949346,
+          "err_med": 0.5759310774296054,
+          "len_med": 4.0,
+          "table_err_med": 0.33227058769891155,
+          "hull_surface_cm2": 66.00000794604419,
+          "points_per_100cm2": 89.39392863139231
+        }
+      },
+      {
+        "track": 1,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "only 12 usable sparse points or no hull to compare; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 1,
+          "sfm_points": 12,
+          "err_ratio": 3.074441577686754,
+          "short_frac": 0.42857142857142855,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.6962444372082927,
+          "err_med": 1.0215465098639467,
+          "len_med": 4.0,
+          "table_err_med": 0.33227058769891155,
+          "hull_surface_cm2": 41.50000783056034,
+          "points_per_100cm2": 28.91565719455907
+        }
+      },
+      {
+        "track": 2,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "only 27 usable sparse points or no hull to compare; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 2,
+          "sfm_points": 27,
+          "err_ratio": 1.807104472571506,
+          "short_frac": 0.26,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.736616760017234,
+          "err_med": 0.6004476651346659,
+          "len_med": 5.5,
+          "table_err_med": 0.33227058769891155,
+          "hull_surface_cm2": 33.99997838679739,
+          "points_per_100cm2": 79.41181518657798
+        }
+      },
+      {
+        "track": 3,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "only 29 usable sparse points or no hull to compare; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 3,
+          "sfm_points": 29,
+          "err_ratio": 1.9503682164812313,
+          "short_frac": 0.30985915492957744,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.8256261734084315,
+          "err_med": 0.6480499935194967,
+          "len_med": 5.0,
+          "table_err_med": 0.33227058769891155,
+          "hull_surface_cm2": 101.50000635907014,
+          "points_per_100cm2": 28.5714267814019
+        }
+      },
+      {
+        "track": 4,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "only 32 usable sparse points or no hull to compare; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 4,
+          "sfm_points": 32,
+          "err_ratio": 2.012375446735218,
+          "short_frac": 0.36585365853658536,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.7815456821026283,
+          "err_med": 0.6686531723575706,
+          "len_med": 5.0,
+          "table_err_med": 0.33227058769891155,
+          "hull_surface_cm2": 59.999966211615465,
+          "points_per_100cm2": 53.333363367469836
+        }
+      },
+      {
+        "track": 5,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "only 71 usable sparse points or no hull to compare; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 5,
+          "sfm_points": 71,
+          "err_ratio": 2.355823286611753,
+          "short_frac": 0.25190839694656486,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.9027874331657141,
+          "err_med": 0.7827707879572685,
+          "len_med": 6.0,
+          "table_err_med": 0.33227058769891155,
+          "hull_surface_cm2": 215.99999723583437,
+          "points_per_100cm2": 32.87037079101458
+        }
+      },
+      {
+        "track": 6,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "only 33 usable sparse points or no hull to compare; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 6,
+          "sfm_points": 33,
+          "err_ratio": 1.8812762925350528,
+          "short_frac": 0.36363636363636365,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.818006374819463,
+          "err_med": 0.6250927793446515,
+          "len_med": 4.5,
+          "table_err_med": 0.33227058769891155,
+          "hull_surface_cm2": 59.999995268881015,
+          "points_per_100cm2": 55.00000433685941
+        }
+      }
+    ],
+    "s12_b": [
+      {
+        "track": 0,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 0,
+          "sfm_points": 1746,
+          "err_ratio": 0.5865739219925173,
+          "short_frac": 0.27691605839416056,
+          "outside_hull_frac": 0.0018248175182481452,
+          "hull_iou": 0.912447885646218,
+          "err_med": 0.37438390154818063,
+          "len_med": 5.0,
+          "table_err_med": 0.6382552778283186,
+          "hull_surface_cm2": 382.499968092888,
+          "points_per_100cm2": 456.470626312835
+        }
+      },
+      {
+        "track": 1,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "signals between the clear and flag limits; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 1,
+          "sfm_points": 326,
+          "err_ratio": 1.0098187265508907,
+          "short_frac": 0.2917378917378917,
+          "outside_hull_frac": 0.0011396011396010985,
+          "hull_iou": 0.5909682592138328,
+          "err_med": 0.6445221318709776,
+          "len_med": 5.0,
+          "table_err_med": 0.6382552778283186,
+          "hull_surface_cm2": 910.5000394377814,
+          "points_per_100cm2": 35.80450146946721
+        }
+      },
+      {
+        "track": 2,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 2,
+          "sfm_points": 412,
+          "err_ratio": 1.0851283762414905,
+          "short_frac": 0.24108658743633277,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.9179881675190338,
+          "err_med": 0.6925889132574048,
+          "len_med": 6.0,
+          "table_err_med": 0.6382552778283186,
+          "hull_surface_cm2": 531.0000324212019,
+          "points_per_100cm2": 77.58944912327081
+        }
+      },
+      {
+        "track": 3,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "only 0 usable sparse points or no hull to compare; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 3,
+          "sfm_points": 0,
+          "err_ratio": 1.1011312951164873,
+          "short_frac": 0.28888888888888886,
+          "outside_hull_frac": null,
+          "hull_iou": null,
+          "err_med": 0.70280286069003,
+          "len_med": 4.0,
+          "table_err_med": 0.6382552778283186,
+          "hull_surface_cm2": null,
+          "points_per_100cm2": null
+        }
+      },
+      {
+        "track": 4,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "only 82 usable sparse points or no hull to compare; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 4,
+          "sfm_points": 82,
+          "err_ratio": 1.2137391839435514,
+          "short_frac": 0.24851190476190477,
+          "outside_hull_frac": 0.007440476190476164,
+          "hull_iou": 0.2434061773844025,
+          "err_med": 0.7746754400590081,
+          "len_med": 6.0,
+          "table_err_med": 0.6382552778283186,
+          "hull_surface_cm2": 747.9998346865202,
+          "points_per_100cm2": 10.962569267727906
+        }
+      },
+      {
+        "track": 5,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 5,
+          "sfm_points": 1216,
+          "err_ratio": 0.8237100709230947,
+          "short_frac": 0.2425287356321839,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.9489609637713934,
+          "err_med": 0.5257373001670038,
+          "len_med": 5.0,
+          "table_err_med": 0.6382552778283186,
+          "hull_surface_cm2": 752.5001319963484,
+          "points_per_100cm2": 161.594656039994
+        }
+      },
+      {
+        "track": 6,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "only 2 usable sparse points or no hull to compare; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 6,
+          "sfm_points": 2,
+          "err_ratio": 1.0847657299393176,
+          "short_frac": 0.25092592592592594,
+          "outside_hull_frac": 0.9407407407407408,
+          "hull_iou": 0.03161980906365595,
+          "err_med": 0.692357452341058,
+          "len_med": 6.0,
+          "table_err_med": 0.6382552778283186,
+          "hull_surface_cm2": 40.000010132789086,
+          "points_per_100cm2": 4.999998733401685
+        }
+      },
+      {
+        "track": 7,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 7,
+          "sfm_points": 2701,
+          "err_ratio": 0.9271404639315687,
+          "short_frac": 0.200678496868476,
+          "outside_hull_frac": 0.0007828810020876764,
+          "hull_iou": 0.8693194822034642,
+          "err_med": 0.5917522943925195,
+          "len_med": 8.0,
+          "table_err_med": 0.6382552778283186,
+          "hull_surface_cm2": 1517.499907948078,
+          "points_per_100cm2": 177.99012611817673
+        }
+      },
+      {
+        "track": 8,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 8,
+          "sfm_points": 415,
+          "err_ratio": 1.0806866949915548,
+          "short_frac": 0.24368231046931407,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.8437829684163995,
+          "err_med": 0.6897539867572022,
+          "len_med": 7.0,
+          "table_err_med": 0.6382552778283186,
+          "hull_surface_cm2": 252.99999516271043,
+          "points_per_100cm2": 164.03162368959866
+        }
+      },
+      {
+        "track": 9,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "only 19 usable sparse points or no hull to compare; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 9,
+          "sfm_points": 19,
+          "err_ratio": 1.6622004930487664,
+          "short_frac": 0.20689655172413793,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.5838926174496645,
+          "err_med": 1.0609082374972085,
+          "len_med": 6.0,
+          "table_err_med": 0.6382552778283186,
+          "hull_surface_cm2": 42.50000517815336,
+          "points_per_100cm2": 44.7058769060262
+        }
+      }
+    ],
+    "s13_b": [
+      {
+        "track": 0,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "signals between the clear and flag limits; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 0,
+          "sfm_points": 1478,
+          "err_ratio": 1.456206377666813,
+          "short_frac": 0.17059961315280464,
+          "outside_hull_frac": 0.204642166344294,
+          "hull_iou": 0.5771634279478852,
+          "err_med": 0.5623394169967505,
+          "len_med": 9.0,
+          "table_err_med": 0.3861673905712123,
+          "hull_surface_cm2": 1125.000073341654,
+          "points_per_100cm2": 131.3777692129219
+        }
+      },
+      {
+        "track": 1,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "signals between the clear and flag limits; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 1,
+          "sfm_points": 891,
+          "err_ratio": 1.8028761883558968,
+          "short_frac": 0.21465076660988075,
+          "outside_hull_frac": 0.0008517887563883608,
+          "hull_iou": 0.9593357234651966,
+          "err_med": 0.6962119931803701,
+          "len_med": 7.0,
+          "table_err_med": 0.3861673905712123,
+          "hull_surface_cm2": 1247.999989612026,
+          "points_per_100cm2": 71.39423136349473
+        }
+      }
+    ],
+    "s14_b": [
+      {
+        "track": 0,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "only 16 usable sparse points or no hull to compare; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 0,
+          "sfm_points": 16,
+          "err_ratio": 2.2022116824186697,
+          "short_frac": 0.34375,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.36557231588287487,
+          "err_med": 1.2224793795749511,
+          "len_med": 4.0,
+          "table_err_med": 0.5551143831152111,
+          "hull_surface_cm2": 225.0000716652764,
+          "points_per_100cm2": 7.1111088461351954
+        }
+      },
+      {
+        "track": 1,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "only 80 usable sparse points or no hull to compare; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 1,
+          "sfm_points": 80,
+          "err_ratio": 0.8908113015994954,
+          "short_frac": 0.43952802359882004,
+          "outside_hull_frac": 0.415929203539823,
+          "hull_iou": 0.44402472527472525,
+          "err_med": 0.49450216615946213,
+          "len_med": 4.0,
+          "table_err_med": 0.5551143831152111,
+          "hull_surface_cm2": 311.5000142008062,
+          "points_per_100cm2": 25.682181814742577
+        }
+      },
+      {
+        "track": 2,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "signals between the clear and flag limits; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 2,
+          "sfm_points": 252,
+          "err_ratio": 1.220888534495835,
+          "short_frac": 0.272984441301273,
+          "outside_hull_frac": 0.005657708628005631,
+          "hull_iou": 0.4152529650202672,
+          "err_med": 0.6777327856790896,
+          "len_med": 5.0,
+          "table_err_med": 0.5551143831152111,
+          "hull_surface_cm2": 715.4999875724307,
+          "points_per_100cm2": 35.22012639790435
+        }
+      },
+      {
+        "track": 3,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 3,
+          "sfm_points": 1815,
+          "err_ratio": 1.095221228798348,
+          "short_frac": 0.348993288590604,
+          "outside_hull_frac": 0.020553691275167818,
+          "hull_iou": 0.9577146546158812,
+          "err_med": 0.6079730567990784,
+          "len_med": 4.0,
+          "table_err_med": 0.5551143831152111,
+          "hull_surface_cm2": 1441.4999498557302,
+          "points_per_100cm2": 125.91051426548096
+        }
+      },
+      {
+        "track": 4,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 4,
+          "sfm_points": 4467,
+          "err_ratio": 1.0864665359259822,
+          "short_frac": 0.2241477813749762,
+          "outside_hull_frac": 0.00019043991620648626,
+          "hull_iou": 0.8330715407682422,
+          "err_med": 0.603113200865872,
+          "len_med": 7.0,
+          "table_err_med": 0.5551143831152111,
+          "hull_surface_cm2": 1928.4999866653236,
+          "points_per_100cm2": 231.63080274240176
+        }
+      },
+      {
+        "track": 5,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "only 27 usable sparse points or no hull to compare; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 5,
+          "sfm_points": 27,
+          "err_ratio": 1.3732141338903197,
+          "short_frac": 0.25925925925925924,
+          "outside_hull_frac": null,
+          "hull_iou": null,
+          "err_med": 0.7622909168196137,
+          "len_med": 4.0,
+          "table_err_med": 0.5551143831152111,
+          "hull_surface_cm2": null,
+          "points_per_100cm2": null
+        }
+      }
+    ],
+    "s16_a": [
+      {
+        "track": 0,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "signals between the clear and flag limits; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 0,
+          "sfm_points": 1862,
+          "err_ratio": 2.1453386613811087,
+          "short_frac": 0.3115487914055506,
+          "outside_hull_frac": 0.0022381378692927223,
+          "hull_iou": 0.9322962787903988,
+          "err_med": 0.575456894139263,
+          "len_med": 5.0,
+          "table_err_med": 0.26823592214051656,
+          "hull_surface_cm2": 817.4999914411445,
+          "points_per_100cm2": 227.767586482483
+        }
+      },
+      {
+        "track": 1,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "only 0 usable sparse points or no hull to compare; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 1,
+          "sfm_points": 0,
+          "err_ratio": 2.5566738192677927,
+          "short_frac": 0.20461538461538462,
+          "outside_hull_frac": null,
+          "hull_iou": null,
+          "err_med": 0.6857917595238128,
+          "len_med": 7.0,
+          "table_err_med": 0.26823592214051656,
+          "hull_surface_cm2": null,
+          "points_per_100cm2": null
+        }
+      },
+      {
+        "track": 2,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "signals between the clear and flag limits; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 2,
+          "sfm_points": 1348,
+          "err_ratio": 2.408634502701573,
+          "short_frac": 0.296045197740113,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.9358512429247446,
+          "err_med": 0.6460822969316209,
+          "len_med": 5.0,
+          "table_err_med": 0.26823592214051656,
+          "hull_surface_cm2": 278.0000330209731,
+          "points_per_100cm2": 484.89202873522794
+        }
+      },
+      {
+        "track": 3,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "signals between the clear and flag limits; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 3,
+          "sfm_points": 2768,
+          "err_ratio": 2.270122859922009,
+          "short_frac": 0.24878212665882748,
+          "outside_hull_frac": 0.03225264572484465,
+          "hull_iou": 0.8603951800627228,
+          "err_med": 0.6089284987034468,
+          "len_med": 7.0,
+          "table_err_med": 0.26823592214051656,
+          "hull_surface_cm2": 788.4998911768221,
+          "points_per_100cm2": 351.0463388737834
+        }
+      },
+      {
+        "track": 4,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "only 0 usable sparse points or no hull to compare; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 4,
+          "sfm_points": 0,
+          "err_ratio": null,
+          "short_frac": null,
+          "outside_hull_frac": null,
+          "hull_iou": null,
+          "err_med": null,
+          "len_med": null,
+          "table_err_med": 0.26823592214051656,
+          "hull_surface_cm2": null,
+          "points_per_100cm2": null
+        }
+      }
+    ],
+    "s17_b": [
+      {
+        "track": 0,
+        "flag": "transparent_or_reflective",
+        "verdict": "uncertain",
+        "reason": "signals between the clear and flag limits; VLM says reflective",
+        "asked_vlm": true,
+        "vlm_answer": "yes",
+        "signals": {
+          "track_id": 0,
+          "sfm_points": 727,
+          "err_ratio": 1.8021290536415207,
+          "short_frac": 0.2526997840172786,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.873902206818352,
+          "err_med": 0.7253243277742198,
+          "len_med": 5.0,
+          "table_err_med": 0.4024819012315315,
+          "hull_surface_cm2": 119.49993938393993,
+          "points_per_100cm2": 608.3685094301431
+        }
+      },
+      {
+        "track": 1,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 1,
+          "sfm_points": 369,
+          "err_ratio": 1.246768503187571,
+          "short_frac": 0.27253218884120173,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.8683245498462889,
+          "err_med": 0.5018017575585243,
+          "len_med": 5.0,
+          "table_err_med": 0.4024819012315315,
+          "hull_surface_cm2": 139.50000195950267,
+          "points_per_100cm2": 264.51612531670213
+        }
+      },
+      {
+        "track": 2,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "signals between the clear and flag limits; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 2,
+          "sfm_points": 1222,
+          "err_ratio": 1.652240944572254,
+          "short_frac": 0.3111559139784946,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.9150397929659408,
+          "err_med": 0.6649970766640222,
+          "len_med": 5.0,
+          "table_err_med": 0.4024819012315315,
+          "hull_surface_cm2": 261.49998090602435,
+          "points_per_100cm2": 467.30404941756075
+        }
+      },
+      {
+        "track": 3,
+        "flag": "transparent_or_reflective",
+        "verdict": "flag",
+        "reason": "point error 2.35x the table's and 51% short-lived points",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 3,
+          "sfm_points": 2178,
+          "err_ratio": 2.349956879296596,
+          "short_frac": 0.5089455652835935,
+          "outside_hull_frac": 0.0007613247049866878,
+          "hull_iou": 0.9518988882479404,
+          "err_med": 0.9458151125914105,
+          "len_med": 3.0,
+          "table_err_med": 0.4024819012315315,
+          "hull_surface_cm2": 1111.000031452626,
+          "points_per_100cm2": 196.03959841047688
+        }
+      },
+      {
+        "track": 4,
+        "flag": "transparent_or_reflective",
+        "verdict": "uncertain",
+        "reason": "only 71 usable sparse points or no hull to compare; VLM says reflective",
+        "asked_vlm": true,
+        "vlm_answer": "yes",
+        "signals": {
+          "track_id": 4,
+          "sfm_points": 71,
+          "err_ratio": 1.3727979370081753,
+          "short_frac": 0.16666666666666666,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.42331531954887214,
+          "err_med": 0.5525263236937746,
+          "len_med": 8.0,
+          "table_err_med": 0.4024819012315315,
+          "hull_surface_cm2": 98.99999590031794,
+          "points_per_100cm2": 71.71717468704661
+        }
+      }
+    ],
+    "s18_b": [
+      {
+        "track": 0,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "signals between the clear and flag limits; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 0,
+          "sfm_points": 1722,
+          "err_ratio": 0.7956889846635644,
+          "short_frac": 0.41159135559921417,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.9121113461398191,
+          "err_med": 0.42571562091741677,
+          "len_med": 4.0,
+          "table_err_med": 0.5350276667427024,
+          "hull_surface_cm2": 881.0000217575578,
+          "points_per_100cm2": 195.45970005365982
+        }
+      },
+      {
+        "track": 1,
+        "flag": "transparent_or_reflective",
+        "verdict": "uncertain",
+        "reason": "signals between the clear and flag limits; VLM says reflective",
+        "asked_vlm": true,
+        "vlm_answer": "yes",
+        "signals": {
+          "track_id": 1,
+          "sfm_points": 377,
+          "err_ratio": 1.0425895570399888,
+          "short_frac": 0.22972972972972974,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.6603980337270431,
+          "err_med": 0.5578142580734129,
+          "len_med": 6.0,
+          "table_err_med": 0.5350276667427024,
+          "hull_surface_cm2": 281.4999528639023,
+          "points_per_100cm2": 133.9254220700596
+        }
+      },
+      {
+        "track": 2,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 2,
+          "sfm_points": 898,
+          "err_ratio": 1.1518222168389778,
+          "short_frac": 0.23556797020484171,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.9423656451125724,
+          "err_med": 0.6162567531777653,
+          "len_med": 6.0,
+          "table_err_med": 0.5350276667427024,
+          "hull_surface_cm2": 1079.5000342577694,
+          "points_per_100cm2": 83.18665785105203
+        }
+      },
+      {
+        "track": 3,
+        "flag": "transparent_or_reflective",
+        "verdict": "uncertain",
+        "reason": "signals between the clear and flag limits; VLM answer unreadable",
+        "asked_vlm": true,
+        "vlm_answer": "None",
+        "signals": {
+          "track_id": 3,
+          "sfm_points": 748,
+          "err_ratio": 1.5299615986348,
+          "short_frac": 0.2891156462585034,
+          "outside_hull_frac": 0.0022675736961451642,
+          "hull_iou": 0.9262548516544964,
+          "err_med": 0.8185717843235121,
+          "len_med": 5.0,
+          "table_err_med": 0.5350276667427024,
+          "hull_surface_cm2": 723.9999166913341,
+          "points_per_100cm2": 103.31492901523329
+        }
+      },
+      {
+        "track": 4,
+        "flag": null,
+        "verdict": "uncertain",
+        "reason": "signals between the clear and flag limits; VLM says not reflective",
+        "asked_vlm": true,
+        "vlm_answer": "no",
+        "signals": {
+          "track_id": 4,
+          "sfm_points": 722,
+          "err_ratio": 1.5174282062870814,
+          "short_frac": 0.2543757292882147,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.9381491500810981,
+          "err_med": 0.8118660726593413,
+          "len_med": 6.0,
+          "table_err_med": 0.5350276667427024,
+          "hull_surface_cm2": 837.9999137371767,
+          "points_per_100cm2": 86.15752676872495
+        }
+      },
+      {
+        "track": 5,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 5,
+          "sfm_points": 1647,
+          "err_ratio": 0.9433724299558831,
+          "short_frac": 0.1839837810440953,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.9121337275150401,
+          "err_med": 0.5047303500686896,
+          "len_med": 7.0,
+          "table_err_med": 0.5350276667427024,
+          "hull_surface_cm2": 487.5000577419976,
+          "points_per_100cm2": 337.84611382992927
+        }
+      },
+      {
+        "track": 6,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 6,
+          "sfm_points": 269,
+          "err_ratio": 1.4394222127639305,
+          "short_frac": 0.3057644110275689,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.8837899584776341,
+          "err_med": 0.7701307079527034,
+          "len_med": 5.0,
+          "table_err_med": 0.5350276667427024,
+          "hull_surface_cm2": 120.00004082918174,
+          "points_per_100cm2": 224.16659039551283
+        }
+      },
+      {
+        "track": 7,
+        "flag": null,
+        "verdict": "clear",
+        "reason": "stable points and hull",
+        "asked_vlm": false,
+        "vlm_answer": null,
+        "signals": {
+          "track_id": 7,
+          "sfm_points": 2484,
+          "err_ratio": 0.9591333539222395,
+          "short_frac": 0.1845370664969774,
+          "outside_hull_frac": 0.0,
+          "hull_iou": 0.8840757958480052,
+          "err_med": 0.5131628804441184,
+          "len_med": 7.0,
+          "table_err_med": 0.5350276667427024,
+          "hull_surface_cm2": 502.9999813791365,
+          "points_per_100cm2": 493.8369964128654
+        }
+      }
+    ]
+  }
+}

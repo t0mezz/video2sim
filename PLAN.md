@@ -6,19 +6,19 @@ roadmap: update it as work happens. Numbers that gate a decision live in
 
 ## Status
 
-Last updated: 2026-10-26. Start date: not set (decision D-002).
+Last updated: 2026-10-29. Start date: not set (decision D-002).
 
 | Phase | Weeks | Focus | Status | Gate |
 | --- | --- | --- | --- | --- |
 | 0 | 1 to 2 | Foundations, benchmark, evaluation harness | Done | Passed |
 | 1 | 3 to 4 | Reconstruction, metric scale, world frame | Done | Passed |
-| 2 | 5 to 6 | Segmentation, tracking, 3D lifting | Open | Open |
+| 2 | 5 to 6 | Segmentation, tracking, 3D lifting | Done | Passed |
 | 3 | 7 to 8 | Shape completion and pose fusion | Not started | Open |
 | 4 | 9 to 10 | Physics readiness, material properties | Not started | Open |
 | 5 | 11 to 12 | Export, simulator validation, demo | Not started | Open |
 
 Status values: Not started, In progress, Done. Gate values: Open, Passed, Failed.
-**Current focus:** Phase 1.
+**Current focus:** Phase 3.
 
 ## How to use this file
 
@@ -130,72 +130,17 @@ The types are in `src/video2sim/schemas.py`. Conventions are in `AGENTS.md`.
 ## 4. Phase 0: Foundations and evaluation set (weeks 1 to 2)
 
 Goal: be able to measure every later change, and settle the access questions that could
-block the plan.
+block the plan. Gate passed 2026-10-26. Full record: `docs/history/phases_0_2.md`.
 
-**Do first, in parallel with code.** These need physical time or other people, so start them
-on day one: print the marker board and measure it, collect and weigh the objects, get GPU
-access, and start reading the model licenses (P0.7).
-
-Tasks
-
-- [x] **P0.1** Capture the benchmark: 24 scenes, two camera paths each.
-
-      Tiers: 10 easy, 6 medium, 8 hard (D-013). Prefer objects with published meshes.
-      Four scenes use a clean board (production tags only, no printed grid) with object
-      positions measured by tape, to check that the grid texture does not flatter
-      registration. The rest use the benchmark grid board. Same tag IDs and size on both.
-      Where: `benchmark/scenes/` (not in git), record in `benchmark/scene_list.yaml`.
-      Done 2026-10-26: 24 scenes captured and 24 `ground_truth.json` files generated from
-      `benchmark/scenes.csv` and `benchmark/inventory.csv`, 103 objects, none incomplete.
-      s06, s14 and s24 have only `video_b.mp4`: no orbit was possible there (kitchen surface
-      against the wall, accepted). Evidence: `benchmark/scene_list.yaml`, the two sheets in `benchmark/`.
-
-- [x] **P0.2** Record ground truth per scene: weights, sizes, grid positions, orientations.
-
-      Format: `benchmark/README.md`. Evidence: commits deeade1, d7af32d, acd2d78
-
-- [x] **P0.3** Revise the capture protocol after the first scenes. Where: `docs/capture_protocol.md`.
-
-      Evidence: commit 4768c4e
-
-- [x] **P0.4** Print the scale marker board, measure the tag size with calipers, set the
-
-      marker config. Where: `configs/default.yaml`. Evidence: tag 100 mm verified by calipers
-      (reported by the user), `capture.marker` set in `configs/default.yaml`
-
-- [x] **P0.5** Stage runner: run folder, manifest, hash-based caching. Where: `src/video2sim/runner.py`.
-
-      Evidence: commit 3ba4d80
-
-- [x] **P0.6** Evaluation harness that computes the section 2 metrics and writes a JSON and
-
-      an HTML report. Run it on a trivial baseline to get a floor. Where:
-      `src/video2sim/evaluation/`, command `video2sim eval`. Conventions: D-012, D-014.
-      Evidence: commit 9bdcce7. On the 13 scored dev scenes (63 objects; s21 and s22 left
-      out as deformable) the oracle scores 100% recall with zero error, and the constant-box
-      floor scores 0% recall, so it has no error medians. The floor is a constant box plus a
-      noise-perturbed oracle that tests the metrics. The boxes-from-masks baseline (segment,
-      then extrude a box on the table plane from the marker pose) moves to the next
-      iteration, with its costs: it needs a segmentation backend (D-004), the marker pose and
-      the table plane from Phase 1.
-
-- [x] **P0.7** Access and limits. SAM 3.1 through the Meta Model API versus self-hosting the
-
-      released checkpoint: video length, rate limits, cost. SAM 3D license and GPU memory.
-      TRELLIS.2 GPU memory. Record decisions D-004 and D-005. Where: `docs/licenses.md`
-      Evidence: `docs/licenses.md`, D-004 and D-005 rows in the decision table, commits
-      2a3bbe0 and 49730c9. Open: Meta Model API retention and length limits, Modal and
-      Baseten terms.
-
-- [ ] **P0.8** One GPU environment that runs every model, as a container image. Where: `Dockerfile`
-
-      Deferred past the MVP (2026-10-26): no Docker image for now. Not done, so unticked.
-
-- [x] **P0.9** Continuous integration: ruff, mypy and pytest on every push.
-
-      Where: `.github/workflows/ci.yml` (Python 3.10 and 3.12). Evidence: commit 70c531d; the
-      same four commands pass locally on 2026-10-26 (ruff check, ruff format --check, mypy,
-      102 tests). A green run on GitHub has not been checked.
+- [x] **P0.1** Benchmark: 24 scenes (10 easy, 6 medium, 8 hard, D-013), 103 objects, two camera paths each; s06, s14 and s24 have only `video_b` (no orbit possible). Evidence: `benchmark/scene_list.yaml`, `benchmark/scenes.csv`, `benchmark/inventory.csv`
+- [x] **P0.2** Ground truth per scene, format in `benchmark/README.md`. Evidence: commits deeade1, d7af32d, acd2d78
+- [x] **P0.3** Capture protocol revised, `docs/capture_protocol.md`. Evidence: commit 4768c4e
+- [x] **P0.4** Marker board printed, tag edge measured with calipers, `capture.marker` in `configs/default.yaml`
+- [x] **P0.5** Stage runner with run folder, manifest and hash caching, `src/video2sim/runner.py`. Evidence: commit 3ba4d80
+- [x] **P0.6** Evaluation harness, `video2sim eval` (D-012, D-014): oracle 100% recall, constant-box floor 0%. Evidence: commit 9bdcce7
+- [x] **P0.7** Access and limits, `docs/licenses.md`, D-004 and D-005. Evidence: commits 2a3bbe0, 49730c9. Open: Meta Model API retention and length limits, Modal and Baseten terms
+- [ ] **P0.8** GPU container image. Deferred past the MVP (2026-10-26)
+- [x] **P0.9** CI with ruff, mypy and pytest, `.github/workflows/ci.yml`. Evidence: commit 70c531d, green on GitHub
 
 Exit criteria
 
@@ -204,142 +149,55 @@ Exit criteria
 - [x] Written decisions on SAM 3.1 hosting (D-004) and on model licensing (D-005)
 - [ ] Container image runs all models (deferred past the MVP, see P0.8)
 
-Evidence: gate passed 2026-10-26 by human decision with the container criterion deferred
-(P0.8). CI is green on GitHub.
-
 ## 5. Phase 1: Reconstruction, metric scale, world frame (weeks 3 to 4)
 
 Goal: camera poses, a dense point cloud, true metric scale and a gravity-aligned world
-frame. Everything later depends on this being right.
+frame. Gate passed 2026-10-27. Full record: `docs/history/phases_0_2.md`.
 
-Tasks
+- [x] **P1.1** Back end: pycolmap on CPU, sequential matching (D-016, section 12 item 6b); the VGGT and MASt3R comparison is a post-MVP item (section 12 item 6). Ticked by human decision with the comparison deferred
+- [x] **P1.2** Metric scale from the printed tag edge (100.26 mm, calipers): scale within 0.5% of the board, tag pairs within 0.75% on 9 dev grid videos. Evidence: `benchmark/results/p1_world_frame_dev_tag_1003.json`
+- [x] **P1.3** Table plane and up axis, origin on the reference tag: up axis within 0.35 deg of the board normal. Evidence: same file
+- [x] **P1.4** Quality gates before and after reconstruction with one message per failed check: 5 of 5 degraded videos rejected. Evidence: `benchmark/results/p1_4_capture_gate.json`. Open: a duration limit, a rolling-shutter or autofocus check; the 60 deg coverage limit is a guess to revisit
+- [x] **P1.5** `WorldModel` from `CaptureStage` and `ReconstructionStage`. Evidence: `benchmark/results/p1_5_worldmodel_s01_b.json`. Open: point cloud cropping (stray points below the table)
+- [x] **P1.6** Gate evaluated on 20 dev videos. Evidence: `benchmark/results/p1_world_frame_dev_tag_1003.json`
 
-- [x] **P1.1** Compare two or three back ends on the benchmark, for example classical
+Exit criteria (dev: 19 accepted videos; test: `benchmark/results/p1_world_frame_test.json`, 16 grid videos)
 
-      COLMAP-style SfM with MVS against a feed-forward model such as VGGT or MASt3R. Judge on
-      pose accuracy, runtime and failures on low-texture tables. Keep one and a fallback.
+- [x] 95% of frames registered on easy and medium scenes: 100% on dev and test
+- [x] Mean reprojection error 1 px or less: max 0.77 px dev, 0.72 px test
+- [x] Marker-point distance within 2% after scaling (grid scenes only): max 1.56% dev; test 15 of 16, s16 video_b 2.53% accepted by human decision (warped marker, flagged `tag_scale_disagree`)
+- [x] Up axis within 2 deg of the table normal: max 0.25 deg dev, 1.28 deg test
+- [x] Quality gate rejects the deliberately bad test videos with a useful message
 
-      Decision D-016 (2026-10-26): pycolmap on CPU is the back end for the MVP, with no fallback
-      yet. The VGGT and MASt3R comparison and the GPU build are deferred, see section 12.
-      Ticked 2026-10-27 by human decision with the comparison deferred: it did not happen, and
-      the evidence is D-016 (six scenes, reprojection 0.46 to 0.72 px, all frames registered), not
-      a back-end comparison.
-
-- [x] **P1.2** Metric scale from the marker board: detect tags, compare their measured spacing
-
-      with the known printed size, scale the reconstruction. Accept phone depth or LiDAR as an
-      optional cross-check after the MVP.
-
-      Done with the printed tag edge instead of the spacing, so one or two arbitrarily placed
-      tags are enough; the grid board's known spacing is only a check on grid scenes. Evidence:
-      `benchmark/results/p1_world_frame_dev.json` (9 dev grid videos: scale within 0.5% of the
-      board scale, tag pair distances within 0.75%); code in commits b65dfb4, 72215b7, 540c39e,
-      92e70ec. Tag edge since measured with calipers: 100.26 mm (5 readings, 100.1 to 100.4,
-      s.e. 0.06), `tag_size_m: 0.1003`; re-run in `benchmark/results/p1_world_frame_dev_tag_1003.json`. Not measured:
-      clean-board scenes and the board layout (still the nominal A1 layout).
-
-- [x] **P1.3** Fit the table plane (RANSAC), take its normal as the up axis, put the origin on
-
-      the marker board.
-
-      The origin is on a reference tag (the one seen in most frames). Evidence: same file; up
-      axis within 0.35 degrees of the board normal on the 9 dev grid videos. The board normal
-      comes from the tag corners, so it is not fully independent of the plane fit.
-
-- [x] **P1.4** Quality gate and frame sampling: blur and exposure filter, camera coverage,
-
-      reprojection error. A failing video gets a specific message.
-
-      Two gates, one message per failed check, all failures in one report. Before
-      reconstruction (`stages/capture.py`): blur-aware sampling (sharpest frame of each
-      1/5 s window), blur, exposure, marker visibility, frame count. After it
-      (`reconstruction.check_reconstruction`): registered fraction, fragmentation,
-      reprojection error, marker in 3D, camera coverage. Evidence:
-      `benchmark/results/p1_4_capture_gate.json` (36 dev videos, 31 accepted, 5 deliberately degraded copies
-      of s01 video_a: all 5 rejected with the matching message) and
-      `benchmark/results/p1_world_frame_dev.json` (20 dev videos with reconstruction gate
-      reasons). Findings: s12, the scene noted as blurred, passes both gates and reconstructs
-      (0.4 to 0.6% scale error); s01 alt_lighting B is rejected by both (37% blurred, 71% of
-      frames registered); s12 alt_path is rejected for blur but reconstructs (1.0% scale error),
-      so the blur limit is stricter than reconstruction needs. Thresholds are guesses tuned on
-      dev videos (`capture.quality`, `reconstruction.quality`); the coverage limit (60 degrees)
-      is not backed by data and should be revisited in Phase 3. Not done: a duration limit (the
-      10 to 60 s rule would reject benchmark videos that reconstruct fine), wiring the gates
-      into the stage runner (P1.5), and a rolling-shutter or autofocus-hunting check.
-
-- [x] **P1.5** Emit `WorldModel`.
-
-      `CaptureStage` and `ReconstructionStage` run through the `Runner`; gate failures raise
-      with the specific messages. Added `WorldModel.flags` for scene-level warnings. Evidence:
-      run `s01_b` (`benchmark/run_stages.py`, local, `runs/` is not in git), summary in
-      `benchmark/results/p1_5_worldmodel_s01_b.json`: 46 of 46 frames registered, 0.54 px, scale
-      from the marker, cameras 0.58 to 0.75 m above the table. Not done: a rejected video run
-      through the real stages (only a synthetic test covers it), more than one video, and
-      cropping the point cloud (stray points lie below the table).
-
-- [x] **P1.6** Evaluate the gate on the benchmark (`gates.reconstruction` in the config).
-
-      Evidence: `benchmark/results/p1_world_frame_dev_tag_1003.json` (20 dev videos, tag edge 100.3 mm, pycolmap 4.2.1,
-      code at commit 30b3530). 19 videos accepted and all pass the four gates; s01 alt_lighting B is
-      rejected with specific messages. Caveats: (1) dev split only, the test split has not been
-      run, so this is not a phase-gate result; (2) frames sampled at a fixed 3 fps, not through
-      the capture gate's blur-aware sampling; (3) the board layout is the nominal A1 grid, not
-      measured, so the marker-distance and up-axis errors inherit that assumption (the board
-      normal comes from the tag corners, so up axis is not fully independent of the plane fit);
-      (4) grid scenes only, no clean-board scene; (5) flags remain on s02 video_a
-      (`sfm_fragmented`) and s12 video_a, video_b, alt_path (`tag_scale_disagree`, spread 4.2 to
-      16.5%), which the gates do not reject.
-
-Exit criteria
-
-- [x] 95% of frames registered on easy and medium scenes: 100% on all 19 accepted dev videos (s01B: 57%, rejected)
-- [x] Mean reprojection error 1 px or less: max 0.77 px (s12 alt_path)
-- [x] Distance between two known marker points correct within 2% after scaling. Only applies to the scenes that are shot on the known grid surface. Max 1.56% (s12 alt_path), grid scenes only
-- [x] Up axis within 2 degrees of the measured table normal: max 0.25 degrees (s06 video_b); the normal is the board normal from tag corners
-- [x] Quality gate rejects the deliberately bad test videos with a useful message: s01 alt_lighting B rejected (57% registered vs 95%, 49 degrees coverage vs 60); the 5 degraded copies in `benchmark/results/p1_4_capture_gate.json`
-
-Evidence: `benchmark/results/p1_world_frame_dev_tag_1003.json` (20 dev videos, 19 accepted, 1 rejected). Dev split only, fixed 3 fps, nominal board layout; see the P1.6 entry for caveats.
-
-Test split (phase-gate run): `benchmark/results/p1_world_frame_test.json` (16 videos from 8 grid scenes, commit 1413958). Registered frames 100% on all 16, max reprojection error 0.72 px (s08 video_a), max up-axis error 1.28 degrees (s15 video_b). Marker-pair distance passes on 15 of 16; s16 video_b fails at 2.53% (limit 2%) and s16 video_a passes at 1.95%. Human decision: the s16 miss is expected, because the marker is badly warped in that footage; both s16 videos carry the `tag_scale_disagree` flag (5.9% and 3.3%). It is an input defect, not a pipeline pass. Without s16 the worst error is 1.54% (s07 video_b). Not run: s10, the only clean-board test scene, because the evaluation script handles grid scenes only; clean-board reconstruction is unevaluated in both splits. Same caveats as P1.6: fixed 3 fps sampling and a nominal board layout.
+Caveats: fixed 3 fps sampling, nominal board layout, clean-board reconstruction not evaluated.
 
 ## 6. Phase 2: Segmentation, tracking, 3D lifting (weeks 5 to 6)
 
 Goal: every physical object is exactly one instance, with a mask in each frame and a clean
-point cluster in the world frame.
+point cluster in the world frame. Gate passed 2026-10-29. Full record: `docs/history/phases_0_2.md`; cluster box
+work: `docs/research/cluster_box_accuracy.md`.
 
-Tasks
-
-- [ ] **P2.1** Object discovery. A vision-language model lists the objects on a few sampled
-
-      frames, then SAM 3.1 is prompted per noun. Compare with automatic mask proposals on
-      recall and keep the better one.
-
-- [ ] **P2.2** Tracking with SAM 3.1 tracks. Repair identity errors with 3D consistency:
-
-      merge tracks that project onto the same cluster, split tracks that cover two.
-
-- [ ] **P2.3** Lift masks to 3D. A point is kept only when several views agree. Remove
-
-      outliers, hands and arms.
-
-- [ ] **P2.4** Keyframe selection per object: score mask area, occlusion, border contact and
-
-      sharpness. Store the top 3 to 5.
-
-- [ ] **P2.5** Failure flags: unstable depth (likely transparent or reflective), thin, tiny,
-
-      heavily occluded.
-
-- [ ] **P2.6** Emit `Instances`.
+- [x] **P2.1** Object discovery: generic SAM prompt 96.8% recall, VLM plus SAM 98.4% with 5.6x the false positives; generic kept. Evidence: `benchmark/results/p2_1_sam_generic.json`, `p2_1_vlm_sam.json`. The discovery code was removed in eef52b6: tracking finds the objects
+- [x] **P2.2** One SAM 3.1 video request per scene plus 3D identity repair: 0 switches on 13 scenes, 60 of 63 rigid objects tracked. Evidence: `benchmark/results/p2_2_dev.json`, `p2_2_test.json`
+- [x] **P2.3** Lift to 3D: voted sparse points without the outermost strays, then a box, cylinder or sphere fitted to the masks; the visual hull is kept for the shape flags. Evidence: `benchmark/results/p2_3b_dev.json` (earlier lifts: `p2_3_dev.json`, `p2_3_test.json`)
+- [x] **P2.4** Keyframes per object with a camera-pose diversity penalty. Evidence: `benchmark/results/p2_4_dev.json`
+- [x] **P2.5** Failure flags (small, thin, occluded, reflective, non-rigid), scene router, material pass (D-017). Evidence: `benchmark/results/p2_5_flags.json`, `p2_5_material.json`, `p2_5_router.json`, `p2_5_router_hard.json`
+- [x] **P2.6** `Instances` from `SegmentationStage`, `point_cluster_path` is the fitted cluster (human decision 2026-10-29). Evidence: `benchmark/results/p2_6_instances.json`, `p2_6b_instances.json`, `p2_test_instances.json`
 
 Exit criteria
 
-- [ ] Object recall 90% or more on the benchmark
-- [ ] At most one identity switch per scene on average
-- [ ] Point clusters on the easy scenes have bounding boxes within 10% of measured size
-- [ ] Failure flags raised on all four hard scenes
+- [x] Object recall 90% or more on the benchmark: 96.8% (P2.1); 92.9% on the test split through the stage
+- [x] At most one identity switch per scene on average: 0.0 (P2.2)
+- [x] Point clusters on the easy scenes have bounding boxes within 10% of measured size: test 6.0% median over 13 objects in s07 to s09 (`benchmark/results/p2_eval_segmentation_test.json`), dev 4.3%. Ticked 2026-10-29 by human decision with s10 unscored (clean-board origin not established)
+- [x] Failure flags raised on all eight hard scenes (s17 to s24), with the per-scene rules in `docs/history/phases_0_2.md`. Evidence: `benchmark/results/p2_5_flags.json`
 
-Evidence:
+Open from Phase 2 (none blocks Phase 3):
+
+- `eval` does not score identity switches (no track loader) and its flag rule is the old one-flag-per-scene check; the real checks are `benchmark/run_tracking.py` and `benchmark/report_flags.py`.
+- No end-to-end stage test with fake hosted clients. The router's missing-object count has no `schemas.py` field.
+- Easy-tier box failures are white-on-white parts the masks miss (in-ear box tab, mug handles).
+- Revisit the cleared reflective objects (s17 mirror cube, s18 foil figure) after the first Phase 3 shape runs.
+- The s05 and s10 clean-board origins are not established, so both scenes are unscored.
 
 ## 7. Phase 3: Shape completion and pose fusion (weeks 7 to 8)
 
@@ -413,7 +271,9 @@ Tasks
 - [ ] **P4.4** Material inference. A vision-language model sees keyframe crops and returns
 
       structured fields only: category, material class, solid or hollow, confidence. Code
-      maps the class to numbers through the table.
+      maps the class to numbers through the table. The classification half already runs in
+      Phase 2 (D-017, `stages/material_pass.py`, plus a surface-finish field); this task is
+      done when the numbers half exists and the class list is final (P4.3).
 
 - [ ] **P4.5** Mass and inertia from the repaired mesh under uniform density, with a hollow
 
@@ -523,6 +383,7 @@ one that supersedes.
 | D-014 | Deformables, refining D-013: `video2sim eval` leaves out every scene that has an object with `deformable: true` in its ground truth (s21 to s23), not just the object. They are listed in the report header as `scenes_excluded_deformable` and do not enter any metric or count. `--scene ID` still evaluates one on request. The scenes stay in the benchmark for testing after the MVP | Decided | Week 2 | `evaluation/scenes.py`, `cli.py` |
 | D-015 | Shape stage inference: run the SAM 3D Objects and TRELLIS.2 checkpoints on Modal or Baseten GPUs, because the Meta Model API does not offer them. Hope for support, not confirmed | Open | Week 2 | Terms of Modal and Baseten read 2026-10-26: neither trains on customer data, neither forbids it, both leave the model licenses in force. SAM 3D access granted 2026-10-26. Needs: GPU credits on Modal or Baseten, a test run of a checkpoint on one host, and a fallback of boxes from masks if neither host works |
 | D-016 | Reconstruction back end for the MVP: pycolmap on CPU (`reconstruction.backend: pycolmap`). Evidence 2026-10-26, mean reprojection error and frames registered: s01_b 0.50 px 28/28, s02_a 0.72 px 108/108, s05_b 0.54 px 20/20, s10_a 0.46 px 187/187, s19_a 0.58 px 193/193, s23_a 0.47 px 68/68, at 3 fps and 1280 px on an Apple M4 CPU, 3 s to 281 s per video. Pose and scale accuracy not yet measured. VGGT, MASt3R and `pycolmap-cuda12` are deferred past the MVP | Decided | Week 3 | Run was in a scratchpad script, not committed. `pycolmap-cuda12` is a separate Linux-only package with the same module name, so it would be a mutually exclusive extra |
+| D-017 | Material pass pulled forward (2026-10-28, human decision). The classification half of P4.4 (category, material class, surface finish, solid or hollow, confidence) runs in Phase 2 as one hosted VLM request per object on its best 2 keyframe crops (`segmentation.material_pass.keyframes`), and it also raises `Flag.TRANSPARENT_OR_REFLECTIVE` (P2.5). The class list in `configs/default.yaml` is provisional, made from the materials seen on the dev scenes, with no numbers; P4.3 completes the list and the values with sources, and the mapping to numbers stays in P4.4. Reason: the geometry-only gate cleared a mirror cube and a foil figure, and asking every object is cheaper than two separate calls | Decided | Week 5 | `src/video2sim/stages/material_pass.py`, `benchmark/run_material_pass.py` |
 
 ## 12. After the MVP
 
@@ -548,15 +409,37 @@ In order:
 
    replacing the material-class guess.
 
-6. **Reconstruction back ends (from P1.1).** Compare VGGT (and MASt3R) with pycolmap on the
+6. **Reconstruction back ends (from P1.1).** On s16 video_a, pycolmap is the most accurate
+   back end; VGGT is about 20x faster on a GPU with twice the tag distance error. Verdict
+   (2026-10-28): VGGT becomes an opt-in fast mode, `reconstruction.backend: vggt`, after the
+   MVP, with an automatic pycolmap fallback when a gate fails; measure the fallback rate on the
+   full dev set first; non-commercial checkpoint. D-016 stands. Results and conditions:
+   `docs/history/reconstruction_experiments.md`; branches `experiment/vggt-modal` and
+   `experiment/colmap-cuda-modal` stay unmerged.
 
-   benchmark for tag-scale and up-axis error and on failures on low-texture tables, and check
-   that `pycolmap-cuda12` runs and how much faster it is on a GPU. Both need a GPU host,
-   weight downloads and license decisions (`docs/licenses.md`).
+6b. **pycolmap optimisation.** Sequential matching is the default (1.3x to 4.2x faster on five
+   videos, quality inside the proposed limits); fewer frames or a smaller image lose the tag
+   distance gate; the global mapper stays off. Open: rerun the full dev set and test split
+   through the P1.6 evaluation, and put the proposed quality limits in `configs/targets.yaml`
+   (human). Tables and steps: `docs/history/reconstruction_experiments.md`.
 
-   If VGGT passes the accuracy gates, add it as an opt-in `reconstruction.backend: vggt` (a
-   `run_sfm_vggt` returning `SfmModel`, torch behind an optional extra); expected gain is mainly
-   on long (~190 frame) videos, unmeasured.
+7. **VGGT geometry for SAM 3D (from P2.3 and the shape stage).** Experiment: improve SAM 3D
+   output by giving it a pointmap and by registering its mesh against dense geometry, instead
+   of the sparse pycolmap cloud (10k to 26k points, weak on glossy surfaces).
+
+   Idea: run VGGT on the registered frames for per-frame dense depth and pointmaps with a
+   confidence per pixel. Pass the pointmap of each object keyframe to SAM 3D (its optional
+   pointmap input, format to be checked in its docs). Keep the pycolmap poses and the marker
+   scale as the reference: fit the VGGT geometry to them so the metric scale and the world
+   frame do not change. Dense surface points would also replace the visual hull of P2.3,
+   whose boxes read about 35% too large from a 127 degree handheld arc even with perfect
+   silhouettes.
+
+   Measure against the MVP, with the same benchmark scenes: SAM 3D mesh size and pose error
+   with and without the pointmap, cluster box error with dense points, VGGT pose and scale
+   error against pycolmap, and runtime and memory per video. Pass only if the metrics gain
+   without breaking the reconstruction gates. Needs a GPU host, weights and a license check
+   (`docs/licenses.md`); `benchmark/modal_vggt.py` is an untracked first attempt.
 
 ## 13. Changelog
 
@@ -580,3 +463,11 @@ In order:
 | 2026-10-27 | P1.4: capture and reconstruction quality gates, saved results in `benchmark/results/` |
 | 2026-10-27 | P1.6: gate evaluated on 20 dev videos with the caliper tag edge (100.26 mm); P1.2 caliper note updated; Phase 1 exit criteria ticked with caveats in the P1.6 entry |
 | 2026-10-27 | P1.6: test-split run on 16 videos; s16 marker-distance miss accepted as a warped-marker input defect by human decision; s10 clean-board not run; results in `benchmark/results/p1_world_frame_test.json` |
+| 2026-10-28 | Section 12 item 6: s16 video_a table of pycolmap (CPU, GPU), VGGT and VGGT with tag refinement, accuracy and process times, gathered from the two experiment branches |
+| 2026-10-28 | Section 12 item 6: P1.1 experiment closed; VGGT added as a post-MVP opt-in fast mode with automatic pycolmap fallback; item 6b added for pycolmap optimisation |
+| 2026-10-28 | Section 12 item 6b step 1: local pycolmap profile on five videos; exhaustive matching is 59 to 80% of the time above 28 frames |
+| 2026-10-28 | Section 12 item 6b steps 2 to 5: sequential matching is 1.3 to 4.2x faster on five videos with quality inside the proposed limits and is the new default (`reconstruction.sfm.matcher`); global mapper, fewer frames, smaller images, fewer features and lighter BA tried and not adopted |
+| 2026-10-28 | P2.4: keyframe selection per object with a camera-pose diversity penalty, `benchmark/results/p2_4_dev.json` |
+| 2026-10-28 | P2.5 and P4.4: D-017 pulls the VLM material classification forward as a single per-object pass that also raises the reflective flag; geometry kept as a cross-check, `segmentation.material_pass` config added, no hosted run yet |
+| 2026-10-29 | Phase 2 cluster box criterion ticked by human decision (test split 6.0% median on s07 to s09, s10 unscored); Phase 2 gate passed; Phase 3 is the current focus |
+| 2026-10-29 | Cleanup before Phase 3: evidence narratives of Phases 0 to 2 and the section 12 reconstruction experiments moved verbatim to `docs/history/`; P2.1 discovery code removed (eef52b6) |
