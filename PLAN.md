@@ -6,19 +6,19 @@ roadmap: update it as work happens. Numbers that gate a decision live in
 
 ## Status
 
-Last updated: 2026-10-26. Start date: not set (decision D-002).
+Last updated: 2026-10-29. Start date: not set (decision D-002).
 
 | Phase | Weeks | Focus | Status | Gate |
 | --- | --- | --- | --- | --- |
 | 0 | 1 to 2 | Foundations, benchmark, evaluation harness | Done | Passed |
 | 1 | 3 to 4 | Reconstruction, metric scale, world frame | Done | Passed |
-| 2 | 5 to 6 | Segmentation, tracking, 3D lifting | Open | Open |
+| 2 | 5 to 6 | Segmentation, tracking, 3D lifting | Done | Passed |
 | 3 | 7 to 8 | Shape completion and pose fusion | Not started | Open |
 | 4 | 9 to 10 | Physics readiness, material properties | Not started | Open |
 | 5 | 11 to 12 | Export, simulator validation, demo | Not started | Open |
 
 Status values: Not started, In progress, Done. Gate values: Open, Passed, Failed.
-**Current focus:** Phase 1.
+**Current focus:** Phase 3.
 
 ## How to use this file
 
@@ -339,7 +339,7 @@ Exit criteria
 
 - [x] Object recall 90% or more on the benchmark
 - [x] At most one identity switch per scene on average
-- [ ] Point clusters on the easy scenes have bounding boxes within 10% of measured size
+- [x] Point clusters on the easy scenes have bounding boxes within 10% of measured size. Evidence: `benchmark/results/p2_eval_segmentation_test.json` (test split, 6.0% median over 13 objects in s07 to s09; s10 unscored, clean-board origin not established), dev `benchmark/results/p2_eval_segmentation_dev.json` (4.3%), see the cluster box gate entry below. Ticked 2026-10-29 by human decision with s10 unscored
 - [x] Failure flags raised on all eight hard scenes (s17 to s24). Reflective: every object labelled reflective in s17 to s20 is flagged (s18: the chocolate santa only; s19: the alarm is reflective on its screen only, so either result passes). Deformable: every tracked object with a point cluster in s21 to s23 is flagged (those scenes hold deformable objects only; tracks without a cluster are dropped when `Instances` is emitted, P2.6), except the s21 basketball, which is borderline (inflated shell) and counts as a pass either way. s24 additionally needs at least one track. Test scenes s19, s20 and s23 are reported separately and not used for tuning (changed 2026-10-28, human decision) Evidence: `benchmark/results/p2_5_flags.json`, P2.5 final run entry below (decision 2026-10-29: clustered tracks only).
 
 Evidence:
@@ -411,7 +411,7 @@ Evidence:
   - **Not done.** No end-to-end stage test with fake hosted clients (only unit tests of the assembly helpers). `video2sim eval` expects `runs/<scene>/shape/output.json` and does not read `Instances` yet, so the harness flag criterion (`FLAG_SCENES`) is unchanged.
   - **Cluster choice.** `point_cluster_path` is the sparse-point lift (18.7% median box error on the easy tier in P2.3, against 36.4% for the hull); a track with no sparse points falls back to its hull with a reason (1 of 75 objects: s12 obj_006, a thin box). Neither lift meets the 10% gate, so that exit criterion stays open. 75 objects over 18 runs, every cluster and hull file present, sparse points per object: min 12, median 550. Whether Phase 3 should register against points or hull is still P3.2's comparison.
   - **Reruns.** A rerun of all 18 after the cluster switch made no hosted calls. Compared with the P2.5 report, one object changed: the s24 cube is now flagged reflective because the stage's fresh answer had confidence 0.48 (matte), where the P2.5 answer was confident; the flag on that matte cube is VLM noise, not a measurement.
-- Cluster box gate follow-up (2026-10-29, not ticked). Write-up: `docs/research/cluster_box_accuracy.md`; evidence `benchmark/results/p2_3b_dev.json` (`benchmark/run_lift.py` on the 13 dev runs, s05 unscored). Two changes: `lift.trim_extremes` drops the 2 outermost sparse points per side of the resting box (`segmentation.lift.trim_points_per_side`), which removes the stray short-track points that set most boxes; `stages/primitive_fit.py` fits an upright box, cylinder or sphere to the masks from those points, and takes the union with the points when the best fit is poor (`segmentation.primitive_fit`).
+- Cluster box gate follow-up (2026-10-29, ticked). Write-up: `docs/research/cluster_box_accuracy.md`; evidence `benchmark/results/p2_3b_dev.json` (`benchmark/run_lift.py` on the 13 dev runs, s05 unscored). Two changes: `lift.trim_extremes` drops the 2 outermost sparse points per side of the resting box (`segmentation.lift.trim_points_per_side`), which removes the stray short-track points that set most boxes; `stages/primitive_fit.py` fits an upright box, cylinder or sphere to the masks from those points, and takes the union with the points when the best fit is poor (`segmentation.primitive_fit`).
 
   | dev scenes | hull | points, trimmed | fitted |
   |---|---|---|---|
@@ -422,7 +422,8 @@ Evidence:
   - **Decision (human, 2026-10-29): the criterion reads the fitted cluster.** `point_cluster_path` now points to it (superseding the P2.6 cluster choice above; no `schemas.py` field changed); the trimmed points are beside it as `clusters/obj_NNN_points.npy`, with the hull and `segmentation/fit.json` (kind, size, mask cost, source). A union or points-only cluster carries a note in `flag_reasons`. Checked offline on s01_b, s03_b and s06_b through `SegmentationStage` with clients that refuse hosted calls: every object and scene flag equals the P2.6 output, except the s03 ball's material answer, which is a cache the harness did not seed (it lives only in `runs_instances/`).
   - **Through the stage** (`benchmark/results/p2_6b_instances.json`): `SegmentationStage` rerun on all 18 runs in `runs_instances/` with clients that refuse hosted calls; no call was needed. Against P2.6, the only change is a note in `flag_reasons` on the 27 union clusters. Scoring `point_cluster_path` of the 12 scored dev runs with the benchmark alignment gives 4.3% easy-tier median (15 of 19 within 10%) and 7.5% over all 56 matched objects, the same as `run_lift.py`.
   - **`video2sim eval --stage segmentation` now aligns.** Before, it scored world-frame clusters against board-frame ground truth (recall 3%, 2 of 59 matched, on the same runs). It now moves each run's clusters into the board frame with `evaluation/alignment.py:align_scene`: the board fit on grid scenes, tag 0 on the clean-board scenes s14 and s24 (`CLEAN_ALIGNED`, moved from `benchmark/run_discovery.py`), and any other clean board (s05) is listed as without a usable prediction. On the 12 scored dev runs in `runs_instances/` (`benchmark/results/p2_eval_segmentation_dev.json`): recall 94.9% (56 of 59), cluster box error 4.3% median on the easy tier (n 19, gate 10%), the same as the benchmark scripts. Switches stay `no_data` and the flag row `partial` (s19 and s20 are test scenes), as before.
-  - **Why not ticked.** Both values were chosen on the same 19 dev objects; the easy test scenes (s07 to s10) have no runs; the trimmed points pass by one object and the fitted cluster by five. Remaining easy failures after the fit are white-on-white parts that the masks miss (s01 and s04 in-ear box tab, s02 mug handles).
+  - **Test split (2026-10-29, run once, nothing tuned on it).** s07_b, s08_b, s09_b and s10_b run through capture, reconstruction (`benchmark/run_stages.py`; every frame registered, 0.29 to 0.55 px) and `SegmentationStage` with the hosted clients (`benchmark/run_instances.py`, `benchmark/results/p2_test_instances.json`; first upload of these four videos, human approval 2026-10-29: 4 SAM video requests, 4 router requests, 16 material requests). `video2sim eval --split test --stage segmentation` over those plus the earlier test runs s16_a, s19_b, s20_b (`benchmark/results/p2_eval_segmentation_test.json`): **cluster box error 6.0% median on the easy tier, 13 objects in s07 to s09, 9 within 10% (gate 10%, passed)**; recall 92.9% (26 of 28). s10 is a clean board whose ground-truth origin is not established, so it is unscored, like s05. The easy failures are the same kinds as on dev: in-ear box 18%, mugs 19% and 31%, action camera 20%.
+  - **Ticked 2026-10-29 by human decision**, with s10 unscored (3 of the 4 easy test scenes measured). On dev, both values were chosen on the same 19 objects; the test split was run once and not tuned on. Remaining easy failures after the fit are white-on-white parts that the masks miss (s01 and s04 in-ear box tab, s02 mug handles).
 
 ## 7. Phase 3: Shape completion and pose fusion (weeks 7 to 8)
 
@@ -864,3 +865,4 @@ In order:
 | 2026-10-28 | Section 12 item 6b steps 2 to 5: sequential matching is 1.3 to 4.2x faster on five videos with quality inside the proposed limits and is the new default (`reconstruction.sfm.matcher`); global mapper, fewer frames, smaller images, fewer features and lighter BA tried and not adopted |
 | 2026-10-28 | P2.4: keyframe selection per object with a camera-pose diversity penalty, `benchmark/results/p2_4_dev.json` |
 | 2026-10-28 | P2.5 and P4.4: D-017 pulls the VLM material classification forward as a single per-object pass that also raises the reflective flag; geometry kept as a cross-check, `segmentation.material_pass` config added, no hosted run yet |
+| 2026-10-29 | Phase 2 cluster box criterion ticked by human decision (test split 6.0% median on s07 to s09, s10 unscored); Phase 2 gate passed; Phase 3 is the current focus |
