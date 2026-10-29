@@ -220,12 +220,28 @@ class ObjectInstance(Model):
     point_cluster_path: RelPath
     keyframes: list[int] = Field(description="Best frames for shape prediction, best first")
     flags: list[Flag] = Field(default_factory=list)
+    flag_reasons: list[str] = Field(
+        default_factory=list, description="Why each flag was raised, and notes on missing checks"
+    )
+    # The material pass (decision D-017); None when no answer could be read. Class names come
+    # from the closed list in configs/default.yaml, and the numbers behind a class stay in
+    # the material table.
+    category: str | None = Field(default=None, description="Short noun from the vision model")
+    material_class: str | None = None
+    finish: str | None = None
+    hollow: str | None = Field(default=None, description="solid, hollow or unknown")
+    rigidity: str | None = Field(default=None, description="rigid, semi_rigid, deformable, unknown")
+    material_confidence: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
 class Instances(Model):
     """Output of stage 3."""
 
     objects: list[ObjectInstance]
+    flags: list[str] = Field(
+        default_factory=list,
+        description="Scene-level warnings for the QA report, such as fewer objects than expected",
+    )
 
     @model_validator(mode="after")
     def _unique_ids(self) -> Instances:

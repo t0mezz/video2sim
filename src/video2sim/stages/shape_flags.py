@@ -23,7 +23,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from video2sim.schemas import Flag, WorldModel
+from video2sim.schemas import Flag
 from video2sim.stages.keyframes import KeyframeConfig, frame_stats
 from video2sim.stages.tracking import Track
 
@@ -103,13 +103,10 @@ def principal_extents(points: F64, voxel_m: float) -> tuple[float, float, float]
 
 def shape_signals(
     tracks: Sequence[Track],
-    world: WorldModel,
-    run_dir: Path,
-    clusters_dir: Path,
+    hulls: Mapping[int, F64],
     cfg: ShapeConfig,
 ) -> list[ShapeSignals]:
     """Size, thinness and occlusion numbers for every track."""
-    del run_dir  # frames are not read: occlusion uses masks only
     frames = sorted({f for t in tracks for f in t.masks})
     seen: dict[int, list[float]] = {t.track_id: [] for t in tracks}
     for frame in frames:
@@ -122,8 +119,8 @@ def shape_signals(
                 seen[track_id].append(s.occlusion_frac)
     out = []
     for t in tracks:
-        path = clusters_dir / f"track_{t.track_id:03d}.npy"
-        extents = principal_extents(np.load(path), cfg.voxel_m) if path.is_file() else None
+        hull = hulls.get(t.track_id)
+        extents = principal_extents(hull, cfg.voxel_m) if hull is not None and len(hull) else None
         fracs = seen[t.track_id]
         share = (
             float(np.mean([f > cfg.occluded_frame_frac for f in fracs]))
@@ -131,8 +128,15 @@ def shape_signals(
             else None
         )
         out.append(ShapeSignals(t.track_id, extents, len(fracs), share))
-    del world
     return out
+
+
+def load_hulls(directory: Path) -> dict[int, F64]:
+    """Hull clusters written as ``track_NNN.npy``, by track id."""
+    return {
+        int(path.stem.split("_")[1]): np.load(path).astype(np.float64)
+        for path in sorted(directory.glob("track_*.npy"))
+    }
 
 
 def judge_shape(sig: ShapeSignals, cfg: ShapeConfig) -> ShapeFlags:

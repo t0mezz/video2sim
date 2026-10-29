@@ -14,9 +14,7 @@ from pathlib import Path
 
 import yaml
 
-from video2sim.runner import OUTPUT_FILE
-from video2sim.schemas import WorldModel
-from video2sim.stages.shape_flags import ShapeConfig, shape_signals
+from video2sim.stages.shape_flags import ShapeConfig, load_hulls, shape_signals
 from video2sim.stages.tracking import load_tracks
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -37,11 +35,8 @@ def main() -> None:
         seg = run_dir / "segmentation"
         if not (seg / "tracks").is_dir():
             continue
-        world = WorldModel.model_validate_json(
-            (run_dir / "reconstruction" / OUTPUT_FILE).read_text(encoding="utf-8")
-        )
         tracks = load_tracks(seg / "tracks")
-        for sig in shape_signals(tracks, world, run_dir, seg / "clusters", cfg):
+        for sig in shape_signals(tracks, load_hulls(seg / "clusters"), cfg):
             row = {"run": run_id, **sig.as_dict()}
             rows.append(row)
             print(json.dumps(row), flush=True)

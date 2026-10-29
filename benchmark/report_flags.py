@@ -22,9 +22,8 @@ from typing import Any
 import yaml
 
 from video2sim.evaluation.scenes import load_scene
-from video2sim.runner import OUTPUT_FILE
-from video2sim.schemas import Flag, WorldModel
-from video2sim.stages.shape_flags import ShapeConfig, judge_all, shape_signals
+from video2sim.schemas import Flag
+from video2sim.stages.shape_flags import ShapeConfig, judge_all, load_hulls, shape_signals
 from video2sim.stages.tracking import load_tracks
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -46,11 +45,8 @@ def main() -> None:
     for run_id in args.run_ids:
         run_dir = args.runs / run_id
         seg = run_dir / "segmentation"
-        world = WorldModel.model_validate_json(
-            (run_dir / "reconstruction" / OUTPUT_FILE).read_text(encoding="utf-8")
-        )
         tracks = load_tracks(seg / "tracks") if (seg / "tracks").is_dir() else []
-        shape = judge_all(shape_signals(tracks, world, run_dir, seg / "clusters", cfg), cfg)
+        shape = judge_all(shape_signals(tracks, load_hulls(seg / "clusters"), cfg), cfg)
         mat_path = seg / "material_pass.json"
         material = (
             {int(r["track"]): r for r in json.loads(mat_path.read_text())}
