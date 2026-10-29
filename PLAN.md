@@ -226,6 +226,18 @@ Tasks
   Here $Y$ is the observed cluster, $\mathcal{M}$ the generated mesh, $\pi_f$ the rendering
   into frame $f$ and $M_f$ the SAM mask in that frame.
 
+  Status 2026-10-29: `stages/registration.py` (`shape.registration` config) fits the cost
+  with Levenberg-Marquardt in NumPy. $\mathcal{L}_{\text{mask}}$ is done without rendering:
+  mesh samples outside the mask (other objects' masks allowed, for occlusion) plus the mesh's
+  reach along 8 image directions against the mask's. Only the rotation of SAM 3D's layout is
+  used as the start, with four yaw starts; scale and centre start from the cluster, since
+  SAM 3D's translation and scale are in its own depth units. Target $Y$ is
+  `point_cluster_path` (human decision 2026-10-29; the voted SfM points would need a schema
+  field). Synthetic box, six views on a handheld arc: under 1 mm corner error and under 0.75%
+  scale error, also with 5% strays, one occluded view or only the top face observed
+  (`tests/test_registration.py`). Open: weights are untuned first guesses, no real SAM 3D
+  sample has been registered yet (needs the P3.1 worker), and it is not yet wired into a stage.
+
 - [ ] **P3.3** Bake-off, time-boxed to one week: SAM 3D, TRELLIS.2, and SAM 3D pose with
 
       TRELLIS.2 geometry, scored on the full benchmark by pose error, point-to-mesh distance
