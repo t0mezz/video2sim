@@ -149,6 +149,13 @@ segmentation:
 shape:
   backend: null                # TODO(P3.3): chosen in the Phase 3 bake-off
   samples_per_keyframe: 3
+  sam3d:                       # P3.1, models/sam3d.py
+    checkpoint: facebook/sam-3d-objects   # Hugging Face repo; the host reports the revision
+    stage1_inference_steps: null   # null keeps SAM 3D's own default
+    stage2_inference_steps: null
+    # Off until the P3.3 A/B: the paper reports shape barely depends on it, and P3.2 sets
+    # pose and scale from the metric cloud (docs/research/sam3d.md, section 5)
+    use_pointmap: false
 
 physics:
   material_table: configs/material_table.yaml

@@ -209,6 +209,11 @@ Tasks
 - [ ] **P3.1** Adapters for SAM 3D Objects and TRELLIS.2 behind one interface. Draw several
 
       samples per keyframe, because both are generative. Where: `src/video2sim/models/`
+      Status 2026-10-29: interface (`shape_model.py`) and the SAM 3D client with pose and mesh
+      decoding (`sam3d.py`, `shape.sam3d` config) done and tested offline. Open: the hosted
+      worker (D-015, needs the `modal` dependency and approval), a first hosted run that checks
+      the mesh frame against the keyframe mask, and the TRELLIS.2 adapter. Single view first,
+      MV-SAM3D only as a P3.3 arm (`docs/research/sam3d_multiview.md`)
 
 - [ ] **P3.2** Registration. SAM 3D's predicted layout is the starting pose. Refine a
 
