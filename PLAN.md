@@ -211,10 +211,13 @@ Tasks
       samples per keyframe, because both are generative. Where: `src/video2sim/models/`
       Status 2026-10-29: interface (`shape_model.py`) and the SAM 3D client with pose and mesh
       decoding (`sam3d.py`, `shape.sam3d` config) done and tested offline. The Modal worker
-      (`sam3d_modal.py`, `modal` dependency added 2026-10-29 by human approval) is written, not
-      built or deployed. Open: the image build, the weight download and a first hosted run
-      that checks the mesh frame against the keyframe mask (each needs a go-ahead), and the
-      TRELLIS.2 adapter. Single view first,
+      (`sam3d_modal.py`, `modal` dependency added 2026-10-29 by human approval) is built and
+      deployed (human go-ahead 2026-10-29), checkpoint `facebook/sam-3d-objects@2e73555`.
+      First hosted run, s01 `track_003` keyframe 37, seed 0: 112 s with a cold start, 702k
+      vertices; the placed mesh projected with our intrinsics overlaps the mask at IoU 0.72.
+      The same mesh with the GLB turn kept scores 0.67 and without the PyTorch3D axis flip
+      0.00, so the decoded conventions hold, though one flat box does not separate the GLB
+      turn sharply. Open: more objects, and the TRELLIS.2 adapter. Single view first,
       MV-SAM3D only as a P3.3 arm (`docs/research/sam3d_multiview.md`)
 
 - [ ] **P3.2** Registration. SAM 3D's predicted layout is the starting pose. Refine a

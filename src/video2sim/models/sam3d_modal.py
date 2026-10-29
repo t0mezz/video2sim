@@ -49,16 +49,21 @@ weights = modal.Volume.from_name("video2sim-sam3d-weights", create_if_missing=Tr
 image = (
     modal.Image.from_registry("nvidia/cuda:12.1.1-devel-ubuntu22.04", add_python="3.11")
     .apt_install("git", "build-essential", "libgl1", "libglib2.0-0")
-    .env({"PIP_EXTRA_INDEX_URL": _TORCH_INDEX, "FORCE_CUDA": "1"})
+    # gcc pinned: the pytorch3d link step otherwise asks for clang++, which the image lacks
+    .env({"PIP_EXTRA_INDEX_URL": _TORCH_INDEX, "FORCE_CUDA": "1", "CC": "gcc", "CXX": "g++"})
     .run_commands(
         f"git clone https://github.com/facebookresearch/sam-3d-objects {SAM3D_DIR}",
         f"cd {SAM3D_DIR} && git checkout {SAM3D_COMMIT}",
+        # its setup.py runs `python -m pip`, which an isolated build env does not have
+        "pip install setuptools wheel && pip install --no-build-isolation nvidia-pyindex",
         f"cd {SAM3D_DIR} && pip install -e '.[dev]'",
     )
     # "pytorch3d dependency on pytorch is broken, this 2-step approach solves it" (setup.md)
     .run_commands(f"cd {SAM3D_DIR} && pip install -e '.[p3d]'", gpu=GPU)
+    # no GPU in this step, so gsplat's CUDA build is told the architecture (A100: 8.0)
     .run_commands(
-        f"cd {SAM3D_DIR} && PIP_FIND_LINKS={_KAOLIN_LINKS} pip install -e '.[inference]'",
+        f"cd {SAM3D_DIR} && TORCH_CUDA_ARCH_LIST=8.0 PIP_FIND_LINKS={_KAOLIN_LINKS} "
+        "pip install -e '.[inference]'",
         f"cd {SAM3D_DIR} && python patching/hydra",
         "pip install 'huggingface-hub[cli]<1.0'",
     )
@@ -120,9 +125,13 @@ def download_weights() -> str:
 class Sam3dWorker:
     @modal.enter()
     def load(self) -> None:
+        import os
         import sys
         from pathlib import Path
 
+        # the wrapper assumes conda and sets CUDA_HOME from CONDA_PREFIX; here CUDA is the base
+        # image's. Set at load, not in the image, so the built layers stay cached.
+        os.environ.setdefault("CONDA_PREFIX", "/usr/local/cuda")
         sys.path.append(f"{SAM3D_DIR}/notebook")
         from inference import Inference  # SAM 3D's own notebook wrapper
 
