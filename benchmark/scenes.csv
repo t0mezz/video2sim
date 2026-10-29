@@ -3,7 +3,7 @@ s01,easy,dev,grid,7,B4,,,0,aruco_4x4_50,100,
 s01,easy,dev,grid,21,B2,,,0,aruco_4x4_50,100,
 s01,easy,dev,grid,29,D2,,,45,aruco_4x4_50,100,
 s01,easy,dev,grid,4,F1,,,20,aruco_4x4_50,100,cylinder shape yaw could be inaccurate
-s01,easy,dev,grid,3,F4,,,0,aruco_4x4_50,100,
+s01,easy,dev,grid,3,F4,,,90,aruco_4x4_50,100,
 s07,easy,test,grid,3,B2,,,45,aruco_4x4_50,100,
 s07,easy,test,grid,21,C1,,,45,aruco_4x4_50,100,
 s07,easy,test,grid,4,f2,,,0,aruco_4x4_50,100,
