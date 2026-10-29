@@ -16,7 +16,7 @@ It is raised when any of these holds, and the reason says which:
   shows up in the QA report instead of passing silently.
 
 Otherwise the object is left unflagged. Whether the reflective objects that end up unflagged hurt
-shape prediction is checked after the first Phase 3 runs (PLAN.md, P2.5 entry).
+shape prediction is checked after the first Phase 3 runs (docs/history/phases_0_2.md, P2.5 entry).
 """
 
 from __future__ import annotations

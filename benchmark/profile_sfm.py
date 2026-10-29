@@ -1,4 +1,5 @@
-"""Time pycolmap per stage on benchmark videos, from scratch each run (PLAN.md item 6b, step 1).
+"""Time pycolmap per stage on benchmark videos, from scratch each run (6b step 1 in
+``docs/history/reconstruction_experiments.md``).
 
     uv run python benchmark/profile_sfm.py s01/video_b s16/video_a --out benchmark/results/x.json
 
