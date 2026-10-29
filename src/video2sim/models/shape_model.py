@@ -57,6 +57,7 @@ class ShapeSample:
     scale_guess: float
     model: str
     checkpoint: str  # as reported by the host, recorded in the run manifest
+    vertex_colors: NDArray[np.uint8] | None = None  # (N, 3) RGB, when the model gives them
 
 
 class ShapeModel(Protocol):

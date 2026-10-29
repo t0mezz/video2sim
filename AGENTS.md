@@ -85,7 +85,13 @@ dev videos and on degraded copies of one good video (P1.4).
 `uv run modal run src/video2sim/models/sam3d_modal.py::download_weights` copies the gated SAM 3D
 checkpoint into a Modal volume, and `uv run modal deploy src/video2sim/models/sam3d_modal.py`
 deploys the GPU worker that `models/sam3d.py` calls (P3.1, D-015). Both need a human go-ahead,
-Modal credit and the Modal secret `huggingface`; neither has been run yet.
+Modal credit and the Modal secret `huggingface`; both were run on 2026-10-29 (checkpoint
+`facebook/sam-3d-objects@2e73555`).
+`python benchmark/run_shape.py RUN_ID ... [--runs runs_instances]` runs the shape stage (P3.4 to
+P3.6) on runs that `benchmark/run_instances.py` finished and writes `shape/` and a `scene.json`;
+each object costs `keyframes_per_object x samples_per_keyframe` SAM 3D calls on Modal, cached in
+`shape.work/`. `python scripts/view_scene.py RUN/scene.json` shows the registered meshes in the
+scene in the browser, and `python scripts/view_glb.py FILE.glb` shows one mesh.
 
 Commands that arrive with their task: `video2sim run` (P5.5).
 Never document a command that does not exist. When you add one, add it here in the same

@@ -147,8 +147,12 @@ segmentation:
       - other
 
 shape:
-  backend: null                # TODO(P3.3): chosen in the Phase 3 bake-off
-  samples_per_keyframe: 3
+  backend: sam3d               # the only adapter so far; TODO(P3.3): chosen in the bake-off
+  keyframes_per_object: 2      # P3.4: best keyframes the model is run on
+  samples_per_keyframe: 3      # seeds per keyframe
+  max_views: 12                # frames whose masks enter registration, spread over the video
+  min_fit_score: 0.5           # below this the convex hull of the cluster stands in; a guess
+  support_gap_m: 0.01          # a cluster this close to the table rests on it (P3.5)
   sam3d:                       # P3.1, models/sam3d.py
     checkpoint: facebook/sam-3d-objects   # Hugging Face repo; the host reports the revision
     stage1_inference_steps: null   # null keeps SAM 3D's own default

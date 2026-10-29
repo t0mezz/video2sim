@@ -244,7 +244,9 @@ Tasks
   12 views, 5 s): median mask IoU 0.95 (raw SAM 3D pose 0.72), model up within 1.2° of world
   up, size 102 x 84 x 42 mm against ground truth 116 x 86 x 45 (-12%, -3%, -6%). The P2.4
   primitive fit reads the same object 98 x 83 x 43 mm, while the other s01 objects read
-  within 6%, so the long side needs a re-measure before it is called a registration error.
+  within 6%. Re-measured by hand 2026-10-29 at 118.8 x 86.4 x 45.9 mm (three readings each),
+  so ground truth holds and both methods read the long side 13 to 17% short. They share the
+  masks: likely the white box against the white board, a P2 segmentation issue to check.
   All five s01 objects (one seed each, points target), size error against ground truth:
   coffee can +6/+6/-4%, small cube +7/+4/+5%, cube +10/+6/-5%, earbud box -11/-3/-1%,
   phone box -1/+12/+32% (tilted 8°, so its height reads high). Median mask IoU 0.92 to 0.96
@@ -276,6 +278,24 @@ Tasks
       align the up axis, remove the small gap or penetration.
 
 - [ ] **P3.6** Emit `RegisteredObjects`.
+
+  Status 2026-10-29 (P3.4 to P3.6): `stages/shape.py` (`ShapeStage`, config `shape`) runs the
+  model on the first `keyframes_per_object` keyframes with `samples_per_keyframe` seeds,
+  registers each sample to `point_cluster_path` and the masks of up to `max_views` frames,
+  keeps the highest `fit_score`, and below `min_fit_score` writes the convex hull of the
+  cluster with `PROXY_GEOMETRY` and `LOW_FIT`. Resting objects are held on the table during
+  registration and then set down exactly; the stable face is the model axis nearest to up
+  (`registration.level`), not a convex-hull face as written above. Meshes go to
+  `shape/meshes/<id>.ply` in the object frame (volume centroid, or the hull's for an open
+  mesh), every sample's fit to `shape/report.json`. Tests: `tests/test_shape_stage.py`.
+  First run, s01 (`benchmark/run_shape.py s01_b`, 30 SAM 3D calls, 12 min): recall 1.0,
+  median size error 3.8%, median position error 3.6 mm (after `video2sim eval` learned to
+  align shape meshes to the board frame, as it already did for clusters), median orientation
+  error 0.6° (phone box 0.8°, earbud box 0.4°). That is after a ground-truth fix confirmed by
+  the human on 2026-10-29: the earbud box in s01 stands at yaw 90°, not 0°
+  (`benchmark/scenes.csv`; it had scored 89.6°). Its long side still reads 13% short. Fit scores against the 8-point box outline sit at 0.97 to 1.00
+  for most samples and separate them poorly. Open: the dev split, a fit score that ranks
+  samples, and the exit criteria on easy and medium scenes.
 
 Exit criteria
 

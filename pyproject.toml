@@ -12,6 +12,7 @@ dependencies = [
     "pycolmap>=4.2.1",
     "pydantic>=2.6",
     "pyyaml>=6.0",
+    "scipy>=1.15.3",
     "trimesh>=5.2.0",
 ]
 

@@ -167,15 +167,22 @@ def camera_from_model(
     return SE3.from_numpy(matrix), float(s.mean())
 
 
-def model_mesh_from_glb(glb: bytes) -> tuple[F64, NDArray[np.int64]]:
-    """Vertices in the model frame (the y-up turn of ``to_glb`` undone) and faces."""
+def model_mesh_from_glb(
+    glb: bytes,
+) -> tuple[F64, NDArray[np.int64], NDArray[np.uint8] | None]:
+    """Vertices in the model frame (the y-up turn of ``to_glb`` undone), faces, and RGB vertex
+    colours when the GLB has them."""
     import trimesh  # kept out of module import time
 
     loaded = trimesh.load(io.BytesIO(glb), file_type="glb", force="mesh", process=False)
     if not isinstance(loaded, trimesh.Trimesh) or len(loaded.faces) == 0:
         raise ValueError("the GLB holds no triangle mesh")
     vertices = np.asarray(loaded.vertices, dtype=float) @ GLB_FROM_MODEL
-    return vertices, np.asarray(loaded.faces, dtype=np.int64)
+    colors = None
+    visual = loaded.visual
+    if isinstance(visual, trimesh.visual.ColorVisuals) and visual.kind == "vertex":
+        colors = np.asarray(visual.vertex_colors, dtype=np.uint8)[:, :3]
+    return vertices, np.asarray(loaded.faces, dtype=np.int64), colors
 
 
 class Sam3d:
@@ -196,7 +203,7 @@ class Sam3d:
         T_camera_from_model, scale = camera_from_model(
             pose["rotation_wxyz"], pose["translation"], pose["scale"]
         )
-        vertices, faces = model_mesh_from_glb(answer.glb)
+        vertices, faces, colors = model_mesh_from_glb(answer.glb)
         return ShapeSample(
             object_id=object_id,
             frame_index=view.frame_index,
@@ -207,6 +214,7 @@ class Sam3d:
             scale_guess=scale,
             model=MODEL_NAME,
             checkpoint=str(pose["checkpoint"]),
+            vertex_colors=colors,
         )
 
     def _build_call(self, view: ShapeView, seed: int) -> Sam3dCall:

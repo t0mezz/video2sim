@@ -11,7 +11,8 @@ working directory)::
                   "T_world_from_model": [[...4x4...]], "scale": 0.102,
                   "info": {"size mm": "103 x 84 x 43"}}]}
 
-A world point is ``R @ (scale * x) + t`` with ``T_world_from_model``, as ``Registration``
+``glb`` may name any mesh file trimesh reads (a PLY from the shape stage, with scale 1). A
+world point is ``R @ (scale * x) + t`` with ``T_world_from_model``, as ``Registration``
 returns it. For ``"model": "sam3d"`` the y-up turn of SAM 3D's ``to_glb`` is undone first,
 as ``models/sam3d.py`` does. From the run the page also draws the SfM points near the objects,
 the table plane, the cameras and the P2.4 primitives (``segmentation/fit.json``).
