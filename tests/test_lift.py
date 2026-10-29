@@ -7,7 +7,14 @@ import pytest
 
 from video2sim.evaluation.geometry import box_vertices
 from video2sim.schemas import SE3, CameraFrame, Intrinsics, Plane, WorldModel
-from video2sim.stages.lift import LiftConfig, _largest_component, lift_points, lift_tracks
+from video2sim.stages.lift import (
+    LiftConfig,
+    _largest_component,
+    footprint_axes,
+    lift_points,
+    lift_tracks,
+    trim_extremes,
+)
 from video2sim.stages.segmentation import BoolMask
 from video2sim.stages.tracking import Track
 
@@ -82,6 +89,7 @@ CFG = LiftConfig(
     min_voxels=20,
     min_points=8,
     table_margin_m=0.003,
+    trim_points_per_side=0,
 )
 
 
@@ -128,10 +136,15 @@ def test_config_rejects_bad_values() -> None:
     base = {
         "voxel_m": 0.005, "max_height_m": 0.3, "margin_m": 0.1, "max_extent_m": 1.5,
         "max_views": 10, "mask_downscale": 4, "min_views": 5, "min_agreement": 0.85,
-        "min_voxels": 20, "min_points": 8, "table_margin_m": 0.003,
+        "min_voxels": 20, "min_points": 8, "table_margin_m": 0.003, "trim_points_per_side": 2,
     }  # fmt: skip
     assert LiftConfig.from_config({"segmentation": {"lift": base}}).max_views == 10
-    for key, value in (("voxel_m", 0.0), ("min_views", 0), ("min_agreement", 1.5)):
+    for key, value in (
+        ("voxel_m", 0.0),
+        ("min_views", 0),
+        ("min_agreement", 1.5),
+        ("trim_points_per_side", -1),
+    ):
         with pytest.raises(ValueError):
             LiftConfig.from_config({"segmentation": {"lift": {**base, key: value}}})
 
@@ -177,3 +190,46 @@ def test_points_of_a_track_seen_in_one_view_are_dropped() -> None:
     clusters, report = lift_points([Track(0, masks), Track(1, {0: masks[0]})], world, cloud, CFG)
     assert 0 in clusters and 1 not in clusters
     assert "sparse points" in report.dropped[1]
+
+
+def test_trimming_drops_a_stray_point_and_keeps_the_box() -> None:
+    size = (0.08, 0.06, 0.05)
+    box = _surface_points(size, (0.0, 0.0))
+    stray = np.array([[0.0, 0.0, 0.08]])  # 3 cm above the top, like a short SfM track
+    trimmed = trim_extremes(np.concatenate([box, stray]), 2, 8)
+    assert not np.any(np.all(np.isclose(trimmed, stray[0]), axis=1))
+    assert len(trimmed) >= len(box) + 1 - 12
+    # Two points per side cost the box under 5 mm on dense faces.
+    assert np.all(_extent(trimmed) >= np.array(size) - 0.005)
+    assert np.all(_extent(trimmed) <= np.array(size) + 1e-9)
+
+
+def test_trimming_leaves_a_sparse_cluster_whole() -> None:
+    few = _surface_points((0.05, 0.05, 0.05), (0.0, 0.0))[:15]
+    assert len(trim_extremes(few, 2, 8)) == 15  # 15 <= 6 * 2 + 8
+    assert len(trim_extremes(few, 0, 8)) == 15
+
+
+def test_trimming_follows_a_rotated_footprint() -> None:
+    a = np.radians(30.0)
+    rot = np.array([[np.cos(a), -np.sin(a), 0.0], [np.sin(a), np.cos(a), 0.0], [0.0, 0.0, 1.0]])
+    box = _surface_points((0.12, 0.04, 0.03), (0.0, 0.0)) @ rot.T
+    u, n = footprint_axes(box)
+    assert abs(abs(float(u @ [np.cos(a), np.sin(a)])) - 1.0) < 1e-3
+    assert abs(float(u @ n)) < 1e-9
+    # The trimmed box along the long side loses only a few millimetres.
+    trimmed = trim_extremes(box, 2, 8)
+    long_side = np.ptp(trimmed[:, :2] @ u)
+    assert 0.115 <= long_side <= 0.12 + 1e-9
+
+
+def test_lift_points_trims_each_cluster() -> None:
+    world = _world()
+    size = (0.08, 0.06, 0.05)
+    cloud = np.concatenate([_surface_points(size, (0.0, 0.0)), [[0.0, 0.0, 0.07]]])
+    masks = _box_masks(world, size, (0.0, 0.0))
+    untrimmed, _ = lift_points([Track(4, masks)], world, cloud, CFG)
+    trimmed, _ = lift_points(
+        [Track(4, masks)], world, cloud, LiftConfig(**{**CFG.__dict__, "trim_points_per_side": 2})
+    )
+    assert len(trimmed[4]) == len(untrimmed[4]) - 12

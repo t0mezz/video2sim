@@ -85,6 +85,7 @@ segmentation:
     min_voxels: 20             # smaller clusters are dropped and listed in the lift report
     min_points: 8              # the sparse-point variant: fewer voted SfM points drop the track
     table_margin_m: 0.003      # sparse points this close to the table plane are the table, not the object
+    trim_points_per_side: 2    # outermost sparse points dropped per side of the resting box (strays); easy-tier median 18.7% -> 8.9%, docs/research/cluster_box_accuracy.md
   keyframes_per_object: 5
   keyframes:                   # P2.4; per-frame quality is the product of four scores, see stages/keyframes.py
     min_mask_px: 400           # smaller masks are not candidates

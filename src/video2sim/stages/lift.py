@@ -23,6 +23,12 @@ in P3.2 compares surface points, which favours points; the hull gives a filled v
 
 The visual hull is slightly larger than the object (silhouettes are loose), so cluster boxes
 read a little high. A concave or hidden surface is never carved out from the inside.
+
+The voted points keep a few strays: short SfM tracks triangulated with a small baseline can
+project into the masks of most views of a short camera arc and float 1 to 2 cm off the object.
+A box is set by its outermost points, so ``trim_extremes`` drops the ``trim_points_per_side``
+outermost points on each side of the resting box (two per side took the easy-tier median box
+error from 18.7% to 8.9%, ``docs/research/cluster_box_accuracy.md``).
 """
 
 from __future__ import annotations
@@ -61,6 +67,7 @@ class LiftConfig:
     min_voxels: int
     min_points: int
     table_margin_m: float
+    trim_points_per_side: int
 
     @classmethod
     def from_config(cls, cfg: dict[str, Any]) -> LiftConfig:
@@ -77,6 +84,7 @@ class LiftConfig:
             int(c["min_voxels"]),
             int(c["min_points"]),
             float(c["table_margin_m"]),
+            int(c["trim_points_per_side"]),
         )
         if (
             min(out.voxel_m, out.max_height_m, out.margin_m, out.max_extent_m) <= 0
@@ -88,6 +96,8 @@ class LiftConfig:
             < 1
         ):
             raise ValueError("lift counts must be at least 1")
+        if out.trim_points_per_side < 0:
+            raise ValueError("trim_points_per_side must not be negative")
         if not 0.0 < out.min_agreement <= 1.0:
             raise ValueError("min_agreement must be in (0, 1]")
         return out
@@ -252,6 +262,34 @@ def lift_tracks(
     return clusters, LiftReport(len(views), voxels, dropped)
 
 
+def footprint_axes(points: F64) -> tuple[F64, F64]:
+    """Unit directions (2,) of the long and short side of the minimum-area rectangle around the
+    XY footprint, the box convention of the ground truth."""
+    import cv2  # heavy import, kept out of module import time
+
+    if len(points) < 3:
+        return np.array([1.0, 0.0]), np.array([0.0, 1.0])
+    (_, _), (w, h), angle = cv2.minAreaRect(points[:, :2].astype(np.float32))
+    a = np.radians(angle if w >= h else angle + 90.0)
+    u = np.array([np.cos(a), np.sin(a)])
+    return u, np.array([-u[1], u[0]])
+
+
+def trim_extremes(points: F64, per_side: int, min_left: int) -> F64:
+    """The points without the ``per_side`` outermost ones on each of the six sides of the resting
+    box (long side, short side, height). A cluster that would keep fewer than ``min_left``
+    points is returned whole: a sparse cluster has no strays to spare."""
+    if per_side == 0 or len(points) <= 6 * per_side + min_left:
+        return points
+    u, n = footprint_axes(points)
+    keep = np.ones(len(points), dtype=bool)
+    for coord in (points[:, :2] @ u, points[:, :2] @ n, points[:, 2]):
+        order = np.argsort(coord, kind="stable")
+        keep[order[:per_side]] = False
+        keep[order[-per_side:]] = False
+    return points[keep]
+
+
 def load_points(path: Path) -> F64:
     """Vertices of the reconstruction's sparse cloud (world frame, metres)."""
     import trimesh  # heavy import, kept out of module import time
@@ -268,9 +306,9 @@ def lift_points(
     Each point was triangulated from image features, so it lies on a visible surface. It is
     kept for the track whose mask holds it in at least ``min_agreement`` of the views that
     see it, with the same view rules as ``lift_tracks``. There is no volume, so the box of a
-    cluster follows the visible faces and is never larger than the object, but a plain or
-    glossy object may have few points or none, and a point in front of the object's edge can
-    pass the vote (there is no occlusion test).
+    cluster follows the visible faces, but a plain or glossy object may have few points or
+    none, and a point in front of the object's edge can pass the vote (there is no occlusion
+    test). Each cluster goes through ``trim_extremes`` to drop stray points.
     """
     k = world.intrinsics
     views = _views(world, cfg)
@@ -304,7 +342,8 @@ def lift_points(
     dropped: dict[int, str] = {}
     counts: dict[int, int] = {}
     for row, track in enumerate(tracks):
-        chosen = points[usable & (best == row)]
+        voted = points[usable & (best == row)]
+        chosen = trim_extremes(voted, cfg.trim_points_per_side, cfg.min_points)
         if len(chosen) < cfg.min_points:
             dropped[track.track_id] = f"only {len(chosen)} sparse points agree"
         else:
