@@ -86,6 +86,18 @@ segmentation:
     min_points: 8              # the sparse-point variant: fewer voted SfM points drop the track
     table_margin_m: 0.003      # sparse points this close to the table plane are the table, not the object
     trim_points_per_side: 2    # outermost sparse points dropped per side of the resting box (strays); easy-tier median 18.7% -> 8.9%, docs/research/cluster_box_accuracy.md
+  primitive_fit:               # box, cylinder or sphere fitted to the masks from the trimmed points; see stages/primitive_fit.py
+    mask_downscale: 4          # masks are shrunk by this factor before the outline is compared
+    min_views: 5               # fewer whole (not edge-cut) masks and the points stay the cluster
+    min_mask_px: 20            # smaller masks (after downscaling) are skipped
+    iterations: 300            # random-walk steps per kind
+    shrink_every: 100          # the step shrinks after this many steps ...
+    shrink: 0.6                # ... by this factor
+    step_m: 0.005              # starting step of centre and sizes
+    step_deg: 5.0              # starting step of the yaw
+    min_size_m: 0.005          # a primitive side below this is rejected
+    max_cost: 0.10             # above this mask disagreement the cluster is the union of primitive and points; chosen on the dev scenes (cluster_box_accuracy.md)
+    seed: 0
   keyframes_per_object: 5
   keyframes:                   # P2.4; per-frame quality is the product of four scores, see stages/keyframes.py
     min_mask_px: 400           # smaller masks are not candidates
