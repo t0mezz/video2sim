@@ -13,6 +13,7 @@ from numpy.typing import NDArray
 
 from video2sim.models.sam3d import (
     GLB_FROM_MODEL,
+    ModalTransport,
     Sam3d,
     Sam3dAnswer,
     Sam3dCall,
@@ -21,6 +22,7 @@ from video2sim.models.sam3d import (
     model_mesh_from_glb,
     quaternion_wxyz_to_matrix,
 )
+from video2sim.models.sam3d_modal import REPO_ID, pose_json
 from video2sim.models.shape_model import ShapeView, draw_samples, sample_seed
 
 CONFIG = Path(__file__).resolve().parents[1] / "configs" / "default.yaml"
@@ -218,3 +220,50 @@ def test_default_config_has_a_valid_sam3d_section() -> None:
     sam3d = Sam3dConfig.from_config(cfg)
     assert sam3d.checkpoint
     assert int(cfg["shape"]["samples_per_keyframe"]) >= 1
+
+
+class _FakeRemote:
+    def __init__(self) -> None:
+        self.args: list[tuple[object, ...]] = []
+
+    def remote(self, *args: object) -> dict[str, object]:
+        self.args.append(args)
+        return {"glb": _glb(TETRA_V, TETRA_F), "pose_json": json.dumps(FakeTransport().pose)}
+
+
+class _FakeWorker:
+    def __init__(self) -> None:
+        self.sample = _FakeRemote()
+
+
+def test_modal_transport_looks_the_worker_up_once_and_passes_the_call(tmp_path: Path) -> None:
+    worker = _FakeWorker()
+    lookups: list[int] = []
+
+    def lookup() -> _FakeWorker:
+        lookups.append(1)
+        return worker
+
+    transport = ModalTransport(lookup)
+    model = Sam3d(_config(), transport, cache_dir=tmp_path / "cache")
+    view = ShapeView(10, _image(tmp_path), _mask())
+    model.sample("o", view, seed=1)
+    model.sample("o", view, seed=2)
+    assert len(lookups) == 1
+    assert [a[2] for a in worker.sample.args] == [1, 2]
+    assert worker.sample.args[0][4] == _config().options()
+
+
+def test_worker_pose_json_decodes_on_the_client() -> None:
+    q = _quat_about((0.0, 1.0, 0.0), 0.4)
+    output = {
+        "rotation": np.array([q]),
+        "translation": np.array([[0.1, 0.0, 1.2]]),
+        "scale": np.array([[0.3, 0.3, 0.3]]),
+    }
+    pose = json.loads(pose_json(output, "facebook/sam-3d-objects@r1"))
+    t, s = camera_from_model(pose["rotation_wxyz"], pose["translation"], pose["scale"])
+    assert s == pytest.approx(0.3)
+    np.testing.assert_allclose(t.to_numpy()[:3, 3], [-0.1, 0.0, 1.2])
+    assert pose["checkpoint"] == "facebook/sam-3d-objects@r1"
+    assert _config().checkpoint == REPO_ID

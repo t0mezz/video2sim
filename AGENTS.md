@@ -82,6 +82,11 @@ masks) and scores their box sizes; it makes no hosted call. `python benchmark/vi
 `python benchmark/eval_capture_gate.py --out results.json` runs the capture quality gate on the
 dev videos and on degraded copies of one good video (P1.4).
 
+`uv run modal run src/video2sim/models/sam3d_modal.py::download_weights` copies the gated SAM 3D
+checkpoint into a Modal volume, and `uv run modal deploy src/video2sim/models/sam3d_modal.py`
+deploys the GPU worker that `models/sam3d.py` calls (P3.1, D-015). Both need a human go-ahead,
+Modal credit and the Modal secret `huggingface`; neither has been run yet.
+
 Commands that arrive with their task: `video2sim run` (P5.5).
 Never document a command that does not exist. When you add one, add it here in the same
 change.

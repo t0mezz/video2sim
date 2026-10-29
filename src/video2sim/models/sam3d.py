@@ -1,5 +1,6 @@
-"""SAM 3D Objects adapter, client side (P3.1). The model runs on a hosted GPU (D-015); the
-worker that runs it is a separate step and plugs in as a ``Sam3dTransport``.
+"""SAM 3D Objects adapter, client side (P3.1). The model runs on a hosted GPU (D-015): the
+worker is ``models/sam3d_modal.py``, reached through ``ModalTransport``, and any other
+``Sam3dTransport`` can stand in for it.
 
 What the worker must do: call SAM 3D's ``InferencePipelinePointMap.run`` on one image, one mask
 and a seed, and return two things unchanged. The GLB from ``to_glb``, and the pose of the
@@ -27,7 +28,7 @@ from __future__ import annotations
 import hashlib
 import io
 import json
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
@@ -105,6 +106,31 @@ class Sam3dAnswer:
 
 class Sam3dTransport(Protocol):
     def __call__(self, call: Sam3dCall) -> Sam3dAnswer: ...
+
+
+class ModalTransport:
+    """Calls the worker deployed from ``models/sam3d_modal.py``. Each call uploads one image
+    and mask to Modal and starts a GPU container if none is warm."""
+
+    def __init__(self, lookup: Callable[[], Any] | None = None) -> None:
+        self._lookup = lookup or _deployed_worker
+        self._worker: Any = None
+
+    def __call__(self, call: Sam3dCall) -> Sam3dAnswer:
+        if self._worker is None:
+            self._worker = self._lookup()
+        out = self._worker.sample.remote(
+            call.image, call.mask_png, call.seed, call.pointmap_npy, call.options
+        )
+        return Sam3dAnswer(glb=bytes(out["glb"]), pose_json=str(out["pose_json"]))
+
+
+def _deployed_worker() -> Any:
+    import modal
+
+    from video2sim.models.sam3d_modal import APP_NAME, WORKER_CLASS
+
+    return modal.Cls.from_name(APP_NAME, WORKER_CLASS)()
 
 
 def quaternion_wxyz_to_matrix(q: Sequence[float]) -> F64:
