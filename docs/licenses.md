@@ -20,6 +20,7 @@ text or terms, and record who read it and when.
 | pycolmap-cuda12 (deferred past the MVP) | Separate PyPI package with the same module name, so it cannot be installed with `pycolmap`. Linux x86-64 only, CUDA 12, BSD-3-Clause per its PyPI page. Not run: no NVIDIA GPU here. | PyPI page, read 2026-10-26 | No |
 | VGGT (deferred past the MVP) | Code allows commercial use except military; only the VGGT-1B-Commercial checkpoint is commercial, the original checkpoint is non-commercial; checkpoint access needs a form. No GPU memory figure in the README, CUDA-specific code, no MPS mention. Not run. | GitHub README, read 2026-10-26 | No |
 | MASt3R (deferred past the MVP) | Code CC BY-NC-SA 4.0 (non-commercial); checkpoints also bound by training-dataset licenses; GPU by default. Not run. | GitHub README, read 2026-10-26 | No |
+| SciPy (convex hulls through trimesh, P3.4) | Added 2026-10-29 by human approval, for the proxy hull and stable-face choice. Its installed metadata gives a BSD-style text, "Copyright (c) 2001-2002 Enthought, Inc. 2003, SciPy Developers"; the wheel also bundles third-party libraries whose licenses were not read. | Installed package metadata, 2026-10-29 | Partly: bundled licenses not read |
 | Convex decomposition (CoACD or V-HACD) | Not checked. | | No |
 | Isaac Sim and Isaac Lab | Not checked. | | No |
 

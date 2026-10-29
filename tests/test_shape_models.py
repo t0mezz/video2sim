@@ -129,7 +129,7 @@ def test_camera_from_model_rejects_anisotropic_scale() -> None:
 
 
 def test_glb_is_turned_back_into_the_model_frame() -> None:
-    vertices, faces = model_mesh_from_glb(_glb(TETRA_V, TETRA_F))
+    vertices, faces, _ = model_mesh_from_glb(_glb(TETRA_V, TETRA_F))
     np.testing.assert_allclose(vertices, TETRA_V, atol=1e-6)
     np.testing.assert_array_equal(faces, TETRA_F)
 

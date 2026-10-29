@@ -45,7 +45,8 @@ def _predict(
         run = load_instances(run_dir, _board_from_world(args, scene, run_dir))
         segmentation_flags[scene.scene_id] = dict(run.flags)
         return run.prediction
-    return load_run(args.runs / scene.scene_id)
+    run_dir = args.runs / scene.scene_id
+    return load_run(run_dir, _board_from_world(args, scene, run_dir))
 
 
 def _board_from_world(
