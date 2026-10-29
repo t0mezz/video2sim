@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import json
 import statistics
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -27,6 +28,8 @@ from video2sim.evaluation.segmentation import score_tracks
 from video2sim.runner import OUTPUT_FILE
 from video2sim.schemas import WorldModel
 from video2sim.stages.discovery_vlm_sam import ResponseCache, read_secret
+from video2sim.stages.material_pass import BasetenMaterialClient
+from video2sim.stages.scene_router import RouterConfig, route_scene, tracking_prompt
 from video2sim.stages.track_repair import RepairConfig, repair_tracks
 from video2sim.stages.tracking import (
     MetaVideoSamClient,
@@ -45,12 +48,25 @@ def main() -> None:
     parser.add_argument("--runs", type=Path, default=ROOT / "runs")
     parser.add_argument("--out", type=Path, default=ROOT / "benchmark/results/p2_2_tracking.json")
     parser.add_argument("--score", action="store_true", help="score identity (needs alignment)")
+    parser.add_argument(
+        "--no-router",
+        action="store_true",
+        help="track with segmentation.tracking.prompt instead of the scene router's prompt",
+    )
     args = parser.parse_args()
 
     cfg: dict[str, Any] = yaml.safe_load(
         (ROOT / "configs/default.yaml").read_text(encoding="utf-8")
     )
     tcfg, rcfg = TrackingConfig.from_config(cfg), RepairConfig.from_config(cfg)
+    rcfg_router = RouterConfig.from_config(cfg)
+    router_client = (
+        None
+        if args.no_router
+        else BasetenMaterialClient(
+            read_secret("BASETEN_API_KEY"), rcfg_router.timeout_s, rcfg_router.retries
+        )
+    )
     client = MetaVideoSamClient(read_secret("META_MODEL_API_KEY"), tcfg.timeout_s)
     layout = board_layout(float(cfg["capture"]["marker"]["tag_size_m"]))
     family = str(cfg["capture"]["marker"]["family"])
@@ -63,12 +79,19 @@ def main() -> None:
         world = WorldModel.model_validate_json(
             (run_dir / "reconstruction" / OUTPUT_FILE).read_text(encoding="utf-8")
         )
+        scene_tcfg = tcfg
+        if not args.no_router:
+            route = route_scene(
+                world, run_dir, router_client, ResponseCache(seg_dir / "router_cache"), rcfg_router
+            )
+            scene_tcfg = replace(tcfg, prompt=tracking_prompt(route, rcfg_router))
+            print(f"{run_id}: {route.reason}; tracking prompt {scene_tcfg.prompt!r}", flush=True)
         raw = track_objects(
             world,
             run_dir,
             client,
             ResponseCache(seg_dir / "tracking_cache"),
-            tcfg,
+            scene_tcfg,
             seg_dir / "tracking_work",
         )
         poses = {f.frame_index: f.T_world_from_camera for f in world.frames}
@@ -79,6 +102,7 @@ def main() -> None:
             "run": run_id,
             "scene": scene_id,
             "frames": len(world.frames),
+            "tracking_prompt": scene_tcfg.prompt,
             "tracks_raw": len(raw),
             "tracks_repaired": len(repaired),
             "splits": [[a, list(b)] for a, b in report.splits],

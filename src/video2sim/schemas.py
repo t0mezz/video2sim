@@ -149,6 +149,7 @@ class Flag(str, Enum):
     TRANSPARENT_OR_REFLECTIVE = "transparent_or_reflective"
     THIN = "thin"
     SMALL = "small"
+    NON_RIGID = "non_rigid"
     ID_SWITCH_REPAIRED = "id_switch_repaired"
     LOW_FIT = "low_fit"
     PROXY_GEOMETRY = "proxy_geometry"

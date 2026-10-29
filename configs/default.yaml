@@ -49,6 +49,21 @@ segmentation:
     generic_prompt: objects on a table   # the one SAM 3.1 prompt of method "sam_generic"
     n_sample_frames: 6         # frames shown to discovery, spread evenly over the registered frames
     max_workers: 8             # parallel hosted calls; they are independent and cached by key
+  router:                      # P2.1/P2.2: one VLM request per scene picks the SAM prompt and lists the objects
+    n_frames: 3                # frames sent, spread evenly over the registered frames
+    max_objects: 30            # longer lists are cut
+    min_confidence: 0.5        # a lower surface confidence falls back to default_surface
+    noun_prompt_max_objects: 1 # off the default surface, a scene with this many listed objects is tracked by its noun; 0 disables
+    default_surface: table     # used when the call fails or the answer cannot be read
+    timeout_s: 300
+    retries: 3
+    pool:                      # surface key -> description shown to the model, SAM concept prompt
+      table:
+        description: a table, desk or board
+        prompt: objects on a table
+      surface:
+        description: a glossy or reflective surface that mirrors its surroundings, such as a glass stove top, polished counter or mirror; a matte counter, floor or shelf is not this
+        prompt: object on a surface
   tracking:                    # P2.2: one SAM 3.1 video request per scene
     prompt: objects on a table # same concept prompt as discovery; the video API takes one concept
     fps: 5                     # frame rate of the clip sent; billed per frame, at least 50 (dev.meta.ai pricing)
@@ -83,6 +98,45 @@ segmentation:
     diversity_sigma_deg: 25.0  # viewing angle at which the penalty falls to 61%
     min_quality: 0.15          # a frame whose own quality is lower is never chosen, so fewer than the count may result
     min_separation_deg: 5.0    # a frame this close in viewing angle to a chosen one adds nothing and is skipped
+  depth_flags:                 # P2.5 geometry evidence; guesses fitted on 5 reflective objects of s17 and s18, see stages/depth_flags.py
+    min_points: 100            # fewer voted SfM points than this and geometry cannot decide
+    flag_err_ratio: 2.0        # flag when point error is this many times the table's ...
+    flag_short_frac: 0.45      # ... and at least this share of its points is short-lived
+    clear_err_ratio: 1.7       # clear only when point error is at most this (the spray can, a true positive, sits at 1.80) ...
+    clear_short_frac: 0.35     # ... short-lived share at most this ...
+    clear_hull_iou: 0.8        # ... hull and mask overlap at least this ...
+    clear_outside_hull_frac: 0.05  # ... and at most this share of points lies away from the hull
+  shape_flags:                 # P2.5 geometric flags from the visual hull and the masks; thresholds are provisional, see stages/shape_flags.py
+    small_max_extent_m: 0.06   # SMALL when the largest hull extent is at most this (hulls read 1.3 to 2 times a 30 mm object)
+    thin_max_extent_m: 0.035   # THIN when the smallest hull extent is at most this ...
+    thin_max_ratio: 0.3        # ... and at most this share of the largest
+    occluded_frame_frac: 0.25  # a frame is occluded when this share of the mask outline lies on other tracks
+    occluded_share: 0.5        # OCCLUDED when this share of the track's frames are occluded
+    min_frames: 5              # fewer usable frames and occlusion is not judged
+  material_pass:               # P2.5 flag and the classification half of P4.4, pulled forward (D-017); one hosted call per object
+    keyframes: 2               # best keyframes of the object sent in one request
+    crop_pad_px: 40            # margin around the mask in each crop
+    min_confidence: 0.6        # an answer below this is not trusted and the object stays flagged
+    max_workers: 4             # parallel hosted requests; they are independent and cached by key
+    timeout_s: 120             # per attempt
+    retries: 4                 # attempts on HTTP 429 and 5xx, with 2, 4, 8 s waits between them
+    finishes: [matte, glossy, metallic, mirror, transparent, translucent]
+    reflective_finishes: [metallic, mirror, transparent, translucent]   # flag the object when the model names one of these
+    classes:                   # PROVISIONAL keys from the materials seen on the dev scenes; P4.3 owns the final list and the numbers
+      - cardboard
+      - paper
+      - plastic_hard
+      - rubber
+      - foam
+      - ceramic
+      - glass
+      - metal_steel
+      - metal_aluminium
+      - foil_wrapped_food
+      - textile
+      - wood
+      - electronics_mixed
+      - other
 
 shape:
   backend: null                # TODO(P3.3): chosen in the Phase 3 bake-off

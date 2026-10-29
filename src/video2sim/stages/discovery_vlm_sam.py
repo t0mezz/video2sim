@@ -82,19 +82,21 @@ def _image_data_url(path: Path) -> str:
 _RETRIES = 4
 
 
-def _post_json(url: str, key: str, body: dict[str, Any], timeout_s: float = 120.0) -> bytes:
+def _post_json(
+    url: str, key: str, body: dict[str, Any], timeout_s: float = 120.0, retries: int = _RETRIES
+) -> bytes:
     request = urllib.request.Request(
         url,
         data=json.dumps(body).encode(),
         headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
     )
-    for attempt in range(_RETRIES):
+    for attempt in range(retries):
         try:
             with urllib.request.urlopen(request, timeout=timeout_s) as response:
                 data: bytes = response.read()
             return data
         except urllib.error.HTTPError as e:
-            if e.code not in (429, 500, 502, 503, 504) or attempt == _RETRIES - 1:
+            if e.code not in (429, 500, 502, 503, 504) or attempt == retries - 1:
                 raise
         time.sleep(2.0 * 2**attempt)
     raise AssertionError("unreachable")

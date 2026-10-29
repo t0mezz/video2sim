@@ -1,0 +1,263 @@
+[
+  {
+    "run": "s01_b",
+    "surface": "table",
+    "prompt": "objects on a table",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "objects": [
+      "cube",
+      "cube",
+      "box",
+      "box",
+      "can"
+    ],
+    "listed": 5,
+    "tracks": 5,
+    "gt_rigid": 5,
+    "gt_deformable": 0,
+    "missing_suspected": false
+  },
+  {
+    "run": "s02_b",
+    "surface": "table",
+    "prompt": "objects on a table",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "objects": [
+      "mug",
+      "mug",
+      "box",
+      "camera",
+      "cap"
+    ],
+    "listed": 5,
+    "tracks": 5,
+    "gt_rigid": 5,
+    "gt_deformable": 0,
+    "missing_suspected": false
+  },
+  {
+    "run": "s03_b",
+    "surface": "table",
+    "prompt": "objects on a table",
+    "fell_back": true,
+    "reason": "VLM call failed: TimeoutError",
+    "objects": [],
+    "listed": 0,
+    "tracks": 1,
+    "gt_rigid": 1,
+    "gt_deformable": 0,
+    "missing_suspected": false
+  },
+  {
+    "run": "s04_b",
+    "surface": "table",
+    "prompt": "objects on a table",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "objects": [
+      "box",
+      "ball",
+      "cube",
+      "bottle",
+      "box"
+    ],
+    "listed": 5,
+    "tracks": 5,
+    "gt_rigid": 5,
+    "gt_deformable": 0,
+    "missing_suspected": false
+  },
+  {
+    "run": "s05_b",
+    "surface": "table",
+    "prompt": "objects on a table",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "objects": [
+      "cube",
+      "camera",
+      "box",
+      "can"
+    ],
+    "listed": 4,
+    "tracks": 0,
+    "gt_rigid": 4,
+    "gt_deformable": 0,
+    "missing_suspected": true
+  },
+  {
+    "run": "s06_b",
+    "surface": "surface",
+    "prompt": "object on a surface",
+    "fell_back": false,
+    "reason": "VLM surface surface (0.96)",
+    "objects": [
+      "can",
+      "box",
+      "car",
+      "cube"
+    ],
+    "listed": 4,
+    "tracks": 4,
+    "gt_rigid": 4,
+    "gt_deformable": 0,
+    "missing_suspected": false
+  },
+  {
+    "run": "s11_b",
+    "surface": "table",
+    "prompt": "objects on a table",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "objects": [
+      "cube",
+      "cube",
+      "cube",
+      "pyramid",
+      "prism",
+      "cylinder",
+      "prism"
+    ],
+    "listed": 7,
+    "tracks": 7,
+    "gt_rigid": 7,
+    "gt_deformable": 0,
+    "missing_suspected": false
+  },
+  {
+    "run": "s12_b",
+    "surface": "table",
+    "prompt": "objects on a table",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "objects": [
+      "can",
+      "can",
+      "box",
+      "box",
+      "box",
+      "box",
+      "cube",
+      "cube",
+      "camera",
+      "cylinder"
+    ],
+    "listed": 10,
+    "tracks": 10,
+    "gt_rigid": 10,
+    "gt_deformable": 0,
+    "missing_suspected": false
+  },
+  {
+    "run": "s13_b",
+    "surface": "table",
+    "prompt": "objects on a table",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "objects": [
+      "box",
+      "box",
+      "cube"
+    ],
+    "listed": 3,
+    "tracks": 2,
+    "gt_rigid": 3,
+    "gt_deformable": 0,
+    "missing_suspected": true
+  },
+  {
+    "run": "s14_b",
+    "surface": "surface",
+    "prompt": "object on a surface",
+    "fell_back": false,
+    "reason": "VLM surface surface (0.96)",
+    "objects": [
+      "can",
+      "box",
+      "controller",
+      "block",
+      "breadboard"
+    ],
+    "listed": 5,
+    "tracks": 6,
+    "gt_rigid": 5,
+    "gt_deformable": 0,
+    "missing_suspected": false
+  },
+  {
+    "run": "s16_a",
+    "surface": "table",
+    "prompt": "objects on a table",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "objects": [
+      "cube",
+      "can",
+      "box",
+      "box"
+    ],
+    "listed": 4,
+    "tracks": 5,
+    "gt_rigid": 4,
+    "gt_deformable": 0,
+    "missing_suspected": false
+  },
+  {
+    "run": "s17_b",
+    "surface": "table",
+    "prompt": "objects on a table",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "objects": [
+      "bottle",
+      "bottle",
+      "can",
+      "cube",
+      "egg"
+    ],
+    "listed": 5,
+    "tracks": 5,
+    "gt_rigid": 5,
+    "gt_deformable": 0,
+    "missing_suspected": false
+  },
+  {
+    "run": "s18_b",
+    "surface": "table",
+    "prompt": "objects on a table",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "objects": [
+      "car",
+      "car",
+      "controller",
+      "hole punch",
+      "figurine",
+      "jar",
+      "pliers",
+      "brush"
+    ],
+    "listed": 8,
+    "tracks": 8,
+    "gt_rigid": 8,
+    "gt_deformable": 0,
+    "missing_suspected": false
+  },
+  {
+    "run": "s24_b",
+    "surface": "surface",
+    "prompt": "object on a surface",
+    "fell_back": false,
+    "reason": "VLM surface surface (0.99)",
+    "objects": [
+      "cube"
+    ],
+    "listed": 1,
+    "tracks": 0,
+    "gt_rigid": 1,
+    "gt_deformable": 0,
+    "missing_suspected": true
+  }
+]
