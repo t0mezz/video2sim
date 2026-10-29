@@ -22,6 +22,12 @@ world frame, by minimising the PLAN.md cost
   silhouette is the projection of the whole object, so neither part needs a visibility test.
 * Points alone cannot hold the unseen sides: with only the top of a box observed, the scale
   came out 3.5% short without the masks and 0.7% off with them (``tests/test_registration.py``).
+* Resting prior, for objects that stand on something. Upright: the model axis (one of +-x,
+  +-y, +-z) that the start rotation turns closest to world up is levelled at the start and held
+  near vertical by a soft term, so a box lying on any face keeps that face down. Without it,
+  points and masks from a short camera arc let s01's phone box tilt 8 degrees and read 32% tall.
+  Contact: when the caller gives a support height, the lowest mesh vertex is held on it. It is
+  the caller's to give, because a stacked object rests on another object, not the table.
 
 Scale comes from this fit against the metric cloud and masks, never from the model (AGENTS.md).
 The start takes only the rotation of the model's guess. Scale starts from the ratio of box
@@ -76,6 +82,8 @@ class RegistrationConfig:
     yaw_screen_iterations: int
     outer_iterations: int
     inner_iterations: int
+    upright_sigma_deg: float  # 0 turns the upright term off
+    contact_sigma_m: float
 
     @classmethod
     def from_config(cls, cfg: dict[str, Any]) -> RegistrationConfig:
@@ -95,6 +103,8 @@ class RegistrationConfig:
             int(c["yaw_screen_iterations"]),
             int(c["outer_iterations"]),
             int(c["inner_iterations"]),
+            float(c["upright_sigma_deg"]),
+            float(c["contact_sigma_m"]),
         )
         counts = (
             out.surface_samples,
@@ -113,6 +123,10 @@ class RegistrationConfig:
             raise ValueError("sigmas, huber_m and inlier_m must be positive")
         if out.mask_weight < 0:
             raise ValueError("mask_weight must not be negative")
+        if not 0 <= out.upright_sigma_deg < 90:
+            raise ValueError("upright_sigma_deg must be in [0, 90)")
+        if out.contact_sigma_m <= 0:
+            raise ValueError("contact_sigma_m must be positive")
         return out
 
 
@@ -280,6 +294,8 @@ class _Problem:
     target: F64
     views: list[_View]
     cfg: RegistrationConfig
+    up_model: F64 | None  # the model axis held vertical, or None without the upright term
+    support_z: float | None  # height the lowest vertex rests on, or None
 
     def place(self, p: F64, base: tuple[float, F64, F64], points: F64) -> F64:
         scale0, r0, t0 = base
@@ -303,6 +319,13 @@ class _Problem:
                 if len(view.directions):
                     reach = np.sqrt(cfg.mask_weight / (len(self.views) * len(view.directions)))
                     parts.append(_extent_gaps(corners, view) * reach / cfg.sigma_mask_px)
+        if self.up_model is not None:
+            # the horizontal part of the turned axis is the sine of the tilt
+            up = rotation_from_vector(p[1:4]) @ base[1] @ self.up_model
+            parts.append(up[:2] / np.sin(np.radians(cfg.upright_sigma_deg)))
+        if self.support_z is not None:
+            lowest = float(np.min(self.place(p, base, self.vertices)[:, 2]))
+            parts.append(np.array([(lowest - self.support_z) / cfg.contact_sigma_m]))
         return np.concatenate(parts)
 
     def match(self, p: F64, base: tuple[float, F64, F64]) -> tuple[I64, F64, F64]:
@@ -360,6 +383,20 @@ def _refine(
     return p, float(r @ r)
 
 
+def level(R_world_from_model: F64) -> tuple[F64, F64]:
+    """The model axis (one of +-x, +-y, +-z) that the rotation turns closest to world up, and
+    the rotation turned by the least angle so that this axis points straight up."""
+    column = int(np.argmax(np.abs(R_world_from_model[2])))
+    up_model = np.zeros(3)
+    up_model[column] = np.sign(R_world_from_model[2, column])
+    up = R_world_from_model @ up_model
+    axis = np.cross(up, [0.0, 0.0, 1.0])
+    angle = float(np.arctan2(np.linalg.norm(axis), up[2]))
+    if np.linalg.norm(axis) > 1e-12:
+        axis = axis / np.linalg.norm(axis) * angle
+    return rotation_from_vector(axis) @ R_world_from_model, up_model
+
+
 def register(
     vertices_model: F64,
     faces: I64,
@@ -368,8 +405,10 @@ def register(
     views: Sequence[MaskView],
     cfg: RegistrationConfig,
     seed: int,
+    support_z: float | None = None,
 ) -> Registration:
-    """Similarity transform that puts the mesh on the observed points and inside the masks."""
+    """Similarity transform that puts the mesh on the observed points and inside the masks.
+    ``support_z`` is the world height the object rests on (the table plane's), if any."""
     if len(target_points) == 0 or len(faces) == 0:
         raise ValueError("registration needs observed points and a mesh with faces")
     rng = np.random.default_rng(seed)
@@ -386,14 +425,20 @@ def register(
     if len(vertices) > cfg.max_vertices:
         vertices = vertices[np.sort(rng.choice(len(vertices), cfg.max_vertices, replace=False))]
     prepared = [_prepare(v, cfg.mask_directions) for v in views]
-    problem = _Problem(samples, samples[np.sort(pick)], vertices, target, prepared, cfg)
+    R_start = np.asarray(R_world_from_model_start, dtype=float)
+    up_model = None
+    if cfg.upright_sigma_deg > 0:
+        R_start, up_model = level(R_start)
+    problem = _Problem(
+        samples, samples[np.sort(pick)], vertices, target, prepared, cfg, up_model, support_z
+    )
 
     # Every yaw start gets a few rounds; only the cheapest is refined to convergence.
     lo, hi = target.min(axis=0), target.max(axis=0)
     starts = []
     for k in range(cfg.yaw_hypotheses):
         yaw = rotation_from_vector(np.array([0.0, 0.0, 2 * np.pi * k / cfg.yaw_hypotheses]))
-        r0 = yaw @ R_world_from_model_start
+        r0 = yaw @ R_start
         turned = samples @ r0.T
         scale0 = float(np.linalg.norm(hi - lo) / np.linalg.norm(turned.max(0) - turned.min(0)))
         t0 = (lo + hi) / 2 - scale0 * (turned.max(0) + turned.min(0)) / 2

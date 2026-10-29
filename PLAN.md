@@ -240,8 +240,26 @@ Tasks
   `point_cluster_path` (human decision 2026-10-29; the voted SfM points would need a schema
   field). Synthetic box, six views on a handheld arc: under 1 mm corner error and under 0.75%
   scale error, also with 5% strays, one occluded view or only the top face observed
-  (`tests/test_registration.py`). Open: weights are untuned first guesses, no real SAM 3D
-  sample has been registered yet (needs the P3.1 worker), and it is not yet wired into a stage.
+  (`tests/test_registration.py`). First real sample, s01 `track_003` (SAM 3D, keyframe 37,
+  12 views, 5 s): median mask IoU 0.95 (raw SAM 3D pose 0.72), model up within 1.2° of world
+  up, size 102 x 84 x 42 mm against ground truth 116 x 86 x 45 (-12%, -3%, -6%). The P2.4
+  primitive fit reads the same object 98 x 83 x 43 mm, while the other s01 objects read
+  within 6%, so the long side needs a re-measure before it is called a registration error.
+  All five s01 objects (one seed each, points target), size error against ground truth:
+  coffee can +6/+6/-4%, small cube +7/+4/+5%, cube +10/+6/-5%, earbud box -11/-3/-1%,
+  phone box -1/+12/+32% (tilted 8°, so its height reads high). Median mask IoU 0.92 to 0.96
+  for all. Registration only scales uniformly, so SAM 3D's proportions carry through: the can
+  is 12% too wide for its height, the phone box 13% too wide for its length. Voted SfM points
+  and the hull cluster give the same poses; the hull's filled interior drops the inlier
+  fraction (0.29 to 0.75, points 0.84 to 0.98), so `fit_score` is not comparable across them.
+  Resting prior added the same day: the model axis nearest to up is levelled and held within
+  `upright_sigma_deg`, and an optional support height holds the lowest vertex
+  (`contact_sigma_m`). Rerun, points target, with contact on the table plane: coffee can
+  +7/+7/-4%, small cube +5/+3/+3%, cube +9/+6/-6%, earbud box -11/-3/-6%, phone box
+  -3/+7/+2% (height was +32%), median mask IoU 0.92 to 0.96, lowest vertex within 1 mm of
+  the table. Left: sizes run 3 to 9% large on all but the earbud box, from SAM 3D's
+  proportions and loose masks. Open: weights are untuned first guesses, one sample per
+  object, not yet wired into a stage.
 
 - [ ] **P3.3** Bake-off, time-boxed to one week: SAM 3D, TRELLIS.2, and SAM 3D pose with
 
