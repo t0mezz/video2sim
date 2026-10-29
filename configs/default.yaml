@@ -171,6 +171,8 @@ shape:
     yaw_screen_iterations: 4   # rounds each start gets before the best one is refined
     outer_iterations: 50       # nearest-neighbour rounds; about 20 on the synthetic box
     inner_iterations: 5        # Levenberg-Marquardt steps per round
+    upright_sigma_deg: 1.0     # tilt of the levelled model axis; 0 turns the term off
+    contact_sigma_m: 0.002     # lowest vertex against the support height, when one is given
 
 physics:
   material_table: configs/material_table.yaml

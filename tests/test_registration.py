@@ -13,6 +13,7 @@ from video2sim.schemas import SE3, Intrinsics
 from video2sim.stages.registration import (
     MaskView,
     RegistrationConfig,
+    level,
     register,
     rotation_from_vector,
 )
@@ -170,6 +171,41 @@ def test_masks_fix_the_scale_when_only_the_top_is_observed() -> None:
         top, _views(), _config(mask_weight=0.0), seed=0,
     )  # fmt: skip
     assert abs(points_only.scale / TRUE_SCALE - 1) > 0.02
+
+
+def test_level_stands_the_nearest_model_axis_straight_up() -> None:
+    r, up_model = level(_perturbed_start(12.0))
+    np.testing.assert_array_equal(up_model, [0.0, 1.0, 0.0])  # TRUE_R turns model +y up
+    np.testing.assert_allclose(r @ up_model, [0.0, 0.0, 1.0], atol=1e-12)
+    np.testing.assert_allclose(r @ r.T, np.eye(3), atol=1e-12)
+    # least turn: a start that is level already stays as it is
+    level_start = rotation_from_vector(np.array([0.0, 0.0, 0.4])) @ TRUE_R
+    np.testing.assert_allclose(level(level_start)[0], level_start, atol=1e-12)
+
+
+def test_registered_model_axis_stays_vertical() -> None:
+    result = register(
+        np.asarray(MODEL.vertices), np.asarray(MODEL.faces), _perturbed_start(12.0),
+        _true_surface(1500), _views(), _config(), seed=0,
+    )  # fmt: skip
+    up = result.T_world_from_model.to_numpy()[:3, :3] @ [0.0, 1.0, 0.0]
+    assert np.degrees(np.arccos(up[2])) < 0.5
+
+
+def test_contact_fixes_the_scale_when_only_the_top_is_observed_and_masks_are_off() -> None:
+    surface = _true_surface(4000)
+    top = surface[surface[:, 2] > float(np.max(surface[:, 2])) - 1e-6]
+    result = register(
+        np.asarray(MODEL.vertices), np.asarray(MODEL.faces), _perturbed_start(5.0),
+        top, _views(), _config(mask_weight=0.0), seed=0,
+        support_z=float(np.min(_true_vertices()[:, 2])),
+    )  # fmt: skip
+    assert result.scale == pytest.approx(TRUE_SCALE, rel=0.01)
+
+
+def test_config_rejects_an_upright_sigma_of_ninety_degrees() -> None:
+    with pytest.raises(ValueError, match="upright"):
+        _config(upright_sigma_deg=90.0)
 
 
 def test_an_occluded_part_of_the_mask_is_not_charged() -> None:
