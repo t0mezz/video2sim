@@ -291,6 +291,41 @@ Tasks
       and the Phase 4 stability pass rate. Keep one path and record it as a decision.
       Where: `configs/default.yaml` (`shape.backend`)
 
+  Status 2026-10-30 (dev split only; the test split is for the gate): three arms on the nine
+  dev scenes (s01 to s04, s06, s11 to s14), 42 ground-truth objects matched by all three,
+  `benchmark/results/p3_3_bakeoff_dev.json` (`benchmark/compare_shape_arms.py`). Arms: SAM 3D
+  (`shape.backend: sam3d`, the existing runs), TRELLIS.2 (`trellis2`, 6 draws per object, about
+  230 hosted calls for the eight scenes beyond s01) and TRELLIS.2 geometry started from SAM 3D's
+  layout (`hybrid`, no new calls: `models/hybrid.py` matches the two model frames by chamfer
+  search over the 24 cube turns and a yaw, then carries SAM 3D's rotation across). Same
+  registration, stretch and settings for all.
+
+  | Paired, 42 objects | SAM 3D | TRELLIS.2 | Hybrid |
+  | --- | --- | --- | --- |
+  | Median size error | 4.5% | 8.7% | 8.4% |
+  | Easy (19) / medium (23) | 4.6% / 4.3% | 6.0% / 20.5% | 4.9% / 16.2% |
+  | Objects over 15% | 5 | 15 | 15 |
+  | Proxy hulls | 1 | 20 | 11 |
+  | Median position error | 6.1 mm | 6.0 mm | 6.9 mm |
+  | Median orientation error | 0.99° | 1.01° | 1.13° |
+  | Observed cluster to mesh, median | 1.2 mm | 1.3 mm | 1.5 mm |
+  | Lowest size error (objects) | 26 | 12 | 4 |
+
+  On the 22 objects where every arm kept a real mesh: size error 4.1% (SAM 3D), 8.7%
+  (TRELLIS.2), 7.1% (hybrid); over 15%: 1, 7, 8; SAM 3D lowest on 17 of 22. So the gap is not the
+  proxy hulls. TRELLIS.2 draws vary far more from seed to seed (flat slabs, near-empty meshes,
+  failed draws), and its fit score finds a good draw for about half the objects: 20 of 42 fall
+  back to the proxy hull, against 1 for SAM 3D. Starting from SAM 3D's pose rescues 9 of those
+  20 from the hull: median size error 10.4% on them (hull 13.2%, SAM 3D 9.9%), with one at 97%. The point-to-mesh distance is observed cluster to registered mesh, since
+  ground truth holds boxes and no surfaces; it is within 1 mm of equal for all arms and so does
+  not separate them. The Phase 4 stability pass rate was not measured (needs Phase 4).
+  Recommendation, for the human to decide and record: keep `sam3d` as the geometry path;
+  TRELLIS.2 is behind on every size measure and not ahead on any other. Sample selection stayed
+  on fit score alone (human decision 2026-10-30, no colour check). Not done: the test split,
+  MV-SAM3D, and the Phase 4 stability measure. Fixes made on the way: `shape.parallel_samples`
+  (hosted draws in flight at once), the worker now reports an empty sparse structure as a
+  failed draw whether torch raises `RuntimeError` or `IndexError`.
+
 - [ ] **P3.4** Pick the best sample per object by fit score. Below the threshold, fall back to
 
       a convex hull or oriented box of the observed points and set `PROXY_GEOMETRY`.

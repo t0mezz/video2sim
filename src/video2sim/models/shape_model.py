@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import hashlib
 from collections.abc import Sequence
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
@@ -84,18 +85,36 @@ def draw_samples(
     samples_per_keyframe: int,
     base_seed: int,
     failures: list[str] | None = None,
+    workers: int = 1,
 ) -> list[ShapeSample]:
     """``samples_per_keyframe`` samples for each view, in view order (best keyframe first).
-    A draw that raises ``SampleFailed`` is left out and, if ``failures`` is given, noted there."""
+    A draw that raises ``SampleFailed`` is left out and, if ``failures`` is given, noted there.
+    ``workers`` draws run at once, since a hosted model spends its time waiting; the order of
+    the result does not depend on it."""
     if samples_per_keyframe < 1:
         raise ValueError("samples_per_keyframe must be at least 1")
+    if workers < 1:
+        raise ValueError("workers must be at least 1")
+    jobs = [
+        (view, sample_seed(base_seed, object_id, view.frame_index, draw))
+        for view in views
+        for draw in range(samples_per_keyframe)
+    ]
+
+    def run(job: tuple[ShapeView, int]) -> ShapeSample | str:
+        view, seed = job
+        try:
+            return model.sample(object_id, view, seed)
+        except SampleFailed as e:
+            return f"frame {view.frame_index} seed {seed}: {e}"
+
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        results = list(pool.map(run, jobs))
     samples = []
-    for view in views:
-        for draw in range(samples_per_keyframe):
-            seed = sample_seed(base_seed, object_id, view.frame_index, draw)
-            try:
-                samples.append(model.sample(object_id, view, seed))
-            except SampleFailed as e:
-                if failures is not None:
-                    failures.append(f"frame {view.frame_index} seed {seed}: {e}")
+    for result in results:
+        if isinstance(result, str):
+            if failures is not None:
+                failures.append(result)
+        else:
+            samples.append(result)
     return samples

@@ -270,9 +270,10 @@ class Trellis2Worker:
                 seed=seed,
                 pipeline_type=options["pipeline_type"],
             )
-        except RuntimeError as e:
-            # an empty sparse structure; anything else (out of memory, a real bug) still raises
-            if "numel() == 0" not in str(e):
+        except (RuntimeError, IndexError) as e:
+            # an empty sparse structure, which torch reports as either of these; anything else
+            # (out of memory, a real bug) still raises
+            if not any(m in str(e) for m in ("numel() == 0", "non-zero size")):
                 raise
             return {"mesh_npz": b"", "meta_json": json.dumps({"failed": str(e)})}
         mesh = meshes[0]
