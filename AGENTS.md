@@ -33,7 +33,7 @@ configs/
 src/video2sim/
   schemas.py             the contracts between stages; start here
   stages/                one module per stage; each documents its contract
-  models/                adapters around external models (SAM 3.1, SAM 3D, TRELLIS.2, VLM)
+  models/                adapters around external models (SAM 3.1, SAM 3D, VLM)
   evaluation/            metrics, baselines and reports against benchmark ground truth
   cli.py                 the `video2sim` command (`eval` today)
 tests/                   fast tests; no GPU, weights or network needed
@@ -115,7 +115,7 @@ notice. Breaking one gives a scene that loads fine and behaves wrongly.
 * **Object frame.** Origin at the volume centroid. Meshes are stored in this frame, in
   meters, already scaled.
 * **Scale.** Metric scale comes from the printed marker. A scale predicted by a generative
-  model (SAM 3D, TRELLIS.2) is a guess and is never used as is.
+  model (SAM 3D) is a guess and is never used as is.
 
 ### Physics
 

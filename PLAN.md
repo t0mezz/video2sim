@@ -206,7 +206,8 @@ metric world frame. This is the highest-risk phase.
 
 Tasks
 
-- [ ] **P3.1** Adapters for SAM 3D Objects and TRELLIS.2 behind one interface. Draw several
+- [ ] **P3.1** Adapters for SAM 3D Objects and TRELLIS.2 behind one interface (TRELLIS.2 was
+      dropped on 2026-10-30, D-018; its notes below are history). Draw several
 
       samples per keyframe, because both are generative. Where: `src/video2sim/models/`
       Status 2026-10-29: interface (`shape_model.py`) and the SAM 3D client with pose and mesh
@@ -532,6 +533,7 @@ one that supersedes.
 | D-015 | Shape stage inference: run the SAM 3D Objects and TRELLIS.2 checkpoints on Modal or Baseten GPUs, because the Meta Model API does not offer them. Hope for support, not confirmed | Open | Week 2 | Terms of Modal and Baseten read 2026-10-26: neither trains on customer data, neither forbids it, both leave the model licenses in force. SAM 3D access granted 2026-10-26. Needs: GPU credits on Modal or Baseten, a test run of a checkpoint on one host, and a fallback of boxes from masks if neither host works |
 | D-016 | Reconstruction back end for the MVP: pycolmap on CPU (`reconstruction.backend: pycolmap`). Evidence 2026-10-26, mean reprojection error and frames registered: s01_b 0.50 px 28/28, s02_a 0.72 px 108/108, s05_b 0.54 px 20/20, s10_a 0.46 px 187/187, s19_a 0.58 px 193/193, s23_a 0.47 px 68/68, at 3 fps and 1280 px on an Apple M4 CPU, 3 s to 281 s per video. Pose and scale accuracy not yet measured. VGGT, MASt3R and `pycolmap-cuda12` are deferred past the MVP | Decided | Week 3 | Run was in a scratchpad script, not committed. `pycolmap-cuda12` is a separate Linux-only package with the same module name, so it would be a mutually exclusive extra |
 | D-017 | Material pass pulled forward (2026-10-28, human decision). The classification half of P4.4 (category, material class, surface finish, solid or hollow, confidence) runs in Phase 2 as one hosted VLM request per object on its best 2 keyframe crops (`segmentation.material_pass.keyframes`), and it also raises `Flag.TRANSPARENT_OR_REFLECTIVE` (P2.5). The class list in `configs/default.yaml` is provisional, made from the materials seen on the dev scenes, with no numbers; P4.3 completes the list and the values with sources, and the mapping to numbers stays in P4.4. Reason: the geometry-only gate cleared a mirror cube and a foil figure, and asking every object is cheaper than two separate calls | Decided | Week 5 | `src/video2sim/stages/material_pass.py`, `benchmark/run_material_pass.py` |
+| D-018 | Shape stage geometry path: SAM 3D Objects only (`shape.backend: sam3d`). TRELLIS.2 is dropped from the project (human decision 2026-10-30, after the P3.3 dev-split bake-off). Evidence: `benchmark/results/p3_3_bakeoff_dev.json`, 42 objects matched by all three arms: median size error 4.5% for SAM 3D, 8.7% for TRELLIS.2, 8.4% for TRELLIS.2 geometry on SAM 3D's pose; objects over 15%: 5, 15, 15; proxy hulls: 1, 20, 11. Removed: `models/trellis2.py`, `models/trellis2_modal.py`, `models/hybrid.py`, `shape.trellis2`, their tests. Kept: the results, `benchmark/compare_shape_arms.py`, `shape.parallel_samples`, `SampleFailed`. Consequences: `nvdiffrast` and `nvdiffrec` (research use only, D-005) are no longer in the pipeline; the DINOv3 and RMBG-2.0 licenses no longer apply; the SAM License terms remain. Not done: the test split and the Phase 4 stability measure were not run for the bake-off. `GeometrySource` in `schemas.py` still lists `trellis2` (schema change left for a human). The Modal app `video2sim-trellis2` and its weights volume are still deployed | Decided | Week 8 | Commands to remove them are in the 2026-10-30 changelog row |
 
 ## 12. After the MVP
 
@@ -603,6 +605,7 @@ In order:
 | 2026-10-26 | D-003 changed to hosted inference; D-005 decided as research; D-015 added for shape-stage hosting; D-004 leans to the Meta Model API |
 | 2026-10-26 | D-004 decided: Meta Model API, and videos may be sent to hosted APIs |
 | 2026-10-26 | D-005: license texts read; research use, TRELLIS.2 blocks commercial use through the NVIDIA renderer licenses |
+| 2026-10-30 | D-018: TRELLIS.2 dropped after the P3.3 dev bake-off; SAM 3D is the only shape model. Cleanup of the hosted side, not done by an agent: `uv run modal app stop video2sim-trellis2` and `uv run modal volume delete video2sim-trellis2-weights` |
 | 2026-10-30 | D-005: DINOv3 License (TRELLIS.2's image encoder) read; no commercial block, acknowledgment in publications, hosting on Modal not addressed. RMBG-2.0 (BiRefNet, CC BY-NC 4.0, gated) is not loaded: the TRELLIS.2 worker stubs the background remover because inputs carry the mask as alpha |
 | 2026-10-26 | P0.9: green CI run confirmed on GitHub; Phase 0 gate passed with the container criterion deferred; Phase 1 is the current focus |
 | 2026-10-26 | D-016: pycolmap on CPU is the MVP reconstruction back end; VGGT, MASt3R and the CUDA build moved to section 12 |

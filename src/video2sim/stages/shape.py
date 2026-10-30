@@ -122,30 +122,11 @@ ModelFactory = Callable[[dict[str, Any], Path], ShapeModel]
 def default_model(cfg: dict[str, Any], work: Path) -> ShapeModel:
     """The hosted model named by ``shape.backend``."""
     backend = cfg["shape"]["backend"]
-    if backend == "sam3d":
-        from video2sim.models.sam3d import ModalTransport, Sam3d, Sam3dConfig
+    if backend != "sam3d":
+        raise ValueError(f"shape.backend {backend!r} has no adapter (only sam3d)")
+    from video2sim.models.sam3d import ModalTransport, Sam3d, Sam3dConfig
 
-        return Sam3d(Sam3dConfig.from_config(cfg), ModalTransport(), work / "sam3d_cache")
-    if backend == "trellis2":
-        from video2sim.models.trellis2 import ModalTransport as TrellisTransport
-        from video2sim.models.trellis2 import Trellis2, Trellis2Config
-
-        return Trellis2(
-            Trellis2Config.from_config(cfg), TrellisTransport(), work / "trellis2_cache"
-        )
-    if backend == "hybrid":
-        # TRELLIS.2 geometry, SAM 3D pose (P3.3): both caches live in this run's work folder
-        from video2sim.models.hybrid import HybridShape
-        from video2sim.models.sam3d import ModalTransport as Sam3dTransport
-        from video2sim.models.sam3d import Sam3d, Sam3dConfig
-        from video2sim.models.trellis2 import ModalTransport as TrellisTransport
-        from video2sim.models.trellis2 import Trellis2, Trellis2Config
-
-        return HybridShape(
-            Sam3d(Sam3dConfig.from_config(cfg), Sam3dTransport(), work / "sam3d_cache"),
-            Trellis2(Trellis2Config.from_config(cfg), TrellisTransport(), work / "trellis2_cache"),
-        )
-    raise ValueError(f"shape.backend {backend!r} has no adapter (sam3d, trellis2 or hybrid)")
+    return Sam3d(Sam3dConfig.from_config(cfg), ModalTransport(), work / "sam3d_cache")
 
 
 def load_masks(run_dir: Path, obj: ObjectInstance) -> Masks:
