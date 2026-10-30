@@ -1,4 +1,4 @@
-"""Adapters around external models (SAM 3.1, SAM 3D, TRELLIS.2, a vision-language model).
+"""Adapters around external models (SAM 3.1, SAM 3D, a vision-language model).
 
 One module per model, each exposing a small typed interface. Rules:
 

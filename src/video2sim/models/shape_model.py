@@ -1,5 +1,4 @@
-"""One interface for the generative shape models of stage 4 (P3.1): SAM 3D Objects now,
-TRELLIS.2 later.
+"""One interface for the generative shape models of stage 4 (P3.1): SAM 3D Objects.
 
 A model takes one keyframe image, the object's mask in it and a seed, and returns one sample:
 a mesh in the model's own frame and units, plus the model's guess of where that frame sits in
@@ -62,8 +61,8 @@ class ShapeSample:
 
 
 class SampleFailed(Exception):
-    """The model ran but produced no usable sample for this seed (TRELLIS.2 can predict an empty
-    structure). Not a bug in the call: ``draw_samples`` skips the draw and reports it."""
+    """The model ran but produced no usable sample for this seed (a generative model can predict an
+    empty structure). Not a bug in the call: ``draw_samples`` skips the draw and reports it."""
 
 
 class ShapeModel(Protocol):

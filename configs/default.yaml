@@ -147,7 +147,7 @@ segmentation:
       - other
 
 shape:
-  backend: sam3d               # sam3d or trellis2; TODO(P3.3): chosen in the bake-off
+  backend: sam3d               # the only adapter; chosen in the P3.3 bake-off (D-018)
   keyframes_per_object: 2      # P3.4: best keyframes the model is run on
   samples_per_keyframe: 3      # seeds per keyframe
   max_views: 12                # frames whose masks enter registration, spread over the video
@@ -160,11 +160,6 @@ shape:
     # Off until the P3.3 A/B: the paper reports shape barely depends on it, and P3.2 sets
     # pose and scale from the metric cloud (docs/research/sam3d.md, section 5)
     use_pointmap: false
-  trellis2:                    # P3.1, models/trellis2.py
-    checkpoint: microsoft/TRELLIS.2-4B    # Hugging Face repo; the host reports the revision
-    pipeline_type: 1024_cascade  # 512, 1024, 1024_cascade or 1536_cascade
-    max_faces: 200000            # the worker simplifies the mesh to this before sending it
-    colors: true                 # vertex colours from the voxel base_color; false sends none
   parallel_samples: 6          # hosted draws in flight at once; the result does not depend on it
   stretch_samples: 1           # best samples per object that get the per-axis refinement
   registration:                # P3.2, stages/registration.py; first guesses, tune in P3.3

@@ -23,7 +23,13 @@ from video2sim.models.sam3d import (
     quaternion_wxyz_to_matrix,
 )
 from video2sim.models.sam3d_modal import REPO_ID, pose_json
-from video2sim.models.shape_model import ShapeView, draw_samples, sample_seed
+from video2sim.models.shape_model import (
+    SampleFailed,
+    ShapeSample,
+    ShapeView,
+    draw_samples,
+    sample_seed,
+)
 
 CONFIG = Path(__file__).resolve().parents[1] / "configs" / "default.yaml"
 P3D_FROM_CV = np.diag([-1.0, -1.0, 1.0])
@@ -267,3 +273,54 @@ def test_worker_pose_json_decodes_on_the_client() -> None:
     np.testing.assert_allclose(t.to_numpy()[:3, 3], [-0.1, 0.0, 1.2])
     assert pose["checkpoint"] == "facebook/sam-3d-objects@r1"
     assert _config().checkpoint == REPO_ID
+
+
+class FlakyModel:
+    """Fails for odd seeds, and records how many draws ran at once."""
+
+    name = "fake"
+
+    def __init__(self) -> None:
+        import threading
+
+        self.lock = threading.Lock()
+        self.in_flight = 0
+        self.peak = 0
+
+    def sample(self, object_id: str, view: ShapeView, seed: int) -> ShapeSample:
+        import time
+
+        with self.lock:
+            self.in_flight += 1
+            self.peak = max(self.peak, self.in_flight)
+        time.sleep(0.03)
+        with self.lock:
+            self.in_flight -= 1
+        if seed % 2:
+            raise SampleFailed("no structure")
+        from video2sim.schemas import SE3
+
+        return ShapeSample(
+            object_id, view.frame_index, seed, TETRA_V, TETRA_F, SE3.from_numpy(np.eye(4)),
+            1.0, "fake", "fake@1",
+        )  # fmt: skip
+
+
+def test_failed_draws_are_skipped_and_reported(tmp_path: Path) -> None:
+    view = ShapeView(frame_index=10, image_path=_image(tmp_path), mask=_mask())
+    failures: list[str] = []
+    samples = draw_samples(FlakyModel(), "o", [view], 6, base_seed=0, failures=failures)
+    assert len(samples) + len(failures) == 6
+    assert all(s.seed % 2 == 0 for s in samples)
+    assert all("frame 10 seed" in f and "no structure" in f for f in failures)
+
+
+def test_parallel_draws_give_the_same_samples_in_the_same_order(tmp_path: Path) -> None:
+    view = ShapeView(frame_index=10, image_path=_image(tmp_path), mask=_mask())
+    serial = draw_samples(FlakyModel(), "o", [view], 8, base_seed=0)
+    model = FlakyModel()
+    parallel = draw_samples(model, "o", [view], 8, base_seed=0, workers=8)
+    assert [s.seed for s in parallel] == [s.seed for s in serial]
+    assert model.peak > 1
+    with pytest.raises(ValueError, match="workers"):
+        draw_samples(model, "o", [view], 1, base_seed=0, workers=0)

@@ -54,7 +54,7 @@ files = ["src", "tests"]
 
 # Installed only inside the SAM 3D worker image on Modal (models/sam3d_modal.py), never here.
 [[tool.mypy.overrides]]
-module = ["torch", "PIL", "PIL.*", "huggingface_hub", "inference", "trellis2", "trellis2.*"]
+module = ["torch", "PIL", "PIL.*", "huggingface_hub", "inference"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

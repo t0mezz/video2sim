@@ -1,7 +1,7 @@
 """Compare shape backends on the same scenes (P3.3 bake-off).
 
     uv run python benchmark/compare_shape_arms.py --out benchmark/results/p3_3_bakeoff_dev.json \
-        sam3d=runs_instances trellis2=runs_trellis2 hybrid=runs_hybrid
+        arm_a=runs_instances arm_b=runs_other
 
 Each ``name=folder`` holds ``<scene>_b`` run folders with a finished shape stage. For every arm
 the script runs ``video2sim eval --stage shape`` (via symlinks named by scene id), then reads the
