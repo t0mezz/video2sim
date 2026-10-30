@@ -255,7 +255,7 @@ class Instances(Model):
 # Stage 4: shape and pose
 # ---------------------------------------------------------------------------
 
-GeometrySource = Literal["sam3d", "trellis2", "proxy_hull", "proxy_box"]
+GeometrySource = Literal["sam3d", "proxy_hull", "proxy_box"]
 
 
 class RegisteredObject(Model):
