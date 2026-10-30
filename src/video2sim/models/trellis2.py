@@ -41,6 +41,7 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import threading
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -120,10 +121,12 @@ class ModalTransport:
     def __init__(self, lookup: Callable[[], Any] | None = None) -> None:
         self._lookup = lookup or _deployed_worker
         self._worker: Any = None
+        self._lock = threading.Lock()
 
     def __call__(self, call: Trellis2Call) -> Trellis2Answer:
-        if self._worker is None:
-            self._worker = self._lookup()
+        with self._lock:
+            if self._worker is None:
+                self._worker = self._lookup()
         out = self._worker.sample.remote(call.image, call.mask_png, call.seed, call.options)
         return Trellis2Answer(mesh_npz=bytes(out["mesh_npz"]), meta_json=str(out["meta_json"]))
 

@@ -80,6 +80,7 @@ class ShapeStageConfig:
     min_fit_score: float
     support_gap_m: float
     stretch_samples: int
+    parallel_samples: int
     registration: RegistrationConfig
 
     @classmethod
@@ -93,6 +94,7 @@ class ShapeStageConfig:
             float(c["min_fit_score"]),
             float(c["support_gap_m"]),
             int(c["stretch_samples"]),
+            int(c["parallel_samples"]),
             RegistrationConfig.from_config(cfg),
         )
         counts = (
@@ -100,11 +102,12 @@ class ShapeStageConfig:
             out.samples_per_keyframe,
             out.max_views,
             out.stretch_samples,
+            out.parallel_samples,
         )
         if min(counts) < 1:
             raise ValueError(
-                "keyframes_per_object, samples_per_keyframe, max_views and stretch_samples "
-                "must be at least 1"
+                "keyframes_per_object, samples_per_keyframe, max_views, stretch_samples and "
+                "parallel_samples must be at least 1"
             )
         if not 0 <= out.min_fit_score <= 1:
             raise ValueError("min_fit_score must be in [0, 1]")
@@ -130,7 +133,19 @@ def default_model(cfg: dict[str, Any], work: Path) -> ShapeModel:
         return Trellis2(
             Trellis2Config.from_config(cfg), TrellisTransport(), work / "trellis2_cache"
         )
-    raise ValueError(f"shape.backend {backend!r} has no adapter (sam3d or trellis2)")
+    if backend == "hybrid":
+        # TRELLIS.2 geometry, SAM 3D pose (P3.3): both caches live in this run's work folder
+        from video2sim.models.hybrid import HybridShape
+        from video2sim.models.sam3d import ModalTransport as Sam3dTransport
+        from video2sim.models.sam3d import Sam3d, Sam3dConfig
+        from video2sim.models.trellis2 import ModalTransport as TrellisTransport
+        from video2sim.models.trellis2 import Trellis2, Trellis2Config
+
+        return HybridShape(
+            Sam3d(Sam3dConfig.from_config(cfg), Sam3dTransport(), work / "sam3d_cache"),
+            Trellis2(Trellis2Config.from_config(cfg), TrellisTransport(), work / "trellis2_cache"),
+        )
+    raise ValueError(f"shape.backend {backend!r} has no adapter (sam3d, trellis2 or hybrid)")
 
 
 def load_masks(run_dir: Path, obj: ObjectInstance) -> Masks:
@@ -283,7 +298,13 @@ def shape_object(
     if views and len(target):
         shape_views = [ShapeView(k, images[k], own[k]) for k in keyframes]
         samples = draw_samples(
-            model, obj.object_id, shape_views, cfg.samples_per_keyframe, seed, failures
+            model,
+            obj.object_id,
+            shape_views,
+            cfg.samples_per_keyframe,
+            seed,
+            failures,
+            cfg.parallel_samples,
         )
         for sample in samples:
             reg = register_sample(sample, world, target, views, cfg.registration, seed, support_z)

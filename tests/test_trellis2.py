@@ -218,3 +218,30 @@ def test_colors_travel_with_the_mesh_and_are_checked() -> None:
     np.testing.assert_array_equal(got, colors)
     with pytest.raises(ValueError, match="colour"):
         mesh_from_npz(mesh_npz(TETRA_V, TETRA_F, colors[:3]))
+
+
+def test_parallel_draws_return_the_same_samples_in_the_same_order(tmp_path: Path) -> None:
+    import threading
+    import time
+
+    lock, in_flight, peak = threading.Lock(), [0], [0]
+
+    def transport(call: Trellis2Call) -> Trellis2Answer:
+        with lock:
+            in_flight[0] += 1
+            peak[0] = max(peak[0], in_flight[0])
+        time.sleep(0.05)
+        with lock:
+            in_flight[0] -= 1
+        return FakeTransport()(call)
+
+    view = _view(tmp_path)
+    serial = draw_samples(Trellis2(_config(), transport, tmp_path / "a"), "o", [view], 6, 0)
+    peak[0] = 0
+    parallel = draw_samples(
+        Trellis2(_config(), transport, tmp_path / "b"), "o", [view], 6, 0, workers=6
+    )
+    assert [s.seed for s in parallel] == [s.seed for s in serial]
+    assert peak[0] > 1
+    with pytest.raises(ValueError, match="workers"):
+        draw_samples(Trellis2(_config(), transport, tmp_path / "c"), "o", [view], 1, 0, workers=0)
