@@ -12,8 +12,11 @@ from numpy.typing import NDArray
 from video2sim.schemas import SE3, Intrinsics
 from video2sim.stages.registration import (
     MaskView,
+    Registration,
     RegistrationConfig,
+    _build_problem,
     level,
+    refine_stretch,
     register,
     rotation_from_vector,
 )
@@ -201,6 +204,77 @@ def test_contact_fixes_the_scale_when_only_the_top_is_observed_and_masks_are_off
         support_z=float(np.min(_true_vertices()[:, 2])),
     )  # fmt: skip
     assert result.scale == pytest.approx(TRUE_SCALE, rel=0.01)
+
+
+def _stretched_model(factors: F64) -> trimesh.Trimesh:
+    return trimesh.Trimesh(np.asarray(MODEL.vertices) * factors, MODEL.faces, process=False)
+
+
+def _placed_extents(result: Registration, mesh: trimesh.Trimesh) -> F64:
+    out: F64 = np.ptp(result.scale * np.asarray(result.stretch) * np.asarray(mesh.vertices), axis=0)
+    return out
+
+
+def test_stretch_corrects_a_mesh_with_wrong_proportions() -> None:
+    wrong = _stretched_model(np.array([1.25, 0.9, 1.0]))
+    truth = TRUE_SCALE * MODEL_EXTENTS
+    start = TRUE_R @ rotation_from_vector(np.array([0.05, -0.04, 0.06]))
+    target = _true_surface(1500)
+    off = register(
+        wrong.vertices, wrong.faces, start, target, _views(), _config(stretch_sigma=0), 3
+    )
+    on = refine_stretch(wrong.vertices, wrong.faces, off, target, _views(), _config(), 3)
+    assert off.stretch == (1.0, 1.0, 1.0)
+    error_off = np.max(np.abs(_placed_extents(off, wrong) / truth - 1))
+    error_on = np.max(np.abs(_placed_extents(on, wrong) / truth - 1))
+    assert error_off > 0.1
+    assert error_on < 0.04
+    placed = on.scale * np.asarray(on.stretch) * np.asarray(wrong.vertices)
+    world = placed @ on.T_world_from_model.to_numpy()[:3, :3].T
+    world = world + on.T_world_from_model.to_numpy()[:3, 3]
+    assert _corner_error_m(world) < 0.005
+
+
+def test_stretch_stays_at_one_when_the_proportions_are_right() -> None:
+    start = TRUE_R @ rotation_from_vector(np.array([0.05, -0.04, 0.06]))
+    fit = register(MODEL.vertices, MODEL.faces, start, _true_surface(1500), _views(), _config(), 3)
+    result = refine_stretch(
+        MODEL.vertices, MODEL.faces, fit, _true_surface(1500), _views(), _config(), 3
+    )
+    # only the product with the scale is meaningful, so compare the sizes
+    np.testing.assert_allclose(
+        _placed_extents(result, MODEL), TRUE_SCALE * MODEL_EXTENTS, rtol=0.015
+    )
+
+
+def test_jacobian_matches_central_differences() -> None:
+    distorted = K.model_copy(update={"distortion": [0.05, -0.02, 0.001, -0.002, 0.01]})
+    views = [MaskView(v.T_world_from_camera, distorted, v.mask, v.occluders) for v in _views()]
+    up = level(TRUE_R)[1]
+    problem, _ = _build_problem(
+        np.asarray(MODEL.vertices), np.asarray(MODEL.faces), _true_surface(500), views,
+        _config(), 0, up, 0.0,
+    )  # fmt: skip
+    base = (TRUE_SCALE, TRUE_R, TRUE_T + np.array([0.002, -0.001, 0.003]))
+    p = np.array([0.02, 0.03, -0.02, 0.05, 0.001, 0.002, -0.001, 0.03, -0.02, 0.01])
+    index, _, weight = problem.match(p, base)
+    exact = problem.jacobian(p, base, index, weight)
+    step = 1e-7
+    numeric = np.empty_like(exact)
+    for i in range(len(p)):
+        d = np.zeros(len(p))
+        d[i] = step
+        high = problem.residuals(p + d, base, index, weight)
+        low = problem.residuals(p - d, base, index, weight)
+        numeric[:, i] = (high - low) / (2 * step)
+    # bilinear pixel costs have kinks at cell borders, so a few rows may differ
+    agree = np.abs(exact - numeric).max(axis=1) <= 1e-3 * (1 + np.abs(numeric).max(axis=1))
+    assert agree.mean() > 0.995
+
+
+def test_config_rejects_a_negative_stretch_sigma() -> None:
+    with pytest.raises(ValueError, match="stretch_sigma"):
+        _config(stretch_sigma=-0.1)
 
 
 def test_config_rejects_an_upright_sigma_of_ninety_degrees() -> None:
