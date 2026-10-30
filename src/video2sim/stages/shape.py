@@ -119,11 +119,18 @@ ModelFactory = Callable[[dict[str, Any], Path], ShapeModel]
 def default_model(cfg: dict[str, Any], work: Path) -> ShapeModel:
     """The hosted model named by ``shape.backend``."""
     backend = cfg["shape"]["backend"]
-    if backend != "sam3d":
-        raise ValueError(f"shape.backend {backend!r} has no adapter yet (only sam3d)")
-    from video2sim.models.sam3d import ModalTransport, Sam3d, Sam3dConfig
+    if backend == "sam3d":
+        from video2sim.models.sam3d import ModalTransport, Sam3d, Sam3dConfig
 
-    return Sam3d(Sam3dConfig.from_config(cfg), ModalTransport(), work / "sam3d_cache")
+        return Sam3d(Sam3dConfig.from_config(cfg), ModalTransport(), work / "sam3d_cache")
+    if backend == "trellis2":
+        from video2sim.models.trellis2 import ModalTransport as TrellisTransport
+        from video2sim.models.trellis2 import Trellis2, Trellis2Config
+
+        return Trellis2(
+            Trellis2Config.from_config(cfg), TrellisTransport(), work / "trellis2_cache"
+        )
+    raise ValueError(f"shape.backend {backend!r} has no adapter (sam3d or trellis2)")
 
 
 def load_masks(run_dir: Path, obj: ObjectInstance) -> Masks:
@@ -271,10 +278,13 @@ def shape_object(
     keyframes = [k for k in obj.keyframes if k in own and k in images][: cfg.keyframes_per_object]
 
     candidates: list[Candidate] = []
+    failures: list[str] = []
     checkpoint = None
     if views and len(target):
         shape_views = [ShapeView(k, images[k], own[k]) for k in keyframes]
-        samples = draw_samples(model, obj.object_id, shape_views, cfg.samples_per_keyframe, seed)
+        samples = draw_samples(
+            model, obj.object_id, shape_views, cfg.samples_per_keyframe, seed, failures
+        )
         for sample in samples:
             reg = register_sample(sample, world, target, views, cfg.registration, seed, support_z)
             candidates.append(Candidate(sample, reg))
@@ -297,6 +307,7 @@ def shape_object(
         "views": view_frames,
         "support_z": support_z,
         "samples": [sample_record(c) for c in candidates],
+        "failed_samples": failures,
     }
     mesh_rel = f"shape/{MESH_DIR}/{obj.object_id}.ply"
 
