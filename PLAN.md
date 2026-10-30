@@ -430,9 +430,14 @@ stated uncertainty.
 
 Tasks
 
-- [ ] **P4.1** Mesh repair: remove floaters, fill holes, make each mesh watertight and
+- [x] **P4.1** Mesh repair: remove floaters, fill holes, make each mesh watertight and
 
       manifold, decimate to a triangle budget. Validators block export on failure.
+      Evidence: `src/video2sim/stages/mesh_repair.py`, `tests/test_mesh_repair.py`; on the 5 raw
+      SAM 3D meshes of `runs/s01_b` (410k to 1.4M faces) all 5 pass the checks after repair and
+      decimation to 20000 faces, volume within 0.7% (`benchmark/results/p4_1_mesh_repair.json`,
+      `benchmark/run_mesh_repair.py`). Only s01 has raw meshes on disk; the exit criterion over all
+      exported meshes is checked in P4.8.
 
 - [ ] **P4.2** Collision geometry by convex decomposition (CoACD or V-HACD) with a cap on parts
 

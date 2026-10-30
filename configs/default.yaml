@@ -187,6 +187,9 @@ physics:
   repair:                      # P4.1, stages/mesh_repair.py
     min_component_area_frac: 0.02   # a piece smaller than this share of the largest piece's area is a floater
     min_volume_m3: 1.0e-9           # below this the mesh is not a solid
+    max_triangles: 20000            # triangle budget per visual mesh; above it the mesh is decimated
+    max_volume_change_frac: 0.02    # decimation that moves the volume more than this is rejected
+    decimation_aggression: 5        # fast_simplification agg, 3 to 10; below 3 it stops short of the budget
 
 export:
   simulator: isaac_sim         # assumed, see PLAN.md decision D-001
