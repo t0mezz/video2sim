@@ -108,7 +108,7 @@ image = (
 )
 
 
-def mesh_npz(vertices: Any, faces: Any) -> bytes:
+def mesh_npz(vertices: Any, faces: Any, colors: Any = None) -> bytes:
     """Vertices and faces as the wire format that ``models/trellis2.py`` decodes."""
     import io
 
@@ -119,17 +119,61 @@ def mesh_npz(vertices: Any, faces: Any) -> bytes:
             values = values.detach().cpu().numpy()
         return np.asarray(values)
 
+    arrays = {
+        "vertices": array(vertices).astype(np.float32),
+        "faces": array(faces).astype(np.int32),
+    }
+    if colors is not None:
+        arrays["colors"] = array(colors).astype(np.uint8)
     buffer = io.BytesIO()
-    np.savez(
-        buffer,
-        vertices=array(vertices).astype(np.float32),
-        faces=array(faces).astype(np.int32),
-    )
+    np.savez(buffer, **arrays)
     return buffer.getvalue()
 
 
-def meta_json(checkpoint: str) -> str:
-    return json.dumps({"checkpoint": checkpoint})
+def vertex_colors(
+    vertices: Any, coords: Any, base_color: Any, voxel_size: float, aabb_min: float = -0.5
+) -> tuple[Any, int]:
+    """RGB per vertex from TRELLIS.2's voxel attributes, and how many vertices found no voxel.
+
+    ``coords`` (V, 3) are integer voxel indices and ``base_color`` (V, 3) the voxel colours in
+    [0, 1]; ``to_glb`` samples them at ``(position - aabb_min) / voxel_size`` and scales by 255.
+    Each vertex takes the nearest occupied voxel among the 27 around the one it lies in; a
+    vertex with none nearby (a simplified mesh can drift off the voxels) gets mid grey.
+    """
+    import numpy as np
+
+    vertices = np.asarray(vertices, dtype=np.float64)
+    coords = np.asarray(coords, dtype=np.int64)
+    base = np.clip(np.asarray(base_color, dtype=np.float64) * 255.0, 0, 255).astype(np.uint8)
+    frac = (vertices - aabb_min) / voxel_size
+    cell = np.floor(frac).astype(np.int64)
+    side = int(max(coords.max(), cell.max()) + 3)
+    key = (coords[:, 0] + 1) * side * side + (coords[:, 1] + 1) * side + (coords[:, 2] + 1)
+    order = np.argsort(key)
+    sorted_key = key[order]
+
+    best = np.full(len(vertices), np.inf)
+    pick = np.full(len(vertices), -1, dtype=np.int64)
+    for dx in (-1, 0, 1):
+        for dy in (-1, 0, 1):
+            for dz in (-1, 0, 1):
+                n = cell + np.array([dx, dy, dz])
+                ok = ((n >= 0) & (n < side - 2)).all(axis=1)
+                k = (n[:, 0] + 1) * side * side + (n[:, 1] + 1) * side + (n[:, 2] + 1)
+                at = np.minimum(np.searchsorted(sorted_key, k), len(sorted_key) - 1)
+                hit = ok & (sorted_key[at] == k)
+                dist = np.where(hit, np.linalg.norm(frac - (n + 0.5), axis=1), np.inf)
+                better = dist < best
+                best[better] = dist[better]
+                pick[better] = order[at[better]]
+    colors = np.full((len(vertices), 3), 128, dtype=np.uint8)
+    found = pick >= 0
+    colors[found] = base[pick[found]]
+    return colors, int((~found).sum())
+
+
+def meta_json(checkpoint: str, vertices_without_color: int = 0) -> str:
+    return json.dumps({"checkpoint": checkpoint, "vertices_without_color": vertices_without_color})
 
 
 class DisabledRembg:
@@ -235,7 +279,17 @@ class Trellis2Worker:
         mesh.simplify(int(options["max_faces"]))
         if len(mesh.faces) == 0:
             raise RuntimeError("TRELLIS.2 returned no mesh")
+        colors, missing = None, 0
+        if options.get("colors"):
+            attrs = mesh.attrs.detach().float().cpu().numpy()
+            base_color = attrs[:, mesh.layout["base_color"]]
+            colors, missing = vertex_colors(
+                mesh.vertices.detach().float().cpu().numpy(),
+                mesh.coords.detach().cpu().numpy()[:, -3:],
+                base_color,
+                float(mesh.voxel_size),
+            )
         return {
-            "mesh_npz": mesh_npz(mesh.vertices, mesh.faces),
-            "meta_json": meta_json(self.checkpoint),
+            "mesh_npz": mesh_npz(mesh.vertices, mesh.faces, colors),
+            "meta_json": meta_json(self.checkpoint, missing),
         }

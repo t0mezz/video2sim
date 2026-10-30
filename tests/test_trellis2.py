@@ -19,7 +19,7 @@ from video2sim.models.trellis2 import (
     Trellis2Config,
     mesh_from_npz,
 )
-from video2sim.models.trellis2_modal import REPO_ID, DisabledRembg, mesh_npz
+from video2sim.models.trellis2_modal import REPO_ID, DisabledRembg, mesh_npz, vertex_colors
 from video2sim.stages.shape import default_model
 
 CONFIG = Path(__file__).resolve().parents[1] / "configs" / "default.yaml"
@@ -32,6 +32,7 @@ def _config(**overrides: object) -> Trellis2Config:
         "checkpoint": REPO_ID,
         "pipeline_type": "1024_cascade",
         "max_faces": 200000,
+        "colors": True,
     }
     base.update(overrides)
     return Trellis2Config.from_config({"shape": {"trellis2": base}})
@@ -146,6 +147,7 @@ def test_modal_transport_passes_the_call_to_the_worker() -> None:
     answer = transport(Trellis2Call(b"img", b"mask", 3, {"pipeline_type": "512"}))
     assert seen == [(b"img", b"mask", 3, {"pipeline_type": "512"})]
     assert mesh_from_npz(answer.mesh_npz)[0].shape == (4, 3)
+    assert mesh_from_npz(answer.mesh_npz)[2] is None
 
 
 def test_shape_backend_selects_the_trellis2_adapter(tmp_path: Path) -> None:
@@ -186,3 +188,33 @@ def test_a_failed_draw_is_skipped_reported_and_cached(tmp_path: Path) -> None:
     samples = draw_samples(model, "o", [view], 6, base_seed=0, failures=failures)
     assert len(samples) + len(failures) == 6
     assert all("frame 10 seed" in f for f in failures)
+
+
+def test_vertex_colors_come_from_the_voxel_a_vertex_lies_in() -> None:
+    size = 1.0 / 8
+    coords = np.array([[0, 0, 0], [4, 4, 4], [7, 7, 7]])
+    base = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
+    # centres of voxel (0,0,0), (4,4,4) and (7,7,7), then a vertex one voxel off the second
+    verts = np.array([[-0.5 + 0.5 * size] * 3, [0.0 + 0.5 * size] * 3, [0.5 - 0.5 * size] * 3])
+    verts = np.vstack([verts, verts[1] + [size, 0.0, 0.0]])
+    colors, missing = vertex_colors(verts, coords, base, size)
+    assert missing == 0
+    np.testing.assert_array_equal(colors[:3], [[255, 0, 0], [0, 255, 0], [0, 0, 255]])
+    np.testing.assert_array_equal(colors[3], [0, 255, 0])  # nearest occupied voxel
+
+
+def test_vertices_far_from_every_voxel_get_grey_and_are_counted() -> None:
+    size = 1.0 / 8
+    colors, missing = vertex_colors(
+        np.array([[0.4, 0.4, 0.4]]), np.array([[0, 0, 0]]), np.array([[1.0, 0.0, 0.0]]), size
+    )
+    assert missing == 1
+    np.testing.assert_array_equal(colors[0], [128, 128, 128])
+
+
+def test_colors_travel_with_the_mesh_and_are_checked() -> None:
+    colors = (np.arange(12).reshape(4, 3) * 20).astype(np.uint8)
+    _, _, got = mesh_from_npz(mesh_npz(TETRA_V, TETRA_F, colors))
+    np.testing.assert_array_equal(got, colors)
+    with pytest.raises(ValueError, match="colour"):
+        mesh_from_npz(mesh_npz(TETRA_V, TETRA_F, colors[:3]))

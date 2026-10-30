@@ -164,6 +164,7 @@ shape:
     checkpoint: microsoft/TRELLIS.2-4B    # Hugging Face repo; the host reports the revision
     pipeline_type: 1024_cascade  # 512, 1024, 1024_cascade or 1536_cascade
     max_faces: 200000            # the worker simplifies the mesh to this before sending it
+    colors: true                 # vertex colours from the voxel base_color; false sends none
   stretch_samples: 1           # best samples per object that get the per-axis refinement
   registration:                # P3.2, stages/registration.py; first guesses, tune in P3.3
     surface_samples: 3000      # mesh points for the point term

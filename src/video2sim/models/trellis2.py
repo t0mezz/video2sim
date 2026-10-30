@@ -17,9 +17,13 @@ Conventions, read from the TRELLIS.2 README and ``trellis2_image_to_3d.py`` on 2
 * The mesh lives in the cube ``[-0.5, 0.5]^3`` (the ``aabb`` the README passes to ``to_glb``).
   It is unitless and carries no pose or scale: unlike SAM 3D, TRELLIS.2 does not place the
   object in the image.
-* UNVERIFIED: the up axis of the raw mesh. TRELLIS (v1) decodes z-up and its GLB export turns
-  to y-up; this module assumes the same of TRELLIS.2. Check it on the first hosted run by
-  registering a sample to a resting object and looking at ``registration.level``'s tilt.
+* Colours: ``mesh.attrs`` holds PBR attributes per voxel and ``to_glb`` bakes them into a UV
+  texture. We want none of that, so the worker reads ``base_color`` at each vertex from the
+  nearest occupied voxel (``vertex_colors`` in the worker) and sends RGB vertex colours, as the
+  SAM 3D path gets from its GLB. ``shape.trellis2.colors`` turns this off.
+* ``to_glb`` writes ``y, z = z, -y`` ("for GLB compatibility"), which fits a z-up raw mesh. That
+  is the up axis assumed here; the first s01 sample was thin along z and registration took z
+  as its axis nearest to up, but a flat slab cannot rule out another axis.
 
 Some seeds make the model predict no voxels and its sampler fails on the empty tensor
 (``max(): Expected reduction dim``, first seen on s01 ``obj_004``). The worker reports that as
@@ -62,6 +66,7 @@ class Trellis2Config:
     checkpoint: str
     pipeline_type: str
     max_faces: int
+    colors: bool
 
     @classmethod
     def from_config(cls, cfg: dict[str, Any]) -> Trellis2Config:
@@ -72,7 +77,12 @@ class Trellis2Config:
             raise ValueError(f"shape.trellis2.pipeline_type must be one of {PIPELINE_TYPES}")
         if int(c["max_faces"]) < 4:
             raise ValueError("shape.trellis2.max_faces must be at least 4")
-        return cls(str(c["checkpoint"]), str(c["pipeline_type"]), int(c["max_faces"]))
+        return cls(
+            str(c["checkpoint"]),
+            str(c["pipeline_type"]),
+            int(c["max_faces"]),
+            bool(c["colors"]),
+        )
 
     def options(self) -> dict[str, Any]:
         """What the worker passes to ``run`` besides the inputs; part of the cache key."""
@@ -80,6 +90,7 @@ class Trellis2Config:
             "checkpoint": self.checkpoint,
             "pipeline_type": self.pipeline_type,
             "max_faces": self.max_faces,
+            "colors": self.colors,
         }
 
 
@@ -125,11 +136,15 @@ def _deployed_worker() -> Any:
     return modal.Cls.from_name(APP_NAME, WORKER_CLASS)()
 
 
-def mesh_from_npz(data: bytes) -> tuple[F64, np.ndarray[Any, np.dtype[np.int64]]]:
-    """Vertices and faces of the worker's answer, checked for shape and index range."""
+def mesh_from_npz(
+    data: bytes,
+) -> tuple[F64, np.ndarray[Any, np.dtype[np.int64]], np.ndarray[Any, np.dtype[np.uint8]] | None]:
+    """Vertices, faces and RGB vertex colours (when sent) of the worker's answer, checked for
+    shape and index range."""
     with np.load(io.BytesIO(data), allow_pickle=False) as arrays:
         vertices = np.asarray(arrays["vertices"], dtype=float)
         faces = np.asarray(arrays["faces"], dtype=np.int64)
+        colors = np.asarray(arrays["colors"], dtype=np.uint8) if "colors" in arrays else None
     if vertices.ndim != 2 or vertices.shape[1] != 3 or len(vertices) == 0:
         raise ValueError(f"expected (N, 3) vertices, got {vertices.shape}")
     if faces.ndim != 2 or faces.shape[1] != 3 or len(faces) == 0:
@@ -138,7 +153,9 @@ def mesh_from_npz(data: bytes) -> tuple[F64, np.ndarray[Any, np.dtype[np.int64]]
         raise ValueError("faces index outside the vertices")
     if not np.isfinite(vertices).all():
         raise ValueError("vertices are not finite")
-    return vertices, faces
+    if colors is not None and colors.shape != vertices.shape:
+        raise ValueError(f"expected one RGB colour per vertex, got {colors.shape}")
+    return vertices, faces, colors
 
 
 def guessed_camera_from_model() -> SE3:
@@ -167,7 +184,7 @@ class Trellis2:
         meta = json.loads(answer.meta_json)
         if "failed" in meta:
             raise SampleFailed(str(meta["failed"]))
-        vertices, faces = mesh_from_npz(answer.mesh_npz)
+        vertices, faces, colors = mesh_from_npz(answer.mesh_npz)
         return ShapeSample(
             object_id=object_id,
             frame_index=view.frame_index,
@@ -178,6 +195,7 @@ class Trellis2:
             scale_guess=1.0,  # the mesh is unitless; registration sets the scale
             model=MODEL_NAME,
             checkpoint=str(meta["checkpoint"]),
+            vertex_colors=colors,
         )
 
     def _build_call(self, view: ShapeView, seed: int) -> Trellis2Call:
