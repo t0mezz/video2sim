@@ -1,8 +1,11 @@
 # Curated material properties. The material-inference model only ever picks a key from this
 # table; code reads the numbers from here. The model never writes a number.
 #
-# Every entry needs a source for each value. Do not add an entry without one, and do not
-# fill values from memory. Ranges express real variation within the class, not our guesses.
+# Every value needs a source. Where none could be found the field is named in `unsourced` and
+# its range is a deliberately wide placeholder, not a measurement: the object then carries
+# Flag.LOW_CONFIDENCE_MATERIAL downstream, and P4.6 narrows what the benchmark can support.
+# Do not fill a value from memory without listing it in `unsourced`. The values and where each
+# was found are in docs/research/material_sources.md (source files in docs/sources/, not in git).
 #
 # Schema of one entry:
 #
@@ -10,8 +13,108 @@
 #     density_kg_m3:        {low: ..., nominal: ..., high: ...}
 #     friction_coefficient: {low: ..., nominal: ..., high: ...}   # against a typical table surface
 #     restitution:          {low: ..., nominal: ..., high: ...}
-#     sources: ["<citation or measurement id>", ...]
+#     sources: ["<source id>", ...]
+#     unsourced: [density_kg_m3, friction_coefficient, restitution]   # the fields with no source
+#     note: "..."
 #
-# Populated in PLAN.md task P4.3.
+# Keys must equal segmentation.material_pass.classes in configs/default.yaml (a test checks it).
 
-materials: {}
+materials:
+  cardboard:
+    density_kg_m3:        {low: 700, nominal: 929, high: 1150}
+    friction_coefficient: {low: 0.2, nominal: 0.5, high: 0.9}
+    restitution:          {low: 0.05, nominal: 0.25, high: 0.55}
+    sources: [marks_10e_table_6.1.5]
+    unsourced: [friction_coefficient, restitution]
+    note: "Density is solid paper sheet; a box is thin-walled, so the hollow correction (P4.5) does the rest."
+  paper:
+    density_kg_m3:        {low: 700, nominal: 929, high: 1150}
+    friction_coefficient: {low: 0.2, nominal: 0.5, high: 0.9}
+    restitution:          {low: 0.05, nominal: 0.25, high: 0.55}
+    sources: [marks_10e_table_6.1.5]
+    unsourced: [friction_coefficient, restitution]
+    note: "Solid sheet density."
+  plastic_hard:
+    density_kg_m3:        {low: 918, nominal: 1100, high: 1240}
+    friction_coefficient: {low: 0.2, nominal: 0.5, high: 0.9}
+    restitution:          {low: 0.2, nominal: 0.5, high: 0.8}
+    sources: [marks_10e_table_6.12.1, natureworks_ingeo_4043d_tds]
+    unsourced: [friction_coefficient, restitution]
+    note: "Low is polyethylene, high is solid PLA resin; ABS, acrylic, nylon, polycarbonate and polystyrene lie between (1020 to 1200). A printed part with infill is lighter than this range; see the PLA note in docs/research/material_sources.md."
+  rubber:
+    density_kg_m3:        {low: 920, nominal: 1200, high: 2000}
+    friction_coefficient: {low: 0.5, nominal: 0.9, high: 1.5}
+    restitution:          {low: 0.3, nominal: 0.6, high: 0.9}
+    sources: [marks_10e_table_6.1.5, marinack_2013_fig3]
+    unsourced: [friction_coefficient, restitution]
+    note: "Density: caoutchouc 946, filled rubber goods 1000 to 2000; nominal is the rounded midpoint of the two averages (946, 1506). Restitution: one point, polybutadiene sphere on a steel plate 0.74 to 0.78, widened because real rubbers differ."
+  foam:
+    density_kg_m3:        {low: 20, nominal: 60, high: 250}
+    friction_coefficient: {low: 0.2, nominal: 0.5, high: 0.9}
+    restitution:          {low: 0.05, nominal: 0.2, high: 0.5}
+    sources: [none]
+    unsourced: [density_kg_m3, friction_coefficient, restitution]
+    note: "No source in hand."
+  ceramic:
+    density_kg_m3:        {low: 2000, nominal: 2400, high: 2800}
+    friction_coefficient: {low: 0.2, nominal: 0.5, high: 0.9}
+    restitution:          {low: 0.2, nominal: 0.5, high: 0.85}
+    sources: [none]
+    unsourced: [density_kg_m3, friction_coefficient, restitution]
+    note: "No source in hand."
+  glass:
+    density_kg_m3:        {low: 2400, nominal: 2590, high: 2800}
+    friction_coefficient: {low: 0.2, nominal: 0.5, high: 0.9}
+    restitution:          {low: 0.84, nominal: 0.9, high: 0.94}
+    sources: [marks_10e_table_6.1.5, marinack_2013_fig3]
+    unsourced: [friction_coefficient]
+    note: "Restitution: borosilicate glass sphere on a steel plate, 0.88 to 0.93 (4.76 mm) and 0.84 to 0.86 (6.35 mm), 2 to 3 m/s; glass on glass about 0.93. Small spheres, not a tabletop."
+  metal_steel:
+    density_kg_m3:        {low: 7700, nominal: 7850, high: 8030}
+    friction_coefficient: {low: 0.2, nominal: 0.5, high: 0.9}
+    restitution:          {low: 0.62, nominal: 0.7, high: 0.78}
+    sources: [marks_10e_table_6.1.5, marks_10e_table_6.1.9, marinack_2013_fig3]
+    unsourced: [friction_coefficient]
+    note: "Restitution: brass, chrome, S2 and low-carbon steel spheres on a steel plate, read off Fig. 3, 2 to 3 m/s; falls with speed. Small spheres, not a tabletop."
+  metal_aluminium:
+    density_kg_m3:        {low: 2640, nominal: 2700, high: 2770}
+    friction_coefficient: {low: 0.2, nominal: 0.5, high: 0.9}
+    restitution:          {low: 0.3, nominal: 0.6, high: 0.8}
+    sources: [marks_10e_table_6.1.5, marks_10e_table_6.1.9]
+    unsourced: [friction_coefficient, restitution]
+    note: "Cast 2643 average, 6061-T6 2700, 2024-T3 2770."
+  foil_wrapped_food:
+    density_kg_m3:        {low: 200, nominal: 800, high: 1200}
+    friction_coefficient: {low: 0.2, nominal: 0.5, high: 0.9}
+    restitution:          {low: 0.05, nominal: 0.25, high: 0.55}
+    sources: [none]
+    unsourced: [density_kg_m3, friction_coefficient, restitution]
+    note: "No source in hand; crumpled foil around a food item."
+  textile:
+    density_kg_m3:        {low: 100, nominal: 300, high: 1500}
+    friction_coefficient: {low: 0.3, nominal: 0.6, high: 1.0}
+    restitution:          {low: 0.05, nominal: 0.2, high: 0.5}
+    sources: [none]
+    unsourced: [density_kg_m3, friction_coefficient, restitution]
+    note: "Fibres alone are 1140 to 1520 (Marks Table 6.8.6), but a finished item is mostly air."
+  wood:
+    density_kg_m3:        {low: 336, nominal: 560, high: 784}
+    friction_coefficient: {low: 0.3, nominal: 0.5, high: 0.62}
+    restitution:          {low: 0.2, nominal: 0.5, high: 0.7}
+    sources: [wood_handbook_fpl_gtr_190_table_4-6a, wood_handbook_fpl_gtr_190_p4-17, marks_10e_table_3.2.4]
+    unsourced: [restitution]
+    note: "Density: specific gravity 0.30 to 0.70 at 12% moisture. Friction: dry smooth wood on hard smooth surfaces, kinetic 0.3 to 0.5 (Wood Handbook); static oak on oak 0.54 to 0.62 (Marks). Not measured on a tabletop. Plywood, MDF and particleboard are 0.4 to 1.0 specific gravity (Table 12-1)."
+  electronics_mixed:
+    density_kg_m3:        {low: 500, nominal: 1500, high: 3000}
+    friction_coefficient: {low: 0.2, nominal: 0.5, high: 0.9}
+    restitution:          {low: 0.2, nominal: 0.5, high: 0.8}
+    sources: [none]
+    unsourced: [density_kg_m3, friction_coefficient, restitution]
+    note: "No source in hand."
+  other:
+    density_kg_m3:        {low: 200, nominal: 1000, high: 3000}
+    friction_coefficient: {low: 0.2, nominal: 0.5, high: 0.9}
+    restitution:          {low: 0.1, nominal: 0.4, high: 0.8}
+    sources: [none]
+    unsourced: [density_kg_m3, friction_coefficient, restitution]
+    note: "Fallback for a class the model could not name; deliberately wide."

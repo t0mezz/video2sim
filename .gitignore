@@ -42,3 +42,6 @@ runs_hybrid/
 .DS_Store
 .idea/
 .vscode/
+
+# Source PDFs for the material table (P4.3); not committed
+docs/sources/
