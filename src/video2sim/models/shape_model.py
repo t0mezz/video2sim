@@ -60,6 +60,11 @@ class ShapeSample:
     vertex_colors: NDArray[np.uint8] | None = None  # (N, 3) RGB, when the model gives them
 
 
+class SampleFailed(Exception):
+    """The model ran but produced no usable sample for this seed (TRELLIS.2 can predict an empty
+    structure). Not a bug in the call: ``draw_samples`` skips the draw and reports it."""
+
+
 class ShapeModel(Protocol):
     name: str
 
@@ -78,12 +83,19 @@ def draw_samples(
     views: Sequence[ShapeView],
     samples_per_keyframe: int,
     base_seed: int,
+    failures: list[str] | None = None,
 ) -> list[ShapeSample]:
-    """``samples_per_keyframe`` samples for each view, in view order (best keyframe first)."""
+    """``samples_per_keyframe`` samples for each view, in view order (best keyframe first).
+    A draw that raises ``SampleFailed`` is left out and, if ``failures`` is given, noted there."""
     if samples_per_keyframe < 1:
         raise ValueError("samples_per_keyframe must be at least 1")
-    return [
-        model.sample(object_id, view, sample_seed(base_seed, object_id, view.frame_index, draw))
-        for view in views
-        for draw in range(samples_per_keyframe)
-    ]
+    samples = []
+    for view in views:
+        for draw in range(samples_per_keyframe):
+            seed = sample_seed(base_seed, object_id, view.frame_index, draw)
+            try:
+                samples.append(model.sample(object_id, view, seed))
+            except SampleFailed as e:
+                if failures is not None:
+                    failures.append(f"frame {view.frame_index} seed {seed}: {e}")
+    return samples

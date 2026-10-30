@@ -217,7 +217,25 @@ Tasks
       vertices; the placed mesh projected with our intrinsics overlaps the mask at IoU 0.72.
       The same mesh with the GLB turn kept scores 0.67 and without the PyTorch3D axis flip
       0.00, so the decoded conventions hold, though one flat box does not separate the GLB
-      turn sharply. Open: more objects, and the TRELLIS.2 adapter. Single view first,
+      turn sharply. Open: more objects. TRELLIS.2 adapter written 2026-10-30
+      (`models/trellis2.py`, `trellis2_modal.py`, `shape.trellis2` config, `shape.backend:
+      trellis2`), tested offline only: the worker is deployed (2026-10-30, app `video2sim-trellis2`, weights on
+      its volume, background remover stubbed out) and made its first mesh the same day (s01 `obj_003`, the earbud box, keyframe 37, seed
+      423485915: 372 s with a cold start; `transformers` had to be pinned to 4.56.2). The raw
+      mesh is 0.98 x 1.00 x 0.11 in the unit cube with z thin, so z-up holds, but it is a flat
+      slab against a box of 116 x 86 x 45 mm: registration scored fit 0 and the stage fell back
+      to the proxy hull. One sample on one hard object (white box on a white board), not a
+      verdict. Full s01 run into `runs_trellis2/s01_b` (`benchmark/run_shape.py --backend
+      trellis2`, 30 calls, 6 samples per object, one draw failed on an empty sparse structure
+      and was skipped, so the worker and `draw_samples` now report that as `SampleFailed`),
+      `benchmark/results/p3_1_trellis2_s01.json`: recall 1.0, median size error 6.4% against
+      4.0% for SAM 3D on the same five objects, position 3.7 mm against 3.5 mm. Per object,
+      TRELLIS.2 against SAM 3D: cube 5.1 / 3.9%, small cube 6.4 / 5.5%, phone box 7.1 / 3.6%,
+      coffee can 5.1 / 4.0%, earbud box 14.8 / 12.6% (the earbud box fell back to the proxy
+      hull, best fit 0.24, where SAM 3D reached 0.996). One scene, one seed set: not a
+      bake-off result. It returns the
+      raw mesh (no pose, unitless, up axis assumed z, UNVERIFIED), so the start rotation is a
+      canonical guess and registration's yaw starts do the rest. Single view first,
       MV-SAM3D only as a P3.3 arm (`docs/research/sam3d_multiview.md`)
 
 - [ ] **P3.2** Registration. SAM 3D's predicted layout is the starting pose. Refine a
@@ -546,6 +564,7 @@ In order:
 | 2026-10-26 | D-003 changed to hosted inference; D-005 decided as research; D-015 added for shape-stage hosting; D-004 leans to the Meta Model API |
 | 2026-10-26 | D-004 decided: Meta Model API, and videos may be sent to hosted APIs |
 | 2026-10-26 | D-005: license texts read; research use, TRELLIS.2 blocks commercial use through the NVIDIA renderer licenses |
+| 2026-10-30 | D-005: DINOv3 License (TRELLIS.2's image encoder) read; no commercial block, acknowledgment in publications, hosting on Modal not addressed. RMBG-2.0 (BiRefNet, CC BY-NC 4.0, gated) is not loaded: the TRELLIS.2 worker stubs the background remover because inputs carry the mask as alpha |
 | 2026-10-26 | P0.9: green CI run confirmed on GitHub; Phase 0 gate passed with the container criterion deferred; Phase 1 is the current focus |
 | 2026-10-26 | D-016: pycolmap on CPU is the MVP reconstruction back end; VGGT, MASt3R and the CUDA build moved to section 12 |
 | 2026-10-27 | P1.2, P1.3: scale from tag edge and world frame on a reference tag pass on 9 dev grid videos; results in `benchmark/results/p1_world_frame_dev.json` |

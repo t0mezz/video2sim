@@ -1,0 +1,228 @@
+{
+  "header": {
+    "created_utc": "2026-10-30T16:19:19+00:00",
+    "split": "scene s01",
+    "source": "runs in /private/tmp/claude-501/-Users-tomkorbmacher-src-video2sim/a350c944-badf-4f9b-bac1-2a16c50e23e4/scratchpad/ev_t2",
+    "code_version": "c44e77cc2191d176cf92d4fe201b32cd7544fa94",
+    "config_sha256": "1fbfa7371d110220401356cded42e08f25e189699e67c4b52dca4a64543a99c1",
+    "scenes_scored": 1,
+    "scenes_without_prediction": null,
+    "scenes_excluded_deformable": null,
+    "targets_status": "provisional",
+    "scenes_without_ground_truth": []
+  },
+  "summary": {
+    "pooled": [
+      {
+        "name": "object_recall",
+        "status": "measured",
+        "value": 1.0,
+        "n": 5,
+        "target": 0.9,
+        "passed": true
+      },
+      {
+        "name": "size_error_median",
+        "status": "measured",
+        "value": 0.06364488601140762,
+        "n": 5,
+        "target": 0.05,
+        "passed": false
+      },
+      {
+        "name": "position_error_median_m",
+        "status": "measured",
+        "value": 0.0037494264336535685,
+        "n": 5,
+        "target": 0.015,
+        "passed": true
+      },
+      {
+        "name": "orientation_error_median_deg",
+        "status": "measured",
+        "value": 0.4020351595354299,
+        "n": 2,
+        "target": 10.0,
+        "passed": true
+      },
+      {
+        "name": "mass_within_tolerance_fraction",
+        "status": "measured",
+        "value": 0.0,
+        "n": 5,
+        "target": 0.7,
+        "passed": false
+      },
+      {
+        "name": "runtime_max_minutes",
+        "status": "measured",
+        "value": 23.44479048541446,
+        "n": 1,
+        "target": 60,
+        "passed": true
+      },
+      {
+        "name": "stability_pass_fraction",
+        "status": "not_measured",
+        "value": null,
+        "n": 0,
+        "target": null,
+        "passed": null,
+        "reason": "needs the simulator (Phase 5)"
+      },
+      {
+        "name": "asset_validity_fraction",
+        "status": "not_measured",
+        "value": null,
+        "n": 0,
+        "target": null,
+        "passed": null,
+        "reason": "needs the export validators (Phase 5)"
+      },
+      {
+        "name": "manual_steps",
+        "status": "not_measured",
+        "value": null,
+        "n": 0,
+        "target": null,
+        "passed": null,
+        "reason": "needs run logs of the full pipeline (Phase 5)"
+      }
+    ],
+    "per_tier": {
+      "easy": [
+        {
+          "name": "object_recall",
+          "status": "measured",
+          "value": 1.0,
+          "n": 5,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "size_error_median",
+          "status": "measured",
+          "value": 0.06364488601140762,
+          "n": 5,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "position_error_median_m",
+          "status": "measured",
+          "value": 0.0037494264336535685,
+          "n": 5,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "orientation_error_median_deg",
+          "status": "measured",
+          "value": 0.4020351595354299,
+          "n": 2,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "mass_within_tolerance_fraction",
+          "status": "measured",
+          "value": 0.0,
+          "n": 5,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "runtime_max_minutes",
+          "status": "measured",
+          "value": 23.44479048541446,
+          "n": 1,
+          "target": null,
+          "passed": null
+        }
+      ]
+    },
+    "n_scenes": 1,
+    "n_evaluable_objects": 5,
+    "n_excluded_objects": 0,
+    "n_false_positives": 0
+  },
+  "scenes": [
+    {
+      "scene_id": "s01",
+      "tier": "easy",
+      "split": "dev",
+      "n_evaluable": 5,
+      "n_excluded": 0,
+      "n_matched": 5,
+      "n_false_positive": 0,
+      "runtime_s": 1406.6874291248678,
+      "objects": [
+        {
+          "scene_id": "s01",
+          "tier": "easy",
+          "object_id": "obj_007",
+          "label": "rubiks cube",
+          "matched": true,
+          "pred_id": "obj_002",
+          "size_error": 0.05050131753850701,
+          "position_error_m": 0.0037494264336535685,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s01",
+          "tier": "easy",
+          "object_id": "obj_021",
+          "label": "rubiks cube smaller",
+          "matched": true,
+          "pred_id": "obj_001",
+          "size_error": 0.06364488601140762,
+          "position_error_m": 0.0016401202250613924,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s01",
+          "tier": "easy",
+          "object_id": "obj_029",
+          "label": "empty phone packaging",
+          "matched": true,
+          "pred_id": "obj_004",
+          "size_error": 0.07058427699413325,
+          "position_error_m": 0.0027669658854833604,
+          "orientation_error_deg": 0.6941701061629431,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s01",
+          "tier": "easy",
+          "object_id": "obj_004",
+          "label": "coffee powder can",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.051395538496223414,
+          "position_error_m": 0.004417656353513047,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s01",
+          "tier": "easy",
+          "object_id": "obj_003",
+          "label": "packaging for in ear headphones",
+          "matched": true,
+          "pred_id": "obj_003",
+          "size_error": 0.14771363171168334,
+          "position_error_m": 0.006025391794280097,
+          "orientation_error_deg": 0.10990021290791674,
+          "mass_error": null,
+          "mass_within_tolerance": false
+        }
+      ]
+    }
+  ]
+}

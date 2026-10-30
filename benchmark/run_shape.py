@@ -1,6 +1,7 @@
 """Run the shape stage (P3.4 to P3.6) on runs that already have ``Instances``.
 
     uv run python benchmark/run_shape.py s01_b --runs runs_instances
+    uv run python benchmark/run_shape.py s01_b --runs runs_trellis2 --backend trellis2
 
 Each run id must be a folder in ``--runs`` made by ``benchmark/run_instances.py``. The finished
 capture, reconstruction and segmentation stages are taken as they are (their recorded cache keys
@@ -71,8 +72,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("run_ids", nargs="+")
     parser.add_argument("--runs", type=Path, default=ROOT / "runs_instances")
+    parser.add_argument(
+        "--backend", help="shape.backend for this run instead of the config's (sam3d, trellis2)"
+    )
     args = parser.parse_args()
     cfg = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
+    if args.backend:
+        cfg["shape"]["backend"] = args.backend
     targets = yaml.safe_load((ROOT / "configs/targets.yaml").read_text(encoding="utf-8"))
     runner = Runner(
         args.runs,
