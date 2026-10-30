@@ -1,0 +1,101 @@
+{
+  "summary": {
+    "meshes": 5,
+    "pass": 4,
+    "by_kind": {
+      "convex_decomposition": 4,
+      "box": 1
+    },
+    "config": {
+      "max_convex_parts": 16,
+      "primitive_tolerance": 0.04,
+      "primitive_volume_ratio": [
+        0.8,
+        1.25
+      ],
+      "fit_tolerance": 0.05,
+      "fit_min_coverage": 0.95,
+      "fit_cover_tolerance": 0.01,
+      "max_part_vertices": 255,
+      "coacd_threshold": 0.05,
+      "seed": 0
+    }
+  },
+  "meshes": [
+    {
+      "mesh": "s01_b/shape.work/sam3d_cache/46ae828382d92bf67e1c95d974025a8dd468201641b5bb92d5d240a7f7bdd843.glb",
+      "faces": 19600,
+      "kind": "convex_decomposition",
+      "parts": 16,
+      "primitive_score": null,
+      "checks": {
+        "collision_loads": true,
+        "collision_fit": true
+      },
+      "steps": {},
+      "coverage": 1.0,
+      "tightness": 0.03489929120881859,
+      "seconds": 43.1
+    },
+    {
+      "mesh": "s01_b/shape.work/sam3d_cache/921110a5c04e7e9d3d53e6f12d34fe943a307d030cf7a4572c3711f13563f3b5.glb",
+      "faces": 19730,
+      "kind": "convex_decomposition",
+      "parts": 8,
+      "primitive_score": null,
+      "checks": {
+        "collision_loads": true,
+        "collision_fit": false
+      },
+      "steps": {},
+      "coverage": 0.9936,
+      "tightness": 0.1202415364386448,
+      "seconds": 11.64
+    },
+    {
+      "mesh": "s01_b/shape.work/sam3d_cache/a5d5636532f3bd735fd838c6c6d75ad2384895a1518545e1639b6d2f1aa8a078.glb",
+      "faces": 19604,
+      "kind": "convex_decomposition",
+      "parts": 16,
+      "primitive_score": null,
+      "checks": {
+        "collision_loads": true,
+        "collision_fit": true
+      },
+      "steps": {},
+      "coverage": 1.0,
+      "tightness": 0.013537099024669359,
+      "seconds": 14.37
+    },
+    {
+      "mesh": "s01_b/shape.work/sam3d_cache/abb2ae9c27b731b9680566280440716f99d60ea673afef152b46d8576ba4825e.glb",
+      "faces": 19614,
+      "kind": "convex_decomposition",
+      "parts": 16,
+      "primitive_score": null,
+      "checks": {
+        "collision_loads": true,
+        "collision_fit": true
+      },
+      "steps": {},
+      "coverage": 1.0,
+      "tightness": 0.04196098150257077,
+      "seconds": 78.28
+    },
+    {
+      "mesh": "s01_b/shape.work/sam3d_cache/deb140e7c3f313e45d3a4a102e6fbb7bb1d957cec9f3d03324edabfddd39d014.glb",
+      "faces": 19600,
+      "kind": "box",
+      "parts": 1,
+      "primitive_score": 0.021779383121472675,
+      "checks": {
+        "collision_loads": true,
+        "collision_fit": true
+      },
+      "steps": {},
+      "coverage": 1.0,
+      "tightness": 0.011779697595914709,
+      "seconds": 0.08
+    }
+  ]
+}

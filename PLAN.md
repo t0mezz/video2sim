@@ -439,9 +439,16 @@ Tasks
       `benchmark/run_mesh_repair.py`). Only s01 has raw meshes on disk; the exit criterion over all
       exported meshes is checked in P4.8.
 
-- [ ] **P4.2** Collision geometry by convex decomposition (CoACD or V-HACD) with a cap on parts
+- [x] **P4.2** Collision geometry by convex decomposition (CoACD or V-HACD) with a cap on parts
 
       per object. Use a box, cylinder or sphere primitive where the object is close to one.
+      Evidence: `src/video2sim/stages/collision.py`, `tests/test_collision.py`; on the 5 raw SAM 3D
+      meshes of `runs/s01_b` (thin-walled shells, walls 0.4 to 1.2% of the object size) 4 pass
+      `collision_loads` and `collision_fit` (1 box, 3 CoACD with 16 parts) and 1 fails fit
+      (8 parts, tightness 0.12 against a limit of 0.05), so export is blocked for it
+      (`benchmark/results/p4_2_collision.json`, `benchmark/run_collision.py`). CoACD takes 12 to
+      78 s per object. The fit check is surface-based because a volume ratio fails on shells.
+      Not yet run on registered, metric meshes (none on disk).
 
 - [ ] **P4.3** Build `configs/material_table.yaml`: density, friction and restitution ranges per
 

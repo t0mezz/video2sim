@@ -184,6 +184,15 @@ shape:
 physics:
   material_table: configs/material_table.yaml
   max_convex_parts: 16
+  collision:                   # P4.2, stages/collision.py
+    primitive_tolerance: 0.04       # a primitive is used if its surface is within this share of the bbox diagonal (95th percentile)
+    primitive_volume_ratio: [0.8, 1.25]   # and its volume is this close to the mesh's
+    fit_tolerance: 0.05             # collision_fit: parts' surfaces within this share of the bbox diagonal of the visual surface (95th percentile)
+    fit_min_coverage: 0.95          # and at least this share of the visual surface inside or near a part
+    fit_cover_tolerance: 0.01       # near, as a share of the bbox diagonal
+    max_part_vertices: 255          # per convex part; assumed PhysX limit, verify in P5.1
+    coacd_threshold: 0.05           # CoACD concavity threshold
+    seed: 0
   repair:                      # P4.1, stages/mesh_repair.py
     min_component_area_frac: 0.02   # a piece smaller than this share of the largest piece's area is a floater
     min_volume_m3: 1.0e-9           # below this the mesh is not a solid
