@@ -21,6 +21,8 @@ benchmark/scenes/*
 benchmark/inventory_images/originals/
 runs/
 runs_instances/
+runs_trellis2/
+runs_hybrid/
 *.mp4
 *.mov
 *.ckpt

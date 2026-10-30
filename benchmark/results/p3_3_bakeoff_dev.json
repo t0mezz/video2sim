@@ -1,0 +1,2276 @@
+{
+ "scenes": [
+  "s01",
+  "s02",
+  "s03",
+  "s04",
+  "s06",
+  "s11",
+  "s12",
+  "s13",
+  "s14"
+ ],
+ "n_common_objects": 42,
+ "arms": {
+  "sam3d": {
+   "harness_summary": {
+    "pooled": [
+     {
+      "name": "object_recall",
+      "status": "measured",
+      "value": 0.9333333333333333,
+      "n": 45,
+      "target": 0.9,
+      "passed": true
+     },
+     {
+      "name": "size_error_median",
+      "status": "measured",
+      "value": 0.044507360507164015,
+      "n": 42,
+      "target": 0.05,
+      "passed": true
+     },
+     {
+      "name": "position_error_median_m",
+      "status": "measured",
+      "value": 0.00612042278019551,
+      "n": 42,
+      "target": 0.015,
+      "passed": true
+     },
+     {
+      "name": "orientation_error_median_deg",
+      "status": "measured",
+      "value": 0.9943326985129618,
+      "n": 21,
+      "target": 10.0,
+      "passed": true
+     },
+     {
+      "name": "mass_within_tolerance_fraction",
+      "status": "measured",
+      "value": 0.0,
+      "n": 42,
+      "target": 0.7,
+      "passed": false
+     },
+     {
+      "name": "runtime_max_minutes",
+      "status": "measured",
+      "value": 5.698978234000242,
+      "n": 9,
+      "target": 60,
+      "passed": true
+     },
+     {
+      "name": "stability_pass_fraction",
+      "status": "not_measured",
+      "value": null,
+      "n": 0,
+      "target": null,
+      "passed": null,
+      "reason": "needs the simulator (Phase 5)"
+     },
+     {
+      "name": "asset_validity_fraction",
+      "status": "not_measured",
+      "value": null,
+      "n": 0,
+      "target": null,
+      "passed": null,
+      "reason": "needs the export validators (Phase 5)"
+     },
+     {
+      "name": "manual_steps",
+      "status": "not_measured",
+      "value": null,
+      "n": 0,
+      "target": null,
+      "passed": null,
+      "reason": "needs run logs of the full pipeline (Phase 5)"
+     }
+    ],
+    "per_tier": {
+     "easy": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.95,
+       "n": 20,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.04647464145772962,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.004381449087897395,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 0.8540301554024943,
+       "n": 10,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "measured",
+       "value": 5.698978234000242,
+       "n": 5,
+       "target": null,
+       "passed": null
+      }
+     ],
+     "medium": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.92,
+       "n": 25,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.0425400795565984,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.007625514452230168,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.6453095012017513,
+       "n": 11,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "measured",
+       "value": 4.7410216645838466,
+       "n": 4,
+       "target": null,
+       "passed": null
+      }
+     ]
+    },
+    "n_scenes": 9,
+    "n_evaluable_objects": 45,
+    "n_excluded_objects": 0,
+    "n_false_positives": 1
+   },
+   "paired": {
+    "all": {
+     "n": 42,
+     "size_error_median": 0.044507360507164015,
+     "position_error_median_m": 0.00612042278019551,
+     "orientation_error_median_deg": 0.9943326985129618,
+     "cluster_to_mesh_median_m": 0.0012314332151175964,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 5,
+     "proxies": 1
+    },
+    "easy": {
+     "n": 19,
+     "size_error_median": 0.04647464145772962,
+     "position_error_median_m": 0.004381449087897395,
+     "orientation_error_median_deg": 0.8540301554024943,
+     "cluster_to_mesh_median_m": 0.001317885627563996,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 1,
+     "proxies": 0
+    },
+    "medium": {
+     "n": 23,
+     "size_error_median": 0.0425400795565984,
+     "position_error_median_m": 0.007625514452230168,
+     "orientation_error_median_deg": 1.6453095012017513,
+     "cluster_to_mesh_median_m": 0.001092091668444699,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 4,
+     "proxies": 1
+    }
+   }
+  },
+  "trellis2": {
+   "harness_summary": {
+    "pooled": [
+     {
+      "name": "object_recall",
+      "status": "measured",
+      "value": 0.9333333333333333,
+      "n": 45,
+      "target": 0.9,
+      "passed": true
+     },
+     {
+      "name": "size_error_median",
+      "status": "measured",
+      "value": 0.08742739222239546,
+      "n": 42,
+      "target": 0.05,
+      "passed": false
+     },
+     {
+      "name": "position_error_median_m",
+      "status": "measured",
+      "value": 0.005982293452289652,
+      "n": 42,
+      "target": 0.015,
+      "passed": true
+     },
+     {
+      "name": "orientation_error_median_deg",
+      "status": "measured",
+      "value": 1.00671083576907,
+      "n": 21,
+      "target": 10.0,
+      "passed": true
+     },
+     {
+      "name": "mass_within_tolerance_fraction",
+      "status": "measured",
+      "value": 0.0,
+      "n": 42,
+      "target": 0.7,
+      "passed": false
+     },
+     {
+      "name": "runtime_max_minutes",
+      "status": "measured",
+      "value": 43.46664971043283,
+      "n": 9,
+      "target": 60,
+      "passed": true
+     },
+     {
+      "name": "stability_pass_fraction",
+      "status": "not_measured",
+      "value": null,
+      "n": 0,
+      "target": null,
+      "passed": null,
+      "reason": "needs the simulator (Phase 5)"
+     },
+     {
+      "name": "asset_validity_fraction",
+      "status": "not_measured",
+      "value": null,
+      "n": 0,
+      "target": null,
+      "passed": null,
+      "reason": "needs the export validators (Phase 5)"
+     },
+     {
+      "name": "manual_steps",
+      "status": "not_measured",
+      "value": null,
+      "n": 0,
+      "target": null,
+      "passed": null,
+      "reason": "needs run logs of the full pipeline (Phase 5)"
+     }
+    ],
+    "per_tier": {
+     "easy": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.95,
+       "n": 20,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.06017537460714032,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.005478000263692098,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.2063929338409736,
+       "n": 10,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "measured",
+       "value": 31.16420215973121,
+       "n": 5,
+       "target": null,
+       "passed": null
+      }
+     ],
+     "medium": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.92,
+       "n": 25,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.2050152391788503,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.007851141874874094,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.00671083576907,
+       "n": 11,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "measured",
+       "value": 43.46664971043283,
+       "n": 4,
+       "target": null,
+       "passed": null
+      }
+     ]
+    },
+    "n_scenes": 9,
+    "n_evaluable_objects": 45,
+    "n_excluded_objects": 0,
+    "n_false_positives": 1
+   },
+   "paired": {
+    "all": {
+     "n": 42,
+     "size_error_median": 0.08742739222239546,
+     "position_error_median_m": 0.005982293452289652,
+     "orientation_error_median_deg": 1.00671083576907,
+     "cluster_to_mesh_median_m": 0.0012770892989218301,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 15,
+     "proxies": 20
+    },
+    "easy": {
+     "n": 19,
+     "size_error_median": 0.06017537460714032,
+     "position_error_median_m": 0.005478000263692098,
+     "orientation_error_median_deg": 1.2063929338409736,
+     "cluster_to_mesh_median_m": 0.0012819943456950228,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 2,
+     "proxies": 8
+    },
+    "medium": {
+     "n": 23,
+     "size_error_median": 0.2050152391788503,
+     "position_error_median_m": 0.007851141874874094,
+     "orientation_error_median_deg": 1.00671083576907,
+     "cluster_to_mesh_median_m": 0.0009182826942943397,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 13,
+     "proxies": 12
+    }
+   }
+  },
+  "hybrid": {
+   "harness_summary": {
+    "pooled": [
+     {
+      "name": "object_recall",
+      "status": "measured",
+      "value": 0.9333333333333333,
+      "n": 45,
+      "target": 0.9,
+      "passed": true
+     },
+     {
+      "name": "size_error_median",
+      "status": "measured",
+      "value": 0.08389000292128801,
+      "n": 42,
+      "target": 0.05,
+      "passed": false
+     },
+     {
+      "name": "position_error_median_m",
+      "status": "measured",
+      "value": 0.006872623306193931,
+      "n": 42,
+      "target": 0.015,
+      "passed": true
+     },
+     {
+      "name": "orientation_error_median_deg",
+      "status": "measured",
+      "value": 1.1323343068290512,
+      "n": 21,
+      "target": 10.0,
+      "passed": true
+     },
+     {
+      "name": "mass_within_tolerance_fraction",
+      "status": "measured",
+      "value": 0.0,
+      "n": 42,
+      "target": 0.7,
+      "passed": false
+     },
+     {
+      "name": "runtime_max_minutes",
+      "status": "measured",
+      "value": 5.320087797900487,
+      "n": 9,
+      "target": 60,
+      "passed": true
+     },
+     {
+      "name": "stability_pass_fraction",
+      "status": "not_measured",
+      "value": null,
+      "n": 0,
+      "target": null,
+      "passed": null,
+      "reason": "needs the simulator (Phase 5)"
+     },
+     {
+      "name": "asset_validity_fraction",
+      "status": "not_measured",
+      "value": null,
+      "n": 0,
+      "target": null,
+      "passed": null,
+      "reason": "needs the export validators (Phase 5)"
+     },
+     {
+      "name": "manual_steps",
+      "status": "not_measured",
+      "value": null,
+      "n": 0,
+      "target": null,
+      "passed": null,
+      "reason": "needs run logs of the full pipeline (Phase 5)"
+     }
+    ],
+    "per_tier": {
+     "easy": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.95,
+       "n": 20,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.049265937672417465,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.005478000252901118,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.0916967171092722,
+       "n": 10,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "measured",
+       "value": 5.320087797900487,
+       "n": 5,
+       "target": null,
+       "passed": null
+      }
+     ],
+     "medium": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.92,
+       "n": 25,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.1618728244346409,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.00817862346919727,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.1323343068290512,
+       "n": 11,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "measured",
+       "value": 4.201479559034124,
+       "n": 4,
+       "target": null,
+       "passed": null
+      }
+     ]
+    },
+    "n_scenes": 9,
+    "n_evaluable_objects": 45,
+    "n_excluded_objects": 0,
+    "n_false_positives": 1
+   },
+   "paired": {
+    "all": {
+     "n": 42,
+     "size_error_median": 0.08389000292128801,
+     "position_error_median_m": 0.006872623306193931,
+     "orientation_error_median_deg": 1.1323343068290512,
+     "cluster_to_mesh_median_m": 0.0014669658506331988,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 15,
+     "proxies": 11
+    },
+    "easy": {
+     "n": 19,
+     "size_error_median": 0.049265937672417465,
+     "position_error_median_m": 0.005478000252901118,
+     "orientation_error_median_deg": 1.0916967171092722,
+     "cluster_to_mesh_median_m": 0.001416047313279056,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 1,
+     "proxies": 5
+    },
+    "medium": {
+     "n": 23,
+     "size_error_median": 0.1618728244346409,
+     "position_error_median_m": 0.00817862346919727,
+     "orientation_error_median_deg": 1.1323343068290512,
+     "cluster_to_mesh_median_m": 0.001935735229417725,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 14,
+     "proxies": 6
+    }
+   }
+  }
+ },
+ "lowest_size_error_count": {
+  "sam3d": 26,
+  "trellis2": 12,
+  "hybrid": 4
+ },
+ "objects": [
+  {
+   "scene": "s01",
+   "object": "obj_003",
+   "label": "packaging for in ear headphones",
+   "sam3d": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.12555758470640213,
+    "position_error_m": 0.005129468263491479,
+    "orientation_error_deg": 0.08002611049019492,
+    "cluster_to_mesh_median_m": 0.0011938470796198442,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.99625
+   },
+   "trellis2": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.14771363171168334,
+    "position_error_m": 0.006025391794280097,
+    "orientation_error_deg": 0.10990021290791674,
+    "cluster_to_mesh_median_m": 0.0004992149657936458,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.14771363171168334,
+    "position_error_m": 0.006025391794280097,
+    "orientation_error_deg": 0.10990021290791674,
+    "cluster_to_mesh_median_m": 0.0004992149657936458,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   }
+  },
+  {
+   "scene": "s01",
+   "object": "obj_004",
+   "label": "coffee powder can",
+   "sam3d": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.039770829144458016,
+    "position_error_m": 0.004381449087897395,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0014190412814451998,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9657031249999999
+   },
+   "trellis2": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.05248873122566927,
+    "position_error_m": 0.004969017797035376,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0017391758665051794,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8953862847222221
+   },
+   "hybrid": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.030053211243761663,
+    "position_error_m": 0.004615143680607375,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013689836846784628,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9677300347222223
+   }
+  },
+  {
+   "scene": "s01",
+   "object": "obj_007",
+   "label": "rubiks cube",
+   "sam3d": {
+    "tier": "easy",
+    "label": "rubiks cube",
+    "size_error": 0.03882988374803085,
+    "position_error_m": 0.0035195068326051454,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0011271037780357714,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9839583333333334
+   },
+   "trellis2": {
+    "tier": "easy",
+    "label": "rubiks cube",
+    "size_error": 0.04066150129896084,
+    "position_error_m": 0.003617821452126625,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.000978120052666289,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.95875
+   },
+   "hybrid": {
+    "tier": "easy",
+    "label": "rubiks cube",
+    "size_error": 0.047436572718604186,
+    "position_error_m": 0.0037682286883808395,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001467730039293214,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9820833333333333
+   }
+  },
+  {
+   "scene": "s01",
+   "object": "obj_021",
+   "label": "rubiks cube smaller",
+   "sam3d": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.05517343669425566,
+    "position_error_m": 0.0010038713126083083,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0006145892863817944,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9914583333333333
+   },
+   "trellis2": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.06017537460714032,
+    "position_error_m": 0.001628572844078476,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0012819943456950228,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.984375
+   },
+   "hybrid": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.06897365067474068,
+    "position_error_m": 0.0015076463304434168,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009941907028222818,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9839583333333334
+   }
+  },
+  {
+   "scene": "s01",
+   "object": "obj_029",
+   "label": "empty phone packaging",
+   "sam3d": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.035913346473272226,
+    "position_error_m": 0.001836565346256271,
+    "orientation_error_deg": 0.7429647360740645,
+    "cluster_to_mesh_median_m": 0.0022324565770890036,
+    "cluster_within_5mm": 0.75,
+    "proxy": false,
+    "fit_score": 0.7334375
+   },
+   "trellis2": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.060195884324962555,
+    "position_error_m": 0.0023818089964612976,
+    "orientation_error_deg": 0.37869329709053545,
+    "cluster_to_mesh_median_m": 0.002581049830882723,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.62109375
+   },
+   "hybrid": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.047504100817664825,
+    "position_error_m": 0.0007692924185945313,
+    "orientation_error_deg": 0.21319968881446982,
+    "cluster_to_mesh_median_m": 0.003666846072044978,
+    "cluster_within_5mm": 0.75,
+    "proxy": false,
+    "fit_score": 0.6151041666666667
+   }
+  },
+  {
+   "scene": "s02",
+   "object": "obj_014",
+   "label": "packaging for electronics",
+   "sam3d": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.11976080896104203,
+    "position_error_m": 0.0041307027952233455,
+    "orientation_error_deg": 0.2088759782110401,
+    "cluster_to_mesh_median_m": 0.0018355640047440956,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9945833333333334
+   },
+   "trellis2": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.030300233921693485,
+    "position_error_m": 0.0022115439090382,
+    "orientation_error_deg": 0.8305870351436795,
+    "cluster_to_mesh_median_m": 0.0006805453493911717,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.14401647354794553,
+    "position_error_m": 0.005255524959958807,
+    "orientation_error_deg": 0.6011946016802767,
+    "cluster_to_mesh_median_m": 0.001416047313279056,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8438281249999999
+   }
+  },
+  {
+   "scene": "s02",
+   "object": "obj_039",
+   "label": "action camera",
+   "sam3d": {
+    "tier": "easy",
+    "label": "action camera",
+    "size_error": 0.016963101628366003,
+    "position_error_m": 0.004374165134277062,
+    "orientation_error_deg": 0.965095574730924,
+    "cluster_to_mesh_median_m": 0.0011911421619954098,
+    "cluster_within_5mm": 0.9491525423728814,
+    "proxy": false,
+    "fit_score": 0.9316631355932203
+   },
+   "trellis2": {
+    "tier": "easy",
+    "label": "action camera",
+    "size_error": 0.03273942204850243,
+    "position_error_m": 0.006755025058456616,
+    "orientation_error_deg": 1.5821988325382677,
+    "cluster_to_mesh_median_m": 0.0012721842521486375,
+    "cluster_within_5mm": 0.8983050847457628,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "easy",
+    "label": "action camera",
+    "size_error": 0.03273942204850243,
+    "position_error_m": 0.006755025058456616,
+    "orientation_error_deg": 1.5821988325382677,
+    "cluster_to_mesh_median_m": 0.0012721842521486375,
+    "cluster_within_5mm": 0.8983050847457628,
+    "proxy": true,
+    "fit_score": null
+   }
+  },
+  {
+   "scene": "s02",
+   "object": "obj_041",
+   "label": "mug",
+   "sam3d": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.016907465170936702,
+    "position_error_m": 0.015742067585480315,
+    "orientation_error_deg": 21.264013919492896,
+    "cluster_to_mesh_median_m": 0.0013434291066381319,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9580403645833334
+   },
+   "trellis2": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.08118159419850862,
+    "position_error_m": 0.01289045070452158,
+    "orientation_error_deg": 34.87297235850348,
+    "cluster_to_mesh_median_m": 0.001302919337370961,
+    "cluster_within_5mm": 0.9270833333333334,
+    "proxy": false,
+    "fit_score": 0.8330230034722222
+   },
+   "hybrid": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.0517094783506331,
+    "position_error_m": 0.013563557103756927,
+    "orientation_error_deg": 22.0942871126025,
+    "cluster_to_mesh_median_m": 0.002581501264551014,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8976388888888889
+   }
+  },
+  {
+   "scene": "s02",
+   "object": "obj_046",
+   "label": "mug",
+   "sam3d": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.05210803836186923,
+    "position_error_m": 0.012345576233489313,
+    "orientation_error_deg": 22.080326563489194,
+    "cluster_to_mesh_median_m": 0.001287850426389088,
+    "cluster_within_5mm": 0.9539473684210527,
+    "proxy": false,
+    "fit_score": 0.9195394736842104
+   },
+   "trellis2": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.13214100453773683,
+    "position_error_m": 0.0058515504919128885,
+    "orientation_error_deg": 35.70565634956945,
+    "cluster_to_mesh_median_m": 0.002120508435223414,
+    "cluster_within_5mm": 0.7680921052631579,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.05470051139459002,
+    "position_error_m": 0.012430456723107613,
+    "orientation_error_deg": 20.092712143911115,
+    "cluster_to_mesh_median_m": 0.002125949445774423,
+    "cluster_within_5mm": 0.8782894736842105,
+    "proxy": false,
+    "fit_score": 0.7656592653508771
+   }
+  },
+  {
+   "scene": "s02",
+   "object": "obj_060",
+   "label": "deodorant cap",
+   "sam3d": {
+    "tier": "easy",
+    "label": "deodorant cap",
+    "size_error": 0.06763571705932812,
+    "position_error_m": 0.005998142203909531,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0008290121422981074,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.973125
+   },
+   "trellis2": {
+    "tier": "easy",
+    "label": "deodorant cap",
+    "size_error": 0.18442195865377212,
+    "position_error_m": 0.005939195110299208,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0012517448657962396,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9270833333333334
+   },
+   "hybrid": {
+    "tier": "easy",
+    "label": "deodorant cap",
+    "size_error": 0.1883617954011276,
+    "position_error_m": 0.005925481924535006,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0014526713447942231,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9185416666666667
+   }
+  },
+  {
+   "scene": "s03",
+   "object": "obj_027",
+   "label": "toy air basketball",
+   "sam3d": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.017598689317691783,
+    "position_error_m": 0.011031400396501844,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013399348267786665,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9299457465277777
+   },
+   "trellis2": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.012753637956094226,
+    "position_error_m": 0.010611922721900315,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0014990785028284994,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9461458333333334
+   },
+   "hybrid": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.021593201455347526,
+    "position_error_m": 0.010656420880240141,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013431479798649973,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9485677083333333
+   }
+  },
+  {
+   "scene": "s04",
+   "object": "obj_003",
+   "label": "packaging for in ear headphones",
+   "sam3d": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.13389963931396773,
+    "position_error_m": 0.0036352482238226525,
+    "orientation_error_deg": 0.15200900067327439,
+    "cluster_to_mesh_median_m": 0.0010404326431031714,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9918392969240427
+   },
+   "trellis2": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.16329304070728146,
+    "position_error_m": 0.004598215180724103,
+    "orientation_error_deg": 0.13864987234354942,
+    "cluster_to_mesh_median_m": 0.0004958945241660733,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.06156120141604598,
+    "position_error_m": 0.002780405929455154,
+    "orientation_error_deg": 0.30297735706805895,
+    "cluster_to_mesh_median_m": 0.0024303038333938665,
+    "cluster_within_5mm": 0.75,
+    "proxy": false,
+    "fit_score": 0.7209180465311256
+   }
+  },
+  {
+   "scene": "s04",
+   "object": "obj_014",
+   "label": "packaging for electronics",
+   "sam3d": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.056457946935474936,
+    "position_error_m": 0.004444691489898091,
+    "orientation_error_deg": 1.1990163169176478,
+    "cluster_to_mesh_median_m": 0.0019133354377846342,
+    "cluster_within_5mm": 0.75,
+    "proxy": false,
+    "fit_score": 0.7388329319027809
+   },
+   "trellis2": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.03785003917100966,
+    "position_error_m": 0.005478000263692098,
+    "orientation_error_deg": 1.9121176845081038,
+    "cluster_to_mesh_median_m": 0.002472474669669246,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.7220630372492837
+   },
+   "hybrid": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.03785003916469005,
+    "position_error_m": 0.005478000252901118,
+    "orientation_error_deg": 1.9121176846218475,
+    "cluster_to_mesh_median_m": 0.0024724746655852845,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.7220630372492837
+   }
+  },
+  {
+   "scene": "s04",
+   "object": "obj_021",
+   "label": "rubiks cube smaller",
+   "sam3d": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.04647464145772962,
+    "position_error_m": 0.0016355951769551104,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0011510581150397238,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.98625
+   },
+   "trellis2": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.1064009249244154,
+    "position_error_m": 0.0013258398635937467,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013239419933179924,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.96625
+   },
+   "hybrid": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.049265937672417465,
+    "position_error_m": 0.001954985491906204,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0012600357051023067,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.96375
+   }
+  },
+  {
+   "scene": "s04",
+   "object": "obj_022",
+   "label": "metal insulated water bottle",
+   "sam3d": {
+    "tier": "easy",
+    "label": "metal insulated water bottle",
+    "size_error": 0.28995475991169756,
+    "position_error_m": 0.0133091863062156,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0020154691761063537,
+    "cluster_within_5mm": 0.96875,
+    "proxy": false,
+    "fit_score": 0.7388129834453842
+   },
+   "trellis2": {
+    "tier": "easy",
+    "label": "metal insulated water bottle",
+    "size_error": 0.07322926419782243,
+    "position_error_m": 0.011038517203881089,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009300636554332165,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "easy",
+    "label": "metal insulated water bottle",
+    "size_error": 0.07322926419782243,
+    "position_error_m": 0.011038517203881089,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009300636554332165,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   }
+  },
+  {
+   "scene": "s04",
+   "object": "obj_027",
+   "label": "toy air basketball",
+   "sam3d": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.013759950895425959,
+    "position_error_m": 0.010608721549399095,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0011594005201949116,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9584167479052061
+   },
+   "trellis2": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.014832159932087382,
+    "position_error_m": 0.010737617932279071,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013448093354031022,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9570848124173453
+   },
+   "hybrid": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.02021141488179205,
+    "position_error_m": 0.01085412022177061,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0014662016619731836,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9470963024858994
+   }
+  },
+  {
+   "scene": "s06",
+   "object": "obj_004",
+   "label": "coffee powder can",
+   "sam3d": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.03640821466744678,
+    "position_error_m": 0.002509387707468817,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001317885627563996,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9370915032679739
+   },
+   "trellis2": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.021853990491799584,
+    "position_error_m": 0.001963281104603398,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.000849187896509641,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.021853990491799584,
+    "position_error_m": 0.001963281104603398,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.000849187896509641,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   }
+  },
+  {
+   "scene": "s06",
+   "object": "obj_018",
+   "label": "3d printed car body",
+   "sam3d": {
+    "tier": "easy",
+    "label": "3d printed car body",
+    "size_error": 0.07856292208471881,
+    "position_error_m": 0.03326386728469631,
+    "orientation_error_deg": 8.063500642933661,
+    "cluster_to_mesh_median_m": 0.0019102556950324487,
+    "cluster_within_5mm": 0.8931116389548693,
+    "proxy": false,
+    "fit_score": 0.8403581349085578
+   },
+   "trellis2": {
+    "tier": "easy",
+    "label": "3d printed car body",
+    "size_error": 0.10020849818343844,
+    "position_error_m": 0.03345844265735758,
+    "orientation_error_deg": 8.444632716013217,
+    "cluster_to_mesh_median_m": 0.00238660479074161,
+    "cluster_within_5mm": 0.8432304038004751,
+    "proxy": false,
+    "fit_score": 0.792397303339388
+   },
+   "hybrid": {
+    "tier": "easy",
+    "label": "3d printed car body",
+    "size_error": 0.1002073365170281,
+    "position_error_m": 0.033458516970327784,
+    "orientation_error_deg": 8.44457132650075,
+    "cluster_to_mesh_median_m": 0.002386563485687872,
+    "cluster_within_5mm": 0.8432304038004751,
+    "proxy": false,
+    "fit_score": 0.792397303339388
+   }
+  },
+  {
+   "scene": "s06",
+   "object": "obj_029",
+   "label": "empty phone packaging",
+   "sam3d": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.042465509950507484,
+    "position_error_m": 0.003319344337575799,
+    "orientation_error_deg": 0.6194543961966872,
+    "cluster_to_mesh_median_m": 0.0016568882813528443,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9920833333333333
+   },
+   "trellis2": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.017152086385879346,
+    "position_error_m": 0.0033444253194931457,
+    "orientation_error_deg": 0.45960421841908783,
+    "cluster_to_mesh_median_m": 0.0008065179525218466,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.017152086385879346,
+    "position_error_m": 0.0033444253194931457,
+    "orientation_error_deg": 0.45960421841908783,
+    "cluster_to_mesh_median_m": 0.0008065179525218466,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   }
+  },
+  {
+   "scene": "s11",
+   "object": "obj_040",
+   "label": "white 3d print cuboid",
+   "sam3d": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.2942966307232203,
+    "position_error_m": 0.006313826032268605,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009265051243955348,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9925
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.2425841284895515,
+    "position_error_m": 0.005706418364536916,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0016933831516536106,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9866666666666667
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.3155088769463791,
+    "position_error_m": 0.006866770921769449,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0020716696243097622,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9666666666666667
+   }
+  },
+  {
+   "scene": "s11",
+   "object": "obj_047",
+   "label": "cube",
+   "sam3d": {
+    "tier": "medium",
+    "label": "cube",
+    "size_error": 0.02298970303679001,
+    "position_error_m": 0.000705719020857991,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007604241049830669,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.990625
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "cube",
+    "size_error": 0.2185937133450398,
+    "position_error_m": 0.0008394780242550197,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013363997775588496,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9475
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "cube",
+    "size_error": 0.21553977413005337,
+    "position_error_m": 0.0016050630603996778,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001935735229417725,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.955625
+   }
+  },
+  {
+   "scene": "s11",
+   "object": "obj_048",
+   "label": "square pyramid",
+   "sam3d": {
+    "tier": "medium",
+    "label": "square pyramid",
+    "size_error": 0.042253011905710416,
+    "position_error_m": 0.0032696922720739452,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0010404887600747395,
+    "cluster_within_5mm": 0.95,
+    "proxy": false,
+    "fit_score": 0.9408958333333333
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "square pyramid",
+    "size_error": 0.22252190305762273,
+    "position_error_m": 0.007851141874874094,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.00022364030554722288,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "square pyramid",
+    "size_error": 0.9665267590729919,
+    "position_error_m": 0.014893277723183478,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.005210791673215115,
+    "cluster_within_5mm": 0.45,
+    "proxy": false,
+    "fit_score": 0.6200729166666668
+   }
+  },
+  {
+   "scene": "s11",
+   "object": "obj_049",
+   "label": "triangular prism",
+   "sam3d": {
+    "tier": "medium",
+    "label": "triangular prism",
+    "size_error": 0.1461280710254744,
+    "position_error_m": 0.0016700964240065903,
+    "orientation_error_deg": 0.27655057372007263,
+    "cluster_to_mesh_median_m": 0.001092091668444699,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9872916666666667
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "triangular prism",
+    "size_error": 0.6273008917726355,
+    "position_error_m": 0.006615967976015821,
+    "orientation_error_deg": 3.6730520667829296,
+    "cluster_to_mesh_median_m": 0.0034863297489740215,
+    "cluster_within_5mm": 0.9026548672566371,
+    "proxy": false,
+    "fit_score": 0.8435213864306784
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "triangular prism",
+    "size_error": 0.740037864322321,
+    "position_error_m": 0.006206026676014231,
+    "orientation_error_deg": 0.4976602604746887,
+    "cluster_to_mesh_median_m": 0.002090694436900673,
+    "cluster_within_5mm": 0.9469026548672567,
+    "proxy": false,
+    "fit_score": 0.872531342182891
+   }
+  },
+  {
+   "scene": "s11",
+   "object": "obj_050",
+   "label": "cuboid",
+   "sam3d": {
+    "tier": "medium",
+    "label": "cuboid",
+    "size_error": 0.0425400795565984,
+    "position_error_m": 0.002132210589528321,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007776496695872759,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.995625
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "cuboid",
+    "size_error": 0.09367319024628229,
+    "position_error_m": 0.002073579319899778,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0014082785186879773,
+    "cluster_within_5mm": 0.9473684210526315,
+    "proxy": false,
+    "fit_score": 0.924078947368421
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "cuboid",
+    "size_error": 0.09367319024628229,
+    "position_error_m": 0.002073579319899778,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0014082785186891958,
+    "cluster_within_5mm": 0.9473684210526315,
+    "proxy": false,
+    "fit_score": 0.924078947368421
+   }
+  },
+  {
+   "scene": "s11",
+   "object": "obj_052",
+   "label": "cylinder",
+   "sam3d": {
+    "tier": "medium",
+    "label": "cylinder",
+    "size_error": 0.02883903934872053,
+    "position_error_m": 0.002311046059240726,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.00035140905780701597,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9941666666666666
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "cylinder",
+    "size_error": 0.2902256886761573,
+    "position_error_m": 0.0044795181427770975,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.005218634790387788,
+    "cluster_within_5mm": 0.4375,
+    "proxy": false,
+    "fit_score": 0.5256749131944444
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "cylinder",
+    "size_error": 0.2681788297462767,
+    "position_error_m": 0.0035467069670605997,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0044000603795621394,
+    "cluster_within_5mm": 0.6354166666666666,
+    "proxy": false,
+    "fit_score": 0.5952105034722223
+   }
+  },
+  {
+   "scene": "s11",
+   "object": "obj_056",
+   "label": "hexagonal prism",
+   "sam3d": {
+    "tier": "medium",
+    "label": "hexagonal prism",
+    "size_error": 0.013456528302023868,
+    "position_error_m": 0.0020061289059015402,
+    "orientation_error_deg": 2.639694400494477,
+    "cluster_to_mesh_median_m": 0.0005726430016528048,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9808333333333333
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "hexagonal prism",
+    "size_error": 0.3771446825765826,
+    "position_error_m": 0.003100374744686104,
+    "orientation_error_deg": 4.077345229878603,
+    "cluster_to_mesh_median_m": 0.0033235715980740885,
+    "cluster_within_5mm": 0.8645833333333334,
+    "proxy": false,
+    "fit_score": 0.8197916666666667
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "hexagonal prism",
+    "size_error": 0.36593468808811497,
+    "position_error_m": 0.003207281014800291,
+    "orientation_error_deg": 54.942610069081326,
+    "cluster_to_mesh_median_m": 0.0034403366351207854,
+    "cluster_within_5mm": 0.84375,
+    "proxy": false,
+    "fit_score": 0.8166666666666667
+   }
+  },
+  {
+   "scene": "s12",
+   "object": "obj_001",
+   "label": "spray can",
+   "sam3d": {
+    "tier": "medium",
+    "label": "spray can",
+    "size_error": 0.023525139514257363,
+    "position_error_m": 0.01069121984601623,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0015764450281399705,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9412176089517078
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "spray can",
+    "size_error": 0.04359267760055143,
+    "position_error_m": 0.012439656851606818,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007908851795036327,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "spray can",
+    "size_error": 0.04359267760055143,
+    "position_error_m": 0.012439656851606818,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007908851795036327,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   }
+  },
+  {
+   "scene": "s12",
+   "object": "obj_002",
+   "label": "packaging for breakfast bags",
+   "sam3d": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.08140577908352137,
+    "position_error_m": 0.007994671636763576,
+    "orientation_error_deg": 0.0005092480470239025,
+    "cluster_to_mesh_median_m": 0.0024589545095582035,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.609765625
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.03484634698367493,
+    "position_error_m": 0.010066529496097728,
+    "orientation_error_deg": 0.1912028117703528,
+    "cluster_to_mesh_median_m": 0.0009179423482838145,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.1041559236188807,
+    "position_error_m": 0.007740824866171141,
+    "orientation_error_deg": 1.025951129892377,
+    "cluster_to_mesh_median_m": 0.0027298006443720563,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.9391666666666667
+   }
+  },
+  {
+   "scene": "s12",
+   "object": "obj_003",
+   "label": "packaging for in ear headphones",
+   "sam3d": {
+    "tier": "medium",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.030516313908047127,
+    "position_error_m": 0.01126563500944116,
+    "orientation_error_deg": 1.6453095012017513,
+    "cluster_to_mesh_median_m": 0.0012690193506153485,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.85640625
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.1553718593532717,
+    "position_error_m": 0.011499130374876942,
+    "orientation_error_deg": 1.4145483982592566,
+    "cluster_to_mesh_median_m": 0.0007453388990485126,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.1553718593532717,
+    "position_error_m": 0.011499130374876942,
+    "orientation_error_deg": 1.4145483982592566,
+    "cluster_to_mesh_median_m": 0.0007453388990485126,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   }
+  },
+  {
+   "scene": "s12",
+   "object": "obj_004",
+   "label": "coffee powder can",
+   "sam3d": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.04165273728737207,
+    "position_error_m": 0.00957634420515208,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001869935503659302,
+    "cluster_within_5mm": 0.90625,
+    "proxy": false,
+    "fit_score": 0.7054513587742122
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.05282979331686693,
+    "position_error_m": 0.009589932820369209,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0026243562958356884,
+    "cluster_within_5mm": 0.84375,
+    "proxy": false,
+    "fit_score": 0.8117987694534926
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.062896147160865,
+    "position_error_m": 0.009181484027024957,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0020331383487007574,
+    "cluster_within_5mm": 0.71875,
+    "proxy": false,
+    "fit_score": 0.6706918000865426
+   }
+  },
+  {
+   "scene": "s12",
+   "object": "obj_007",
+   "label": "rubiks cube",
+   "sam3d": {
+    "tier": "medium",
+    "label": "rubiks cube",
+    "size_error": 0.0483543867851716,
+    "position_error_m": 0.011350026223333911,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0008675143642874852,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9722916666666667
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "rubiks cube",
+    "size_error": 0.073365285893178,
+    "position_error_m": 0.010112052774909897,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0019106220438476773,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9564583333333333
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "rubiks cube",
+    "size_error": 0.073365285893178,
+    "position_error_m": 0.010112052774906302,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001910622043849142,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9564583333333333
+   }
+  },
+  {
+   "scene": "s12",
+   "object": "obj_014",
+   "label": "packaging for electronics",
+   "sam3d": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.032640078670292824,
+    "position_error_m": 0.012825109400781359,
+    "orientation_error_deg": 10.124617202281897,
+    "cluster_to_mesh_median_m": 0.002880348267792129,
+    "cluster_within_5mm": 0.7608695652173914,
+    "proxy": false,
+    "fit_score": 0.693768115942029
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.3835434420304869,
+    "position_error_m": 0.015098711540759003,
+    "orientation_error_deg": 9.852806988667624,
+    "cluster_to_mesh_median_m": 0.0037052726060203206,
+    "cluster_within_5mm": 0.6304347826086957,
+    "proxy": false,
+    "fit_score": 0.6190081521739131
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.15793956006758725,
+    "position_error_m": 0.01273444871677014,
+    "orientation_error_deg": 8.97295728338915,
+    "cluster_to_mesh_median_m": 0.003930504333764644,
+    "cluster_within_5mm": 0.5869565217391305,
+    "proxy": false,
+    "fit_score": 0.5770516304347827
+   }
+  },
+  {
+   "scene": "s12",
+   "object": "obj_021",
+   "label": "rubiks cube smaller",
+   "sam3d": {
+    "tier": "medium",
+    "label": "rubiks cube smaller",
+    "size_error": 0.052082562622163646,
+    "position_error_m": 0.009179190610805093,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007384749919713259,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9922916666666667
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "rubiks cube smaller",
+    "size_error": 0.14214665955011901,
+    "position_error_m": 0.009644789577290798,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0015822940034788523,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9470833333333334
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "rubiks cube smaller",
+    "size_error": 0.1618728244346409,
+    "position_error_m": 0.00817862346919727,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013114120381407667,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.939375
+   }
+  },
+  {
+   "scene": "s12",
+   "object": "obj_029",
+   "label": "empty phone packaging",
+   "sam3d": {
+    "tier": "medium",
+    "label": "empty phone packaging",
+    "size_error": 0.036367361927388105,
+    "position_error_m": 0.0064049926122236416,
+    "orientation_error_deg": 0.4925015545380802,
+    "cluster_to_mesh_median_m": 0.0008944813912563871,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.989375
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "empty phone packaging",
+    "size_error": 0.01120101214104324,
+    "position_error_m": 0.0068784756906184125,
+    "orientation_error_deg": 0.6425916364423188,
+    "cluster_to_mesh_median_m": 0.00046462021331798595,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "empty phone packaging",
+    "size_error": 0.01120101214104324,
+    "position_error_m": 0.0068784756906184125,
+    "orientation_error_deg": 0.6425916364423188,
+    "cluster_to_mesh_median_m": 0.00046462021331798595,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   }
+  },
+  {
+   "scene": "s12",
+   "object": "obj_060",
+   "label": "deodorant cap",
+   "sam3d": {
+    "tier": "medium",
+    "label": "deodorant cap",
+    "size_error": 0.023876820729403864,
+    "position_error_m": 0.004277946692086642,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0004759850300967178,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.985625
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "deodorant cap",
+    "size_error": 0.003744658017288589,
+    "position_error_m": 0.0045895310703586425,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009182826942943397,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9877083333333333
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "deodorant cap",
+    "size_error": 0.006612646669309229,
+    "position_error_m": 0.004639155923983345,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009023568937803282,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9872916666666667
+   }
+  },
+  {
+   "scene": "s13",
+   "object": "obj_002",
+   "label": "packaging for breakfast bags",
+   "sam3d": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.13443401658060766,
+    "position_error_m": 0.007625514452230168,
+    "orientation_error_deg": 0.40372112836112706,
+    "cluster_to_mesh_median_m": 0.0026389076167968283,
+    "cluster_within_5mm": 0.75,
+    "proxy": false,
+    "fit_score": 0.61796875
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.2050152391788503,
+    "position_error_m": 0.01276856692090861,
+    "orientation_error_deg": 1.00671083576907,
+    "cluster_to_mesh_median_m": 0.0006270893106950261,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.2050152391788503,
+    "position_error_m": 0.01276856692090861,
+    "orientation_error_deg": 1.00671083576907,
+    "cluster_to_mesh_median_m": 0.0006270893106950261,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   }
+  },
+  {
+   "scene": "s13",
+   "object": "obj_014",
+   "label": "packaging for electronics",
+   "sam3d": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.6615474817190125,
+    "position_error_m": 0.02309755147453837,
+    "orientation_error_deg": 0.9943326985129618,
+    "cluster_to_mesh_median_m": 0.0007519232515138369,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.6615474817190125,
+    "position_error_m": 0.02309755147453837,
+    "orientation_error_deg": 0.9943326985129618,
+    "cluster_to_mesh_median_m": 0.0007519232515138369,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.6615474817190125,
+    "position_error_m": 0.02309755147453837,
+    "orientation_error_deg": 0.9943326985129618,
+    "cluster_to_mesh_median_m": 0.0007519232515138369,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   }
+  },
+  {
+   "scene": "s14",
+   "object": "obj_002",
+   "label": "packaging for breakfast bags",
+   "sam3d": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.0992813739932609,
+    "position_error_m": 0.02283805798618677,
+    "orientation_error_deg": 2.1984535573031962,
+    "cluster_to_mesh_median_m": 0.0023884319518419654,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.7366805525104144
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.05918055543532739,
+    "position_error_m": 0.025834904565748804,
+    "orientation_error_deg": 0.7986509634401102,
+    "cluster_to_mesh_median_m": 0.0007163781180420123,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.23941885795496629,
+    "position_error_m": 0.023968754185048402,
+    "orientation_error_deg": 1.2043460907762267,
+    "cluster_to_mesh_median_m": 0.003113343751015152,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9788126241447804
+   }
+  },
+  {
+   "scene": "s14",
+   "object": "obj_004",
+   "label": "coffee powder can",
+   "sam3d": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.036833440964517794,
+    "position_error_m": 0.012357133652111718,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001690118235927471,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8449921452579278
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.030282498155749803,
+    "position_error_m": 0.012885205799595905,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.000843284400142688,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.07892944054493399,
+    "position_error_m": 0.012296402616838094,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.003925491465562883,
+    "cluster_within_5mm": 0.75,
+    "proxy": false,
+    "fit_score": 0.5494252090149037
+   }
+  },
+  {
+   "scene": "s14",
+   "object": "obj_006",
+   "label": "gamepad controller",
+   "sam3d": {
+    "tier": "medium",
+    "label": "gamepad controller",
+    "size_error": 0.13421206223246795,
+    "position_error_m": 0.008916844187890322,
+    "orientation_error_deg": 9.133279653346278,
+    "cluster_to_mesh_median_m": 0.001900217377141581,
+    "cluster_within_5mm": 0.84,
+    "proxy": false,
+    "fit_score": 0.7355385920271417
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "gamepad controller",
+    "size_error": 0.23081741967683414,
+    "position_error_m": 0.005669858770555915,
+    "orientation_error_deg": 3.403193613897372,
+    "cluster_to_mesh_median_m": 0.006002037648875624,
+    "cluster_within_5mm": 0.32,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "gamepad controller",
+    "size_error": 0.08885056529764203,
+    "position_error_m": 0.008836209864493886,
+    "orientation_error_deg": 8.838811397695281,
+    "cluster_to_mesh_median_m": 0.0014914490592878357,
+    "cluster_within_5mm": 0.896,
+    "proxy": false,
+    "fit_score": 0.814556263269639
+   }
+  },
+  {
+   "scene": "s14",
+   "object": "obj_036",
+   "label": "single breadboard module",
+   "sam3d": {
+    "tier": "medium",
+    "label": "single breadboard module",
+    "size_error": 0.7486221686500311,
+    "position_error_m": 0.006242703356481489,
+    "orientation_error_deg": 1.683129389267894,
+    "cluster_to_mesh_median_m": 0.002185249501487951,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8664501906577693
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "single breadboard module",
+    "size_error": 0.6218600794672966,
+    "position_error_m": 0.0054536616304794285,
+    "orientation_error_deg": 0.1340936984887854,
+    "cluster_to_mesh_median_m": 0.00028937892231945775,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "single breadboard module",
+    "size_error": 0.691596521200359,
+    "position_error_m": 0.007672683789626116,
+    "orientation_error_deg": 1.1323343068290512,
+    "cluster_to_mesh_median_m": 0.0029781105030953466,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.7262635805384978
+   }
+  },
+  {
+   "scene": "s14",
+   "object": "obj_040",
+   "label": "white 3d print cuboid",
+   "sam3d": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.2131953751405161,
+    "position_error_m": 0.00566241335418409,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0011803263336016018,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9908051132540928
+   },
+   "trellis2": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.22604709863662723,
+    "position_error_m": 0.0051654175655891236,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0002638659610041847,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "hybrid": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.22604709863662723,
+    "position_error_m": 0.0051654175655891236,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0002638659610041847,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   }
+  }
+ ]
+}

@@ -11,13 +11,17 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 
 from video2sim.evaluation.scenes import Prediction, PredObject
 from video2sim.runner import MANIFEST_FILE, OUTPUT_FILE
 from video2sim.schemas import RegisteredObjects, RunManifest, SimAssets
 
 
-def load_run(run_dir: Path) -> Prediction:
+def load_run(run_dir: Path, T_board_from_world: NDArray[np.float64] | None = None) -> Prediction:
+    """Meshes are placed in the world frame; ground truth is in the board frame, so the scorer
+    passes ``T_board_from_world`` (``evaluation.alignment.align_scene``), as for the clusters
+    of ``--stage segmentation``. Without it the meshes stay in the world frame."""
     import trimesh  # heavy import, kept out of module import time
 
     shape_file = run_dir / "shape" / OUTPUT_FILE
@@ -37,7 +41,8 @@ def load_run(run_dir: Path) -> Prediction:
         mesh: Any = trimesh.load(run_dir / obj.mesh_path, force="mesh")
         vertices = np.array(mesh.vertices, dtype=np.float64)
         homogeneous = np.c_[vertices, np.ones(len(vertices))]
-        world = (obj.T_world_from_object.to_numpy() @ homogeneous.T).T[:, :3]
+        t = np.eye(4) if T_board_from_world is None else T_board_from_world
+        world = (t @ obj.T_world_from_object.to_numpy() @ homogeneous.T).T[:, :3]
         objects.append(PredObject(obj.object_id, world, masses.get(obj.object_id)))
 
     runtime = None

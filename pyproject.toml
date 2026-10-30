@@ -6,11 +6,13 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "meta-sam-parser>=0.1.0",
+    "modal>=1.6.3",
     "numpy>=1.26",
     "opencv-python-headless>=5.0.0.93",
     "pycolmap>=4.2.1",
     "pydantic>=2.6",
     "pyyaml>=6.0",
+    "scipy>=1.15.3",
     "trimesh>=5.2.0",
 ]
 
@@ -49,6 +51,11 @@ python_version = "3.10"
 strict = true
 plugins = ["pydantic.mypy"]
 files = ["src", "tests"]
+
+# Installed only inside the SAM 3D worker image on Modal (models/sam3d_modal.py), never here.
+[[tool.mypy.overrides]]
+module = ["torch", "PIL", "PIL.*", "huggingface_hub", "inference"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

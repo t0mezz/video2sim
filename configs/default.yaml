@@ -147,8 +147,39 @@ segmentation:
       - other
 
 shape:
-  backend: null                # TODO(P3.3): chosen in the Phase 3 bake-off
-  samples_per_keyframe: 3
+  backend: sam3d               # the only adapter; chosen in the P3.3 bake-off (D-018)
+  keyframes_per_object: 2      # P3.4: best keyframes the model is run on
+  samples_per_keyframe: 3      # seeds per keyframe
+  max_views: 12                # frames whose masks enter registration, spread over the video
+  min_fit_score: 0.5           # below this the convex hull of the cluster stands in; a guess
+  support_gap_m: 0.01          # a cluster this close to the table rests on it (P3.5)
+  sam3d:                       # P3.1, models/sam3d.py
+    checkpoint: facebook/sam-3d-objects   # Hugging Face repo; the host reports the revision
+    stage1_inference_steps: null   # null keeps SAM 3D's own default
+    stage2_inference_steps: null
+    # Off until the P3.3 A/B: the paper reports shape barely depends on it, and P3.2 sets
+    # pose and scale from the metric cloud (docs/research/sam3d.md, section 5)
+    use_pointmap: false
+  parallel_samples: 6          # hosted draws in flight at once; the result does not depend on it
+  stretch_samples: 1           # best samples per object that get the per-axis refinement
+  registration:                # P3.2, stages/registration.py; first guesses, tune in P3.3
+    surface_samples: 3000      # mesh points for the point term
+    mask_samples: 400          # mesh points projected into each view
+    mask_directions: 8         # image directions where mesh and mask must reach equally far
+    max_vertices: 4000         # mesh vertices projected for that reach
+    max_target_points: 2000    # observed points kept, chosen at random by the seed
+    sigma_points_m: 0.003
+    sigma_mask_px: 3.0
+    mask_weight: 1.0           # lambda in the PLAN.md cost
+    huber_m: 0.005             # above this a point counts linearly, for SfM strays
+    inlier_m: 0.005            # fit score: observed points this close to the mesh
+    yaw_hypotheses: 4          # starts at quarter turns about world up
+    yaw_screen_iterations: 4   # rounds each start gets before the best one is refined
+    outer_iterations: 50       # nearest-neighbour rounds; about 20 on the synthetic box
+    inner_iterations: 5        # Levenberg-Marquardt steps per round
+    upright_sigma_deg: 1.0     # tilt of the levelled model axis; 0 turns the term off
+    contact_sigma_m: 0.002     # lowest vertex against the support height, when one is given
+    stretch_sigma: 0.5         # log scale per model axis after the similarity fit; 0 is off
 
 physics:
   material_table: configs/material_table.yaml

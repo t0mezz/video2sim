@@ -1,0 +1,328 @@
+{
+ "summary": {
+  "tolerance_mm": 2.0,
+  "instances": 43,
+  "registered": 43,
+  "proxies": 1,
+  "objects_without_registered_object": 0,
+  "mesh_files_missing": 0,
+  "proxies_without_flags": 0,
+  "resting_meshes": 41,
+  "resting_max_abs_gap_mm": 5.300667044183527e-06,
+  "resting_over_tolerance": 0,
+  "resting_proxies": 1,
+  "resting_proxy_max_abs_gap_mm": 2.6569731831349586e-07,
+  "resting_proxy_over_tolerance": 0
+ },
+ "runs": {
+  "s01_b": {
+   "instances": 5,
+   "registered": 5,
+   "without_registered_object": [],
+   "mesh_file_missing": [],
+   "proxy_without_flags": [],
+   "proxies": 0,
+   "contact": [
+    {
+     "object": "obj_000",
+     "proxy": false,
+     "gap_m": -1.9520384197946328e-09
+    },
+    {
+     "object": "obj_001",
+     "proxy": false,
+     "gap_m": 5.562530575042857e-10
+    },
+    {
+     "object": "obj_002",
+     "proxy": false,
+     "gap_m": 1.5095178648727448e-09
+    },
+    {
+     "object": "obj_003",
+     "proxy": false,
+     "gap_m": 3.158903624789211e-10
+    },
+    {
+     "object": "obj_004",
+     "proxy": false,
+     "gap_m": 1.0106453243730051e-09
+    }
+   ],
+   "contact_over_tolerance": []
+  },
+  "s02_b": {
+   "instances": 5,
+   "registered": 5,
+   "without_registered_object": [],
+   "mesh_file_missing": [],
+   "proxy_without_flags": [],
+   "proxies": 0,
+   "contact": [
+    {
+     "object": "obj_000",
+     "proxy": false,
+     "gap_m": -6.12348782791372e-11
+    },
+    {
+     "object": "obj_001",
+     "proxy": false,
+     "gap_m": -1.2222006393058926e-09
+    },
+    {
+     "object": "obj_002",
+     "proxy": false,
+     "gap_m": -1.0849664569545503e-09
+    },
+    {
+     "object": "obj_003",
+     "proxy": false,
+     "gap_m": -7.807707501361616e-10
+    },
+    {
+     "object": "obj_004",
+     "proxy": false,
+     "gap_m": -2.4667753603657694e-10
+    }
+   ],
+   "contact_over_tolerance": []
+  },
+  "s03_b": {
+   "instances": 1,
+   "registered": 1,
+   "without_registered_object": [],
+   "mesh_file_missing": [],
+   "proxy_without_flags": [],
+   "proxies": 0,
+   "contact": [
+    {
+     "object": "obj_000",
+     "proxy": false,
+     "gap_m": 7.621165643012517e-10
+    }
+   ],
+   "contact_over_tolerance": []
+  },
+  "s04_b": {
+   "instances": 5,
+   "registered": 5,
+   "without_registered_object": [],
+   "mesh_file_missing": [],
+   "proxy_without_flags": [],
+   "proxies": 0,
+   "contact": [
+    {
+     "object": "obj_000",
+     "proxy": false,
+     "gap_m": -1.043091113483996e-09
+    },
+    {
+     "object": "obj_001",
+     "proxy": false,
+     "gap_m": 3.6253008581232926e-10
+    },
+    {
+     "object": "obj_002",
+     "proxy": false,
+     "gap_m": 2.6251091578277652e-11
+    },
+    {
+     "object": "obj_003",
+     "proxy": false,
+     "gap_m": -5.300667044183527e-09
+    },
+    {
+     "object": "obj_004",
+     "proxy": false,
+     "gap_m": -8.382560340303158e-10
+    }
+   ],
+   "contact_over_tolerance": []
+  },
+  "s06_b": {
+   "instances": 4,
+   "registered": 4,
+   "without_registered_object": [],
+   "mesh_file_missing": [],
+   "proxy_without_flags": [],
+   "proxies": 0,
+   "contact": [
+    {
+     "object": "obj_000",
+     "proxy": false,
+     "gap_m": 4.782683173110147e-10
+    },
+    {
+     "object": "obj_001",
+     "proxy": false,
+     "gap_m": 7.256046388737225e-10
+    },
+    {
+     "object": "obj_002",
+     "proxy": false,
+     "gap_m": 3.322812996975344e-10
+    },
+    {
+     "object": "obj_003",
+     "proxy": false,
+     "gap_m": -1.9177669868808422e-10
+    }
+   ],
+   "contact_over_tolerance": []
+  },
+  "s11_b": {
+   "instances": 7,
+   "registered": 7,
+   "without_registered_object": [],
+   "mesh_file_missing": [],
+   "proxy_without_flags": [],
+   "proxies": 0,
+   "contact": [
+    {
+     "object": "obj_000",
+     "proxy": false,
+     "gap_m": 1.6408580397198058e-10
+    },
+    {
+     "object": "obj_001",
+     "proxy": false,
+     "gap_m": -1.1560112589403815e-10
+    },
+    {
+     "object": "obj_002",
+     "proxy": false,
+     "gap_m": 1.79795246399439e-10
+    },
+    {
+     "object": "obj_003",
+     "proxy": false,
+     "gap_m": 6.098467217330317e-12
+    },
+    {
+     "object": "obj_004",
+     "proxy": false,
+     "gap_m": 1.5712880822860154e-10
+    },
+    {
+     "object": "obj_005",
+     "proxy": false,
+     "gap_m": -3.271362104817488e-10
+    },
+    {
+     "object": "obj_006",
+     "proxy": false,
+     "gap_m": -2.373291840829239e-10
+    }
+   ],
+   "contact_over_tolerance": []
+  },
+  "s12_b": {
+   "instances": 9,
+   "registered": 9,
+   "without_registered_object": [],
+   "mesh_file_missing": [],
+   "proxy_without_flags": [],
+   "proxies": 0,
+   "contact": [
+    {
+     "object": "obj_000",
+     "proxy": false,
+     "gap_m": 3.1524278326644506e-10
+    },
+    {
+     "object": "obj_001",
+     "proxy": false,
+     "gap_m": -4.358743366239537e-10
+    },
+    {
+     "object": "obj_002",
+     "proxy": false,
+     "gap_m": 2.9630564668536863e-10
+    },
+    {
+     "object": "obj_004",
+     "proxy": false,
+     "gap_m": 3.595014286261744e-10
+    },
+    {
+     "object": "obj_005",
+     "proxy": false,
+     "gap_m": 2.147188427059632e-09
+    },
+    {
+     "object": "obj_007",
+     "proxy": false,
+     "gap_m": 4.2418343837447026e-10
+    },
+    {
+     "object": "obj_008",
+     "proxy": false,
+     "gap_m": 6.750962046331299e-10
+    },
+    {
+     "object": "obj_009",
+     "proxy": false,
+     "gap_m": -9.446354115594247e-11
+    }
+   ],
+   "contact_over_tolerance": []
+  },
+  "s13_b": {
+   "instances": 2,
+   "registered": 2,
+   "without_registered_object": [],
+   "mesh_file_missing": [],
+   "proxy_without_flags": [],
+   "proxies": 1,
+   "contact": [
+    {
+     "object": "obj_000",
+     "proxy": false,
+     "gap_m": 8.885213016729399e-10
+    },
+    {
+     "object": "obj_001",
+     "proxy": true,
+     "gap_m": -2.6569731831349586e-10
+    }
+   ],
+   "contact_over_tolerance": []
+  },
+  "s14_b": {
+   "instances": 5,
+   "registered": 5,
+   "without_registered_object": [],
+   "mesh_file_missing": [],
+   "proxy_without_flags": [],
+   "proxies": 0,
+   "contact": [
+    {
+     "object": "obj_000",
+     "proxy": false,
+     "gap_m": -3.037839181596613e-10
+    },
+    {
+     "object": "obj_001",
+     "proxy": false,
+     "gap_m": 3.1044011632175295e-10
+    },
+    {
+     "object": "obj_002",
+     "proxy": false,
+     "gap_m": 7.396925433278412e-10
+    },
+    {
+     "object": "obj_003",
+     "proxy": false,
+     "gap_m": 9.057824768010647e-10
+    },
+    {
+     "object": "obj_004",
+     "proxy": false,
+     "gap_m": 1.4677037710186802e-10
+    }
+   ],
+   "contact_over_tolerance": []
+  }
+ }
+}
