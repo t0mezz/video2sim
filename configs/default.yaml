@@ -160,6 +160,7 @@ shape:
     # Off until the P3.3 A/B: the paper reports shape barely depends on it, and P3.2 sets
     # pose and scale from the metric cloud (docs/research/sam3d.md, section 5)
     use_pointmap: false
+  stretch_samples: 1           # best samples per object that get the per-axis refinement
   registration:                # P3.2, stages/registration.py; first guesses, tune in P3.3
     surface_samples: 3000      # mesh points for the point term
     mask_samples: 400          # mesh points projected into each view
@@ -177,6 +178,7 @@ shape:
     inner_iterations: 5        # Levenberg-Marquardt steps per round
     upright_sigma_deg: 1.0     # tilt of the levelled model axis; 0 turns the term off
     contact_sigma_m: 0.002     # lowest vertex against the support height, when one is given
+    stretch_sigma: 0.5         # log scale per model axis after the similarity fit; 0 is off
 
 physics:
   material_table: configs/material_table.yaml

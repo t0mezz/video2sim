@@ -12,7 +12,9 @@ Per object:
    occluders. The start rotation is the model's guess in its keyframe. On s01 the cluster (the
    P2.4 primitive outline) and the voted SfM points gave sizes within 2 points of each other
    and the same mask IoU, so the typed cluster is used as it is.
-3. Selection (P3.4). The sample with the highest ``fit_score`` is kept. When none reaches
+3. Selection (P3.4). The ``stretch_samples`` samples with the highest ``fit_score`` get the
+   per-axis refinement (``registration.refine_stretch``), and the highest of those after it is
+   kept. When none reaches
    ``min_fit_score``, the object gets the convex hull of its cluster instead, with
    ``Flag.PROXY_GEOMETRY`` and ``Flag.LOW_FIT``, and ``geometry_source`` ``proxy_hull``.
 4. Resting (P3.5). An object whose cluster comes within ``support_gap_m`` of the table rests on
@@ -54,7 +56,13 @@ from video2sim.schemas import (
     StageName,
     WorldModel,
 )
-from video2sim.stages.registration import MaskView, Registration, RegistrationConfig, register
+from video2sim.stages.registration import (
+    MaskView,
+    Registration,
+    RegistrationConfig,
+    refine_stretch,
+    register,
+)
 
 F64 = NDArray[np.float64]
 Masks = dict[int, NDArray[np.bool_]]
@@ -71,6 +79,7 @@ class ShapeStageConfig:
     max_views: int
     min_fit_score: float
     support_gap_m: float
+    stretch_samples: int
     registration: RegistrationConfig
 
     @classmethod
@@ -83,10 +92,20 @@ class ShapeStageConfig:
             int(c["max_views"]),
             float(c["min_fit_score"]),
             float(c["support_gap_m"]),
+            int(c["stretch_samples"]),
             RegistrationConfig.from_config(cfg),
         )
-        if min(out.keyframes_per_object, out.samples_per_keyframe, out.max_views) < 1:
-            raise ValueError("keyframes_per_object, samples_per_keyframe, max_views must be >= 1")
+        counts = (
+            out.keyframes_per_object,
+            out.samples_per_keyframe,
+            out.max_views,
+            out.stretch_samples,
+        )
+        if min(counts) < 1:
+            raise ValueError(
+                "keyframes_per_object, samples_per_keyframe, max_views and stretch_samples "
+                "must be at least 1"
+            )
         if not 0 <= out.min_fit_score <= 1:
             raise ValueError("min_fit_score must be in [0, 1]")
         if out.support_gap_m < 0:
@@ -166,7 +185,8 @@ def place(candidate: Candidate, support_z: float | None) -> tuple[F64, F64]:
     """World vertices of the kept sample, set down exactly on the support, and its rotation."""
     reg = candidate.registration
     T = reg.T_world_from_model.to_numpy()
-    world = (reg.scale * candidate.sample.vertices_model) @ T[:3, :3].T + T[:3, 3]
+    scaled = reg.scale * np.asarray(reg.stretch) * candidate.sample.vertices_model
+    world = scaled @ T[:3, :3].T + T[:3, 3]
     if support_z is not None:
         world[:, 2] += support_z - float(np.min(world[:, 2]))
     return world, T[:3, :3]
@@ -223,6 +243,7 @@ def sample_record(c: Candidate) -> dict[str, Any]:
         "inlier_fraction": r.inlier_fraction,
         "mask_inside_fraction": r.mask_inside_fraction,
         "scale": r.scale,
+        "stretch": list(r.stretch),
         "cost": r.cost,
         "yaw_index": r.yaw_index,
     }
@@ -258,7 +279,20 @@ def shape_object(
             reg = register_sample(sample, world, target, views, cfg.registration, seed, support_z)
             candidates.append(Candidate(sample, reg))
             checkpoint = sample.checkpoint
-    best = max(candidates, key=lambda c: c.registration.fit_score, default=None)
+    ranked = sorted(candidates, key=lambda c: -c.registration.fit_score)
+    finalists = [
+        Candidate(
+            c.sample,
+            refine_stretch(
+                c.sample.vertices_model, c.sample.faces, c.registration, target, views,
+                cfg.registration, seed, support_z,
+            ),
+        )
+        for c in ranked[: cfg.stretch_samples]
+    ]  # fmt: skip
+    for old, new in zip(ranked, finalists, strict=False):
+        candidates[candidates.index(old)] = new
+    best = max(finalists, key=lambda c: c.registration.fit_score, default=None)
     report: dict[str, Any] = {
         "views": view_frames,
         "support_z": support_z,

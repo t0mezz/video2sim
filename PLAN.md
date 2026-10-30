@@ -294,8 +294,39 @@ Tasks
   error 0.6° (phone box 0.8°, earbud box 0.4°). That is after a ground-truth fix confirmed by
   the human on 2026-10-29: the earbud box in s01 stands at yaw 90°, not 0°
   (`benchmark/scenes.csv`; it had scored 89.6°). Its long side still reads 13% short. Fit scores against the 8-point box outline sit at 0.97 to 1.00
-  for most samples and separate them poorly. Open: the dev split, a fit score that ranks
-  samples, and the exit criteria on easy and medium scenes.
+  for most samples and separate them poorly.
+  Dev split, easy and medium scenes (s01 to s04, s06, s11 to s14; 8 more runs, 240 SAM 3D
+  calls, 2 to 17 min per scene), `benchmark/results/p3_6_dev.json`: recall 0.93 (42 of 45,
+  the same misses as P2), median position error 6.1 mm, orientation 1.0°, size 6.4%
+  (target 5%). Easy: size 5.5%, position 4.5 mm, orientation 0.9°. Medium: 8.1%, 7.4 mm,
+  2.2°. Against the P2.4 primitives on the same 42 objects (`p2_eval_segmentation_dev.json`),
+  median size error goes from 4.3% to 5.5% on easy and from 14.7% to 8.1% on medium. Meshes
+  win where no primitive fits (s12 electronics box 93% to 8%, a mug 32% to 3%, the s11 shapes)
+  and lose where the box or cylinder was already right (water bottle 7% to 33%, the s13 breakfast
+  bag box 21% to 37%, s02 electronics box 3% to 18%, coffee cans 2-3% to 6-10%): registration
+  scales uniformly, so SAM 3D's proportions carry through. One proxy (s13 electronics box,
+  inlier fraction 0 for all six samples); its P2 box stands on the table through the breakfast
+  box it sits on, so the stack is lost before shape (both methods 66%). Fit scores against
+  the 8-point outline step in eighths, and the kept sample is often not the lowest cost.
+  Every one of the 6 samples scored against ground truth (cached samples re-registered, same
+  fits): median size error 5.0% if the best sample were always kept, 6.4% as picked, 8.6% for
+  a typical sample, 15.8% for the worst. Fit score picks the best sample for 17 of 42 objects
+  (rank correlation with size error -0.38), so better selection gains at most 1.4 points;
+  proportions remain the larger error.
+  Per-axis stretch added 2026-10-30 (`registration.refine_stretch`, `shape.registration.
+  stretch_sigma`, `shape.stretch_samples`): after the similarity fit, the kept sample is
+  refined once more with a scale along each model axis, against the same points and masks,
+  with a prior on each log scale. Same cached samples, no hosted calls,
+  `benchmark/results/p3_6_dev_stretch.json`: median size error 4.5% (easy 4.6%, medium 4.3%,
+  target 5%), position 6.1 mm, orientation 1.0°, recall 0.93. 25 objects improve, 12 worsen.
+  Prior width swept on the dev scenes only, median size error with stretch on the single best
+  sample: 0.1 gives 5.1%, 0.3 gives 4.7%, 0.5 gives 4.5%, 1.0 gives 4.7%. Stretching the top
+  2, 3 or 6 samples and reselecting is no better (4.6 to 4.7% at 0.5), so one sample it is.
+  Registration also got exact Jacobians and a KD-tree: fits unchanged on s03, about 2 s a
+  sample instead of 4. Still over 15%: s14 breadboard 75%, s13 electronics box 66% (proxy),
+  s04 water bottle 29%, the white cuboid in s11 (29%) and s14 (21%). The size target is
+  provisional and the settings are tuned on dev, so the test split may read higher.
+  Open: a fit score that ranks samples, stacked clusters in P2, and the bake-off.
 
 Exit criteria
 
