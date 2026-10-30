@@ -382,7 +382,7 @@ class _Problem:
         moved = self.place(p, base, self.samples[index])
         r_points = (np.sqrt(weight)[:, None] * (self.target - moved)).ravel()
         r_points /= cfg.sigma_points_m * np.sqrt(len(self.target))
-        parts = [r_points]
+        parts: list[F64] = [r_points]
         if cfg.mask_weight > 0 and self.views:
             placed = self.place(p, base, self.mask_samples)
             outside = np.sqrt(cfg.mask_weight / (len(self.views) * len(placed))) / cfg.sigma_mask_px
@@ -516,7 +516,7 @@ def level(R_world_from_model: F64) -> tuple[F64, F64]:
     angle = float(np.arctan2(np.linalg.norm(axis), up[2]))
     if np.linalg.norm(axis) > 1e-12:
         axis = axis / np.linalg.norm(axis) * angle
-    return rotation_from_vector(axis) @ R_world_from_model, up_model
+    return rotation_from_vector(np.asarray(axis, dtype=np.float64)) @ R_world_from_model, up_model
 
 
 def _build_problem(
