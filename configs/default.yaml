@@ -184,6 +184,9 @@ shape:
 physics:
   material_table: configs/material_table.yaml
   max_convex_parts: 16
+  repair:                      # P4.1, stages/mesh_repair.py
+    min_component_area_frac: 0.02   # a piece smaller than this share of the largest piece's area is a floater
+    min_volume_m3: 1.0e-9           # below this the mesh is not a solid
 
 export:
   simulator: isaac_sim         # assumed, see PLAN.md decision D-001
