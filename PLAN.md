@@ -233,7 +233,11 @@ Tasks
       TRELLIS.2 against SAM 3D: cube 5.1 / 3.9%, small cube 6.4 / 5.5%, phone box 7.1 / 3.6%,
       coffee can 5.1 / 4.0%, earbud box 14.8 / 12.6% (the earbud box fell back to the proxy
       hull, best fit 0.24, where SAM 3D reached 0.996). One scene, one seed set: not a
-      bake-off result. It returns the
+      bake-off result. Vertex colours added 2026-10-30 (the raw mesh had none; the worker now
+      reads `base_color` from the nearest voxel, `shape.trellis2.colors`) and s01 rerun: the
+      hue follows the photo for good draws, but some draws are far too dark and fit score
+      cannot see it (phone box kept sample: mean RGB 1, 0, 0 against 65, 49, 31 in the image).
+      A colour check in sample selection is open. It returns the
       raw mesh (no pose, unitless, up axis assumed z, UNVERIFIED), so the start rotation is a
       canonical guess and registration's yaw starts do the rest. Single view first,
       MV-SAM3D only as a P3.3 arm (`docs/research/sam3d_multiview.md`)
