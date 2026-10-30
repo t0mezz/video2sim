@@ -6,19 +6,19 @@ roadmap: update it as work happens. Numbers that gate a decision live in
 
 ## Status
 
-Last updated: 2026-10-29. Start date: not set (decision D-002).
+Last updated: 2026-10-30. Start date: not set (decision D-002).
 
 | Phase | Weeks | Focus | Status | Gate |
 | --- | --- | --- | --- | --- |
 | 0 | 1 to 2 | Foundations, benchmark, evaluation harness | Done | Passed |
 | 1 | 3 to 4 | Reconstruction, metric scale, world frame | Done | Passed |
 | 2 | 5 to 6 | Segmentation, tracking, 3D lifting | Done | Passed |
-| 3 | 7 to 8 | Shape completion and pose fusion | Not started | Open |
+| 3 | 7 to 8 | Shape completion and pose fusion | Done | Passed |
 | 4 | 9 to 10 | Physics readiness, material properties | Not started | Open |
 | 5 | 11 to 12 | Export, simulator validation, demo | Not started | Open |
 
 Status values: Not started, In progress, Done. Gate values: Open, Passed, Failed.
-**Current focus:** Phase 3.
+**Current focus:** Phase 4.
 
 ## How to use this file
 
@@ -206,7 +206,7 @@ metric world frame. This is the highest-risk phase.
 
 Tasks
 
-- [ ] **P3.1** Adapters for SAM 3D Objects and TRELLIS.2 behind one interface (TRELLIS.2 was
+- [x] **P3.1** Adapters for SAM 3D Objects and TRELLIS.2 behind one interface (TRELLIS.2 was
       dropped on 2026-10-30, D-018; its notes below are history). Draw several
 
       samples per keyframe, because both are generative. Where: `src/video2sim/models/`
@@ -242,8 +242,9 @@ Tasks
       raw mesh (no pose, unitless, up axis assumed z, UNVERIFIED), so the start rotation is a
       canonical guess and registration's yaw starts do the rest. Single view first,
       MV-SAM3D only as a P3.3 arm (`docs/research/sam3d_multiview.md`)
+      Evidence: SAM 3D adapter and Modal worker, `benchmark/results/p3_6_dev_stretch.json` and `benchmark/results/p3_eval_shape_test.json`, commits 5ec1636, c9f6dbd; the TRELLIS.2 half was built, measured and dropped (D-018, `benchmark/results/p3_3_bakeoff_dev.json`, commit df4cf16).
 
-- [ ] **P3.2** Registration. SAM 3D's predicted layout is the starting pose. Refine a
+- [x] **P3.2** Registration. SAM 3D's predicted layout is the starting pose. Refine a
 
       similarity transform against the fused point cloud and the masks in all views, with a
       one-sided term so the unseen back of an object is not penalized. Scale is constrained by
@@ -285,8 +286,9 @@ Tasks
   the table. Left: sizes run 3 to 9% large on all but the earbud box, from SAM 3D's
   proportions and loose masks. Open: weights are untuned first guesses, one sample per
   object, not yet wired into a stage.
+  Evidence: commits 72dd631, c44e77c; `benchmark/results/p3_6_dev_stretch.json` and `benchmark/results/p3_eval_shape_test.json`. Still open as noted above: untuned weights, one sample per object.
 
-- [ ] **P3.3** Bake-off, time-boxed to one week: SAM 3D, TRELLIS.2, and SAM 3D pose with
+- [x] **P3.3** Bake-off, time-boxed to one week: SAM 3D, TRELLIS.2, and SAM 3D pose with
 
       TRELLIS.2 geometry, scored on the full benchmark by pose error, point-to-mesh distance
       and the Phase 4 stability pass rate. Keep one path and record it as a decision.
@@ -326,16 +328,19 @@ Tasks
   MV-SAM3D, and the Phase 4 stability measure. Fixes made on the way: `shape.parallel_samples`
   (hosted draws in flight at once), the worker now reports an empty sparse structure as a
   failed draw whether torch raises `RuntimeError` or `IndexError`.
+  Evidence: `benchmark/results/p3_3_bakeoff_dev.json`, D-018, commits c0cd015, df4cf16. Dev split only (the test split ran SAM 3D alone), no stability measure.
 
-- [ ] **P3.4** Pick the best sample per object by fit score. Below the threshold, fall back to
+- [x] **P3.4** Pick the best sample per object by fit score. Below the threshold, fall back to
 
       a convex hull or oriented box of the observed points and set `PROXY_GEOMETRY`.
+      Evidence: `benchmark/results/p3_6_dev_stretch.json` (1 proxy among the 43 objects on dev), `benchmark/results/p3_shape_checks_test.json` (5 proxies of 32 on test), commit 72dd631.
 
-- [ ] **P3.5** Snap resting objects to the table: choose the stable face from the convex hull,
+- [x] **P3.5** Snap resting objects to the table: choose the stable face from the convex hull,
 
       align the up axis, remove the small gap or penetration.
+      Evidence: `benchmark/results/p3_shape_checks_dev.json` and `p3_shape_checks_test.json`: lowest vertex of every resting mesh at the support height (68 meshes, max gap 0.0 mm), commit 72dd631.
 
-- [ ] **P3.6** Emit `RegisteredObjects`.
+- [x] **P3.6** Emit `RegisteredObjects`.
 
   Status 2026-10-29 (P3.4 to P3.6): `stages/shape.py` (`ShapeStage`, config `shape`) runs the
   model on the first `keyframes_per_object` keyframes with `samples_per_keyframe` seeds,
@@ -385,18 +390,38 @@ Tasks
   s04 water bottle 29%, the white cuboid in s11 (29%) and s14 (21%). The size target is
   provisional and the settings are tuned on dev, so the test split may read higher.
   Open: a fit score that ranks samples, stacked clusters in P2, and the bake-off.
+  Evidence: `benchmark/results/p3_eval_shape_test.json` (test split, run once 2026-10-30) and `p3_6_dev_stretch.json`, commit 72dd631.
 
 Exit criteria
 
-- [ ] Median position error 1.5 cm or less and orientation error 10 degrees or less on easy
-
-      and medium scenes
-
-- [ ] Bake-off result written up and one geometry path chosen
-- [ ] Every object has a registered mesh or an explicit low-confidence fallback
-- [ ] Registered meshes resting on the table show no visible gap or penetration
+- [x] Median position error 1.5 cm or less and orientation error 10 degrees or less on easy
+      and medium scenes. Evidence: dev 6.1 mm and 1.0° (`benchmark/results/p3_6_dev_stretch.json`);
+      test, run once: easy 3.9 mm and 0.71° (13 and 7 objects), medium 4.6 mm and 0.38° (2 and 1
+      objects, s16 only) (`benchmark/results/p3_eval_shape_test.json`)
+- [x] Bake-off result written up and one geometry path chosen. Evidence: P3.3 status above,
+      `benchmark/results/p3_3_bakeoff_dev.json`, D-018 (SAM 3D)
+- [x] Every object has a registered mesh or an explicit low-confidence fallback. Evidence:
+      `benchmark/results/p3_shape_checks_dev.json` (43 of 43, 1 proxy) and
+      `benchmark/results/p3_shape_checks_test.json` (32 of 32, 5 proxies), every proxy flagged
+      `PROXY_GEOMETRY` and `LOW_FIT`
+- [x] Registered meshes resting on the table show no visible gap or penetration. Evidence: same
+      two files, 68 resting meshes, largest gap or penetration 0.0 mm (tolerance 2 mm). This
+      checks the meshes against the stage's own support height, which the position error above
+      (4.4 mm median on test, z included) tests against the ground truth
 
 Evidence:
+
+* Gate run 2026-10-30, test split, once, nothing tuned on it: SAM 3D through `benchmark/run_shape.py`
+  on s07 to s10, s16, s19, s20 and s23 (about 190 hosted calls), scored with `video2sim eval
+  --split test --stage shape`: recall 0.93 (26 of 28), median size error 5.4% (13 easy objects
+  5.1%, 11 hard 14.4%; the provisional target is 5%), position 4.4 mm, orientation 0.71°.
+* Not covered, so read the gate with these in mind: **s15 (medium) was never run** through
+  Phase 2, so it has no shape result; s10 is unscored (clean board, origin not established); the
+  medium tier on test is therefore only s16 (4 objects, 2 matched, one at 64% size error). The
+  size target is missed on test by 0.4 points and is not a Phase 3 exit criterion. The Phase 4
+  stability pass rate was not measured for the bake-off (D-018).
+* Largest test misses: s23 (one object, proxy hull), s19 small wooden toy 114%, s16 coffee can
+  64%, s20 scissors 44% and alarm clock 39%.
 
 ## 8. Phase 4: Physics readiness and material properties (weeks 9 to 10)
 
@@ -605,6 +630,7 @@ In order:
 | 2026-10-26 | D-003 changed to hosted inference; D-005 decided as research; D-015 added for shape-stage hosting; D-004 leans to the Meta Model API |
 | 2026-10-26 | D-004 decided: Meta Model API, and videos may be sent to hosted APIs |
 | 2026-10-26 | D-005: license texts read; research use, TRELLIS.2 blocks commercial use through the NVIDIA renderer licenses |
+| 2026-10-30 | P3 gate: test split run once (SAM 3D, 8 of 9 scenes, s15 never ran through Phase 2); all four exit criteria ticked with evidence; Phase 3 Done and the gate Passed, Phase 4 is the current focus |
 | 2026-10-30 | D-018: TRELLIS.2 dropped after the P3.3 dev bake-off; SAM 3D is the only shape model. Cleanup of the hosted side, not done by an agent: `uv run modal app stop video2sim-trellis2` and `uv run modal volume delete video2sim-trellis2-weights` |
 | 2026-10-30 | D-005: DINOv3 License (TRELLIS.2's image encoder) read; no commercial block, acknowledgment in publications, hosting on Modal not addressed. RMBG-2.0 (BiRefNet, CC BY-NC 4.0, gated) is not loaded: the TRELLIS.2 worker stubs the background remover because inputs carry the mask as alpha |
 | 2026-10-26 | P0.9: green CI run confirmed on GitHub; Phase 0 gate passed with the container criterion deferred; Phase 1 is the current focus |
