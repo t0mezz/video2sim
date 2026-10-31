@@ -14,11 +14,11 @@ Last updated: 2026-10-31. Start date: not set (decision D-002).
 | 1 | 3 to 4 | Reconstruction, metric scale, world frame | Done | Passed |
 | 2 | 5 to 6 | Segmentation, tracking, 3D lifting | Done | Passed |
 | 3 | 7 to 8 | Shape completion and pose fusion | Done | Passed |
-| 4 | 9 to 10 | Physics readiness, material properties | In progress | Open |
+| 4 | 9 to 10 | Physics readiness, material properties | Done | Failed, waived (D-026) |
 | 5 | 11 to 12 | Export, simulator validation, demo | Not started | Open |
 
 Status values: Not started, In progress, Done. Gate values: Open, Passed, Failed.
-**Current focus:** Phase 4.
+**Current focus:** Phase 5.
 
 ## How to use this file
 
@@ -29,7 +29,8 @@ Status values: Not started, In progress, Done. Gate values: Open, Passed, Failed
 
 * A phase gate passes only when every exit criterion is ticked with evidence. A phase starts
 
-  when the previous gate has passed, except where Phase 0 notes say otherwise.
+  when the previous gate has passed or a human has waived it (D-026), except where Phase 0 notes
+  say otherwise.
 
 * Humans change scope, targets, exit criteria and decisions. Agents propose changes in a pull
 
@@ -534,17 +535,26 @@ Tasks
 
 Exit criteria
 
-- [ ] 100% of exported meshes pass the watertight, manifold and collision-load validators
+- [x] 100% of exported meshes pass the watertight, manifold and collision-load validators
 - [ ] Mass within 30% for 50% of benchmark objects (D-025)
-- [ ] 95% of scenes settle with maximum drift of 2 cm in 5 s, round objects not counted (D-025)
-- [ ] Every property in the export carries a low, nominal and high value
+- [x] 95% of scenes settle with maximum drift of 2 cm in 5 s, round objects not counted (D-025)
+- [x] Every property in the export carries a low, nominal and high value
 
-Evidence: dev split only, so nothing is ticked until the phase gate runs the test split
-(`benchmark/results/p4_8_physics.json`). 61 of 61 meshes pass. Mass 52% against 50% (D-025), with
-the geometry part held out in the experiment and in sample in the pipeline. 13 of 13 scenes settle
-in every case against 95%, in MuJoCo (D-021), with the round objects of s03, s04 and s17 not
-counted, and s13 fixed by seating stacked objects (D-025). All friction, restitution, mass and
-density values carry low, nominal and high, and inertia follows from mass (D-023).
+Evidence: gate run once on the test split, `benchmark/results/p4_gate_test.json` and
+`benchmark/results/p4_gate_eval_test.json` (8 rigid scenes, s23 left out as deformable, code
+68e06bf, nothing tuned afterwards).
+
+* Meshes: 35 of 35 test objects pass, 61 of 61 on dev.
+* Mass: **not met, 14 of 31 (45%) on test against 50%**; 29 of 56 (52%) on dev. s10 has no scored
+  masses (clean board). Pooled, 43 of 87 (49%).
+* Settling: 8 of 8 test scenes in every case, 13 of 13 on dev, in MuJoCo (D-021) with round objects
+  not counted (D-025). Largest counted drift on test 1.3 cm. The two round objects on test, a plate
+  and a container, did not move, so ignoring them changed nothing there.
+* Ranges: friction, restitution, mass and density carry low, nominal and high, and inertia follows
+  from mass (D-023).
+* The gate failed on mass and the human waived it (D-026). The target stays 50% and the box stays
+  unticked, because no number was changed after seeing the test.
+  s15 now has a shape result, and its fifth object is missing (4 tracks of 5).
 
 ## 9. Phase 5: Export, simulator validation, demo (weeks 11 to 12)
 
@@ -638,6 +648,7 @@ one that supersedes.
 | D-023 | `SimAssets` contract for P4.8 (human decisions 2026-10-31). `SimAsset` gains `T_world_from_object`, because moving the origin to the center of mass changes the pose. Inertia stays one matrix at nominal mass: the body is the same, so low and high are the matrix scaled by `mass_kg`, and this is how the "every property" criterion is read. An object that fails settling is reported in `physics/settling.json` and not blocked, so the QA report of P5.3 shows it | Decided | Week 9 | `src/video2sim/schemas.py`, `src/video2sim/stages/physics_stage.py` |
 | D-024 | Mass combines geometry with the vision-language model (human decision 2026-10-31), an exception to the rule that a model writes no number. One hosted request per object on 2 keyframe crops returns a low, nominal and high mass; the geometry mass stands when it falls inside that range, otherwise the model's mass and range are used, and inertia scales with the mass because the body is unchanged. Without a readable answer the geometry mass stands with `Flag.LOW_CONFIDENCE_MATERIAL`. On 56 weighed dev objects within 30%: geometry 36% held out, model alone 46%, the rule 52% held out (90% interval 38 to 66%, resampling objects). Measured size made the model worse (41%), so it is not sent. `physics.vlm_mass.enabled: false` turns it off to save calls: no request, no key, geometry mass only, no flag. The mass target is unchanged; only a human changes `configs/targets.yaml` | Decided | Week 9 | `src/video2sim/stages/vlm_mass.py`, `benchmark/run_vlm_mass.py`, `benchmark/results/p4_vlm_mass.json` |
 | D-025 | Phase 4 gate terms (human decisions 2026-10-31). The mass target is 50% within 30%, down from 70%, because no method on these inputs reached it (D-024). Round objects do not count towards settling: they really roll and fall over on the table (the s17 egg stands only through a dent made by hand). `Flag.IGNORED_ROUND` marks an object within `physics.settling.round_tolerance` of the ellipsoid in its bounding box, 0.04 from the dev gap between the egg (0.028) and the nearest other object (0.053); it stays in the scene and its drift is reported. The Phase 2 box fit now seats stacked objects: most of the footprint over another object and the lowest points near its top. This fixes s13 obj_001. The stack rule was scanned on all scenes' points without scores, and it also fires on s16 obj_002, a real stack in the test split | Decided | Week 9 | `configs/targets.yaml`, `src/video2sim/stages/settling.py`, `src/video2sim/stages/primitive_fit.py` |
+| D-026 | Phase 4 mass miss waived (human decision 2026-10-31). The gate failed on mass at 45% on test against 50%, and Phase 5 starts anyway. The target and the failed result stand as recorded, and the exit box stays unticked. Reason: mass carries low and high values, so the simulator work is not blocked, and no cheap fix remains on these inputs. Consequence: masses may be wrong by more than 30% on about half of objects, so the QA report of P5.3 must show the mass source and range, and a future mass method is built on dev only, because the test split has been seen | Decided | Week 10 | `benchmark/results/p4_gate_eval_test.json` |
 
 ## 12. After the MVP
 
@@ -736,6 +747,8 @@ In order:
 | 2026-10-31 | P4.6 ticked: fill fractions per class and answer; 20 of 56 dev objects within 30% with objects held out (36%), exit criterion not met |
 | 2026-10-31 | P4.7 ticked under D-021: settling in MuJoCo, 10 of 13 rigid dev scenes pass (77%), exit criterion not met; `mujoco` added by human approval |
 | 2026-10-31 | P4.8 ticked under D-023: physics stage emits `SimAssets` on 13 rigid dev runs, 61 of 61 valid; all Phase 4 tasks done, the mass and settling exit criteria are not met and the gate stays Open |
+| 2026-10-31 | P4 gate run once on the test split: meshes 35 of 35, settling 8 of 8, mass 45% against 50%; gate Failed on mass |
+| 2026-10-31 | D-026: mass miss waived by human decision; Phase 4 Done with the gate Failed and waived, Phase 5 is the current focus |
 | 2026-10-31 | D-025: mass target 50%, round objects ignored in settling, stacked objects seated; 13 of 13 rigid dev scenes settle and mass is 52% on dev, gate still Open until the test split runs |
 | 2026-10-31 | D-024: mass combines geometry with the vision-language model; 52% of dev objects within 30%, exit criterion not met, `AGENTS.md` rule amended by human decision |
 | 2026-10-31 | D-022: collision fit ignores surfaces inside the sealed body, primitive fallback and vertex thinning fixed; 61 of 61 dev objects pass the collision checks |

@@ -3,9 +3,9 @@
     uv run python benchmark/run_physics.py --out benchmark/results/p4_8_physics.json
 
 Takes the finished stages as they are, the way ``run_shape.py`` does, and writes ``physics/`` in
-each run of the rigid dev scenes, then sums up the checks and ``physics/settling.json``. One hosted
-request per object for the mass (D-024), cached in ``physics.work/``, and no GPU. Run a scene at a
-time because CoACD takes up to 99 s per object.
+each run of the rigid scenes of a split, then sums up the checks and ``physics/settling.json``.
+One hosted request per object for the mass (D-024), cached in ``physics.work/``, and no GPU. Run a
+scene at a time because CoACD takes up to 99 s per object.
 """
 
 from __future__ import annotations
@@ -66,10 +66,11 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--workers", type=int, default=6)
     parser.add_argument("--scene", action="append", help="limit to these scene ids")
+    parser.add_argument("--split", default="dev", help="dev, or test at a phase gate only")
     args = parser.parse_args()
     targets = yaml.safe_load((ROOT / "configs/targets.yaml").read_text(encoding="utf-8"))
 
-    scenes, _ = discover_scenes(ROOT / "benchmark/scenes", ("dev",), None)
+    scenes, _ = discover_scenes(ROOT / "benchmark/scenes", (args.split,), None)
     run_ids = []
     for scene in scenes:
         if scene.has_deformable or (args.scene and scene.scene_id not in args.scene):

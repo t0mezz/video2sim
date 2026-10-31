@@ -1,0 +1,2785 @@
+{
+ "summary": {
+  "simulator": "mujoco (D-021)",
+  "runs": 8,
+  "statuses": {
+   "s07_b": "done",
+   "s08_b": "done",
+   "s09_b": "done",
+   "s10_b": "done",
+   "s15_b": "done",
+   "s16_a": "done",
+   "s19_b": "done",
+   "s20_b": "done"
+  },
+  "objects": 35,
+  "objects_valid": 35,
+  "mass_source": {
+   "geometry": 13,
+   "model": 22
+  },
+  "settling_gate": 0.95,
+  "settling_pass_fraction": {
+   "nominal": 1.0,
+   "friction_low": 1.0,
+   "friction_high": 1.0,
+   "mass_low": 1.0,
+   "mass_high": 1.0
+  },
+  "stable_in_every_case": [
+   "s07_b",
+   "s08_b",
+   "s09_b",
+   "s10_b",
+   "s15_b",
+   "s16_a",
+   "s19_b",
+   "s20_b"
+  ]
+ },
+ "objects": [
+  {
+   "run": "s07_b",
+   "object": "obj_000",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "box",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.08,
+    "nominal": 0.1,
+    "high": 0.12
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.8
+   }
+  },
+  {
+   "run": "s07_b",
+   "object": "obj_001",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "convex_decomposition",
+   "parts": 16,
+   "mass_kg": {
+    "low": 0.095,
+    "nominal": 0.14,
+    "high": 0.19
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.05,
+    "nominal": 0.25,
+    "high": 0.55
+   }
+  },
+  {
+   "run": "s07_b",
+   "object": "obj_002",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "cylinder",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.21,
+    "nominal": 0.245,
+    "high": 0.275
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.62,
+    "nominal": 0.7,
+    "high": 0.78
+   }
+  },
+  {
+   "run": "s07_b",
+   "object": "obj_003",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "box",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.32,
+    "nominal": 0.42,
+    "high": 0.52
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.05,
+    "nominal": 0.25,
+    "high": 0.55
+   }
+  },
+  {
+   "run": "s07_b",
+   "object": "obj_004",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "convex_decomposition",
+   "parts": 16,
+   "mass_kg": {
+    "low": 0.057015888610071744,
+    "nominal": 0.13550072293134335,
+    "high": 0.22890547387994192
+   },
+   "mass_source": "geometry",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.8
+   }
+  },
+  {
+   "run": "s08_b",
+   "object": "obj_000",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [
+    "low_confidence_material"
+   ],
+   "kind": "convex_decomposition",
+   "parts": 16,
+   "mass_kg": {
+    "low": 0.27085380637924555,
+    "nominal": 0.32502456765509463,
+    "high": 0.37919532893094376
+   },
+   "mass_source": "geometry",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.85
+   }
+  },
+  {
+   "run": "s08_b",
+   "object": "obj_001",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [
+    "low_confidence_material"
+   ],
+   "kind": "convex_decomposition",
+   "parts": 16,
+   "mass_kg": {
+    "low": 0.004303894605083245,
+    "nominal": 0.007809700401214008,
+    "high": 0.029515118674278185
+   },
+   "mass_source": "geometry",
+   "friction": {
+    "low": 0.5,
+    "nominal": 0.9,
+    "high": 1.5
+   },
+   "restitution": {
+    "low": 0.3,
+    "nominal": 0.6,
+    "high": 0.9
+   }
+  },
+  {
+   "run": "s08_b",
+   "object": "obj_002",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [
+    "low_confidence_material"
+   ],
+   "kind": "convex_decomposition",
+   "parts": 16,
+   "mass_kg": {
+    "low": 0.2382457570556646,
+    "nominal": 0.2858949084667975,
+    "high": 0.33354405987793045
+   },
+   "mass_source": "geometry",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.85
+   }
+  },
+  {
+   "run": "s08_b",
+   "object": "obj_003",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "box",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.10882314228879224,
+    "nominal": 0.1705576965863906,
+    "high": 0.25710392732583365
+   },
+   "mass_source": "geometry",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.05,
+    "nominal": 0.25,
+    "high": 0.55
+   }
+  },
+  {
+   "run": "s08_b",
+   "object": "obj_004",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [
+    "low_confidence_material"
+   ],
+   "kind": "convex_decomposition",
+   "parts": 16,
+   "mass_kg": {
+    "low": 0.085,
+    "nominal": 0.12,
+    "high": 0.16
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.8
+   }
+  },
+  {
+   "run": "s09_b",
+   "object": "obj_000",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "box",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.11,
+    "nominal": 0.15,
+    "high": 0.195
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.8
+   }
+  },
+  {
+   "run": "s09_b",
+   "object": "obj_001",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "box",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.19966724807908745,
+    "nominal": 0.3129369838056946,
+    "high": 0.4717308520943338
+   },
+   "mass_source": "geometry",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.05,
+    "nominal": 0.25,
+    "high": 0.55
+   }
+  },
+  {
+   "run": "s09_b",
+   "object": "obj_002",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [
+    "proxy_geometry",
+    "low_fit",
+    "ignored_round"
+   ],
+   "kind": "cylinder",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.03,
+    "nominal": 0.055,
+    "high": 0.085
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.8
+   }
+  },
+  {
+   "run": "s10_b",
+   "object": "obj_000",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "box",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.32,
+    "nominal": 0.42,
+    "high": 0.53
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.05,
+    "nominal": 0.25,
+    "high": 0.55
+   }
+  },
+  {
+   "run": "s10_b",
+   "object": "obj_001",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "box",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.059511299291657514,
+    "nominal": 0.14143117424251941,
+    "high": 0.2389239648395401
+   },
+   "mass_source": "geometry",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.8
+   }
+  },
+  {
+   "run": "s10_b",
+   "object": "obj_002",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "box",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.1914535293407095,
+    "nominal": 0.30006368389023635,
+    "high": 0.452325243129445
+   },
+   "mass_source": "geometry",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.05,
+    "nominal": 0.25,
+    "high": 0.55
+   }
+  },
+  {
+   "run": "s15_b",
+   "object": "obj_000",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "box",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.10338555247042575,
+    "nominal": 0.16203540275351241,
+    "high": 0.2442571589998562
+   },
+   "mass_source": "geometry",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.05,
+    "nominal": 0.25,
+    "high": 0.55
+   }
+  },
+  {
+   "run": "s15_b",
+   "object": "obj_001",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [
+    "proxy_geometry",
+    "low_fit",
+    "low_confidence_material"
+   ],
+   "kind": "cylinder",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.12,
+    "nominal": 0.2,
+    "high": 0.32
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.1,
+    "nominal": 0.4,
+    "high": 0.8
+   }
+  },
+  {
+   "run": "s15_b",
+   "object": "obj_002",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "cylinder",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.215,
+    "nominal": 0.245,
+    "high": 0.27
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.62,
+    "nominal": 0.7,
+    "high": 0.78
+   }
+  },
+  {
+   "run": "s15_b",
+   "object": "obj_003",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [
+    "low_confidence_material"
+   ],
+   "kind": "box",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.003,
+    "nominal": 0.008,
+    "high": 0.016
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.05,
+    "nominal": 0.2,
+    "high": 0.5
+   }
+  },
+  {
+   "run": "s16_a",
+   "object": "obj_000",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "box",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.32,
+    "nominal": 0.42,
+    "high": 0.52
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.05,
+    "nominal": 0.25,
+    "high": 0.55
+   }
+  },
+  {
+   "run": "s16_a",
+   "object": "obj_002",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "convex_decomposition",
+   "parts": 16,
+   "mass_kg": {
+    "low": 0.07,
+    "nominal": 0.09,
+    "high": 0.115
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.8
+   }
+  },
+  {
+   "run": "s16_a",
+   "object": "obj_003",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [
+    "proxy_geometry",
+    "low_fit"
+   ],
+   "kind": "cylinder",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.21,
+    "nominal": 0.24,
+    "high": 0.27
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.62,
+    "nominal": 0.7,
+    "high": 0.78
+   }
+  },
+  {
+   "run": "s19_b",
+   "object": "obj_000",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [
+    "low_confidence_material"
+   ],
+   "kind": "convex_decomposition",
+   "parts": 16,
+   "mass_kg": {
+    "low": 0.22,
+    "nominal": 0.28,
+    "high": 0.3
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.8
+   }
+  },
+  {
+   "run": "s19_b",
+   "object": "obj_001",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "convex_decomposition",
+   "parts": 12,
+   "mass_kg": {
+    "low": 0.018,
+    "nominal": 0.038,
+    "high": 0.075
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.05,
+    "nominal": 0.25,
+    "high": 0.55
+   }
+  },
+  {
+   "run": "s19_b",
+   "object": "obj_002",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "box",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.025,
+    "nominal": 0.045,
+    "high": 0.07
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.8
+   }
+  },
+  {
+   "run": "s19_b",
+   "object": "obj_003",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "convex_decomposition",
+   "parts": 16,
+   "mass_kg": {
+    "low": 0.006,
+    "nominal": 0.013,
+    "high": 0.026
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.3,
+    "nominal": 0.5,
+    "high": 0.62
+   },
+   "restitution": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.7
+   }
+  },
+  {
+   "run": "s19_b",
+   "object": "obj_004",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [
+    "proxy_geometry",
+    "low_fit",
+    "low_confidence_material"
+   ],
+   "kind": "box",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.7,
+    "nominal": 1.1,
+    "high": 1.6
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.3,
+    "nominal": 0.6,
+    "high": 1.0
+   },
+   "restitution": {
+    "low": 0.05,
+    "nominal": 0.2,
+    "high": 0.5
+   }
+  },
+  {
+   "run": "s19_b",
+   "object": "obj_005",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [
+    "low_confidence_material"
+   ],
+   "kind": "convex_decomposition",
+   "parts": 16,
+   "mass_kg": {
+    "low": 0.006310243580526554,
+    "nominal": 0.13494213195279864,
+    "high": 0.6611193658982437
+   },
+   "mass_source": "geometry",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.8
+   }
+  },
+  {
+   "run": "s20_b",
+   "object": "obj_000",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "box",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.055,
+    "nominal": 0.075,
+    "high": 0.095
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.8
+   }
+  },
+  {
+   "run": "s20_b",
+   "object": "obj_001",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "cylinder",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.025,
+    "nominal": 0.04,
+    "high": 0.065
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.8
+   }
+  },
+  {
+   "run": "s20_b",
+   "object": "obj_002",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [
+    "proxy_geometry",
+    "low_fit",
+    "low_confidence_material"
+   ],
+   "kind": "box",
+   "parts": 1,
+   "mass_kg": {
+    "low": 0.007883706365559651,
+    "nominal": 0.16859002843273718,
+    "high": 0.8259698515301728
+   },
+   "mass_source": "geometry",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.8
+   }
+  },
+  {
+   "run": "s20_b",
+   "object": "obj_003",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "convex_decomposition",
+   "parts": 16,
+   "mass_kg": {
+    "low": 0.18,
+    "nominal": 0.26,
+    "high": 0.35
+   },
+   "mass_source": "model",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.8
+   }
+  },
+  {
+   "run": "s20_b",
+   "object": "obj_004",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [],
+   "kind": "convex_decomposition",
+   "parts": 11,
+   "mass_kg": {
+    "low": 0.037012570252912866,
+    "nominal": 0.052493738510404515,
+    "high": 0.12176284941246683
+   },
+   "mass_source": "geometry",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.62,
+    "nominal": 0.7,
+    "high": 0.78
+   }
+  },
+  {
+   "run": "s20_b",
+   "object": "obj_005",
+   "valid": true,
+   "failed_checks": [],
+   "flags": [
+    "ignored_round"
+   ],
+   "kind": "convex_decomposition",
+   "parts": 16,
+   "mass_kg": {
+    "low": 0.011781889148498304,
+    "nominal": 0.020445197564302256,
+    "high": 0.03631581696537415
+   },
+   "mass_source": "geometry",
+   "friction": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.9
+   },
+   "restitution": {
+    "low": 0.2,
+    "nominal": 0.5,
+    "high": 0.8
+   }
+  }
+ ],
+ "settling": {
+  "s07_b": {
+   "nominal": {
+    "stable": true,
+    "residual_penetration_m": 0.00039833920787245986,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00022512273051090954,
+      "final_drift_m": 0.0001626829494148302,
+      "rotation_deg": 0.10524178302235503,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0006429114165050868,
+      "max_drift_m": 0.0006429114165050868,
+      "final_drift_m": 0.0005452493565746587,
+      "rotation_deg": 0.09099769617181934,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0005613720968387359,
+      "max_drift_m": 0.0009587928550204871,
+      "final_drift_m": 0.0005297737599192818,
+      "rotation_deg": 0.35776332644873393,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 8.083625231410868e-05,
+      "final_drift_m": 8.08362507822018e-05,
+      "rotation_deg": 0.08037378979464735,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00031988019766880134,
+      "final_drift_m": 0.0003198801976346723,
+      "rotation_deg": 0.02209866940027931,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "friction_low": {
+    "stable": true,
+    "residual_penetration_m": 0.00039833920787245986,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0002447381106254795,
+      "final_drift_m": 0.0002072197759238941,
+      "rotation_deg": 0.10519524843784521,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0006429114165050868,
+      "max_drift_m": 0.0006429114165050868,
+      "final_drift_m": 0.0005531575405652842,
+      "rotation_deg": 0.09099810423758022,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0005613720968387359,
+      "max_drift_m": 0.003310947283737226,
+      "final_drift_m": 0.003310947283737226,
+      "rotation_deg": 0.35239371130474795,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 8.082437901944251e-05,
+      "final_drift_m": 8.082437748919065e-05,
+      "rotation_deg": 0.08037379006672468,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00031988019767116013,
+      "final_drift_m": 0.0003198801976350027,
+      "rotation_deg": 0.02209866940027931,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "friction_high": {
+    "stable": true,
+    "residual_penetration_m": 0.00039833920787245986,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00024623134967880704,
+      "final_drift_m": 0.0001567046640575386,
+      "rotation_deg": 0.10515770624184406,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0006429114165050868,
+      "max_drift_m": 0.0006429114165050868,
+      "final_drift_m": 0.0005465065772003839,
+      "rotation_deg": 0.09099769521056925,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0005613720968387359,
+      "max_drift_m": 0.0009568343487743142,
+      "final_drift_m": 0.0005294767413591596,
+      "rotation_deg": 0.3570547991325681,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 8.0836252314126e-05,
+      "final_drift_m": 8.083625078239775e-05,
+      "rotation_deg": 0.08037378979464735,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00031988019767107236,
+      "final_drift_m": 0.000319880197634968,
+      "rotation_deg": 0.02209866940027931,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "mass_low": {
+    "stable": true,
+    "residual_penetration_m": 0.00039833920787245986,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00022512273051091287,
+      "final_drift_m": 0.0001626829494170061,
+      "rotation_deg": 0.10524178302235503,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0006429114165050868,
+      "max_drift_m": 0.0006429114165050868,
+      "final_drift_m": 0.0005452493565724648,
+      "rotation_deg": 0.09099769621988182,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0005613720968387359,
+      "max_drift_m": 0.0009587928550206502,
+      "final_drift_m": 0.0005297737599191701,
+      "rotation_deg": 0.35776332644873393,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 8.083625231410461e-05,
+      "final_drift_m": 8.083625078218905e-05,
+      "rotation_deg": 0.08037378979464735,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0003198801976700123,
+      "final_drift_m": 0.00031988019763612815,
+      "rotation_deg": 0.02209866940027931,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "mass_high": {
+    "stable": true,
+    "residual_penetration_m": 0.00039833920787245986,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00022512273051091287,
+      "final_drift_m": 0.00016268294941350692,
+      "rotation_deg": 0.10524178302235503,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0006429114165050868,
+      "max_drift_m": 0.0006429114165050868,
+      "final_drift_m": 0.0005452493565724677,
+      "rotation_deg": 0.09099769621988182,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0005613720968387359,
+      "max_drift_m": 0.0009587928550205304,
+      "final_drift_m": 0.0005297737599191701,
+      "rotation_deg": 0.35776332645280884,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 8.08362523141036e-05,
+      "final_drift_m": 8.083625078218257e-05,
+      "rotation_deg": 0.08037378979464735,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0003198801976696442,
+      "final_drift_m": 0.0003198801976340622,
+      "rotation_deg": 0.02209866940027931,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   }
+  },
+  "s08_b": {
+   "nominal": {
+    "stable": true,
+    "residual_penetration_m": 0.00042668937199108643,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0005556180631656055,
+      "max_drift_m": 0.0015105678152783505,
+      "final_drift_m": 0.0011430396045262249,
+      "rotation_deg": 1.297171093329543,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 1.8367918359239158e-05,
+      "final_drift_m": 1.836791834135332e-05,
+      "rotation_deg": 0.026166045093008645,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0006626860784170185,
+      "max_drift_m": 0.0012011494091787825,
+      "final_drift_m": 0.000816395947318736,
+      "rotation_deg": 1.134879812196748,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.001239340279375145,
+      "final_drift_m": 0.0006796127461626318,
+      "rotation_deg": 0.6939428526109516,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0014572286788200513,
+      "final_drift_m": 0.0009407990570631367,
+      "rotation_deg": 2.0533162335468726,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "friction_low": {
+    "stable": true,
+    "residual_penetration_m": 0.00042668937199108643,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0005556180631656055,
+      "max_drift_m": 0.0011116225888240852,
+      "final_drift_m": 0.0007058752914778173,
+      "rotation_deg": 1.3009684208705585,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 1.8367918359112273e-05,
+      "final_drift_m": 1.8367918341564355e-05,
+      "rotation_deg": 0.026166045093008645,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0006626860784170185,
+      "max_drift_m": 0.0009902164717470058,
+      "final_drift_m": 0.0008554229786501457,
+      "rotation_deg": 1.1340317738782149,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.001182233081036301,
+      "final_drift_m": 0.0007186080567874195,
+      "rotation_deg": 0.6937638514598147,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0008694276558179959,
+      "final_drift_m": 0.00030954345989522765,
+      "rotation_deg": 2.0522715102474285,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "friction_high": {
+    "stable": true,
+    "residual_penetration_m": 0.00042668937199108643,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0005556180631656055,
+      "max_drift_m": 0.0015093999045309463,
+      "final_drift_m": 0.0011430040280986313,
+      "rotation_deg": 1.2971679864797085,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 1.8367918359520102e-05,
+      "final_drift_m": 1.8367918341840387e-05,
+      "rotation_deg": 0.026166045093008645,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0006626860784170185,
+      "max_drift_m": 0.0012005104413412005,
+      "final_drift_m": 0.0008160069555971656,
+      "rotation_deg": 1.1335325783269996,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0013167536533360993,
+      "final_drift_m": 0.0007550764214017141,
+      "rotation_deg": 0.693646550412359,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0014935545779523412,
+      "final_drift_m": 0.0009403128811639255,
+      "rotation_deg": 2.052970481578781,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "mass_low": {
+    "stable": true,
+    "residual_penetration_m": 0.00042668937199108643,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0005556180631656055,
+      "max_drift_m": 0.0015105678152783505,
+      "final_drift_m": 0.001143039604526287,
+      "rotation_deg": 1.2971710933194278,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 1.8367918357897817e-05,
+      "final_drift_m": 1.836791834290533e-05,
+      "rotation_deg": 0.026166045093008645,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0006626860784170185,
+      "max_drift_m": 0.0012011494091787825,
+      "final_drift_m": 0.0008158553188967875,
+      "rotation_deg": 1.1341322120481858,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0012393402793751758,
+      "final_drift_m": 0.0006796127461627542,
+      "rotation_deg": 0.6939428525983464,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0014572286788193535,
+      "final_drift_m": 0.0009407990570618812,
+      "rotation_deg": 2.0533162335475827,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "mass_high": {
+    "stable": true,
+    "residual_penetration_m": 0.00042668937199108643,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0005556180631656055,
+      "max_drift_m": 0.001510567815278267,
+      "final_drift_m": 0.0011430396045267082,
+      "rotation_deg": 1.2971710933205518,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 1.8367918355231357e-05,
+      "final_drift_m": 1.8367918344275786e-05,
+      "rotation_deg": 0.026166045093008645,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0006626860784170185,
+      "max_drift_m": 0.0012011494091787825,
+      "final_drift_m": 0.0008157263892079737,
+      "rotation_deg": 1.1346908973741467,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0012393402793751769,
+      "final_drift_m": 0.0006796127461628759,
+      "rotation_deg": 0.6939428526088507,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0014572286788137536,
+      "final_drift_m": 0.0009407990570496892,
+      "rotation_deg": 2.0533162335518425,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   }
+  },
+  "s09_b": {
+   "nominal": {
+    "stable": true,
+    "residual_penetration_m": 0.0004935736225138328,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00041490748204022783,
+      "final_drift_m": 0.0001760143328265098,
+      "rotation_deg": 0.29736141286051393,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.001833767356379508,
+      "final_drift_m": 0.0010318896819948202,
+      "rotation_deg": 0.9021538012252284,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00010771945290456004,
+      "final_drift_m": 0.00010771945013972301,
+      "rotation_deg": 3.226315605981829e-05,
+      "stable": true,
+      "ignored": true
+     }
+    ]
+   },
+   "friction_low": {
+    "stable": true,
+    "residual_penetration_m": 0.0004935736225138328,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.000363585949038173,
+      "final_drift_m": 0.00029720096718698275,
+      "rotation_deg": 0.2973607833392932,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0018461013842062308,
+      "final_drift_m": 0.001032892585159663,
+      "rotation_deg": 0.9021869196342476,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00010771945290456696,
+      "final_drift_m": 0.00010771945013985371,
+      "rotation_deg": 3.226315605981829e-05,
+      "stable": true,
+      "ignored": true
+     }
+    ]
+   },
+   "friction_high": {
+    "stable": true,
+    "residual_penetration_m": 0.0004935736225138328,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00045926292597512876,
+      "final_drift_m": 0.0002561080454332343,
+      "rotation_deg": 0.29735825572983093,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0018713191460854952,
+      "final_drift_m": 0.001075642936431894,
+      "rotation_deg": 0.9022913238453673,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00010771945290455829,
+      "final_drift_m": 0.0001077194501398589,
+      "rotation_deg": 3.226315605981829e-05,
+      "stable": true,
+      "ignored": true
+     }
+    ]
+   },
+   "mass_low": {
+    "stable": true,
+    "residual_penetration_m": 0.0004935736225138328,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0004149074820402397,
+      "final_drift_m": 0.00017601433282307083,
+      "rotation_deg": 0.29736141287031925,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.001833767356379518,
+      "final_drift_m": 0.001031889681994786,
+      "rotation_deg": 0.9021538012203805,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00010771945290459462,
+      "final_drift_m": 0.00010771945013954616,
+      "rotation_deg": 3.226315605981829e-05,
+      "stable": true,
+      "ignored": true
+     }
+    ]
+   },
+   "mass_high": {
+    "stable": true,
+    "residual_penetration_m": 0.0004935736225138328,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0004149074820402397,
+      "final_drift_m": 0.0001760143328262691,
+      "rotation_deg": 0.2973614128801245,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.001833767356379543,
+      "final_drift_m": 0.0010318896819947754,
+      "rotation_deg": 0.9021538012219965,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00010771945290457909,
+      "final_drift_m": 0.00010771945013983486,
+      "rotation_deg": 3.226315605981829e-05,
+      "stable": true,
+      "ignored": true
+     }
+    ]
+   }
+  },
+  "s10_b": {
+   "nominal": {
+    "stable": true,
+    "residual_penetration_m": 0.00039078662306495787,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 8.478895354367741e-05,
+      "final_drift_m": 8.478895334218951e-05,
+      "rotation_deg": 0.13073732702528484,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0003129847530597452,
+      "final_drift_m": 0.00017161723807689015,
+      "rotation_deg": 0.42926083748805915,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0018162484612179314,
+      "max_drift_m": 0.0018162484612179314,
+      "final_drift_m": 0.0006420149647734809,
+      "rotation_deg": 0.4494183007176905,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "friction_low": {
+    "stable": true,
+    "residual_penetration_m": 0.00039078662306495787,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 7.679048902891731e-05,
+      "final_drift_m": 7.679048873980404e-05,
+      "rotation_deg": 0.13073728786277194,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00024078880357052894,
+      "final_drift_m": 0.00010972209080605078,
+      "rotation_deg": 0.4292607316381992,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0018162484612179314,
+      "max_drift_m": 0.0018162484612179314,
+      "final_drift_m": 0.0006405892812922705,
+      "rotation_deg": 0.44887312593623774,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "friction_high": {
+    "stable": true,
+    "residual_penetration_m": 0.00039078662306495787,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 9.24285264285663e-05,
+      "final_drift_m": 9.242852636779687e-05,
+      "rotation_deg": 0.13073724775240703,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0003763269269876099,
+      "final_drift_m": 0.000274614091749481,
+      "rotation_deg": 0.42925953224576124,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0018162484612179314,
+      "max_drift_m": 0.0018162484612179314,
+      "final_drift_m": 0.0006616410469822363,
+      "rotation_deg": 0.44959757289021285,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "mass_low": {
+    "stable": true,
+    "residual_penetration_m": 0.00039078662306495787,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 8.478895354442388e-05,
+      "final_drift_m": 8.478895334339139e-05,
+      "rotation_deg": 0.1307373270141338,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0003129847530597452,
+      "final_drift_m": 0.0001716172380773357,
+      "rotation_deg": 0.4292608374744743,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0018162484612179314,
+      "max_drift_m": 0.0018162484612179314,
+      "final_drift_m": 0.0006420149647737157,
+      "rotation_deg": 0.44941830072093447,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "mass_high": {
+    "stable": true,
+    "residual_penetration_m": 0.00039078662306495787,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 8.478895354400866e-05,
+      "final_drift_m": 8.478895334223461e-05,
+      "rotation_deg": 0.13073732700298274,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0003129847530597452,
+      "final_drift_m": 0.00017161723807611085,
+      "rotation_deg": 0.42926083746768184,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0018162484612179314,
+      "max_drift_m": 0.0018162484612179314,
+      "final_drift_m": 0.0006420149647734941,
+      "rotation_deg": 0.4494183007176905,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   }
+  },
+  "s15_b": {
+   "nominal": {
+    "stable": true,
+    "residual_penetration_m": 0.00023253913270529503,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0005565204584281984,
+      "final_drift_m": 0.0002831766964914984,
+      "rotation_deg": 0.20125300250940165,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00011406893749143078,
+      "final_drift_m": 0.00010811200875229581,
+      "rotation_deg": 0.001368983379047704,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0003266814510853777,
+      "final_drift_m": 0.00014422567933442963,
+      "rotation_deg": 0.10098296183779548,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00010919163304142616,
+      "final_drift_m": 0.00010919163146097623,
+      "rotation_deg": 0.08222828627951141,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "friction_low": {
+    "stable": true,
+    "residual_penetration_m": 0.00023253913270529503,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0005678203593684931,
+      "final_drift_m": 0.00029771580116734773,
+      "rotation_deg": 0.2012436415527155,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00011406893749143078,
+      "final_drift_m": 0.0001081120087522963,
+      "rotation_deg": 0.001368983379047704,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0069118466675242,
+      "final_drift_m": 0.0069118466675242,
+      "rotation_deg": 0.1065160787510528,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00011004210547764364,
+      "final_drift_m": 0.00011004210385863418,
+      "rotation_deg": 0.08222337971392278,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "friction_high": {
+    "stable": true,
+    "residual_penetration_m": 0.00023253913270529503,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0005606443909578307,
+      "final_drift_m": 0.00028421763983881644,
+      "rotation_deg": 0.20122053956073657,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00011406893749143078,
+      "final_drift_m": 0.00010811200875229599,
+      "rotation_deg": 0.001368983379047704,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0003271187142622864,
+      "final_drift_m": 0.0001417509804727269,
+      "rotation_deg": 0.0994183013701979,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0001102127376762052,
+      "final_drift_m": 0.00011021273575661257,
+      "rotation_deg": 0.0822214049238733,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "mass_low": {
+    "stable": true,
+    "residual_penetration_m": 0.00023253913270529503,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0005565204584281952,
+      "final_drift_m": 0.0002831766964915052,
+      "rotation_deg": 0.20125300252388947,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00011406893749143078,
+      "final_drift_m": 0.00010811200875229561,
+      "rotation_deg": 0.001368983379047704,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0003266814510853782,
+      "final_drift_m": 0.0001442256793344054,
+      "rotation_deg": 0.10098296172230202,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00010919165214564087,
+      "final_drift_m": 0.00010919165056509103,
+      "rotation_deg": 0.08222829113736962,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "mass_high": {
+    "stable": true,
+    "residual_penetration_m": 0.00023253913270529503,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0005565204584281984,
+      "final_drift_m": 0.00028317669649147127,
+      "rotation_deg": 0.2012530025166456,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00011406893749143078,
+      "final_drift_m": 0.00010811200875229591,
+      "rotation_deg": 0.001368983379047704,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0003266814510853777,
+      "final_drift_m": 0.00014422567933431896,
+      "rotation_deg": 0.10098296183779548,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00010919163302684846,
+      "final_drift_m": 0.00010919163144632549,
+      "rotation_deg": 0.082228286261782,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   }
+  },
+  "s16_a": {
+   "nominal": {
+    "stable": true,
+    "residual_penetration_m": 2.7737294694664405e-05,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00013831341197840537,
+      "final_drift_m": 0.00011305138884252608,
+      "rotation_deg": 0.020129061892952476,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0015454679750357156,
+      "final_drift_m": 0.0009921280419208337,
+      "rotation_deg": 0.9032619737695419,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00014989923725160546,
+      "final_drift_m": 0.00014656401532397867,
+      "rotation_deg": 0.00397179391037001,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "friction_low": {
+    "stable": true,
+    "residual_penetration_m": 2.7737294694664405e-05,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00014060988955296222,
+      "final_drift_m": 0.00011701984504704036,
+      "rotation_deg": 0.020128903063039463,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.001545474662865467,
+      "final_drift_m": 0.000992755340175141,
+      "rotation_deg": 0.923916726237565,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0001498990772653199,
+      "final_drift_m": 0.00014679495044940346,
+      "rotation_deg": 0.005670076048101039,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "friction_high": {
+    "stable": true,
+    "residual_penetration_m": 2.7737294694664405e-05,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00014037017339802149,
+      "final_drift_m": 0.00011293720331448725,
+      "rotation_deg": 0.020128850264309293,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0015454770205359234,
+      "final_drift_m": 0.0009931178990004869,
+      "rotation_deg": 0.9087393854401249,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00014989934548277387,
+      "final_drift_m": 0.00014684133002040964,
+      "rotation_deg": 0.005906876518428305,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "mass_low": {
+    "stable": true,
+    "residual_penetration_m": 2.7737294694664405e-05,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00013831341197840537,
+      "final_drift_m": 0.00011305138884270806,
+      "rotation_deg": 0.020129061892952476,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0015410531925848184,
+      "final_drift_m": 0.0009890862553582661,
+      "rotation_deg": 0.4199038545216021,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00014561649167611505,
+      "final_drift_m": 0.0001424349838531044,
+      "rotation_deg": 0.0050234392976293805,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "mass_high": {
+    "stable": true,
+    "residual_penetration_m": 2.7737294694664405e-05,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00013831341197840537,
+      "final_drift_m": 0.00011305138884270565,
+      "rotation_deg": 0.020129061892952476,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0015508902312451204,
+      "final_drift_m": 0.001004292137091131,
+      "rotation_deg": 0.8724167871202134,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00015509026095498086,
+      "final_drift_m": 0.00015203429343293125,
+      "rotation_deg": 0.006556946252446419,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   }
+  },
+  "s19_b": {
+   "nominal": {
+    "stable": true,
+    "residual_penetration_m": 0.0002700646254388192,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0049904520333246445,
+      "final_drift_m": 0.0036046243996200136,
+      "rotation_deg": 5.418521259027585,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0002353209027982951,
+      "final_drift_m": 0.00023532090277113952,
+      "rotation_deg": 0.040919981080237054,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00013558642296544052,
+      "final_drift_m": 8.080695651938492e-05,
+      "rotation_deg": 0.1381848550412036,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 9.875239441304069e-05,
+      "final_drift_m": 7.28555797485468e-05,
+      "rotation_deg": 0.06506041458968448,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00011407300173782868,
+      "final_drift_m": 0.00010775337815739892,
+      "rotation_deg": 0.002603506265911452,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_005",
+      "separation_m": 0.0,
+      "max_drift_m": 0.013161233334755627,
+      "final_drift_m": 0.0061129111828878415,
+      "rotation_deg": 7.22892631377378,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "friction_low": {
+    "stable": true,
+    "residual_penetration_m": 0.0002700646254388192,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.004574884626016104,
+      "final_drift_m": 0.003428033611071787,
+      "rotation_deg": 5.4181163812629105,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00023532090280582046,
+      "final_drift_m": 0.00023532090277883996,
+      "rotation_deg": 0.040919981044609983,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00013499914731901786,
+      "final_drift_m": 7.999358233199669e-05,
+      "rotation_deg": 0.13818522400814148,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 9.874987187434537e-05,
+      "final_drift_m": 7.285564390540276e-05,
+      "rotation_deg": 0.06505913607926558,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00011407300173782868,
+      "final_drift_m": 0.00010775337815738194,
+      "rotation_deg": 0.002603506265911452,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_005",
+      "separation_m": 0.0,
+      "max_drift_m": 0.004740983212961107,
+      "final_drift_m": 0.004007085371085647,
+      "rotation_deg": 7.276139121114534,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "friction_high": {
+    "stable": true,
+    "residual_penetration_m": 0.0002700646254388192,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.005557098438741793,
+      "final_drift_m": 0.0042502918574930755,
+      "rotation_deg": 5.418083507559132,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0002353209027082016,
+      "final_drift_m": 0.00023532090268121503,
+      "rotation_deg": 0.04091998111586412,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00013558642296544052,
+      "final_drift_m": 8.080695651934974e-05,
+      "rotation_deg": 0.1381848550412036,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 9.875156517431627e-05,
+      "final_drift_m": 7.285558272720536e-05,
+      "rotation_deg": 0.06506041508265545,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00011407300173782868,
+      "final_drift_m": 0.0001077533781573694,
+      "rotation_deg": 0.002603506265911452,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_005",
+      "separation_m": 0.0,
+      "max_drift_m": 0.013228196377529257,
+      "final_drift_m": 0.006205527106732657,
+      "rotation_deg": 7.228838335922203,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "mass_low": {
+    "stable": true,
+    "residual_penetration_m": 0.0002700646254388192,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.004990452033324571,
+      "final_drift_m": 0.003604624399632422,
+      "rotation_deg": 5.41852125900713,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00023532090279876946,
+      "final_drift_m": 0.00023532090277179215,
+      "rotation_deg": 0.040919981080237054,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00013558642296544052,
+      "final_drift_m": 8.080695651944397e-05,
+      "rotation_deg": 0.1381848550412036,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 9.875239454128345e-05,
+      "final_drift_m": 7.285558003499958e-05,
+      "rotation_deg": 0.06506041389504354,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00011407300173782868,
+      "final_drift_m": 0.0001077533781573795,
+      "rotation_deg": 0.002603506265911452,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_005",
+      "separation_m": 0.0,
+      "max_drift_m": 0.01316123333502459,
+      "final_drift_m": 0.006112911182351802,
+      "rotation_deg": 7.2289263137862925,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   },
+   "mass_high": {
+    "stable": true,
+    "residual_penetration_m": 0.0002700646254388192,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00499045203332458,
+      "final_drift_m": 0.0036046243996328974,
+      "rotation_deg": 5.418521259006591,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00023532090279733818,
+      "final_drift_m": 0.00023532090276983698,
+      "rotation_deg": 0.040919980902101714,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00013558642296544052,
+      "final_drift_m": 8.080695651948426e-05,
+      "rotation_deg": 0.1381848550306535,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 9.875239448636867e-05,
+      "final_drift_m": 7.285557987213853e-05,
+      "rotation_deg": 0.06506041411912125,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00011407300173782868,
+      "final_drift_m": 0.0001077533781573683,
+      "rotation_deg": 0.002603506265911452,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_005",
+      "separation_m": 0.0,
+      "max_drift_m": 0.01316123333475523,
+      "final_drift_m": 0.006112911182888576,
+      "rotation_deg": 7.228926313774184,
+      "stable": true,
+      "ignored": false
+     }
+    ]
+   }
+  },
+  "s20_b": {
+   "nominal": {
+    "stable": true,
+    "residual_penetration_m": 0.00023378216157232679,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00012602507505304734,
+      "final_drift_m": 0.00011607677768568525,
+      "rotation_deg": 0.07026473168721876,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00026779908839025897,
+      "final_drift_m": 0.00025912460685259867,
+      "rotation_deg": 0.29509042551411635,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00011405511513096426,
+      "final_drift_m": 0.00010772324584842237,
+      "rotation_deg": 0.0007196010297767503,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00034129473046381277,
+      "final_drift_m": 0.0002727081773461542,
+      "rotation_deg": 0.08188266675666508,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0011660629163504966,
+      "final_drift_m": 0.00067747531210156,
+      "rotation_deg": 0.7202825297601697,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_005",
+      "separation_m": 0.0006367110304288156,
+      "max_drift_m": 0.0006367110304288156,
+      "final_drift_m": 0.0003755764801106321,
+      "rotation_deg": 0.2552872769658798,
+      "stable": true,
+      "ignored": true
+     }
+    ]
+   },
+   "friction_low": {
+    "stable": true,
+    "residual_penetration_m": 0.00023378216157232679,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00013454455499847036,
+      "final_drift_m": 0.00013025437273629604,
+      "rotation_deg": 0.0702698300548697,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00026779908839025897,
+      "final_drift_m": 0.00025912460685259867,
+      "rotation_deg": 0.29509042551411635,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00011405511513096426,
+      "final_drift_m": 0.00010772324584942388,
+      "rotation_deg": 0.0007196010297767503,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00034129473046381277,
+      "final_drift_m": 0.0002727081773461582,
+      "rotation_deg": 0.08188266675666508,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0011656297394834598,
+      "final_drift_m": 0.0006763374880457308,
+      "rotation_deg": 0.7197040445733403,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_005",
+      "separation_m": 0.0006367110304288156,
+      "max_drift_m": 0.0006367110304288156,
+      "final_drift_m": 0.0003770081335728451,
+      "rotation_deg": 0.2552873241245459,
+      "stable": true,
+      "ignored": true
+     }
+    ]
+   },
+   "friction_high": {
+    "stable": true,
+    "residual_penetration_m": 0.00023378216157232679,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0001268471015067817,
+      "final_drift_m": 0.00011652922961393036,
+      "rotation_deg": 0.07025851578249857,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00026779908839025897,
+      "final_drift_m": 0.00025912460685259867,
+      "rotation_deg": 0.29509042551411635,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00011405511513096426,
+      "final_drift_m": 0.00010772324585003583,
+      "rotation_deg": 0.0007196010297767503,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00034129473046381277,
+      "final_drift_m": 0.0002727081773461562,
+      "rotation_deg": 0.08188266675666508,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0011660635200043084,
+      "final_drift_m": 0.0006774691064466674,
+      "rotation_deg": 0.7202780858418256,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_005",
+      "separation_m": 0.0006367110304288156,
+      "max_drift_m": 0.0006367110304288156,
+      "final_drift_m": 0.0003757452048660798,
+      "rotation_deg": 0.25528724011495674,
+      "stable": true,
+      "ignored": true
+     }
+    ]
+   },
+   "mass_low": {
+    "stable": true,
+    "residual_penetration_m": 0.00023378216157232679,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00012602507505304734,
+      "final_drift_m": 0.00011607677768337887,
+      "rotation_deg": 0.0702647316042264,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00026779908839025897,
+      "final_drift_m": 0.00025912460685259867,
+      "rotation_deg": 0.29509042551411635,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00011405511513096426,
+      "final_drift_m": 0.0001077232458508761,
+      "rotation_deg": 0.0007196010297767503,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00034129473046381277,
+      "final_drift_m": 0.0002727081773461542,
+      "rotation_deg": 0.08188266675666508,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0011660629163506415,
+      "final_drift_m": 0.0006774753121042048,
+      "rotation_deg": 0.720282529776362,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_005",
+      "separation_m": 0.0006367110304288156,
+      "max_drift_m": 0.0006367110304288156,
+      "final_drift_m": 0.00037557648011033167,
+      "rotation_deg": 0.2552872769773011,
+      "stable": true,
+      "ignored": true
+     }
+    ]
+   },
+   "mass_high": {
+    "stable": true,
+    "residual_penetration_m": 0.00023378216157232679,
+    "bodies": [
+     {
+      "object_id": "obj_000",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00012602507505304734,
+      "final_drift_m": 0.00011607677768390197,
+      "rotation_deg": 0.07026473172871493,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_001",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00026779908839025897,
+      "final_drift_m": 0.00025912460685258615,
+      "rotation_deg": 0.29509042551411635,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_002",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00011405511513096426,
+      "final_drift_m": 0.00010772324584878088,
+      "rotation_deg": 0.0007196010297767503,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_003",
+      "separation_m": 0.0,
+      "max_drift_m": 0.00034129473046381277,
+      "final_drift_m": 0.0002727081773461562,
+      "rotation_deg": 0.08188266675666508,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_004",
+      "separation_m": 0.0,
+      "max_drift_m": 0.0011660629163506183,
+      "final_drift_m": 0.000677475312101572,
+      "rotation_deg": 0.7202825297601697,
+      "stable": true,
+      "ignored": false
+     },
+     {
+      "object_id": "obj_005",
+      "separation_m": 0.0006367110304288156,
+      "max_drift_m": 0.0006367110304288156,
+      "final_drift_m": 0.00037557648011084574,
+      "rotation_deg": 0.2552872769773011,
+      "stable": true,
+      "ignored": true
+     }
+    ]
+   }
+  }
+ }
+}
