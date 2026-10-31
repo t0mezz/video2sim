@@ -470,7 +470,9 @@ Tasks
       (`benchmark/results/p4_4_material_numbers.json`, `benchmark/run_material_numbers.py`), after
       the four cardboard packages obj_002, 003, 014 and 029 were marked hollow in the inventory
       by human decision (2026-10-31, ground truth regenerated, hollow fields only). Coffee can
-      obj_004 is open: inventory cardboard and not hollow, model steel and hollow.
+      obj_004 is settled by human check (2026-10-31): a cardboard can with a metal bottom, about
+      80% filled, so the inventory stays cardboard and not hollow. The model says steel and hollow;
+      the filling cannot be seen, the wall can.
 
 - [x] **P4.5** Mass and inertia from the repaired mesh under uniform density, with a hollow
 

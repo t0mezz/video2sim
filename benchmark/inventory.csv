@@ -3,7 +3,7 @@ obj_000,lego toy car,160,160,160,76,76,76,43,43,43,163,163,161,hard plastic,FALS
 obj_001,spray can,67,68,67,67,68,67,240,240,240,474,473,473,metal,TRUE,FALSE,cylinder,2026-10-23,T. K.,folding rule,"Spray can, filled with bike cleaner fluid."
 obj_002,packaging for breakfast bags,237,237,237,136,136,136,39,39,39,275,274,273,cardboard,TRUE,FALSE,cuboid,2026-10-23,T. K.,folding rule,"damaged, content: small paper breakfast bags"
 obj_003,packaging for in ear headphones,115,116,116,85,87,87,45,45,45,95,95,94,cardboard,TRUE,FALSE,cuboid,2026-10-23,T. K.,folding rule,thicker and polished cardboard
-obj_004,coffee powder can,101,101,101,101,101,101,159,159,159,232,231,233,cardboard,FALSE,FALSE,cylinder,2026-10-23,T. K.,folding rule,lid made out of plastic and ground feels like aluminium
+obj_004,coffee powder can,101,101,101,101,101,101,159,159,159,232,231,233,cardboard,FALSE,FALSE,cylinder,2026-10-23,T. K.,folding rule,cardboard can with plastic lid and metal bottom; about 80% filled with coffee powder (human check 2026-10-31); filling not visible from outside
 obj_005,plastic plate,280,280,280,280,280,280,18,18,18,144,144,144,hard plastic,FALSE,FALSE,cylinder,2026-10-23,T. K.,folding rule,
 obj_006,gamepad controller,154,153,153,108,107,108,64,64,64,289,288,287,hard plastic,FALSE,FALSE,,2026-10-23,T. K.,folding rule,xbox gamepad controller white
 obj_007,rubiks cube,70,70,70,70,70,70,70,70,70,249,249,249,hard plastic,FALSE,FALSE,cube,2026-10-23,T. K.,folding rule,"5x5 rubic cube, unsolved"

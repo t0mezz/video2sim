@@ -101,8 +101,8 @@ Why they differ:
   with infill, a can. The hollow correction has to close this gap, and it is a factor of 2 to 40.
 * s11 printed shapes come out 2.3 to 5.8 times too heavy. The inventory lists them as not hollow,
   but a print with infill is not solid resin, which `material_table.yaml` already warns about.
-* The coffee can comes out about 43 times too heavy. The model says steel, and the object is a
-  mixed can (inventory cardboard) with `obj_004` still undecided.
+* The coffee can comes out about 43 times too heavy. The model says steel, and `obj_004` is a
+  cardboard can with a metal bottom, about 80% filled with coffee powder (human check).
 * The small paint can (7.7 times) and the hole punch (6.7 times) show the same for metal: thin
   sheet over air, listed as not hollow.
 
@@ -161,8 +161,8 @@ What still misses, in sample (30 of 56):
 
 * `plastic_hard`, 9 misses: one class covers solid parts, thin housings and sparse prints, and its
   range of 3 times is wider than the tolerance. A class cannot fix this.
-* Coffee can, 4 runs, 3 times too heavy, and it pulls up the `metal_steel` fit. The inventory says
-  cardboard and `obj_004` is undecided, so this waits on a human decision.
+* Coffee can, 4 runs, 3 times too heavy, and it pulls up the `metal_steel` fit. It is a cardboard can with a
+  metal bottom, about 80% filled, so steel is a model error and the filling cannot be seen.
 * Prints and a cap the model calls `foam`, 3 runs, 10 to 30 times too light. A need above 1 cannot
   be fitted: `f` stays in (0, 1], and the density is the wrong one.
 * Toy air basketball, 2 runs, 7.5 times too heavy. It has one distinct object, so it takes the
