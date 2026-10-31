@@ -475,6 +475,10 @@ Tasks
 - [ ] **P4.5** Mass and inertia from the repaired mesh under uniform density, with a hollow
 
       correction. Store low, nominal and high.
+      Status 2026-10-31: volume test done, not implemented. 43 of 56 dev meshes are shells, mesh
+      volume is a median 0.13 of true; voxel fill, or the hull where the fill leaks, gives 1.01
+      (34 of 39 within 20%). Density is now the main mass error. `docs/research/mesh_volume.md`,
+      `benchmark/results/p4_5_mesh_volume.json`.
 
   $$m = \rho\,V_{\text{eff}}, \qquad \mathbf{I} = \rho \int_V \left(\lVert\mathbf{r}\rVert^2 \mathbf{1} - \mathbf{r}\mathbf{r}^{\top}\right) dV$$
 
@@ -677,4 +681,5 @@ In order:
 | 2026-10-31 | P4.3 ticked under D-019: friction and restitution placeholders accepted, only an unsourced density flags an object; Phase 4 set to In progress |
 | 2026-10-31 | P4.4 ticked: class to numbers mapping in `stages/physics.py`, checked against the inventory on 56 dev objects |
 | 2026-10-31 | Inventory: obj_002, obj_003, obj_014 and obj_029 marked hollow by human decision; ground truth regenerated, only the 23 hollow fields changed |
+| 2026-10-31 | P4.5: volume test written up in `docs/research/mesh_volume.md`; meshes are shells, the outer volume is right and density is the main mass error |
 | 2026-10-31 | D-020: tags-on-table layer on the plane fit; s05 rerun, all 4 objects now SAM 3D with fit 0.95 to 0.98 and `lift.max_extent_m` back at 1.5 |
