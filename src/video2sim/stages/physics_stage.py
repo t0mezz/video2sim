@@ -1,9 +1,11 @@
 """Stage 5 as a runner stage (P4.8): ``RegisteredObjects`` in, ``SimAssets`` out.
 
 Each object goes through repair (P4.1), collision geometry (P4.2), its material (P4.4) and mass
-(P4.5, P4.6). The mass gives the center of mass, and the asset's frame moves there: meshes shift
-by it and ``T_world_from_object`` takes it up, so the world surface stays where it was and
-``AGENTS.md``'s object frame holds. Inertia is about that point already.
+(P4.5, P4.6), which the vision-language model's mass may replace (D-024,
+``stages/vlm_mass.py``); the body stays, so inertia scales with the mass. The body gives the
+center of mass, and the asset's frame moves there: meshes shift by it and
+``T_world_from_object`` takes it up, so the world surface stays where it was and ``AGENTS.md``'s
+object frame holds. Inertia is about that point already.
 
 The scene is then settled (P4.7, D-021) for the nominal values and each low and high friction and
 mass. The result goes to ``physics/settling.json`` for the QA report and does not change
@@ -22,9 +24,11 @@ from typing import Any, cast
 import numpy as np
 import trimesh
 
+from video2sim.models.hosted import ResponseCache, read_secret
 from video2sim.runner import StageContext
 from video2sim.schemas import (
     SE3,
+    Estimate,
     Flag,
     Instances,
     ObjectInstance,
@@ -39,10 +43,19 @@ from video2sim.schemas import (
 )
 from video2sim.stages.collision import CollisionConfig, collision_geometry, write_collision
 from video2sim.stages.mass import MassConfig, estimate_mass
+from video2sim.stages.material_pass import (
+    BasetenMaterialClient,
+    MaterialClient,
+    crop_for_vlm,
+    pick_frames,
+)
 from video2sim.stages.material_table import MaterialTable, load_material_table
 from video2sim.stages.mesh_repair import RepairConfig, repair_mesh
 from video2sim.stages.physics import object_material
 from video2sim.stages.settling import SettleBody, SettlingConfig, settle_scene
+from video2sim.stages.shape import load_masks
+from video2sim.stages.tracking import Track
+from video2sim.stages.vlm_mass import VlmMassConfig, ask_mass, combine
 
 CASES = ("nominal", "friction_low", "friction_high", "mass_low", "mass_high")
 
@@ -53,6 +66,7 @@ class PhysicsConfig:
     collision: CollisionConfig
     mass: MassConfig
     settling: SettlingConfig
+    vlm_mass: VlmMassConfig
     min_confidence: float
 
     @classmethod
@@ -64,6 +78,7 @@ class PhysicsConfig:
             collision=CollisionConfig.from_config(full),
             mass=MassConfig.from_config(full),
             settling=SettlingConfig.from_config(full, {"targets": cfg["stability"]}),
+            vlm_mass=VlmMassConfig.from_config(full),
             min_confidence=float(cfg["material_min_confidence"]),
         )
 
@@ -103,6 +118,7 @@ def prepare_object(
     registered: RegisteredObject,
     instance: ObjectInstance,
     table: MaterialTable,
+    model_mass: Estimate | None,
     run_dir: Path,
     out_dir: Path,
     cfg: PhysicsConfig,
@@ -115,6 +131,8 @@ def prepare_object(
     collision = collision_geometry(repaired.mesh, cfg.collision)
     material = object_material(instance, table, cfg.min_confidence)
     mass = estimate_mass(repaired.mesh, material, cfg.mass)
+    final_mass, mass_source = combine(mass.mass_kg, model_mass, cfg.vlm_mass.enabled)
+    inertia = mass.inertia_kg_m2 * final_mass.nominal / mass.mass_kg.nominal  # same body
 
     offset = mass.center_of_mass_m
     visual = repaired.mesh.copy()
@@ -137,6 +155,7 @@ def prepare_object(
 
     checks = {**repaired.checks, **collision.checks}
     failed = (Flag.FAILED_VALIDATION,) if not all(checks.values()) else ()
+    no_answer = (Flag.LOW_CONFIDENCE_MATERIAL,) if mass_source == "geometry_no_answer" else ()
     numbers = material.numbers
     asset = SimAsset(
         object_id=registered.object_id,
@@ -146,15 +165,15 @@ def prepare_object(
         properties=PhysicalProperties(
             material_class=numbers.material_class,
             is_hollow=material.is_hollow,
-            mass_kg=mass.mass_kg,
+            mass_kg=final_mass,
             density_kg_m3=numbers.density_kg_m3,
             friction_coefficient=numbers.friction_coefficient,
             restitution=numbers.restitution,
-            inertia_kg_m2=mass.inertia_kg_m2.tolist(),
+            inertia_kg_m2=inertia.tolist(),
             confidence=material.confidence,
         ),
         checks=checks,
-        flags=_flags(registered.flags, material.flags, failed),
+        flags=_flags(registered.flags, material.flags, no_answer, failed),
     )
     entry = {
         "collision_kind": collision.kind,
@@ -162,10 +181,45 @@ def prepare_object(
         "repair_steps": repaired.steps,
         "collision_steps": collision.steps,
         "fill_fraction": mass.fill_fraction.nominal,
+        "mass_source": mass_source,
+        "mass_geometry_kg": mass.mass_kg.model_dump(),
+        "mass_model_kg": None if model_mass is None else model_mass.model_dump(),
         "center_of_mass_offset_m": float(np.linalg.norm(offset)),
-        "reasons": [*material.reasons, *mass.reasons],
+        "reasons": [
+            *material.reasons,
+            *mass.reasons,
+            *(["no mass from the model: kept the geometry mass"] if no_answer else []),
+        ],
     }
     return PreparedObject(asset, parts), entry
+
+
+def model_mass(
+    instance: ObjectInstance,
+    world: WorldModel,
+    client: MaterialClient,
+    run_dir: Path,
+    work: Path,
+    cfg: VlmMassConfig,
+) -> Estimate | None:
+    """The model's mass for one object; a failed call counts as no answer and is flagged."""
+    track = Track(int(instance.object_id.removeprefix("obj_")), load_masks(run_dir, instance))
+    crops = [
+        crop_for_vlm(
+            run_dir,
+            world,
+            track,
+            frame,
+            cfg.crop_pad_px,
+            work / "vlm_mass_crops" / f"{instance.object_id}_f{frame:05d}.png",
+        )
+        for frame in pick_frames(track, instance.keyframes, cfg.keyframes)
+    ]
+    cache = ResponseCache(work / "vlm_mass_cache")
+    try:
+        return ask_mass(client, cache, instance.category or instance.label, crops)
+    except (OSError, ValueError, KeyError, RuntimeError):
+        return None
 
 
 def settle_body(item: PreparedObject, case: str) -> SettleBody:
@@ -214,8 +268,10 @@ class PhysicsStage:
     output_type = SimAssets
     dependencies: tuple[StageName, ...] = ("reconstruction", "segmentation", "shape")
 
-    def __init__(self, material_table: Path):
+    def __init__(self, material_table: Path, client: MaterialClient | None = None):
+        """``client`` is the hosted model; by default it reads ``BASETEN_API_KEY``."""
         self._table = material_table
+        self._client = client
         self.extra_inputs: tuple[Path, ...] = (material_table,)
 
     def run(self, ctx: StageContext) -> SimAssets:
@@ -224,11 +280,22 @@ class PhysicsStage:
         registered = ctx.load("shape", RegisteredObjects)
         cfg = PhysicsConfig.from_config(ctx.config)
         table = load_material_table(self._table)
+        client = self._client
+        if client is None and cfg.vlm_mass.enabled:
+            client = BasetenMaterialClient(
+                read_secret("BASETEN_API_KEY"), cfg.vlm_mass.timeout_s, cfg.vlm_mass.retries
+            )
+        work = ctx.run_dir / "physics.work"
+        work.mkdir(exist_ok=True)
 
         items, report = [], {}
         for obj in registered.objects:
+            instance = instances[obj.object_id]
+            answer = None
+            if client is not None and cfg.vlm_mass.enabled:
+                answer = model_mass(instance, world, client, ctx.run_dir, work, cfg.vlm_mass)
             item, entry = prepare_object(
-                obj, instances[obj.object_id], table, ctx.run_dir, ctx.out_dir, cfg
+                obj, instance, table, answer, ctx.run_dir, ctx.out_dir, cfg
             )
             items.append(item)
             report[obj.object_id] = entry
@@ -247,6 +314,7 @@ __all__ = [
     "PhysicsConfig",
     "PhysicsStage",
     "PreparedObject",
+    "model_mass",
     "physics_stage_config",
     "prepare_object",
     "settle_body",

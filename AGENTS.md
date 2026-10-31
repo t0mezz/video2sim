@@ -99,7 +99,8 @@ scores `stages/mass.py` against the weighed masses (P4.5); it makes no hosted ca
 them with each object held out (P4.6); the table values in `configs/material_table.yaml` are copied from it by hand.
 `python benchmark/run_physics.py --out FILE.json` runs the physics stage on the rigid dev scenes and writes `physics/`
 (`output.json` as `SimAssets`, meshes, collision parts, `report.json`, `settling.json`) in each run, then sums up the checks and the settling; it
-makes no hosted call (P4.8). `python benchmark/run_settling.py --runs runs_instances --out FILE.json` settles the rigid dev scenes in
+makes one hosted request per object for the mass, cached in `physics.work/` (P4.8, D-024), and needs `BASETEN_API_KEY`. `python benchmark/run_vlm_mass.py --out FILE.json` asks the hosted vision-language model for each weighed dev object's mass and scores it, one request per object and arm, cached in `<run>/vlm_mass_cache`; the experiment behind D-024.
+`python benchmark/run_settling.py --runs runs_instances --out FILE.json` settles the rigid dev scenes in
 MuJoCo for the nominal, low and high friction and mass (P4.7, D-021), caching each object in `<run>/physics.work/`; it makes no hosted call.
 
 Commands that arrive with their task: `video2sim run` (P5.5).
@@ -144,7 +145,9 @@ notice. Breaking one gives a scene that loads fine and behaves wrongly.
 * Every physical property is an `Estimate` (low, nominal, high), never a bare float.
 * The vision-language model picks a **material class**. Numbers come from
   `configs/material_table.yaml`, each with a source. A model must never write a number
-  that ends up in an asset, because then results cannot be audited or repeated.
+  that ends up in an asset, because then results cannot be audited or repeated. The one
+  exception is mass (D-024, `stages/vlm_mass.py`): when the geometry mass falls outside the
+  model's range, the model's mass is used, and `physics/report.json` records which it was.
 
 ### Pipeline contract
 

@@ -204,6 +204,12 @@ physics:
     samples_per_voxel_area: 8.0     # surface samples per voxel face area
     max_surface_samples: 3000000
     seed: 0
+  vlm_mass:                    # D-024, stages/vlm_mass.py; one hosted call per object
+    enabled: true              # false makes no call and needs no key: geometry mass only, 36% within 30% held out against 52%
+    keyframes: 2               # as segmentation.material_pass
+    crop_pad_px: 40
+    timeout_s: 120
+    retries: 4
   settling:                    # P4.7, stages/settling.py; window and drift limit are in targets.yaml
     timestep_s: 0.001               # stable on the closed-form tests in tests/test_settling.py
     gravity_m_s2: 9.80665           # standard gravity, CGPM 1901

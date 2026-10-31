@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Sequence
 from pathlib import Path
 from typing import cast
 
+import cv2
 import numpy as np
 import pytest
 import trimesh
@@ -14,6 +16,7 @@ import yaml
 from video2sim.runner import OUTPUT_FILE, StageContext
 from video2sim.schemas import (
     SE3,
+    CameraFrame,
     Flag,
     Instances,
     Intrinsics,
@@ -44,13 +47,46 @@ def _write(run_dir: Path, name: str, text: str) -> None:
     (folder / OUTPUT_FILE).write_text(text)
 
 
-def run_stage(tmp_path: Path, mesh: trimesh.Trimesh, pose: SE3) -> tuple[SimAssets, Path]:
+class FakeClient:
+    """Answers in grams; ``None`` gives a reply that cannot be read."""
+
+    def __init__(self, grams: tuple[float, float, float] | None) -> None:
+        self.grams = grams
+
+    def ask(self, prompt: str, images: Sequence[Path]) -> str:
+        assert "block" in prompt and len(images) == 1
+        if self.grams is None:
+            return "no idea"
+        low, nominal, high = self.grams
+        return f'{{"mass_low_g": {low}, "mass_nominal_g": {nominal}, "mass_high_g": {high}}}'
+
+
+WIDE = FakeClient((1.0, 100.0, 1e5))  # brackets any geometry mass, so the geometry mass stands
+
+
+def run_stage(
+    tmp_path: Path,
+    mesh: trimesh.Trimesh,
+    pose: SE3,
+    client: FakeClient | None = WIDE,
+    vlm_mass: bool = True,
+) -> tuple[SimAssets, Path]:
     run_dir = tmp_path / "run"
+    (run_dir / "frames").mkdir(parents=True)
+    (run_dir / "segmentation" / "masks" / "obj_000").mkdir(parents=True)
+    cv2.imwrite(str(run_dir / "frames" / "0.png"), np.full((48, 64, 3), 128, np.uint8))
+    mask = np.zeros((48, 64), np.uint8)
+    mask[10:30, 20:40] = 255
+    cv2.imwrite(str(run_dir / "segmentation" / "masks" / "obj_000" / "00000.png"), mask)
     (run_dir / "shape" / "meshes").mkdir(parents=True)
     mesh.export(run_dir / "shape" / "meshes" / "obj_000.ply")
     world = WorldModel(
         intrinsics=K,
-        frames=[],
+        frames=[
+            CameraFrame(
+                frame_index=0, image_path="frames/0.png", T_world_from_camera=SE3.identity()
+            )
+        ],
         scale_factor=1.0,
         scale_source="marker",
         table_plane=FLAT,
@@ -82,10 +118,11 @@ def run_stage(tmp_path: Path, mesh: trimesh.Trimesh, pose: SE3) -> tuple[SimAsse
     _write(run_dir, "shape", RegisteredObjects(objects=[registered]).model_dump_json())
 
     cfg = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
+    cfg["physics"]["vlm_mass"]["enabled"] = vlm_mass
     targets = yaml.safe_load((ROOT / "configs/targets.yaml").read_text(encoding="utf-8"))
     out_dir = run_dir / "physics.tmp"
     out_dir.mkdir()
-    stage = PhysicsStage(ROOT / "configs/material_table.yaml")
+    stage = PhysicsStage(ROOT / "configs/material_table.yaml", client)
     ctx = StageContext(
         stage="physics",
         run_dir=run_dir,
@@ -178,3 +215,59 @@ def test_the_visual_mesh_keeps_its_colors(
     assert isinstance(visual.visual, trimesh.visual.ColorVisuals)
     assert visual.visual.kind == "vertex"
     assert np.all(np.asarray(visual.visual.vertex_colors)[:, :3] == [200, 50, 10])
+
+
+def box_mesh() -> trimesh.Trimesh:
+    return cast(trimesh.Trimesh, trimesh.creation.box(extents=(0.1, 0.08, 0.04)))
+
+
+def resting() -> SE3:
+    pose = np.eye(4)
+    pose[2, 3] = 0.02
+    return SE3.from_numpy(pose)
+
+
+def test_a_mass_outside_the_model_range_is_replaced_and_inertia_follows(tmp_path: Path) -> None:
+    base, _ = run_stage(tmp_path / "a", box_mesh(), resting())
+    (tmp_path / "b").mkdir()
+    grams = (9000.0, 10000.0, 11000.0)
+    assets, run_dir = run_stage(tmp_path / "b", box_mesh(), resting(), FakeClient(grams))
+    before, after = base.assets[0].properties, assets.assets[0].properties
+    assert after.mass_kg.nominal == pytest.approx(10.0)
+    assert after.mass_kg.low == pytest.approx(9.0) and after.mass_kg.high == pytest.approx(11.0)
+    ratio = after.mass_kg.nominal / before.mass_kg.nominal
+    assert np.allclose(
+        np.asarray(after.inertia_kg_m2), ratio * np.asarray(before.inertia_kg_m2), rtol=1e-6
+    )
+    report = json.loads((run_dir / "physics" / "report.json").read_text())
+    assert report["obj_000"]["mass_source"] == "model"
+
+
+def test_a_mass_inside_the_model_range_stands(tmp_path: Path) -> None:
+    (tmp_path / "a").mkdir()
+    _, run_dir = run_stage(tmp_path / "a", box_mesh(), resting())
+    report = json.loads((run_dir / "physics" / "report.json").read_text())
+    assert report["obj_000"]["mass_source"] == "geometry"
+
+
+def test_an_unreadable_answer_keeps_the_geometry_mass_and_flags_it(tmp_path: Path) -> None:
+    (tmp_path / "a").mkdir()
+    assets, run_dir = run_stage(tmp_path / "a", box_mesh(), resting(), FakeClient(None))
+    asset = assets.assets[0]
+    assert Flag.LOW_CONFIDENCE_MATERIAL in asset.flags and asset.is_valid
+    report = json.loads((run_dir / "physics" / "report.json").read_text())
+    assert report["obj_000"]["mass_source"] == "geometry_no_answer"
+    assert report["obj_000"]["reasons"]
+
+
+def test_disabled_vlm_mass_needs_no_client_or_key_and_raises_no_flag(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.delenv("BASETEN_API_KEY", raising=False)
+    monkeypatch.chdir(tmp_path)  # no .env to read a key from
+    (tmp_path / "a").mkdir()
+    assets, run_dir = run_stage(tmp_path / "a", box_mesh(), resting(), None, vlm_mass=False)
+    assert Flag.LOW_CONFIDENCE_MATERIAL not in assets.assets[0].flags
+    report = json.loads((run_dir / "physics" / "report.json").read_text())
+    assert report["obj_000"]["mass_source"] == "geometry_only"
+    assert not (run_dir / "physics.work" / "vlm_mass_cache").exists()

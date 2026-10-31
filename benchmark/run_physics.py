@@ -3,8 +3,9 @@
     uv run python benchmark/run_physics.py --out benchmark/results/p4_8_physics.json
 
 Takes the finished stages as they are, the way ``run_shape.py`` does, and writes ``physics/`` in
-each run of the rigid dev scenes, then sums up the checks and ``physics/settling.json``. No hosted
-call and no GPU. Run a scene at a time because CoACD takes up to 99 s per object.
+each run of the rigid dev scenes, then sums up the checks and ``physics/settling.json``. One hosted
+request per object for the mass (D-024), cached in ``physics.work/``, and no GPU. Run a scene at a
+time because CoACD takes up to 99 s per object.
 """
 
 from __future__ import annotations
@@ -100,6 +101,7 @@ def main() -> None:
                     "kind": report[a.object_id]["collision_kind"],
                     "parts": report[a.object_id]["collision_parts"],
                     "mass_kg": p.mass_kg.model_dump(),
+                    "mass_source": report[a.object_id]["mass_source"],
                     "friction": p.friction_coefficient.model_dump(),
                     "restitution": p.restitution.model_dump(),
                 }
@@ -113,6 +115,10 @@ def main() -> None:
         "statuses": statuses,
         "objects": len(objects),
         "objects_valid": sum(o["valid"] for o in objects),
+        "mass_source": {
+            k: sum(o["mass_source"] == k for o in objects)
+            for k in sorted({o["mass_source"] for o in objects})
+        },
         "settling_gate": targets["targets"]["stability_pass_fraction_min"],
         "settling_pass_fraction": fraction,
         "stable_in_every_case": [
