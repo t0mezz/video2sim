@@ -52,7 +52,7 @@ from video2sim.stages.material_pass import (
 from video2sim.stages.material_table import MaterialTable, load_material_table
 from video2sim.stages.mesh_repair import RepairConfig, repair_mesh
 from video2sim.stages.physics import object_material
-from video2sim.stages.settling import SettleBody, SettlingConfig, settle_scene
+from video2sim.stages.settling import SettleBody, SettlingConfig, is_round, settle_scene
 from video2sim.stages.shape import load_masks
 from video2sim.stages.tracking import Track
 from video2sim.stages.vlm_mass import VlmMassConfig, ask_mass, combine
@@ -156,6 +156,7 @@ def prepare_object(
     checks = {**repaired.checks, **collision.checks}
     failed = (Flag.FAILED_VALIDATION,) if not all(checks.values()) else ()
     no_answer = (Flag.LOW_CONFIDENCE_MATERIAL,) if mass_source == "geometry_no_answer" else ()
+    round_flag = (Flag.IGNORED_ROUND,) if is_round(visual, cfg.settling.round_tolerance) else ()
     numbers = material.numbers
     asset = SimAsset(
         object_id=registered.object_id,
@@ -173,7 +174,7 @@ def prepare_object(
             confidence=material.confidence,
         ),
         checks=checks,
-        flags=_flags(registered.flags, material.flags, no_answer, failed),
+        flags=_flags(registered.flags, material.flags, no_answer, round_flag, failed),
     )
     entry = {
         "collision_kind": collision.kind,
@@ -239,6 +240,7 @@ def settle_body(item: PreparedObject, case: str) -> SettleBody:
         np.asarray(p.inertia_kg_m2) * mass / p.mass_kg.nominal,  # same body, so linear in mass
         np.zeros(3),  # the asset's origin is the center of mass
         friction,
+        Flag.IGNORED_ROUND in item.asset.flags,
     )
 
 

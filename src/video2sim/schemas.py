@@ -155,6 +155,7 @@ class Flag(str, Enum):
     PROXY_GEOMETRY = "proxy_geometry"
     LOW_CONFIDENCE_MATERIAL = "low_confidence_material"
     FAILED_VALIDATION = "failed_validation"
+    IGNORED_ROUND = "ignored_round"
 
 
 # ---------------------------------------------------------------------------

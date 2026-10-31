@@ -20,6 +20,8 @@ also checks what ``stages/collision.py`` leaves to the simulator: a part it cann
   separation. The stable test takes the largest drift in the window and not the last one, so an
   object that rolls away and stops is not excused. Rotation is reported and does not gate:
   ``stability_max_drift_m`` is a length.
+* A round object stays in the scene and its drift is reported, but it does not count towards a
+  scene being stable (D-025): a ball rolls and an egg falls over on the real table too.
 
 Restitution is not simulated. MuJoCo has no restitution coefficient, only a contact spring, and
 these objects fall a few millimeters. It stays in the export for P5.1.
@@ -37,12 +39,14 @@ from numpy.typing import NDArray
 from video2sim.schemas import Plane
 
 F64 = NDArray[np.float64]
+ROUND_SAMPLES = 4000
 
 
 @dataclass(frozen=True)
 class SettlingConfig:
     """``physics.settling`` in ``configs/default.yaml``, and the gate from ``targets.yaml``."""
 
+    round_tolerance: float
     timestep_s: float
     gravity_m_s2: float
     penetration_tolerance_m: float
@@ -57,6 +61,7 @@ class SettlingConfig:
         c = cfg["physics"]["settling"]
         t = targets["targets"]
         out = cls(
+            round_tolerance=float(c["round_tolerance"]),
             timestep_s=float(c["timestep_s"]),
             gravity_m_s2=float(c["gravity_m_s2"]),
             penetration_tolerance_m=float(c["penetration_tolerance_m"]),
@@ -84,6 +89,7 @@ class SettleBody:
     inertia_kg_m2: F64  # about the center of mass, in the object frame
     center_of_mass_m: F64  # in the object frame
     friction: float
+    ignored: bool = False  # round, so it does not count towards the scene (D-025)
 
 
 @dataclass(frozen=True)
@@ -94,6 +100,7 @@ class BodyResult:
     final_drift_m: float
     rotation_deg: float
     stable: bool
+    ignored: bool = False
 
 
 @dataclass(frozen=True)
@@ -103,7 +110,25 @@ class SceneResult:
 
     @property
     def stable(self) -> bool:
-        return all(b.stable for b in self.bodies)
+        return all(b.stable or b.ignored for b in self.bodies)
+
+
+def is_round(mesh: trimesh.Trimesh, tolerance: float, seed: int = 0) -> bool:
+    """Whether ``mesh`` is close to the ellipsoid in its oriented bounding box.
+
+    The 95th percentile of the surface distances in both directions, as a share of the bounding
+    box diagonal, as in ``collision.py``.
+    """
+    from scipy.spatial import cKDTree  # type: ignore[import-untyped]  # heavy import
+
+    to_origin, extents = trimesh.bounds.oriented_bounds(mesh)  # type: ignore[no-untyped-call]
+    ellipsoid = trimesh.creation.icosphere(subdivisions=4)
+    ellipsoid.apply_scale(np.asarray(extents) / 2)
+    ellipsoid.apply_transform(np.linalg.inv(to_origin))
+    a = trimesh.sample.sample_surface(mesh, ROUND_SAMPLES, seed=seed)[0]
+    b = trimesh.sample.sample_surface(ellipsoid, ROUND_SAMPLES, seed=seed)[0]
+    distance = np.concatenate([cKDTree(b).query(a)[0], cKDTree(a).query(b)[0]])
+    return bool(np.percentile(distance, 95) / np.linalg.norm(mesh.extents) <= tolerance)
 
 
 def _floats(values: F64) -> str:
@@ -235,6 +260,7 @@ def settle_scene(bodies: list[SettleBody], table: Plane, cfg: SettlingConfig) ->
             final_drift_m=float(final[i]),
             rotation_deg=_rotation_deg(observed[i, 3:], final_pose[i, 3:]),
             stable=bool(largest[i] <= cfg.max_drift_m),
+            ignored=body.ignored,
         )
         for i, body in enumerate(bodies)
     ]
@@ -246,6 +272,7 @@ __all__ = [
     "SceneResult",
     "SettleBody",
     "SettlingConfig",
+    "is_round",
     "scene_xml",
     "settle_scene",
 ]

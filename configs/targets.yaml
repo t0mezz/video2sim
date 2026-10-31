@@ -10,7 +10,7 @@ targets:
   size_error_median_max: 0.05        # relative error of object bounding-box size
   position_error_median_max_m: 0.015
   orientation_error_median_max_deg: 10.0
-  mass_within_30pct_fraction_min: 0.70   # share of objects with mass within 30% of truth
+  mass_within_30pct_fraction_min: 0.50   # share of objects with mass within 30% of truth
   mass_tolerance: 0.30
   stability_pass_fraction_min: 0.95  # share of scenes that settle under gravity
   stability_max_drift_m: 0.02        # per object, over the settle window

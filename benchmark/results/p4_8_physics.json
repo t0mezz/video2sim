@@ -25,21 +25,24 @@
   },
   "settling_gate": 0.95,
   "settling_pass_fraction": {
-   "nominal": 0.7692307692307693,
-   "friction_low": 0.7692307692307693,
-   "friction_high": 0.7692307692307693,
-   "mass_low": 0.7692307692307693,
-   "mass_high": 0.7692307692307693
+   "nominal": 1.0,
+   "friction_low": 1.0,
+   "friction_high": 1.0,
+   "mass_low": 1.0,
+   "mass_high": 1.0
   },
   "stable_in_every_case": [
    "s01_b",
    "s02_b",
+   "s03_b",
    "s04_b",
    "s05_b",
    "s06_b",
    "s11_b",
    "s12_b",
+   "s13_b",
    "s14_b",
+   "s17_b",
    "s18_b",
    "s24_b"
   ]
@@ -308,7 +311,9 @@
    "object": "obj_000",
    "valid": true,
    "failed_checks": [],
-   "flags": [],
+   "flags": [
+    "ignored_round"
+   ],
    "kind": "sphere",
    "parts": 1,
    "mass_kg": {
@@ -333,7 +338,9 @@
    "object": "obj_000",
    "valid": true,
    "failed_checks": [],
-   "flags": [],
+   "flags": [
+    "ignored_round"
+   ],
    "kind": "sphere",
    "parts": 1,
    "mass_kg": {
@@ -1100,9 +1107,9 @@
    "kind": "box",
    "parts": 1,
    "mass_kg": {
-    "low": 0.16569128037506792,
-    "nominal": 0.25968670386512005,
-    "high": 0.39145973928068767
+    "low": 0.13323414994123864,
+    "nominal": 0.20881688621266567,
+    "high": 0.31477700867069514
    },
    "mass_source": "geometry",
    "friction": {
@@ -1349,7 +1356,8 @@
    "valid": true,
    "failed_checks": [],
    "flags": [
-    "low_confidence_material"
+    "low_confidence_material",
+    "ignored_round"
    ],
    "kind": "convex_decomposition",
    "parts": 16,
@@ -1619,7 +1627,8 @@
       "max_drift_m": 0.00030567474646325436,
       "final_drift_m": 0.00016017722648131063,
       "rotation_deg": 0.06547434274495925,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -1627,7 +1636,8 @@
       "max_drift_m": 0.00010310627189187517,
       "final_drift_m": 0.00010310627187336811,
       "rotation_deg": 0.07138479478027235,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -1635,7 +1645,8 @@
       "max_drift_m": 0.00024162416741238115,
       "final_drift_m": 0.0001288163674623338,
       "rotation_deg": 0.1258044337950026,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -1643,7 +1654,8 @@
       "max_drift_m": 0.0001834074178112313,
       "final_drift_m": 0.00011458122705418125,
       "rotation_deg": 0.07021498976849104,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -1651,7 +1663,8 @@
       "max_drift_m": 0.0007668414672868591,
       "final_drift_m": 0.0004245546205914336,
       "rotation_deg": 0.250281585281297,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -1665,7 +1678,8 @@
       "max_drift_m": 0.000277694140254881,
       "final_drift_m": 0.00023743566357379162,
       "rotation_deg": 0.06546671023442087,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -1673,7 +1687,8 @@
       "max_drift_m": 0.00010310517784192316,
       "final_drift_m": 0.00010310517782372184,
       "rotation_deg": 0.07138479471900472,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -1681,7 +1696,8 @@
       "max_drift_m": 0.0001977522932791095,
       "final_drift_m": 0.00018621728444509185,
       "rotation_deg": 0.12580437337360637,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -1689,7 +1705,8 @@
       "max_drift_m": 0.00018735371733869804,
       "final_drift_m": 0.00012496787841525785,
       "rotation_deg": 0.07021383804717733,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -1697,7 +1714,8 @@
       "max_drift_m": 0.0007516935417064171,
       "final_drift_m": 0.0004578875745603333,
       "rotation_deg": 0.24614793469385085,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -1711,7 +1729,8 @@
       "max_drift_m": 0.00030577965622879553,
       "final_drift_m": 0.00015998479199149675,
       "rotation_deg": 0.06546510858264916,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -1719,7 +1738,8 @@
       "max_drift_m": 0.00010310627189223927,
       "final_drift_m": 0.000103106271872736,
       "rotation_deg": 0.07138479478027235,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -1727,7 +1747,8 @@
       "max_drift_m": 0.0002627840448794276,
       "final_drift_m": 0.00014897932328025224,
       "rotation_deg": 0.12580411502371872,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -1735,7 +1756,8 @@
       "max_drift_m": 0.00019240060189038087,
       "final_drift_m": 0.0001168941230674517,
       "rotation_deg": 0.07021372204348039,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -1743,7 +1765,8 @@
       "max_drift_m": 0.0007676914933990174,
       "final_drift_m": 0.00041877106431827165,
       "rotation_deg": 0.2519746377150043,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -1757,7 +1780,8 @@
       "max_drift_m": 0.00030567474646325436,
       "final_drift_m": 0.00016017722648131063,
       "rotation_deg": 0.06547434274495925,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -1765,7 +1789,8 @@
       "max_drift_m": 0.00010310627189235692,
       "final_drift_m": 0.00010310627187417068,
       "rotation_deg": 0.07138479478027235,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -1773,7 +1798,8 @@
       "max_drift_m": 0.00024162416741238115,
       "final_drift_m": 0.00012881636746099983,
       "rotation_deg": 0.12580443384135578,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -1781,7 +1807,8 @@
       "max_drift_m": 0.0001834074178112313,
       "final_drift_m": 0.00011458122705413807,
       "rotation_deg": 0.07021498976849104,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -1789,7 +1816,8 @@
       "max_drift_m": 0.0007668414672868591,
       "final_drift_m": 0.00042455462059131646,
       "rotation_deg": 0.250281585281297,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -1803,7 +1831,8 @@
       "max_drift_m": 0.00030567474646325436,
       "final_drift_m": 0.0001601772264813049,
       "rotation_deg": 0.06547434274495925,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -1811,7 +1840,8 @@
       "max_drift_m": 0.0001031062718921605,
       "final_drift_m": 0.00010310627187343251,
       "rotation_deg": 0.07138479478027235,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -1819,7 +1849,8 @@
       "max_drift_m": 0.00024162416741238115,
       "final_drift_m": 0.0001288163674627772,
       "rotation_deg": 0.12580443389929727,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -1827,7 +1858,8 @@
       "max_drift_m": 0.0001834074178112313,
       "final_drift_m": 0.00011458122705405482,
       "rotation_deg": 0.07021498976849104,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -1835,7 +1867,8 @@
       "max_drift_m": 0.0007668414672868591,
       "final_drift_m": 0.00042455462059166345,
       "rotation_deg": 0.2502815852871219,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    }
@@ -1851,7 +1884,8 @@
       "max_drift_m": 0.0003096396185473641,
       "final_drift_m": 0.0003096396185409528,
       "rotation_deg": 0.16368859841723604,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -1859,7 +1893,8 @@
       "max_drift_m": 0.000898353247235256,
       "final_drift_m": 0.0006988204163601693,
       "rotation_deg": 0.7246923687033303,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -1867,7 +1902,8 @@
       "max_drift_m": 0.000728974518831485,
       "final_drift_m": 0.0005250611312876513,
       "rotation_deg": 0.13207818391293832,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -1875,7 +1911,8 @@
       "max_drift_m": 0.0015180710383675322,
       "final_drift_m": 0.0008625269663159371,
       "rotation_deg": 1.0175727294805588,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -1883,7 +1920,8 @@
       "max_drift_m": 1.447693526461368e-05,
       "final_drift_m": 1.4476935253080342e-05,
       "rotation_deg": 0.03953777498458134,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -1897,7 +1935,8 @@
       "max_drift_m": 0.00030963961854775117,
       "final_drift_m": 0.00030963961854129935,
       "rotation_deg": 0.16368859841723604,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -1905,7 +1944,8 @@
       "max_drift_m": 0.0007718117647081763,
       "final_drift_m": 0.0007716448092299669,
       "rotation_deg": 0.7260005499160342,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -1913,7 +1953,8 @@
       "max_drift_m": 0.000728974518831485,
       "final_drift_m": 0.000517024750648974,
       "rotation_deg": 0.1339699990727988,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -1921,7 +1962,8 @@
       "max_drift_m": 0.0015035306336803938,
       "final_drift_m": 0.0009131003030679139,
       "rotation_deg": 1.0175848811757573,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -1929,7 +1971,8 @@
       "max_drift_m": 1.4476935264596153e-05,
       "final_drift_m": 1.4476935253066847e-05,
       "rotation_deg": 0.03953777505832645,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -1943,7 +1986,8 @@
       "max_drift_m": 0.0003096396185478309,
       "final_drift_m": 0.0003096396185412712,
       "rotation_deg": 0.16368859841723604,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -1951,7 +1995,8 @@
       "max_drift_m": 0.0008960119977319559,
       "final_drift_m": 0.0006996702532985645,
       "rotation_deg": 0.7255822826535814,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -1959,7 +2004,8 @@
       "max_drift_m": 0.000728974518831485,
       "final_drift_m": 0.0005250229699612201,
       "rotation_deg": 0.13430534663527371,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -1967,7 +2013,8 @@
       "max_drift_m": 0.0017037669009791411,
       "final_drift_m": 0.0010155702746213018,
       "rotation_deg": 1.0175730414039967,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -1975,7 +2022,8 @@
       "max_drift_m": 1.4476935264577855e-05,
       "final_drift_m": 1.4476935252976885e-05,
       "rotation_deg": 0.03953777494770878,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -1989,7 +2037,8 @@
       "max_drift_m": 0.0003096396185455265,
       "final_drift_m": 0.00030963961853888093,
       "rotation_deg": 0.16368859840832972,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -1997,7 +2046,8 @@
       "max_drift_m": 0.000898353247235256,
       "final_drift_m": 0.0006988204163601557,
       "rotation_deg": 0.7246923687033303,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2005,7 +2055,8 @@
       "max_drift_m": 0.000728974518831485,
       "final_drift_m": 0.0005250611312876513,
       "rotation_deg": 0.13207818391293832,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2013,7 +2064,8 @@
       "max_drift_m": 0.001518071038367405,
       "final_drift_m": 0.0008625269663159637,
       "rotation_deg": 1.0175727294877224,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -2021,7 +2073,8 @@
       "max_drift_m": 1.4476935264571757e-05,
       "final_drift_m": 1.4476935252674437e-05,
       "rotation_deg": 0.03953777498458134,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -2035,7 +2088,8 @@
       "max_drift_m": 0.0003096396185459511,
       "final_drift_m": 0.00030963961853937473,
       "rotation_deg": 0.16368859843504863,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -2043,7 +2097,8 @@
       "max_drift_m": 0.000898353247235256,
       "final_drift_m": 0.0006988204163601624,
       "rotation_deg": 0.7246923687033303,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2051,7 +2106,8 @@
       "max_drift_m": 0.000728974518831485,
       "final_drift_m": 0.0005250611312876477,
       "rotation_deg": 0.13207818391293832,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2059,7 +2115,8 @@
       "max_drift_m": 0.0015180710383674346,
       "final_drift_m": 0.0008625269663160163,
       "rotation_deg": 1.0175727294920205,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -2067,14 +2124,15 @@
       "max_drift_m": 1.447693526461788e-05,
       "final_drift_m": 1.4476935253173702e-05,
       "rotation_deg": 0.03953777505832645,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    }
   },
   "s03_b": {
    "nominal": {
-    "stable": false,
+    "stable": true,
     "residual_penetration_m": -0.0,
     "bodies": [
      {
@@ -2083,12 +2141,13 @@
       "max_drift_m": 0.02783895071185133,
       "final_drift_m": 0.026869580735984576,
       "rotation_deg": 20.899750850572882,
-      "stable": false
+      "stable": false,
+      "ignored": true
      }
     ]
    },
    "friction_low": {
-    "stable": false,
+    "stable": true,
     "residual_penetration_m": -0.0,
     "bodies": [
      {
@@ -2097,12 +2156,13 @@
       "max_drift_m": 0.027839776112186326,
       "final_drift_m": 0.02686968109575946,
       "rotation_deg": 20.899761983176365,
-      "stable": false
+      "stable": false,
+      "ignored": true
      }
     ]
    },
    "friction_high": {
-    "stable": false,
+    "stable": true,
     "residual_penetration_m": -0.0,
     "bodies": [
      {
@@ -2111,12 +2171,13 @@
       "max_drift_m": 0.027778318375560794,
       "final_drift_m": 0.026868472303097767,
       "rotation_deg": 20.899793667270295,
-      "stable": false
+      "stable": false,
+      "ignored": true
      }
     ]
    },
    "mass_low": {
-    "stable": false,
+    "stable": true,
     "residual_penetration_m": -0.0,
     "bodies": [
      {
@@ -2125,12 +2186,13 @@
       "max_drift_m": 0.027838950711855586,
       "final_drift_m": 0.026869580735996924,
       "rotation_deg": 20.89975085057036,
-      "stable": false
+      "stable": false,
+      "ignored": true
      }
     ]
    },
    "mass_high": {
-    "stable": false,
+    "stable": true,
     "residual_penetration_m": -0.0,
     "bodies": [
      {
@@ -2139,7 +2201,8 @@
       "max_drift_m": 0.027838950711853522,
       "final_drift_m": 0.02686958073581968,
       "rotation_deg": 20.89975085060115,
-      "stable": false
+      "stable": false,
+      "ignored": true
      }
     ]
    }
@@ -2155,7 +2218,8 @@
       "max_drift_m": 0.017558628694214803,
       "final_drift_m": 0.013668353750855032,
       "rotation_deg": 10.566826452520477,
-      "stable": true
+      "stable": true,
+      "ignored": true
      },
      {
       "object_id": "obj_001",
@@ -2163,7 +2227,8 @@
       "max_drift_m": 0.0003142476082417671,
       "final_drift_m": 0.00014695668055900139,
       "rotation_deg": 0.13332837896115213,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2171,7 +2236,8 @@
       "max_drift_m": 0.0001712294502981214,
       "final_drift_m": 0.00017122945026615792,
       "rotation_deg": 0.11049093204031941,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2179,7 +2245,8 @@
       "max_drift_m": 0.002681837909433877,
       "final_drift_m": 0.0014657285953345763,
       "rotation_deg": 0.6276523806980765,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -2187,7 +2254,8 @@
       "max_drift_m": 9.945281312316154e-05,
       "final_drift_m": 9.943777357584817e-05,
       "rotation_deg": 0.03525923427692946,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -2201,7 +2269,8 @@
       "max_drift_m": 0.017558628694214862,
       "final_drift_m": 0.013668353750855674,
       "rotation_deg": 10.566826452521582,
-      "stable": true
+      "stable": true,
+      "ignored": true
      },
      {
       "object_id": "obj_001",
@@ -2209,7 +2278,8 @@
       "max_drift_m": 0.00032274144496622704,
       "final_drift_m": 0.00017274214079219093,
       "rotation_deg": 0.133326547007509,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2217,7 +2287,8 @@
       "max_drift_m": 0.00017123062602309786,
       "final_drift_m": 0.00017123062598591076,
       "rotation_deg": 0.11049092908477874,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2225,7 +2296,8 @@
       "max_drift_m": 0.0018059614475947657,
       "final_drift_m": 0.0005438410507405989,
       "rotation_deg": 0.615093454530438,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -2233,7 +2305,8 @@
       "max_drift_m": 0.00010016367064861602,
       "final_drift_m": 0.0001001216773187256,
       "rotation_deg": 0.03525923522790741,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -2247,7 +2320,8 @@
       "max_drift_m": 0.01755862869421486,
       "final_drift_m": 0.013668353750855428,
       "rotation_deg": 10.56682645252103,
-      "stable": true
+      "stable": true,
+      "ignored": true
      },
      {
       "object_id": "obj_001",
@@ -2255,7 +2329,8 @@
       "max_drift_m": 0.00033173827907394536,
       "final_drift_m": 0.00015928953746703256,
       "rotation_deg": 0.13332385263186242,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2263,7 +2338,8 @@
       "max_drift_m": 0.00017122947730783313,
       "final_drift_m": 0.0001712294772564982,
       "rotation_deg": 0.11049093213268006,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2271,7 +2347,8 @@
       "max_drift_m": 0.0026824283157334053,
       "final_drift_m": 0.0014579336928862156,
       "rotation_deg": 0.6278513951510184,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -2279,7 +2356,8 @@
       "max_drift_m": 0.00010009708886137503,
       "final_drift_m": 9.997874090308961e-05,
       "rotation_deg": 0.035259233904807646,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -2293,7 +2371,8 @@
       "max_drift_m": 0.017558628694214862,
       "final_drift_m": 0.013668353750855858,
       "rotation_deg": 10.566826452520477,
-      "stable": true
+      "stable": true,
+      "ignored": true
      },
      {
       "object_id": "obj_001",
@@ -2301,7 +2380,8 @@
       "max_drift_m": 0.0003142476082417671,
       "final_drift_m": 0.00014695668055893877,
       "rotation_deg": 0.13332837896115213,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2309,7 +2389,8 @@
       "max_drift_m": 0.00017122945029865696,
       "final_drift_m": 0.00017122945026322404,
       "rotation_deg": 0.11049093202712504,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2317,7 +2398,8 @@
       "max_drift_m": 0.0026818379094339794,
       "final_drift_m": 0.001465728595334324,
       "rotation_deg": 0.6276523807259493,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -2325,7 +2407,8 @@
       "max_drift_m": 9.945281312316154e-05,
       "final_drift_m": 9.943777357588669e-05,
       "rotation_deg": 0.03525923427692946,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -2339,7 +2422,8 @@
       "max_drift_m": 0.017558628694214862,
       "final_drift_m": 0.013668353750855858,
       "rotation_deg": 10.566826452520477,
-      "stable": true
+      "stable": true,
+      "ignored": true
      },
      {
       "object_id": "obj_001",
@@ -2347,7 +2431,8 @@
       "max_drift_m": 0.0003142476082417671,
       "final_drift_m": 0.00014695668055906508,
       "rotation_deg": 0.13332837896115213,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2355,7 +2440,8 @@
       "max_drift_m": 0.00017122945029800755,
       "final_drift_m": 0.00017122945026649657,
       "rotation_deg": 0.11049093202712504,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2363,7 +2449,8 @@
       "max_drift_m": 0.002681837909433861,
       "final_drift_m": 0.0014657285953368565,
       "rotation_deg": 0.6276523807050447,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -2371,7 +2458,8 @@
       "max_drift_m": 9.945281312316154e-05,
       "final_drift_m": 9.943777357596316e-05,
       "rotation_deg": 0.03525923427692946,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    }
@@ -2387,7 +2475,8 @@
       "max_drift_m": 0.002133018178732086,
       "final_drift_m": 0.0020247749409850043,
       "rotation_deg": 4.628140380728937,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -2395,7 +2484,8 @@
       "max_drift_m": 0.00020780692718527116,
       "final_drift_m": 0.00019825110112341466,
       "rotation_deg": 0.1193368153843457,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2403,7 +2493,8 @@
       "max_drift_m": 0.0001507152454299621,
       "final_drift_m": 0.00015071524541874207,
       "rotation_deg": 0.24203427617264278,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2411,7 +2502,8 @@
       "max_drift_m": 0.001354047068497901,
       "final_drift_m": 0.0007869617762386847,
       "rotation_deg": 0.4481663129683488,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -2425,7 +2517,8 @@
       "max_drift_m": 0.0022176511472732146,
       "final_drift_m": 0.002096958370634341,
       "rotation_deg": 4.625198231256712,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -2433,7 +2526,8 @@
       "max_drift_m": 0.00020780692718527116,
       "final_drift_m": 0.00019825110112341824,
       "rotation_deg": 0.1193368153843457,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2441,7 +2535,8 @@
       "max_drift_m": 0.00015069819235343225,
       "final_drift_m": 0.0001506981923420942,
       "rotation_deg": 0.24203427504025077,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2449,7 +2544,8 @@
       "max_drift_m": 0.0013361144721137513,
       "final_drift_m": 0.0007686017458185814,
       "rotation_deg": 0.44817758103238176,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -2463,7 +2559,8 @@
       "max_drift_m": 0.00212493236821195,
       "final_drift_m": 0.0020231568361383234,
       "rotation_deg": 4.625327919038963,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -2471,7 +2568,8 @@
       "max_drift_m": 0.00020780692718527116,
       "final_drift_m": 0.00019825110112341466,
       "rotation_deg": 0.1193368153843457,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2479,7 +2577,8 @@
       "max_drift_m": 0.00015071524542998414,
       "final_drift_m": 0.0001507152454186231,
       "rotation_deg": 0.24203427612445588,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2487,7 +2586,8 @@
       "max_drift_m": 0.001354047068497901,
       "final_drift_m": 0.0007869617762383588,
       "rotation_deg": 0.44816631295859,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -2501,7 +2601,8 @@
       "max_drift_m": 0.002133018178817115,
       "final_drift_m": 0.0020247749413686636,
       "rotation_deg": 4.628140380779351,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -2509,7 +2610,8 @@
       "max_drift_m": 0.00020780692718527116,
       "final_drift_m": 0.00019825110112341824,
       "rotation_deg": 0.1193368153843457,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2517,7 +2619,8 @@
       "max_drift_m": 0.00015071524543000883,
       "final_drift_m": 0.0001507152454188659,
       "rotation_deg": 0.24203427615457265,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2525,7 +2628,8 @@
       "max_drift_m": 0.001354047068497901,
       "final_drift_m": 0.0007869617762383676,
       "rotation_deg": 0.4481663129748547,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -2539,7 +2643,8 @@
       "max_drift_m": 0.002133018178732086,
       "final_drift_m": 0.0020247749408720253,
       "rotation_deg": 4.628140380714443,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -2547,7 +2652,8 @@
       "max_drift_m": 0.00020780692718527116,
       "final_drift_m": 0.00019825110112342182,
       "rotation_deg": 0.1193368153843457,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2555,7 +2661,8 @@
       "max_drift_m": 0.00015071524542993925,
       "final_drift_m": 0.00015071524541864756,
       "rotation_deg": 0.24203427614252596,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2563,7 +2670,8 @@
       "max_drift_m": 0.001354047068497901,
       "final_drift_m": 0.0007869617762383347,
       "rotation_deg": 0.44816631295533704,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    }
@@ -2579,7 +2687,8 @@
       "max_drift_m": 0.0001316815150418972,
       "final_drift_m": 0.00010091335253997951,
       "rotation_deg": 0.026338187189713216,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -2587,7 +2696,8 @@
       "max_drift_m": 0.0011312653283530754,
       "final_drift_m": 0.0006224449951458169,
       "rotation_deg": 0.7889528980109777,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2595,7 +2705,8 @@
       "max_drift_m": 0.0005515398777002771,
       "final_drift_m": 0.00019820720365699166,
       "rotation_deg": 0.04263226708894509,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2603,7 +2714,8 @@
       "max_drift_m": 0.0001799556021912458,
       "final_drift_m": 0.0001023421189859028,
       "rotation_deg": 0.1357205239489034,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -2617,7 +2729,8 @@
       "max_drift_m": 0.00013346355866549457,
       "final_drift_m": 0.0001042314440206866,
       "rotation_deg": 0.026338179163740514,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -2625,7 +2738,8 @@
       "max_drift_m": 0.001102626647087382,
       "final_drift_m": 0.000626088459362494,
       "rotation_deg": 0.7875326078143926,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2633,7 +2747,8 @@
       "max_drift_m": 0.0030609765994896424,
       "final_drift_m": 0.0030609765994896424,
       "rotation_deg": 0.1506234339314023,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2641,7 +2756,8 @@
       "max_drift_m": 0.00018387843432770523,
       "final_drift_m": 0.00011372562712500561,
       "rotation_deg": 0.13572052714990815,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -2655,7 +2771,8 @@
       "max_drift_m": 0.00013430695719148663,
       "final_drift_m": 0.00010183464881513913,
       "rotation_deg": 0.026338170362843503,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -2663,7 +2780,8 @@
       "max_drift_m": 0.0011220338381219704,
       "final_drift_m": 0.000630788774231924,
       "rotation_deg": 0.7905944564992059,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2671,7 +2789,8 @@
       "max_drift_m": 0.0005178399902822755,
       "final_drift_m": 0.0002666282436318679,
       "rotation_deg": 0.041208429364416495,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2679,7 +2798,8 @@
       "max_drift_m": 0.0001862610228612292,
       "final_drift_m": 0.00010559044632465467,
       "rotation_deg": 0.13572052586091296,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -2693,7 +2813,8 @@
       "max_drift_m": 0.00013168151504189377,
       "final_drift_m": 0.00010091335253991233,
       "rotation_deg": 0.026338187189713216,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -2701,7 +2822,8 @@
       "max_drift_m": 0.0011312653283557664,
       "final_drift_m": 0.0006224450092494111,
       "rotation_deg": 0.7889528572620828,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2709,7 +2831,8 @@
       "max_drift_m": 0.0005515398777002471,
       "final_drift_m": 0.00019820720365701413,
       "rotation_deg": 0.04263226705474895,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2717,7 +2840,8 @@
       "max_drift_m": 0.00017995560219118817,
       "final_drift_m": 0.00010234211898513829,
       "rotation_deg": 0.13572052397038664,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -2731,7 +2855,8 @@
       "max_drift_m": 0.0001316815150418936,
       "final_drift_m": 0.0001009133525399401,
       "rotation_deg": 0.026338187189713216,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -2739,7 +2864,8 @@
       "max_drift_m": 0.0011312653283532099,
       "final_drift_m": 0.0006224449951438247,
       "rotation_deg": 0.7889528980183692,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2747,7 +2873,8 @@
       "max_drift_m": 0.0005515398777002796,
       "final_drift_m": 0.00019820720365691126,
       "rotation_deg": 0.04263226712314123,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2755,7 +2882,8 @@
       "max_drift_m": 0.00017995560219126396,
       "final_drift_m": 0.00010234211898596452,
       "rotation_deg": 0.13572052403483642,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    }
@@ -2771,7 +2899,8 @@
       "max_drift_m": 0.00016186081601965598,
       "final_drift_m": 0.0001209500550323067,
       "rotation_deg": 0.007666984891115548,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -2779,7 +2908,8 @@
       "max_drift_m": 0.00012146753524727687,
       "final_drift_m": 0.00012146753518148372,
       "rotation_deg": 0.05015487760764096,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2787,7 +2917,8 @@
       "max_drift_m": 2.6923811275218746e-05,
       "final_drift_m": 2.669760675928726e-05,
       "rotation_deg": 0.07145784612631079,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2795,7 +2926,8 @@
       "max_drift_m": 0.00011498905177756964,
       "final_drift_m": 0.00011498905173838953,
       "rotation_deg": 0.021900698663679802,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -2803,7 +2935,8 @@
       "max_drift_m": 0.0010169133949920572,
       "final_drift_m": 0.0009753808572585391,
       "rotation_deg": 0.07202827991446592,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_005",
@@ -2811,7 +2944,8 @@
       "max_drift_m": 0.0001316193949073598,
       "final_drift_m": 0.00011392117743792763,
       "rotation_deg": 0.06888962265086859,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_006",
@@ -2819,7 +2953,8 @@
       "max_drift_m": 0.0003200354468491288,
       "final_drift_m": 0.00021228729968101348,
       "rotation_deg": 0.09471470131358822,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -2833,7 +2968,8 @@
       "max_drift_m": 0.00016456398737486782,
       "final_drift_m": 0.00012289665679192838,
       "rotation_deg": 0.007649205058639862,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -2841,7 +2977,8 @@
       "max_drift_m": 0.00012146753524723822,
       "final_drift_m": 0.0001214675351814729,
       "rotation_deg": 0.05015487786924523,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2849,7 +2986,8 @@
       "max_drift_m": 2.6885294686612054e-05,
       "final_drift_m": 2.6565046490256693e-05,
       "rotation_deg": 0.06943006378864565,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2857,7 +2995,8 @@
       "max_drift_m": 0.00011864128001254012,
       "final_drift_m": 0.00011864127998262249,
       "rotation_deg": 0.0218973142138802,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -2865,7 +3004,8 @@
       "max_drift_m": 0.0041629389401934445,
       "final_drift_m": 0.004143537195508425,
       "rotation_deg": 0.8364831247725393,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_005",
@@ -2873,7 +3013,8 @@
       "max_drift_m": 0.00013672740840193972,
       "final_drift_m": 0.00012245021974190113,
       "rotation_deg": 0.0688897529255161,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_006",
@@ -2881,7 +3022,8 @@
       "max_drift_m": 0.00034371583615418146,
       "final_drift_m": 0.00024121167137312053,
       "rotation_deg": 0.08971622183725253,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -2895,7 +3037,8 @@
       "max_drift_m": 0.00016060486877902724,
       "final_drift_m": 0.00011860904453773644,
       "rotation_deg": 0.007669793427403219,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -2903,7 +3046,8 @@
       "max_drift_m": 0.00012146753524725505,
       "final_drift_m": 0.00012146753518158992,
       "rotation_deg": 0.05015487760764096,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2911,7 +3055,8 @@
       "max_drift_m": 2.692381127521692e-05,
       "final_drift_m": 2.6697606759286327e-05,
       "rotation_deg": 0.07145784612631079,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2919,7 +3064,8 @@
       "max_drift_m": 0.0001249950909570727,
       "final_drift_m": 0.00011229851743096295,
       "rotation_deg": 0.021902281231583626,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -2927,7 +3073,8 @@
       "max_drift_m": 0.0006016719937040243,
       "final_drift_m": 0.0005481263506505981,
       "rotation_deg": 1.1067109774671189,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_005",
@@ -2935,7 +3082,8 @@
       "max_drift_m": 0.00013658262559479727,
       "final_drift_m": 0.00011377005057963734,
       "rotation_deg": 0.06888950075623847,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_006",
@@ -2943,7 +3091,8 @@
       "max_drift_m": 0.00029166966251801244,
       "final_drift_m": 0.00021172216099095127,
       "rotation_deg": 0.08810673855719477,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -2957,7 +3106,8 @@
       "max_drift_m": 0.00016186081601965598,
       "final_drift_m": 0.0001209500550323744,
       "rotation_deg": 0.007666984700967933,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -2965,7 +3115,8 @@
       "max_drift_m": 0.00012146753524723046,
       "final_drift_m": 0.00012146753518150285,
       "rotation_deg": 0.050154877694842386,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -2973,7 +3124,8 @@
       "max_drift_m": 2.6923811275218994e-05,
       "final_drift_m": 2.669760675928925e-05,
       "rotation_deg": 0.07145784610590912,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -2981,7 +3133,8 @@
       "max_drift_m": 0.00011498905177773036,
       "final_drift_m": 0.0001149890517542219,
       "rotation_deg": 0.021900698663679802,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -2989,7 +3142,8 @@
       "max_drift_m": 0.0010169116778932375,
       "final_drift_m": 0.0009753786380736178,
       "rotation_deg": 0.07203767025951634,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_005",
@@ -2997,7 +3151,8 @@
       "max_drift_m": 0.0001316193949025084,
       "final_drift_m": 0.00011392117742894443,
       "rotation_deg": 0.06888962282016653,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_006",
@@ -3005,7 +3160,8 @@
       "max_drift_m": 0.0003200354468529782,
       "final_drift_m": 0.00021228729968060257,
       "rotation_deg": 0.09471470135976455,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -3019,7 +3175,8 @@
       "max_drift_m": 0.00016186081601965598,
       "final_drift_m": 0.00012095005503249603,
       "rotation_deg": 0.007666985461558368,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -3027,7 +3184,8 @@
       "max_drift_m": 0.00012146753524731464,
       "final_drift_m": 0.0001214675351821212,
       "rotation_deg": 0.050154877782043805,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -3035,7 +3193,8 @@
       "max_drift_m": 2.692381127521522e-05,
       "final_drift_m": 2.6697606759286195e-05,
       "rotation_deg": 0.07145784612631079,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -3043,7 +3202,8 @@
       "max_drift_m": 0.00011498905177745597,
       "final_drift_m": 0.00011498905175441388,
       "rotation_deg": 0.02190069859711303,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -3051,7 +3211,8 @@
       "max_drift_m": 0.0010169108466121864,
       "final_drift_m": 0.000975377860424618,
       "rotation_deg": 0.07201888073376717,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_005",
@@ -3059,7 +3220,8 @@
       "max_drift_m": 0.0001316193949084494,
       "final_drift_m": 0.0001139211774406168,
       "rotation_deg": 0.06888962277784205,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_006",
@@ -3067,7 +3229,8 @@
       "max_drift_m": 0.0003200354468491288,
       "final_drift_m": 0.00021228729968101597,
       "rotation_deg": 0.09471470131358822,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    }
@@ -3083,7 +3246,8 @@
       "max_drift_m": 0.0002868999049779882,
       "final_drift_m": 0.00028689990492988576,
       "rotation_deg": 0.14193838564127445,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -3091,7 +3255,8 @@
       "max_drift_m": 0.0007217017374584931,
       "final_drift_m": 0.0006972907509395182,
       "rotation_deg": 0.49299460769751724,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -3099,7 +3264,8 @@
       "max_drift_m": 0.0006528579538399824,
       "final_drift_m": 0.0005641333764170093,
       "rotation_deg": 0.43058081570984025,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -3107,7 +3273,8 @@
       "max_drift_m": 0.0004016380150708358,
       "final_drift_m": 0.00018431064105448882,
       "rotation_deg": 0.12049429156707175,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_005",
@@ -3115,7 +3282,8 @@
       "max_drift_m": 0.002317288616814997,
       "final_drift_m": 0.0016838751039811909,
       "rotation_deg": 0.7976593149500317,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_006",
@@ -3123,7 +3291,8 @@
       "max_drift_m": 0.001402462728095429,
       "final_drift_m": 0.0007953923451925693,
       "rotation_deg": 0.8183262431813616,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_007",
@@ -3131,7 +3300,8 @@
       "max_drift_m": 0.0013494893377580704,
       "final_drift_m": 0.00010617506411901155,
       "rotation_deg": 0.522441485876867,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_008",
@@ -3139,7 +3309,8 @@
       "max_drift_m": 0.00020430182273500696,
       "final_drift_m": 0.00020374624531940895,
       "rotation_deg": 0.3335247327995272,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_009",
@@ -3147,7 +3318,8 @@
       "max_drift_m": 7.02828203836117e-05,
       "final_drift_m": 3.099822640068314e-05,
       "rotation_deg": 0.010050623221843706,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -3161,7 +3333,8 @@
       "max_drift_m": 0.00028690048815173863,
       "final_drift_m": 0.0002869004881077063,
       "rotation_deg": 0.14193838553856375,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -3169,7 +3342,8 @@
       "max_drift_m": 0.0006984286657524089,
       "final_drift_m": 0.0006709836480024611,
       "rotation_deg": 0.49298437447316845,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -3177,7 +3351,8 @@
       "max_drift_m": 0.0006528579538399824,
       "final_drift_m": 0.0005615271441555856,
       "rotation_deg": 0.43056988877541064,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -3185,7 +3360,8 @@
       "max_drift_m": 0.0004069309587967424,
       "final_drift_m": 0.00020303182737946206,
       "rotation_deg": 0.12049310449308531,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_005",
@@ -3193,7 +3369,8 @@
       "max_drift_m": 0.0020460863964901835,
       "final_drift_m": 0.0013873393978098133,
       "rotation_deg": 0.8025250971046956,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_006",
@@ -3201,7 +3378,8 @@
       "max_drift_m": 0.0014399013620366087,
       "final_drift_m": 0.0008375075397279923,
       "rotation_deg": 0.8180451113901887,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_007",
@@ -3209,7 +3387,8 @@
       "max_drift_m": 0.0013494893377580704,
       "final_drift_m": 0.00012089427300444288,
       "rotation_deg": 0.5213909159204523,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_008",
@@ -3217,7 +3396,8 @@
       "max_drift_m": 0.00020424189239851085,
       "final_drift_m": 0.00020375043806438708,
       "rotation_deg": 0.3334893742822176,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_009",
@@ -3225,7 +3405,8 @@
       "max_drift_m": 6.699812941969723e-05,
       "final_drift_m": 6.699812935710247e-05,
       "rotation_deg": 0.010049567335855302,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -3239,7 +3420,8 @@
       "max_drift_m": 0.0002868996255268524,
       "final_drift_m": 0.0002868996254812652,
       "rotation_deg": 0.14193838568235873,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -3247,7 +3429,8 @@
       "max_drift_m": 0.0007217017374584931,
       "final_drift_m": 0.0006972907509395182,
       "rotation_deg": 0.49299460769751724,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -3255,7 +3438,8 @@
       "max_drift_m": 0.0006528579538399824,
       "final_drift_m": 0.0005641321689707806,
       "rotation_deg": 0.4305798706259075,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -3263,7 +3447,8 @@
       "max_drift_m": 0.00041245807338577363,
       "final_drift_m": 0.0001955272048574188,
       "rotation_deg": 0.12049205600397772,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_005",
@@ -3271,7 +3456,8 @@
       "max_drift_m": 0.002318184602352781,
       "final_drift_m": 0.0016840511170973854,
       "rotation_deg": 0.7977512122446073,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_006",
@@ -3279,7 +3465,8 @@
       "max_drift_m": 0.001583080524359157,
       "final_drift_m": 0.0008850335889687007,
       "rotation_deg": 0.8178680825530866,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_007",
@@ -3287,7 +3474,8 @@
       "max_drift_m": 0.0013494893377580704,
       "final_drift_m": 0.00020092177277351966,
       "rotation_deg": 0.5228065111043413,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_008",
@@ -3295,7 +3483,8 @@
       "max_drift_m": 0.00020448847543420244,
       "final_drift_m": 0.00020407766552521276,
       "rotation_deg": 0.333852310168901,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_009",
@@ -3303,7 +3492,8 @@
       "max_drift_m": 7.029026450315619e-05,
       "final_drift_m": 3.099822050658241e-05,
       "rotation_deg": 0.010050623656998468,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -3317,7 +3507,8 @@
       "max_drift_m": 0.00028690003151841123,
       "final_drift_m": 0.00028690003147292575,
       "rotation_deg": 0.1419383856207323,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -3325,7 +3516,8 @@
       "max_drift_m": 0.0007217017374584931,
       "final_drift_m": 0.0006972907509395156,
       "rotation_deg": 0.4929946076945601,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -3333,7 +3525,8 @@
       "max_drift_m": 0.0006528579538399824,
       "final_drift_m": 0.0005641333764166434,
       "rotation_deg": 0.43058081570984025,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -3341,7 +3534,8 @@
       "max_drift_m": 0.0004016380150708358,
       "final_drift_m": 0.00018431064105449196,
       "rotation_deg": 0.12049429156707175,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_005",
@@ -3349,7 +3543,8 @@
       "max_drift_m": 0.002317288616815978,
       "final_drift_m": 0.001683875103984189,
       "rotation_deg": 0.7976593149500317,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_006",
@@ -3357,7 +3552,8 @@
       "max_drift_m": 0.0014024627280957158,
       "final_drift_m": 0.0007953923451915235,
       "rotation_deg": 0.8183262431849248,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_007",
@@ -3365,7 +3561,8 @@
       "max_drift_m": 0.0013494893377580704,
       "final_drift_m": 0.00010617506412428202,
       "rotation_deg": 0.5224414858852384,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_008",
@@ -3373,7 +3570,8 @@
       "max_drift_m": 0.00020430182266990162,
       "final_drift_m": 0.0002037462452538863,
       "rotation_deg": 0.33352473277767186,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_009",
@@ -3381,7 +3579,8 @@
       "max_drift_m": 7.02828203836117e-05,
       "final_drift_m": 3.0998226401524986e-05,
       "rotation_deg": 0.010050623366895295,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -3395,7 +3594,8 @@
       "max_drift_m": 0.0002868999048669693,
       "final_drift_m": 0.0002868999048218897,
       "rotation_deg": 0.14193838560019018,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -3403,7 +3603,8 @@
       "max_drift_m": 0.0007217017374584931,
       "final_drift_m": 0.0006972907509394682,
       "rotation_deg": 0.4929946076945601,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -3411,7 +3612,8 @@
       "max_drift_m": 0.0006528579538399824,
       "final_drift_m": 0.0005641333764159493,
       "rotation_deg": 0.430580815696297,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -3419,7 +3621,8 @@
       "max_drift_m": 0.00040163801507083613,
       "final_drift_m": 0.00018431064105740345,
       "rotation_deg": 0.12049429133719095,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_005",
@@ -3427,7 +3630,8 @@
       "max_drift_m": 0.0023172886168147688,
       "final_drift_m": 0.0016838751039807813,
       "rotation_deg": 0.797659314953687,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_006",
@@ -3435,7 +3639,8 @@
       "max_drift_m": 0.0014024627280952923,
       "final_drift_m": 0.000795392345192469,
       "rotation_deg": 0.8183262431742354,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_007",
@@ -3443,7 +3648,8 @@
       "max_drift_m": 0.0013494893377580704,
       "final_drift_m": 0.00010617506412078933,
       "rotation_deg": 0.522441485882448,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_008",
@@ -3451,7 +3657,8 @@
       "max_drift_m": 0.00020430182273500696,
       "final_drift_m": 0.0002037462453193174,
       "rotation_deg": 0.33352473281264045,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_009",
@@ -3459,119 +3666,130 @@
       "max_drift_m": 7.02828203836117e-05,
       "final_drift_m": 3.0998226401010986e-05,
       "rotation_deg": 0.010050623366895295,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    }
   },
   "s13_b": {
    "nominal": {
-    "stable": false,
-    "residual_penetration_m": 0.0003476424612940676,
+    "stable": true,
+    "residual_penetration_m": 1.2291281285436995e-05,
     "bodies": [
      {
       "object_id": "obj_000",
-      "separation_m": 0.0003353511800086306,
-      "max_drift_m": 0.00035040419019568913,
-      "final_drift_m": 0.00035040366522719017,
-      "rotation_deg": 0.10797407643541142,
-      "stable": true
+      "separation_m": 0.0,
+      "max_drift_m": 0.0004894659615498261,
+      "final_drift_m": 0.00033282282714524355,
+      "rotation_deg": 0.10852940864996224,
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
-      "separation_m": 0.044137466460536054,
-      "max_drift_m": 0.044137466460536054,
-      "final_drift_m": 0.043827527451996445,
-      "rotation_deg": 0.0046876530491346685,
-      "stable": false
+      "separation_m": 0.0,
+      "max_drift_m": 0.004517307443747458,
+      "final_drift_m": 0.0029145891784161247,
+      "rotation_deg": 0.0035569980728537417,
+      "stable": true,
+      "ignored": false
      }
     ]
    },
    "friction_low": {
-    "stable": false,
-    "residual_penetration_m": 0.0003476424612940676,
+    "stable": true,
+    "residual_penetration_m": 1.2291281285436995e-05,
     "bodies": [
      {
       "object_id": "obj_000",
-      "separation_m": 0.0003353511800086306,
-      "max_drift_m": 0.00035041237483907523,
-      "final_drift_m": 0.0003504119112067131,
-      "rotation_deg": 0.10809606806233432,
-      "stable": true
+      "separation_m": 0.0,
+      "max_drift_m": 0.0004928198351228843,
+      "final_drift_m": 0.00033722537697060704,
+      "rotation_deg": 0.10839075648949194,
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
-      "separation_m": 0.044137466460536054,
-      "max_drift_m": 0.044137466460536054,
-      "final_drift_m": 0.04382825215918602,
-      "rotation_deg": 0.004139591233222358,
-      "stable": false
+      "separation_m": 0.0,
+      "max_drift_m": 0.0045436513745169315,
+      "final_drift_m": 0.0029238730086989656,
+      "rotation_deg": 0.0033505206496772465,
+      "stable": true,
+      "ignored": false
      }
     ]
    },
    "friction_high": {
-    "stable": false,
-    "residual_penetration_m": 0.0003476424612940676,
+    "stable": true,
+    "residual_penetration_m": 1.2291281285436995e-05,
     "bodies": [
      {
       "object_id": "obj_000",
-      "separation_m": 0.0003353511800086306,
-      "max_drift_m": 0.00035039607585574426,
-      "final_drift_m": 0.00035039549295700663,
-      "rotation_deg": 0.10787597620575579,
-      "stable": true
+      "separation_m": 0.0,
+      "max_drift_m": 0.0005502213297414792,
+      "final_drift_m": 0.0003338495399680422,
+      "rotation_deg": 0.10873992894959592,
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
-      "separation_m": 0.044137466460536054,
-      "max_drift_m": 0.044137466460536054,
-      "final_drift_m": 0.04382719115891804,
-      "rotation_deg": 0.004075245046660476,
-      "stable": false
+      "separation_m": 0.0,
+      "max_drift_m": 0.004508728985427556,
+      "final_drift_m": 0.0029092746037752307,
+      "rotation_deg": 0.004488266539651245,
+      "stable": true,
+      "ignored": false
      }
     ]
    },
    "mass_low": {
-    "stable": false,
-    "residual_penetration_m": 0.0003476424612940676,
+    "stable": true,
+    "residual_penetration_m": 1.2291281285436995e-05,
     "bodies": [
      {
       "object_id": "obj_000",
-      "separation_m": 0.0003353511800086306,
-      "max_drift_m": 0.0003504041901956845,
-      "final_drift_m": 0.0003504036652271934,
-      "rotation_deg": 0.10797407643541142,
-      "stable": true
+      "separation_m": 0.0,
+      "max_drift_m": 0.000489465961549788,
+      "final_drift_m": 0.0003328228271452427,
+      "rotation_deg": 0.1085294087439922,
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
-      "separation_m": 0.044137466460536054,
-      "max_drift_m": 0.044137466460536054,
-      "final_drift_m": 0.04382752745199643,
-      "rotation_deg": 0.0046876530491346685,
-      "stable": false
+      "separation_m": 0.0,
+      "max_drift_m": 0.004517307443747443,
+      "final_drift_m": 0.0029145891784160926,
+      "rotation_deg": 0.0035569980728537417,
+      "stable": true,
+      "ignored": false
      }
     ]
    },
    "mass_high": {
-    "stable": false,
-    "residual_penetration_m": 0.0003476424612940676,
+    "stable": true,
+    "residual_penetration_m": 1.2291281285436995e-05,
     "bodies": [
      {
       "object_id": "obj_000",
-      "separation_m": 0.0003353511800086306,
-      "max_drift_m": 0.0003504041901956857,
-      "final_drift_m": 0.00035040366522718876,
-      "rotation_deg": 0.10797407643541142,
-      "stable": true
+      "separation_m": 0.0,
+      "max_drift_m": 0.0004894659615498457,
+      "final_drift_m": 0.00033282282714523304,
+      "rotation_deg": 0.10852940867682795,
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
-      "separation_m": 0.044137466460536054,
-      "max_drift_m": 0.044137466460536054,
-      "final_drift_m": 0.043827527451996445,
-      "rotation_deg": 0.0046876530491346685,
-      "stable": false
+      "separation_m": 0.0,
+      "max_drift_m": 0.004517307443747471,
+      "final_drift_m": 0.0029145891784161334,
+      "rotation_deg": 0.0035569980728537417,
+      "stable": true,
+      "ignored": false
      }
     ]
    }
@@ -3587,7 +3805,8 @@
       "max_drift_m": 0.0001707377766032363,
       "final_drift_m": 0.00010921992828078294,
       "rotation_deg": 0.1481997413420424,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -3595,7 +3814,8 @@
       "max_drift_m": 0.0016653853250681596,
       "final_drift_m": 0.0010903993809680314,
       "rotation_deg": 3.199311213484066,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -3603,7 +3823,8 @@
       "max_drift_m": 0.004899404423305789,
       "final_drift_m": 0.0034379954524395772,
       "rotation_deg": 6.574354482888835,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -3611,7 +3832,8 @@
       "max_drift_m": 0.0006018423937444303,
       "final_drift_m": 0.00038359004541465945,
       "rotation_deg": 0.2132045785348163,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -3619,7 +3841,8 @@
       "max_drift_m": 0.0010919401571906464,
       "final_drift_m": 0.0005986421686445302,
       "rotation_deg": 0.24059589497216122,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -3633,7 +3856,8 @@
       "max_drift_m": 0.00017676723828964267,
       "final_drift_m": 0.00012868080651977351,
       "rotation_deg": 0.14819906206737493,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -3641,7 +3865,8 @@
       "max_drift_m": 0.0016479270389924295,
       "final_drift_m": 0.0010350666308365228,
       "rotation_deg": 3.199322475221981,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -3649,7 +3874,8 @@
       "max_drift_m": 0.004035484595399598,
       "final_drift_m": 0.0029794727233837114,
       "rotation_deg": 6.573306976077317,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -3657,7 +3883,8 @@
       "max_drift_m": 0.00039838068503295174,
       "final_drift_m": 0.0003953977169054433,
       "rotation_deg": 0.21313280162167667,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -3665,7 +3892,8 @@
       "max_drift_m": 0.001083945958912833,
       "final_drift_m": 0.0005929001898955184,
       "rotation_deg": 0.24059587131031368,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -3679,7 +3907,8 @@
       "max_drift_m": 0.00018126075739246784,
       "final_drift_m": 0.00011498579363612173,
       "rotation_deg": 0.14819765115479455,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -3687,7 +3916,8 @@
       "max_drift_m": 0.001786961104122917,
       "final_drift_m": 0.0011303333488501667,
       "rotation_deg": 3.1997971325735985,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -3695,7 +3925,8 @@
       "max_drift_m": 0.005606936679689885,
       "final_drift_m": 0.004300346823114796,
       "rotation_deg": 6.573773927958004,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -3703,7 +3934,8 @@
       "max_drift_m": 0.0006016682841298233,
       "final_drift_m": 0.00038358024000930774,
       "rotation_deg": 0.213197422692689,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -3711,7 +3943,8 @@
       "max_drift_m": 0.0010919401571906464,
       "final_drift_m": 0.0005986421686446765,
       "rotation_deg": 0.24059589497822056,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -3725,7 +3958,8 @@
       "max_drift_m": 0.00017073777659558755,
       "final_drift_m": 0.00010921992823521989,
       "rotation_deg": 0.1481997413420424,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -3733,7 +3967,8 @@
       "max_drift_m": 0.0016653853250511042,
       "final_drift_m": 0.0010903993819031527,
       "rotation_deg": 3.1993112135214363,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -3741,7 +3976,8 @@
       "max_drift_m": 0.0048994044233058275,
       "final_drift_m": 0.003437995452439667,
       "rotation_deg": 6.574354482889278,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -3749,7 +3985,8 @@
       "max_drift_m": 0.0006018423937444303,
       "final_drift_m": 0.00038359004541472434,
       "rotation_deg": 0.2132045785348163,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -3757,7 +3994,8 @@
       "max_drift_m": 0.0010919401571906464,
       "final_drift_m": 0.0005986421686445834,
       "rotation_deg": 0.24059589496610181,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -3771,7 +4009,8 @@
       "max_drift_m": 0.00017073777660536608,
       "final_drift_m": 0.00010921992829571898,
       "rotation_deg": 0.1481997413420424,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -3779,7 +4018,8 @@
       "max_drift_m": 0.0016653853250701643,
       "final_drift_m": 0.0010903993807398575,
       "rotation_deg": 3.1993112133231905,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -3787,7 +4027,8 @@
       "max_drift_m": 0.004899404423305797,
       "final_drift_m": 0.0034379954524392737,
       "rotation_deg": 6.574354482889945,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -3795,7 +4036,8 @@
       "max_drift_m": 0.000601842393744421,
       "final_drift_m": 0.0003835900454146592,
       "rotation_deg": 0.21320457854849198,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -3803,14 +4045,15 @@
       "max_drift_m": 0.0010919401571906464,
       "final_drift_m": 0.0005986421686445388,
       "rotation_deg": 0.24059589497216122,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    }
   },
   "s17_b": {
    "nominal": {
-    "stable": false,
+    "stable": true,
     "residual_penetration_m": 0.0003569694132755305,
     "bodies": [
      {
@@ -3819,7 +4062,8 @@
       "max_drift_m": 0.0005176075080328274,
       "final_drift_m": 0.00035616284674734925,
       "rotation_deg": 0.027718255830634288,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -3827,7 +4071,8 @@
       "max_drift_m": 0.0003695505409585114,
       "final_drift_m": 0.00020711258302998385,
       "rotation_deg": 0.40992082424211834,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -3835,7 +4080,8 @@
       "max_drift_m": 0.0001701811492339533,
       "final_drift_m": 0.0001701619820243271,
       "rotation_deg": 0.0478983609349311,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -3843,7 +4089,8 @@
       "max_drift_m": 0.0013009726674145794,
       "final_drift_m": 0.001104298379285586,
       "rotation_deg": 0.098053819123317,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -3851,12 +4098,13 @@
       "max_drift_m": 0.05887736337359792,
       "final_drift_m": 0.05883452661056206,
       "rotation_deg": 126.42360894921546,
-      "stable": false
+      "stable": false,
+      "ignored": true
      }
     ]
    },
    "friction_low": {
-    "stable": false,
+    "stable": true,
     "residual_penetration_m": 0.0003569694132755305,
     "bodies": [
      {
@@ -3865,7 +4113,8 @@
       "max_drift_m": 0.0005176075080328274,
       "final_drift_m": 0.00035681395899172396,
       "rotation_deg": 0.030116728019089527,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -3873,7 +4122,8 @@
       "max_drift_m": 0.0003575886735123618,
       "final_drift_m": 0.0002922788358477989,
       "rotation_deg": 0.4101121401324045,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -3881,7 +4131,8 @@
       "max_drift_m": 0.00017007948032244272,
       "final_drift_m": 0.00016987384078226455,
       "rotation_deg": 0.045612734995038734,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -3889,7 +4140,8 @@
       "max_drift_m": 0.0013009726674145794,
       "final_drift_m": 0.0011042980615176235,
       "rotation_deg": 0.09805402202598953,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -3897,12 +4149,13 @@
       "max_drift_m": 0.062137266858825146,
       "final_drift_m": 0.061053231152021895,
       "rotation_deg": 111.04821942712765,
-      "stable": false
+      "stable": false,
+      "ignored": true
      }
     ]
    },
    "friction_high": {
-    "stable": false,
+    "stable": true,
     "residual_penetration_m": 0.0003569694132755305,
     "bodies": [
      {
@@ -3911,7 +4164,8 @@
       "max_drift_m": 0.0005176075080328274,
       "final_drift_m": 0.00035616284674735125,
       "rotation_deg": 0.027718255830634288,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -3919,7 +4173,8 @@
       "max_drift_m": 0.000453073221192788,
       "final_drift_m": 0.000249448321043225,
       "rotation_deg": 0.4099227574122994,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -3927,7 +4182,8 @@
       "max_drift_m": 0.00017018351754953222,
       "final_drift_m": 0.00017008785797623118,
       "rotation_deg": 0.0456029969304313,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -3935,7 +4191,8 @@
       "max_drift_m": 0.0013009726674145794,
       "final_drift_m": 0.0011042983792855846,
       "rotation_deg": 0.098053819123317,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -3943,12 +4200,13 @@
       "max_drift_m": 0.058361458906799474,
       "final_drift_m": 0.0579909203073894,
       "rotation_deg": 124.71762252272374,
-      "stable": false
+      "stable": false,
+      "ignored": true
      }
     ]
    },
    "mass_low": {
-    "stable": false,
+    "stable": true,
     "residual_penetration_m": 0.0003569694132755305,
     "bodies": [
      {
@@ -3957,7 +4215,8 @@
       "max_drift_m": 0.0005176075080328274,
       "final_drift_m": 0.0003561628467473494,
       "rotation_deg": 0.027718255883229907,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -3965,7 +4224,8 @@
       "max_drift_m": 0.0003695505409585085,
       "final_drift_m": 0.00020711258303193398,
       "rotation_deg": 0.40992082424211834,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -3973,7 +4233,8 @@
       "max_drift_m": 0.0001701811492552297,
       "final_drift_m": 0.00017016198204534077,
       "rotation_deg": 0.04789836120885968,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -3981,7 +4242,8 @@
       "max_drift_m": 0.0013009726674145794,
       "final_drift_m": 0.0011042983792855987,
       "rotation_deg": 0.098053819123317,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -3989,12 +4251,13 @@
       "max_drift_m": 0.058892416227688996,
       "final_drift_m": 0.05883520374149684,
       "rotation_deg": 126.42779324285776,
-      "stable": false
+      "stable": false,
+      "ignored": true
      }
     ]
    },
    "mass_high": {
-    "stable": false,
+    "stable": true,
     "residual_penetration_m": 0.0003569694132755305,
     "bodies": [
      {
@@ -4003,7 +4266,8 @@
       "max_drift_m": 0.0005176075080328274,
       "final_drift_m": 0.0003561628467473484,
       "rotation_deg": 0.027718255830634288,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -4011,7 +4275,8 @@
       "max_drift_m": 0.0003695505409585114,
       "final_drift_m": 0.0002071125830297715,
       "rotation_deg": 0.40992082424211834,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -4019,7 +4284,8 @@
       "max_drift_m": 0.00017018114923208748,
       "final_drift_m": 0.0001701619820224813,
       "rotation_deg": 0.04789836111755016,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -4027,7 +4293,8 @@
       "max_drift_m": 0.0013009726674145794,
       "final_drift_m": 0.0011042983792855998,
       "rotation_deg": 0.098053819123317,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -4035,7 +4302,8 @@
       "max_drift_m": 0.05884620635875471,
       "final_drift_m": 0.05883599031229549,
       "rotation_deg": 126.42814776967192,
-      "stable": false
+      "stable": false,
+      "ignored": true
      }
     ]
    }
@@ -4051,7 +4319,8 @@
       "max_drift_m": 0.0009349027697557985,
       "final_drift_m": 0.0007820563636010885,
       "rotation_deg": 2.115072704639898,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -4059,7 +4328,8 @@
       "max_drift_m": 0.0006559616083403859,
       "final_drift_m": 0.00028399873531475113,
       "rotation_deg": 2.2425930287940377,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -4067,7 +4337,8 @@
       "max_drift_m": 0.0006342193157398475,
       "final_drift_m": 0.0003403331980285799,
       "rotation_deg": 0.2576683880204851,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -4075,7 +4346,8 @@
       "max_drift_m": 0.0005600118962821414,
       "final_drift_m": 0.0004502595136891414,
       "rotation_deg": 0.15896858778949802,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -4083,7 +4355,8 @@
       "max_drift_m": 0.005412982097406799,
       "final_drift_m": 0.0037739184727241743,
       "rotation_deg": 6.962018566002206,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_005",
@@ -4091,7 +4364,8 @@
       "max_drift_m": 0.00010771931594326195,
       "final_drift_m": 0.00010771931301060646,
       "rotation_deg": 7.636383641665691e-06,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_006",
@@ -4099,7 +4373,8 @@
       "max_drift_m": 0.00016616232867250317,
       "final_drift_m": 0.00016615131936741526,
       "rotation_deg": 0.06300143411207389,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_007",
@@ -4107,7 +4382,8 @@
       "max_drift_m": 0.0007422186590217011,
       "final_drift_m": 0.0006970390994201882,
       "rotation_deg": 0.22928597224078462,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -4121,7 +4397,8 @@
       "max_drift_m": 0.0007592399273831165,
       "final_drift_m": 0.0006361061842563644,
       "rotation_deg": 2.1157386080293614,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -4129,7 +4406,8 @@
       "max_drift_m": 0.0006559616083403859,
       "final_drift_m": 0.0002760332620641814,
       "rotation_deg": 2.241169419341315,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -4137,7 +4415,8 @@
       "max_drift_m": 0.0006242170772862847,
       "final_drift_m": 0.00033673029213978625,
       "rotation_deg": 0.25625515645291846,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -4145,7 +4424,8 @@
       "max_drift_m": 0.001439287058356633,
       "final_drift_m": 0.001439287058356633,
       "rotation_deg": 0.3564938531808426,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -4153,7 +4433,8 @@
       "max_drift_m": 0.004787193946179527,
       "final_drift_m": 0.0034212259539485364,
       "rotation_deg": 6.9607965540896055,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_005",
@@ -4161,7 +4442,8 @@
       "max_drift_m": 0.00010771931589836744,
       "final_drift_m": 0.00010771931301063636,
       "rotation_deg": 7.636383641665691e-06,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_006",
@@ -4169,7 +4451,8 @@
       "max_drift_m": 0.000166162328672501,
       "final_drift_m": 0.00016615131936741312,
       "rotation_deg": 0.06300143411207389,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_007",
@@ -4177,7 +4460,8 @@
       "max_drift_m": 0.0007422186590217011,
       "final_drift_m": 0.0006576690953298791,
       "rotation_deg": 0.229372006865248,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -4191,7 +4475,8 @@
       "max_drift_m": 0.0009350012740259936,
       "final_drift_m": 0.0007823766380910081,
       "rotation_deg": 2.1150720256697126,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -4199,7 +4484,8 @@
       "max_drift_m": 0.0006559616083403859,
       "final_drift_m": 0.0002839902910471232,
       "rotation_deg": 2.242593065268304,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -4207,7 +4493,8 @@
       "max_drift_m": 0.0006349358422373853,
       "final_drift_m": 0.0003408663269318616,
       "rotation_deg": 0.25624171115149325,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -4215,7 +4502,8 @@
       "max_drift_m": 0.0006937358520854566,
       "final_drift_m": 0.0003674016337146486,
       "rotation_deg": 0.05360975681344496,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -4223,7 +4511,8 @@
       "max_drift_m": 0.00616145125597457,
       "final_drift_m": 0.004695487098499854,
       "rotation_deg": 6.960741326709697,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_005",
@@ -4231,7 +4520,8 @@
       "max_drift_m": 0.00010771931578371438,
       "final_drift_m": 0.00010771931301061171,
       "rotation_deg": 7.636383641665691e-06,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_006",
@@ -4239,7 +4529,8 @@
       "max_drift_m": 0.00016616232867250317,
       "final_drift_m": 0.00016615131936741526,
       "rotation_deg": 0.06300143411207389,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_007",
@@ -4247,7 +4538,8 @@
       "max_drift_m": 0.0007422186590217011,
       "final_drift_m": 0.0006970401298463657,
       "rotation_deg": 0.2292858525910147,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -4261,7 +4553,8 @@
       "max_drift_m": 0.0009349027697302672,
       "final_drift_m": 0.0007820563635118285,
       "rotation_deg": 2.115072704635073,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -4269,7 +4562,8 @@
       "max_drift_m": 0.0006559616083403859,
       "final_drift_m": 0.0002839987353173693,
       "rotation_deg": 2.242593028790787,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -4277,7 +4571,8 @@
       "max_drift_m": 0.00063421931573573,
       "final_drift_m": 0.00034033317719176913,
       "rotation_deg": 0.25766839553982446,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -4285,7 +4580,8 @@
       "max_drift_m": 0.0005600118962821414,
       "final_drift_m": 0.00045025951371394866,
       "rotation_deg": 0.15896858767027844,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -4293,7 +4589,8 @@
       "max_drift_m": 0.005412982097406799,
       "final_drift_m": 0.00377391847272445,
       "rotation_deg": 6.962018566001996,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_005",
@@ -4301,7 +4598,8 @@
       "max_drift_m": 0.00010771931578372304,
       "final_drift_m": 0.00010771931301061,
       "rotation_deg": 7.636383641665691e-06,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_006",
@@ -4309,7 +4607,8 @@
       "max_drift_m": 0.00016616232867249886,
       "final_drift_m": 0.00016615131936741098,
       "rotation_deg": 0.06300143411207389,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_007",
@@ -4317,7 +4616,8 @@
       "max_drift_m": 0.0007422186590217011,
       "final_drift_m": 0.0006970390994284248,
       "rotation_deg": 0.22928597226621766,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -4331,7 +4631,8 @@
       "max_drift_m": 0.0009349027698749379,
       "final_drift_m": 0.000782056363874366,
       "rotation_deg": 2.115072704643344,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_001",
@@ -4339,7 +4640,8 @@
       "max_drift_m": 0.0006559616083403859,
       "final_drift_m": 0.00028399873531466456,
       "rotation_deg": 2.2425930287927374,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_002",
@@ -4347,7 +4649,8 @@
       "max_drift_m": 0.0006342193157452999,
       "final_drift_m": 0.00034033319059432164,
       "rotation_deg": 0.2576683809198296,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_003",
@@ -4355,7 +4658,8 @@
       "max_drift_m": 0.0005600118962821414,
       "final_drift_m": 0.00045025951368913767,
       "rotation_deg": 0.15896858778949802,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_004",
@@ -4363,7 +4667,8 @@
       "max_drift_m": 0.005412982097406799,
       "final_drift_m": 0.00377391847272467,
       "rotation_deg": 6.962018566001787,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_005",
@@ -4371,7 +4676,8 @@
       "max_drift_m": 0.00010771931589830696,
       "final_drift_m": 0.00010771931301060652,
       "rotation_deg": 7.636383641665691e-06,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_006",
@@ -4379,7 +4685,8 @@
       "max_drift_m": 0.000166162328672501,
       "final_drift_m": 0.00016615131936741312,
       "rotation_deg": 0.06300143411207389,
-      "stable": true
+      "stable": true,
+      "ignored": false
      },
      {
       "object_id": "obj_007",
@@ -4387,7 +4694,8 @@
       "max_drift_m": 0.0007422186590217011,
       "final_drift_m": 0.0006970390994330307,
       "rotation_deg": 0.22928597226621766,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    }
@@ -4403,7 +4711,8 @@
       "max_drift_m": 0.0001192362010272544,
       "final_drift_m": 0.0001004623082411492,
       "rotation_deg": 0.053194485730967404,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -4417,7 +4726,8 @@
       "max_drift_m": 0.00012571088494637807,
       "final_drift_m": 0.00011247124274860361,
       "rotation_deg": 0.05319452697728851,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -4431,7 +4741,8 @@
       "max_drift_m": 0.00012474872432684548,
       "final_drift_m": 9.946559295583485e-05,
       "rotation_deg": 0.05319441581769492,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -4445,7 +4756,8 @@
       "max_drift_m": 0.00011923620102736342,
       "final_drift_m": 0.00010046230824164639,
       "rotation_deg": 0.053194485730967404,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    },
@@ -4459,7 +4771,8 @@
       "max_drift_m": 0.0001192362010272544,
       "final_drift_m": 0.0001004623082412099,
       "rotation_deg": 0.053194485730967404,
-      "stable": true
+      "stable": true,
+      "ignored": false
      }
     ]
    }

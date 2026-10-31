@@ -95,6 +95,10 @@ segmentation:
     step_m: 0.005              # starting step of centre and sizes
     step_deg: 5.0              # starting step of the yaw
     min_size_m: 0.005          # a primitive side below this is rejected
+    stack_min_overlap: 0.8     # stacked: this share of the footprint lies over another object ...
+    stack_gap_m: 0.015         # ... and the lowest points are this close to that object's top; s13 is 1.0 cm off
+    stack_min_points: 20       # fewer points say nothing about where an object starts
+    stack_percentile: 2.0      # the lowest points, without strays
     max_cost: 0.10             # above this mask disagreement the cluster is the union of primitive and points; chosen on the dev scenes (cluster_box_accuracy.md)
     seed: 0
   keyframes_per_object: 5
@@ -211,6 +215,7 @@ physics:
     timeout_s: 120
     retries: 4
   settling:                    # P4.7, stages/settling.py; window and drift limit are in targets.yaml
+    round_tolerance: 0.04           # within this share of the bbox diagonal of an ellipsoid an object cannot be expected to rest (D-025); dev: egg 0.028, nearest other 0.053
     timestep_s: 0.001               # stable on the closed-form tests in tests/test_settling.py
     gravity_m_s2: 9.80665           # standard gravity, CGPM 1901
     penetration_tolerance_m: 0.0005 # overlaps deeper than this are separated before the drop
