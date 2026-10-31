@@ -242,7 +242,7 @@ Tasks
       raw mesh (no pose, unitless, up axis assumed z, UNVERIFIED), so the start rotation is a
       canonical guess and registration's yaw starts do the rest. Single view first,
       MV-SAM3D only as a P3.3 arm (`docs/research/sam3d_multiview.md`)
-      Evidence: SAM 3D adapter and Modal worker, `benchmark/results/p3_6_dev_stretch.json` and `benchmark/results/p3_eval_shape_test.json`, commits 5ec1636, c9f6dbd; the TRELLIS.2 half was built, measured and dropped (D-018, `benchmark/results/p3_3_bakeoff_dev.json`, commit df4cf16).
+      Evidence: SAM 3D adapter and Modal worker, `benchmark/results/p3_6_dev_stretch.json` and `benchmark/results/p3_eval_shape_test.json`, commits 5401dec, 69b9d04; the TRELLIS.2 half was built, measured and dropped (D-018, `benchmark/results/p3_3_bakeoff_dev.json`, commit 509cf09).
 
 - [x] **P3.2** Registration. SAM 3D's predicted layout is the starting pose. Refine a
 
@@ -286,7 +286,7 @@ Tasks
   the table. Left: sizes run 3 to 9% large on all but the earbud box, from SAM 3D's
   proportions and loose masks. Open: weights are untuned first guesses, one sample per
   object, not yet wired into a stage.
-  Evidence: commits 72dd631, c44e77c; `benchmark/results/p3_6_dev_stretch.json` and `benchmark/results/p3_eval_shape_test.json`. Still open as noted above: untuned weights, one sample per object.
+  Evidence: commits abf530b, acc2a36; `benchmark/results/p3_6_dev_stretch.json` and `benchmark/results/p3_eval_shape_test.json`. Still open as noted above: untuned weights, one sample per object.
 
 - [x] **P3.3** Bake-off, time-boxed to one week: SAM 3D, TRELLIS.2, and SAM 3D pose with
 
@@ -328,17 +328,17 @@ Tasks
   MV-SAM3D, and the Phase 4 stability measure. Fixes made on the way: `shape.parallel_samples`
   (hosted draws in flight at once), the worker now reports an empty sparse structure as a
   failed draw whether torch raises `RuntimeError` or `IndexError`.
-  Evidence: `benchmark/results/p3_3_bakeoff_dev.json`, D-018, commits c0cd015, df4cf16. Dev split only (the test split ran SAM 3D alone), no stability measure.
+  Evidence: `benchmark/results/p3_3_bakeoff_dev.json`, D-018, commits 3e531bd, 509cf09. Dev split only (the test split ran SAM 3D alone), no stability measure.
 
 - [x] **P3.4** Pick the best sample per object by fit score. Below the threshold, fall back to
 
       a convex hull or oriented box of the observed points and set `PROXY_GEOMETRY`.
-      Evidence: `benchmark/results/p3_6_dev_stretch.json` (1 proxy among the 43 objects on dev), `benchmark/results/p3_shape_checks_test.json` (5 proxies of 32 on test), commit 72dd631.
+      Evidence: `benchmark/results/p3_6_dev_stretch.json` (1 proxy among the 43 objects on dev), `benchmark/results/p3_shape_checks_test.json` (5 proxies of 32 on test), commit abf530b.
 
 - [x] **P3.5** Snap resting objects to the table: choose the stable face from the convex hull,
 
       align the up axis, remove the small gap or penetration.
-      Evidence: `benchmark/results/p3_shape_checks_dev.json` and `p3_shape_checks_test.json`: lowest vertex of every resting mesh at the support height (68 meshes, max gap 0.0 mm), commit 72dd631.
+      Evidence: `benchmark/results/p3_shape_checks_dev.json` and `p3_shape_checks_test.json`: lowest vertex of every resting mesh at the support height (68 meshes, max gap 0.0 mm), commit abf530b.
 
 - [x] **P3.6** Emit `RegisteredObjects`.
 
@@ -390,7 +390,7 @@ Tasks
   s04 water bottle 29%, the white cuboid in s11 (29%) and s14 (21%). The size target is
   provisional and the settings are tuned on dev, so the test split may read higher.
   Open: a fit score that ranks samples, stacked clusters in P2, and the bake-off.
-  Evidence: `benchmark/results/p3_eval_shape_test.json` (test split, run once 2026-10-30) and `p3_6_dev_stretch.json`, commit 72dd631.
+  Evidence: `benchmark/results/p3_eval_shape_test.json` (test split, run once 2026-10-30) and `p3_6_dev_stretch.json`, commit abf530b.
 
 Exit criteria
 
