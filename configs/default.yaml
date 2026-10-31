@@ -72,7 +72,7 @@ segmentation:
     voxel_m: 0.005             # grid resolution; a cluster point is a voxel centre
     max_height_m: 0.35         # grid top above the table plane; objects taller than this are cut off
     margin_m: 0.10             # grid extends this far beyond the track footprints
-    max_extent_m: 1.5          # refuse a grid wider than this (a stray track far from the others)
+    max_extent_m: 2.0          # refuse a grid wider than this (a stray track far from the others); s05 is 1.52 m with no stray
     max_views: 40              # frames used, spread evenly; cost is voxels x views x tracks
     mask_downscale: 2          # masks are shrunk by this factor before lookup
     min_views: 5               # a voxel needs this many views that see it
