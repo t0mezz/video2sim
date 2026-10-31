@@ -77,3 +77,29 @@ def test_hollow_answers(
     assert m.is_hollow is hollow
     assert bool(m.reasons) is noted
     assert m.flags == ()  # hollow alone says nothing about the material numbers
+
+
+def test_fill_fraction_is_the_class_value_when_fitted(table: MaterialTable) -> None:
+    assert (
+        object_material(_obj(hollow="hollow"), table, 0.6).fill_fraction
+        == table.materials["plastic_hard"].hollow_fill_fraction
+    )
+    assert (
+        object_material(_obj(), table, 0.6).fill_fraction
+        == table.materials["plastic_hard"].solid_fill_fraction
+    )
+
+
+@pytest.mark.parametrize(("answer", "hollow"), [("hollow", True), ("solid", False)])
+def test_fill_fraction_falls_back_to_the_answer(
+    table: MaterialTable, answer: str, hollow: bool
+) -> None:
+    fill = object_material(_obj(material_class="wood", hollow=answer), table, 0.6).fill_fraction
+    assert fill == (table.hollow_fill_fraction if hollow else table.solid_fill_fraction)
+
+
+def test_fill_fraction_above_one_is_refused(table: MaterialTable) -> None:
+    raw = table.model_dump()
+    raw["solid_fill_fraction"] = {"low": 0.5, "nominal": 1.0, "high": 1.5}
+    with pytest.raises(ValueError, match="fill fraction"):
+        MaterialTable.model_validate(raw)

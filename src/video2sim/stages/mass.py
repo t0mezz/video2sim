@@ -9,11 +9,12 @@ median 0.13 of the true volume (``docs/research/mesh_volume.md``). So the body i
   and the box becomes solid. The mouth of a cup stays open until the radius reaches about half its
   width, so the cup keeps its cavity. A vessel with a mouth under about 8% of the longest side is
   sealed as a solid.
-* A hollow answer scales the body: ``V_eff = f * V_sealed``, where ``f`` is
-  ``hollow_fill_fraction`` of the material table. It applies to closed objects only. A body under
-  ``open_vessel_hull_ratio`` of its convex hull has already lost its cavity, and a second
-  correction would count it twice. Concave solids fall under the same test and keep ``f = 1``.
-* A solid answer keeps ``f = 1``.
+* The body is scaled: ``V_eff = f * V_sealed``, where ``f`` is the fill fraction of the material
+  table for the class and the solid-or-hollow answer. A solid answer has one too, because the
+  table holds the density of the material and a print or a can is mostly air (P4.6).
+* A hollow answer on a body under ``open_vessel_hull_ratio`` of its convex hull keeps ``f = 1``.
+  That body has already lost its cavity, and a second correction would count it twice. A concave
+  solid with a hollow answer falls under the same test.
 
 Low and high multiply the density range by the range of ``f``, and leave out the scale error.
 ``f`` dilutes the body evenly rather than moving mass to a wall, so the inertia of an empty box
@@ -136,7 +137,6 @@ def body_inertia(body: SealedBody, density_kg_m3: float) -> tuple[F64, F64]:
 def estimate_mass(
     mesh: trimesh.Trimesh,
     material: ObjectMaterial,
-    hollow_fill_fraction: Estimate,
     cfg: MassConfig,
 ) -> MassEstimate:
     """``m = rho * V_eff`` and the inertia of the sealed body at that density (AGENTS.md)."""
@@ -145,11 +145,10 @@ def estimate_mass(
     hull_ratio = volume / float(mesh.convex_hull.volume)
     is_open = hull_ratio < cfg.open_vessel_hull_ratio
     reasons = []
-    fill = Estimate(low=1.0, nominal=1.0, high=1.0)
+    fill = material.fill_fraction
     if material.is_hollow and is_open:
+        fill = Estimate(low=1.0, nominal=1.0, high=1.0)
         reasons.append(f"sealed body is {hull_ratio:.2f} of the hull: read as open, no correction")
-    elif material.is_hollow:
-        fill = hollow_fill_fraction
     rho = material.numbers.density_kg_m3
     mass = Estimate(
         low=rho.low * fill.low * volume,

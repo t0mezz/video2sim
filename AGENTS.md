@@ -95,6 +95,8 @@ scene in the browser, and `python scripts/view_glb.py FILE.glb` shows one mesh.
 
 `python benchmark/run_mass.py --runs runs_instances --out FILE.json` repairs the matched dev meshes and
 scores `stages/mass.py` against the weighed masses (P4.5); it makes no hosted call.
+`python benchmark/fit_fill_fractions.py --out FILE.json` fits the fill fractions from that output and scores
+them with each object held out (P4.6); the table values in `configs/material_table.yaml` are copied from it by hand.
 
 Commands that arrive with their task: `video2sim run` (P5.5).
 Never document a command that does not exist. When you add one, add it here in the same

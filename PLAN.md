@@ -489,9 +489,16 @@ Tasks
 
   $$m = \rho\,V_{\text{eff}}, \qquad \mathbf{I} = \rho \int_V \left(\lVert\mathbf{r}\rVert^2 \mathbf{1} - \mathbf{r}\mathbf{r}^{\top}\right) dV$$
 
-- [ ] **P4.6** Calibrate on the weighed benchmark objects: fit per-material corrections (for
+- [x] **P4.6** Calibrate on the weighed benchmark objects: fit per-material corrections (for
 
       example the wall fraction of hollow containers) and report mass error before and after.
+      Evidence: `benchmark/fit_fill_fractions.py`, `benchmark/results/p4_6_fill_fit.json`,
+      `benchmark/results/p4_6_mass.json`, `configs/material_table.yaml`, `tests/test_physics.py`,
+      `docs/research/mesh_volume.md`. A fill fraction per class and solid-or-hollow answer, from 3
+      distinct objects, else one global value per answer. Only 4 pairs qualify; the 56 rows are 35
+      distinct objects. Within 30%, leave one object out: 4 of 56 uncorrected, 17 with the global
+      values, 20 (36%) per class; 26 (46%) in sample. The 70% exit criterion is not met. Friction
+      and restitution stay as placeholders (D-019). No test split was run.
 
 - [ ] **P4.7** Scene settling: resolve interpenetrations, drop the scene under gravity in the
 
@@ -690,4 +697,5 @@ In order:
 | 2026-10-31 | Inventory: obj_002, obj_003, obj_014 and obj_029 marked hollow by human decision; ground truth regenerated, only the 23 hollow fields changed |
 | 2026-10-31 | P4.5: volume test written up in `docs/research/mesh_volume.md`; meshes are shells, the outer volume is right and density is the main mass error |
 | 2026-10-31 | P4.5 ticked: `stages/mass.py`, sealed voxel body, one dev-measured hollow fill fraction and the center of mass left to P4.8 (human decisions); 14 of 56 dev objects within 30%, exit criterion not met |
+| 2026-10-31 | P4.6 ticked: fill fractions per class and answer; 20 of 56 dev objects within 30% with objects held out (36%), exit criterion not met |
 | 2026-10-31 | D-020: tags-on-table layer on the plane fit; s05 rerun, all 4 objects now SAM 3D with fit 0.95 to 0.98 and `lift.max_extent_m` back at 1.5 |

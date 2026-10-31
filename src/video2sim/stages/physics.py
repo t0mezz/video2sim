@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from video2sim.schemas import Flag, ObjectInstance
+from video2sim.schemas import Estimate, Flag, ObjectInstance
 from video2sim.stages.material_table import MaterialNumbers, MaterialTable
 
 
@@ -21,6 +21,7 @@ class ObjectMaterial:
     """What the material pass said about one object, turned into numbers (P4.4)."""
 
     numbers: MaterialNumbers
+    fill_fraction: Estimate
     is_hollow: bool
     confidence: float
     flags: tuple[Flag, ...]
@@ -48,7 +49,9 @@ def object_material(
     flags = (Flag.LOW_CONFIDENCE_MATERIAL,) if reasons else ()
     if obj.hollow != "hollow" and obj.hollow != "solid":
         reasons.append(f"hollow is {obj.hollow}: treated as solid")
-    return ObjectMaterial(numbers, obj.hollow == "hollow", confidence, flags, tuple(reasons))
+    is_hollow = obj.hollow == "hollow"
+    fill = table.fill_fraction(numbers.material_class, is_hollow)
+    return ObjectMaterial(numbers, fill, is_hollow, confidence, flags, tuple(reasons))
 
 
 __all__ = ["ObjectMaterial", "object_material"]

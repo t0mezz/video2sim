@@ -25,10 +25,17 @@ FALLBACK_CLASS = "other"
 QUANTITIES = ("density_kg_m3", "friction_coefficient", "restitution")
 
 
+def _check_fill(fill: Estimate | None) -> None:
+    if fill is not None and (fill.low <= 0 or fill.high > 1):
+        raise ValueError("a fill fraction must lie in (0, 1]")
+
+
 class MaterialEntry(Model):
     density_kg_m3: Estimate
     friction_coefficient: Estimate
     restitution: Estimate
+    hollow_fill_fraction: Estimate | None = None
+    solid_fill_fraction: Estimate | None = None
     sources: list[str] = Field(min_length=1)
     unsourced: list[str] = Field(default_factory=list)
     note: str = ""
@@ -46,6 +53,8 @@ class MaterialEntry(Model):
             raise ValueError("restitution must lie in [0, 1]")
         if set(self.unsourced) != set(QUANTITIES) and self.sources == ["none"]:
             raise ValueError("an entry that names a source for no quantity must say 'none'")
+        _check_fill(self.hollow_fill_fraction)
+        _check_fill(self.solid_fill_fraction)
         return self
 
 
@@ -65,15 +74,24 @@ class MaterialNumbers:
 
 class MaterialTable(Model):
     hollow_fill_fraction: Estimate
+    solid_fill_fraction: Estimate
     materials: dict[str, MaterialEntry]
 
     @model_validator(mode="after")
     def _has_fallback(self) -> MaterialTable:
         if FALLBACK_CLASS not in self.materials:
             raise ValueError(f"the table needs a '{FALLBACK_CLASS}' entry")
-        if self.hollow_fill_fraction.low <= 0 or self.hollow_fill_fraction.high > 1:
-            raise ValueError("hollow_fill_fraction must lie in (0, 1]")
+        _check_fill(self.hollow_fill_fraction)
+        _check_fill(self.solid_fill_fraction)
         return self
+
+    def fill_fraction(self, material_class: str, is_hollow: bool) -> Estimate:
+        """The class's fitted share of the sealed volume, else the global one of that answer."""
+        e = self.materials[material_class]
+        own = e.hollow_fill_fraction if is_hollow else e.solid_fill_fraction
+        if own is not None:
+            return own
+        return self.hollow_fill_fraction if is_hollow else self.solid_fill_fraction
 
     def lookup(self, material_class: str | None) -> MaterialNumbers:
         fell_back = material_class not in self.materials

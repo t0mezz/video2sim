@@ -114,9 +114,9 @@ Implemented in `stages/mass.py`, scored in `benchmark/results/p4_5_mass.json`
 1. The body is the sealed fill at 4% of the longest side. There is no hull fallback, because it
    fills cups. Inertia is integrated over the same voxels.
 2. An open vessel keeps its cavity and `f = 1`. A body under 0.5 of its hull counts as open.
-3. A closed hollow object gets `V_eff = f * V_sealed`. `f` is one value for all classes, 0.024,
-   0.22 and 0.61 (10th, 50th and 90th percentile of the `f` each of the 31 such objects needs).
-4. A solid answer keeps `f = 1`.
+3. A closed hollow object gets `V_eff = f * V_sealed`. In P4.5 `f` was one value for all classes,
+   0.024, 0.22 and 0.61 (10th, 50th and 90th percentile of what each of the 31 such objects needs).
+4. A solid answer kept `f = 1` in P4.5. The table below is that state; P4.6 replaced both.
 
 | Objects | Median mass ratio | Within 30% | Within 30% with no correction | Truth inside low to high |
 | --- | --- | --- | --- | --- |
@@ -128,14 +128,49 @@ Implemented in `stages/mass.py`, scored in `benchmark/results/p4_5_mass.json`
 **14 of 56 is 25%, against the 70% exit criterion.** The closed row is in sample, since `f` came
 from those objects, so a median of 1.00 is by construction and says nothing about accuracy.
 
-Left for P4.6:
+## Calibration (P4.6)
 
-* The largest gap is the solid row. Non-hollow is not enough to mean solid: prints with infill and
-  metal cans are in it, and the inventory `hollow` column marks them the same way, so check those
-  rows before fitting.
-* Fit `f` per class. The spread of 25 times in the global value is mostly different classes.
-  Keep the fit apart from the objects it is scored on.
-* `f` divides by nominal density, so it absorbs table errors too.
+Fit in `benchmark/fit_fill_fractions.py`, result in `benchmark/results/p4_6_fill_fit.json`, pipeline
+rerun in `benchmark/results/p4_6_mass.json`. `f` is now fitted for solid answers too, because the
+solid row above was the largest gap. A class gets its own value from 3 distinct objects, otherwise
+the global value of the answer. An open vessel still keeps `f = 1`.
+
+The 56 rows are only 35 distinct objects, so an object held out only per scene would still be in
+its own fit. Scores hold out every run of the object:
+
+| Fill fraction | Within 30% of 56 | Share | Median mass ratio |
+| --- | --- | --- | --- |
+| None | 4 | 7% | 2.85 |
+| Global per answer, held out | 17 | 30% | 1.11 |
+| Per class, held out | 20 | 36% | 0.97 |
+| Per class, in sample | 26 | 46% | 0.99 |
+
+**The honest number is 36%, against the 70% exit criterion.** Density and fill alone do not reach it.
+Truth inside low to high went from 31 to 42 of 56, in sample.
+
+| Class and answer | Distinct objects | Low | Nominal | High |
+| --- | --- | --- | --- | --- |
+| `cardboard` hollow | 4 | 0.21 | 0.248 | 0.302 |
+| `metal_steel` hollow | 4 | 0.028 | 0.073 | 0.122 |
+| `plastic_hard` hollow | 5 | 0.415 | 0.601 | 0.947 |
+| `plastic_hard` solid | 12 | 0.18 | 0.357 | 0.535 |
+| Global hollow | | 0.039 | 0.278 | 0.681 |
+| Global solid | | 0.317 | 0.441 | 1.0 |
+
+What still misses, in sample (30 of 56):
+
+* `plastic_hard`, 9 misses: one class covers solid parts, thin housings and sparse prints, and its
+  range of 3 times is wider than the tolerance. A class cannot fix this.
+* Coffee can, 4 runs, 3 times too heavy, and it pulls up the `metal_steel` fit. The inventory says
+  cardboard and `obj_004` is undecided, so this waits on a human decision.
+* Prints and a cap the model calls `foam`, 3 runs, 10 to 30 times too light. A need above 1 cannot
+  be fitted: `f` stays in (0, 1], and the density is the wrong one.
+* Toy air basketball, 2 runs, 7.5 times too heavy. It has one distinct object, so it takes the
+  global value, and an inflated ball needs about 0.04.
+* Size errors: 7 runs are above 20%, 3 of them within tolerance anyway, and no fill fixes the rest.
+
+Next steps with a real chance of moving this are a class list or a model answer that separates
+sparse from dense objects, and the size errors of the shape stage. Both are outside P4.6.
 
 ## Limits of the mass estimate
 
@@ -143,7 +178,8 @@ Left for P4.6:
   higher than this gives, by up to 5/3 for a thin spherical shell. There is no measured inertia on
   the benchmark to size this; only the closed forms are checked.
 * Low and high carry the density and `f` ranges, not the scale error, which counts three times in
-  mass. On solid objects, where `f = 1`, the truth is outside the range on 18 of 21.
+  mass. The range holds the truth on 42 of 56, in sample, and 16 of 21 solid answers.
+* `f` is fitted on the same dev set it is reported on, and has not been run on the test split.
 * The sealed body's center of mass is a median 1.7 mm from the mesh centroid, the object-frame
   origin. P4.8 has to move the origin to it.
 * The 0.5 hull test also catches concave solids. A hollow answer on one, such as the chocolate

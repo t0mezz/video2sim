@@ -11,11 +11,12 @@ import yaml
 
 from video2sim.schemas import Estimate, PhysicalProperties
 from video2sim.stages.mass import MassConfig, SealedBody, body_inertia, estimate_mass, sealed_body
-from video2sim.stages.material_table import MaterialNumbers, load_material_table
+from video2sim.stages.material_table import MaterialNumbers
 from video2sim.stages.physics import ObjectMaterial
 
 ROOT = Path(__file__).resolve().parent.parent
 FILL = Estimate(low=0.1, nominal=0.2, high=0.5)
+ONE = Estimate(low=1.0, nominal=1.0, high=1.0)
 
 
 @pytest.fixture(scope="module")
@@ -24,11 +25,11 @@ def cfg() -> MassConfig:
     return MassConfig.from_config(raw)
 
 
-def _material(is_hollow: bool = False) -> ObjectMaterial:
+def _material(is_hollow: bool = False, fill: Estimate = ONE) -> ObjectMaterial:
     rho = Estimate(low=800, nominal=1000, high=1200)
     span = Estimate(low=0.1, nominal=0.5, high=0.9)
     numbers = MaterialNumbers("plastic_hard", rho, span, span, (), False)
-    return ObjectMaterial(numbers, is_hollow, 0.9, (), ())
+    return ObjectMaterial(numbers, fill, is_hollow, 0.9, (), ())
 
 
 def _shell(outer: trimesh.Trimesh, wall_m: float) -> trimesh.Trimesh:
@@ -55,7 +56,7 @@ def _cup(radius_m: float, height_m: float, wall_m: float) -> trimesh.Trimesh:
 
 def test_solid_box_matches_closed_forms(cfg: MassConfig) -> None:
     a, b, c = 0.2, 0.1, 0.06
-    est = estimate_mass(trimesh.creation.box((a, b, c)), _material(), FILL, cfg)
+    est = estimate_mass(trimesh.creation.box((a, b, c)), _material(), cfg)
     m = 1000 * a * b * c
     assert est.fill_fraction.nominal == 1.0
     assert est.mass_kg.nominal == pytest.approx(m, rel=0.08)  # the fill reads high, see the note
@@ -68,13 +69,13 @@ def test_solid_box_matches_closed_forms(cfg: MassConfig) -> None:
 
 def test_solid_cylinder_and_sphere_match_closed_forms(cfg: MassConfig) -> None:
     r, h = 0.04, 0.12
-    cyl = estimate_mass(trimesh.creation.cylinder(r, h, sections=64), _material(), FILL, cfg)
+    cyl = estimate_mass(trimesh.creation.cylinder(r, h, sections=64), _material(), cfg)
     assert cyl.volume_sealed_m3 == pytest.approx(math.pi * r**2 * h, rel=0.08)
     i = cyl.inertia_kg_m2 / cyl.mass_kg.nominal
     assert i[2, 2] == pytest.approx(r**2 / 2, rel=0.06)
     assert i[0, 0] == pytest.approx((3 * r**2 + h**2) / 12, rel=0.06)
 
-    ball = estimate_mass(trimesh.creation.icosphere(4, 0.05), _material(), FILL, cfg)
+    ball = estimate_mass(trimesh.creation.icosphere(4, 0.05), _material(), cfg)
     assert ball.volume_sealed_m3 == pytest.approx(4 / 3 * math.pi * 0.05**3, rel=0.08)
     assert ball.inertia_kg_m2[0, 0] / ball.mass_kg.nominal == pytest.approx(
         2 / 5 * 0.05**2, rel=0.06
@@ -96,10 +97,10 @@ def test_inertia_of_a_voxel_block_is_exact() -> None:
 
 def test_inertia_scales_with_the_fifth_power(cfg: MassConfig) -> None:
     box = trimesh.creation.box((0.2, 0.1, 0.06))
-    small = estimate_mass(box, _material(), FILL, cfg)
+    small = estimate_mass(box, _material(), cfg)
     big_mesh = box.copy()
     big_mesh.apply_scale(2.0)
-    big = estimate_mass(big_mesh, _material(), FILL, cfg)
+    big = estimate_mass(big_mesh, _material(), cfg)
     assert big.mass_kg.nominal / small.mass_kg.nominal == pytest.approx(8, rel=1e-6)
     assert big.inertia_kg_m2[0, 0] / small.inertia_kg_m2[0, 0] == pytest.approx(32, rel=1e-6)
 
@@ -108,14 +109,14 @@ def test_thin_shell_counts_as_its_outer_volume(cfg: MassConfig) -> None:
     outer = trimesh.creation.box((0.2, 0.1, 0.06))
     shell = _shell(outer, 0.001)
     assert abs(shell.volume) < 0.1 * outer.volume
-    est = estimate_mass(shell, _material(), FILL, cfg)
+    est = estimate_mass(shell, _material(), cfg)
     assert est.volume_sealed_m3 == pytest.approx(outer.volume, rel=0.08)
 
 
 def test_hollow_closed_object_scales_mass_and_inertia_by_fill(cfg: MassConfig) -> None:
     box = trimesh.creation.box((0.2, 0.1, 0.06))
-    solid = estimate_mass(box, _material(), FILL, cfg)
-    hollow = estimate_mass(box, _material(is_hollow=True), FILL, cfg)
+    solid = estimate_mass(box, _material(), cfg)
+    hollow = estimate_mass(box, _material(True, FILL), cfg)
     assert not hollow.is_open and hollow.fill_fraction == FILL
     assert hollow.mass_kg.nominal == pytest.approx(0.2 * solid.mass_kg.nominal)
     assert hollow.mass_kg.low == pytest.approx(800 * 0.1 * hollow.volume_sealed_m3)
@@ -128,7 +129,7 @@ def test_open_cup_keeps_its_cavity_and_gets_no_second_correction(cfg: MassConfig
     r, h, wall = 0.04, 0.10, 0.003
     cup = _cup(r, h, wall)
     assert cup.is_watertight
-    est = estimate_mass(cup, _material(is_hollow=True), FILL, cfg)
+    est = estimate_mass(cup, _material(True, FILL), cfg)
     assert est.is_open
     assert est.fill_fraction.nominal == 1.0
     assert est.reasons and "open" in est.reasons[0]
@@ -146,12 +147,12 @@ def test_crack_in_a_shell_is_sealed(cfg: MassConfig) -> None:
     assert slot.any()
     fine.update_faces(~slot)
     assert not fine.is_watertight
-    est = estimate_mass(fine, _material(), FILL, cfg)
+    est = estimate_mass(fine, _material(), cfg)
     assert est.volume_sealed_m3 == pytest.approx(0.008, rel=0.1)
 
 
 def test_output_is_accepted_as_physical_properties(cfg: MassConfig) -> None:
-    est = estimate_mass(trimesh.creation.box((0.2, 0.1, 0.002)), _material(), FILL, cfg)
+    est = estimate_mass(trimesh.creation.box((0.2, 0.1, 0.002)), _material(), cfg)
     span = Estimate(low=0.1, nominal=0.5, high=0.9)
     PhysicalProperties(
         material_class="plastic_hard",
@@ -186,8 +187,9 @@ def test_bad_config_is_refused(bad: dict[str, float]) -> None:
         MassConfig.from_config(raw)
 
 
-def test_table_fill_fraction_is_a_share() -> None:
-    raw = yaml.safe_load((ROOT / "configs/material_table.yaml").read_text(encoding="utf-8"))
-    fill = load_material_table(ROOT / "configs/material_table.yaml").hollow_fill_fraction
-    assert 0 < fill.low <= fill.nominal <= fill.high <= 1
-    assert raw["hollow_fill_fraction"]["nominal"] == fill.nominal
+def test_solid_answer_uses_its_fill_fraction(cfg: MassConfig) -> None:
+    box = trimesh.creation.box((0.2, 0.1, 0.06))
+    full = estimate_mass(box, _material(), cfg)
+    diluted = estimate_mass(box, _material(False, FILL), cfg)
+    assert diluted.mass_kg.nominal == pytest.approx(0.2 * full.mass_kg.nominal)
+    assert diluted.fill_fraction == FILL

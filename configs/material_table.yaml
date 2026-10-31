@@ -21,18 +21,21 @@
 #
 # Keys must equal segmentation.material_pass.classes in configs/default.yaml (a test checks it).
 
-# Share of a closed hollow object's sealed volume that holds material at the density below (P4.5).
+# Share of an object's sealed volume that holds material at the density below (P4.5, P4.6).
 # Not a material property and not from a reference: the 10th, 50th and 90th percentile of weighed
-# mass / (nominal density * sealed volume) on the 31 closed dev objects the model calls hollow
-# (fill_needed_percentiles in benchmark/results/p4_5_mass.json). One value for all classes until
-# P4.6 fits per class. Because it divides by nominal density it also absorbs density errors.
-hollow_fill_fraction: {low: 0.024, nominal: 0.22, high: 0.61}
+# mass / (nominal density * sealed volume) on the dev objects, per solid-or-hollow answer
+# (benchmark/results/p4_6_fill_fit.json, benchmark/fit_fill_fractions.py). A class has its own
+# value under an entry only with 3 distinct objects behind it. Because it divides by nominal
+# density it also absorbs density errors. An open vessel keeps 1 (stages/mass.py).
+hollow_fill_fraction: {low: 0.039, nominal: 0.278, high: 0.681}
+solid_fill_fraction:  {low: 0.317, nominal: 0.441, high: 1.0}
 
 materials:
   cardboard:
     density_kg_m3:        {low: 700, nominal: 929, high: 1150}
     friction_coefficient: {low: 0.2, nominal: 0.5, high: 0.9}
     restitution:          {low: 0.05, nominal: 0.25, high: 0.55}
+    hollow_fill_fraction: {low: 0.21, nominal: 0.248, high: 0.302}
     sources: [marks_10e_table_6.1.5]
     unsourced: [friction_coefficient, restitution]
     note: "Density is solid paper sheet; a box is thin-walled, so the hollow correction (P4.5) does the rest."
@@ -47,6 +50,8 @@ materials:
     density_kg_m3:        {low: 918, nominal: 1100, high: 1240}
     friction_coefficient: {low: 0.2, nominal: 0.5, high: 0.9}
     restitution:          {low: 0.2, nominal: 0.5, high: 0.8}
+    hollow_fill_fraction: {low: 0.415, nominal: 0.601, high: 0.947}
+    solid_fill_fraction:  {low: 0.18, nominal: 0.357, high: 0.535}
     sources: [marks_10e_table_6.12.1, natureworks_ingeo_4043d_tds]
     unsourced: [friction_coefficient, restitution]
     note: "Low is polyethylene, high is solid PLA resin; ABS, acrylic, nylon, polycarbonate and polystyrene lie between (1020 to 1200). A printed part with infill is lighter than this range; see the PLA note in docs/research/material_sources.md."
@@ -82,6 +87,7 @@ materials:
     density_kg_m3:        {low: 7700, nominal: 7850, high: 8030}
     friction_coefficient: {low: 0.2, nominal: 0.5, high: 0.9}
     restitution:          {low: 0.62, nominal: 0.7, high: 0.78}
+    hollow_fill_fraction: {low: 0.028, nominal: 0.073, high: 0.122}
     sources: [marks_10e_table_6.1.5, marks_10e_table_6.1.9, marinack_2013_fig3]
     unsourced: [friction_coefficient]
     note: "Restitution: brass, chrome, S2 and low-carbon steel spheres on a steel plate, read off Fig. 3, 2 to 3 m/s; falls with speed. Small spheres, not a tabletop."

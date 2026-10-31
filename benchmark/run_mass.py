@@ -1,12 +1,12 @@
-"""Score the P4.5 mass estimate against the weighed inventory on finished runs.
+"""Score the mass estimate against the weighed inventory on finished runs (P4.5, P4.6).
 
     uv run python benchmark/run_mass.py --runs runs_instances \
-        --out benchmark/results/p4_5_mass.json
+        --out benchmark/results/p4_6_mass.json
 
 Repairs each matched dev mesh, runs ``estimate_mass`` and compares it with the weighed mass, with
-and without the hollow correction. ``fill_needed`` is the ``f`` that would make each closed
-hollow object exact at nominal density; its percentiles are the source of
-``hollow_fill_fraction`` in ``configs/material_table.yaml``. No hosted call and no GPU.
+and without the fill fraction. ``fill_needed`` is the ``f`` that would make each object exact at
+nominal density, which ``benchmark/fit_fill_fractions.py`` reads. These scores are in sample; the
+held-out ones are in that script's output. No hosted call and no GPU.
 """
 
 from __future__ import annotations
@@ -111,9 +111,7 @@ def main() -> None:
             gt, reg = truth[r.object_id], registered[r.pred_id]
             material = object_material(instances[r.pred_id], table, min_conf)
             mesh = trimesh.load(run_dir / reg.mesh_path, force="mesh", process=False)
-            est = estimate_mass(
-                repair_mesh(mesh, repair_cfg).mesh, material, table.hollow_fill_fraction, mass_cfg
-            )
+            est = estimate_mass(repair_mesh(mesh, repair_cfg).mesh, material, mass_cfg)
             rho = material.numbers.density_kg_m3.nominal
             mass_true = float(gt["mass_kg"])
             rows.append(
@@ -148,14 +146,11 @@ def main() -> None:
             )
 
     corrected = [r for r in rows if r["model_hollow"] and not r["is_open"]]
-    needed = [r["fill_needed"] for r in corrected]
-    p10, p50, p90 = np.percentile(needed, (10, 50, 90)) if needed else (None, None, None)
     summary = {
         "all": score(rows, tolerance),
         "hollow_corrected": score(corrected, tolerance),
         "hollow_open": score([r for r in rows if r["model_hollow"] and r["is_open"]], tolerance),
         "solid": score([r for r in rows if not r["model_hollow"]], tolerance),
-        "fill_needed_percentiles": {"p10": p10, "p50": p50, "p90": p90},
         "center_of_mass_offset_median_m": float(
             np.median([r["center_of_mass_offset_m"] for r in rows])
         ),
