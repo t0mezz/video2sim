@@ -520,7 +520,15 @@ Tasks
       basketball passes since it became a sphere primitive under D-022, which is not a fix for
       rolling. No test split was run.
 
-- [ ] **P4.8** Emit `SimAssets`.
+- [x] **P4.8** Emit `SimAssets`.
+      Evidence: `src/video2sim/stages/physics_stage.py`, `tests/test_physics_stage.py`,
+      `benchmark/run_physics.py`, `benchmark/results/p4_8_physics.json`. All 13 rigid dev runs
+      finish the stage (61 assets, all valid). The origin moves to the center of mass with the new
+      `SimAsset.T_world_from_object`, and vertex colors are carried over from the registered mesh
+      because repair drops them (D-023). `physics/settling.json` gives 10 of 13 scenes (77%) in
+      every case; the failing objects are those of P4.7, now measured at the center of mass
+      (s17 obj_004 5.9 cm). `video2sim eval` reads the masses: 26 of 56 within 30% (46%, in
+      sample), size error 0.0505 against 0.05. No test split was run.
 
 Exit criteria
 
@@ -529,7 +537,10 @@ Exit criteria
 - [ ] 95% of scenes settle with maximum drift of 2 cm in 5 s
 - [ ] Every property in the export carries a low, nominal and high value
 
-Evidence:
+Evidence: dev split only, so nothing is ticked until the phase gate runs the test split. 61 of 61
+meshes pass (P4.8). Mass 36% held out against 70% (P4.6), not met. Settling 77% against 95%, not
+met, in MuJoCo and so provisional (D-021). All friction, restitution, mass and density values
+carry low, nominal and high, and inertia follows from mass (D-023).
 
 ## 9. Phase 5: Export, simulator validation, demo (weeks 11 to 12)
 
@@ -620,6 +631,7 @@ one that supersedes.
 | D-020 | Optional tags-on-table layer on the table plane fit (human decision 2026-10-31, `reconstruction.world_frame.tags_on_table`, on by default). On s05 RANSAC settled on the object tops, 3 to 7 cm above a bare white table, which cut the objects off in lifting and sent two of them to proxy hulls, with no flag. A plane more than 15 mm from a tag corner is refitted on the points near the plane through the tags; a refit that cannot hold all the tags is dropped and `tags_off_table` is raised (s24, 23 cm). Disable it for scenes whose markers are not on the table plane. Dev scenes: good ones up to 8.2 mm, s05 64 mm before and 1.1 mm after; the test split was not measured | Decided | Week 9 | `src/video2sim/stages/world_frame.py`, `src/video2sim/stages/reconstruction.py` |
 | D-021 | MuJoCo settles the scenes for P4.7, in place of Isaac Sim (human decision 2026-10-31). Isaac Sim does not run on the development Mac and P5.2 needs a second simulator anyway. Stability numbers from MuJoCo are provisional: the contact solver is not PhysX, and the gate is repeated in Isaac Sim in P5.1. Drift is the distance of the object-frame origin from the observed pose, the largest in the window, including separation; rotation is reported and does not gate. Restitution is not simulated, and the pair friction is the object's own or the larger of two objects' (MuJoCo's rule) | Decided | Week 9 | `configs/default.yaml` `physics.settling`, `src/video2sim/stages/settling.py` |
 | D-022 | `collision_fit` tightness ignores part surfaces inside the sealed body of `stages/mass.py` (human decision 2026-10-31). The old test, which side of the nearest visual surface a point is on, read cuts through the cavity of a shell as outside and failed 11 of 61 dev objects whose plain hulls were mostly tight. Plain hulls fail on 8 of 61 objects under both tests, and the hull of an open cup still fails (`tests/test_collision.py`). Known gap: mouths under about 8% of the longest side are sealed, so parts filling a narrow neck are not caught. With it: primitives compare against the sealed volume, a primitive that fails a check falls back to the decomposition, and hulls that edge collapse cannot thin use farthest point selection. Result: 47 to 61 of 61 objects pass, and 13 objects changed to primitives | Decided | Week 9 | `src/video2sim/stages/collision.py`, `benchmark/results/p4_7_settling.json` |
+| D-023 | `SimAssets` contract for P4.8 (human decisions 2026-10-31). `SimAsset` gains `T_world_from_object`, because moving the origin to the center of mass changes the pose. Inertia stays one matrix at nominal mass: the body is the same, so low and high are the matrix scaled by `mass_kg`, and this is how the "every property" criterion is read. An object that fails settling is reported in `physics/settling.json` and not blocked, so the QA report of P5.3 shows it | Decided | Week 9 | `src/video2sim/schemas.py`, `src/video2sim/stages/physics_stage.py` |
 
 ## 12. After the MVP
 
@@ -717,5 +729,6 @@ In order:
 | 2026-10-31 | P4.5 ticked: `stages/mass.py`, sealed voxel body, one dev-measured hollow fill fraction and the center of mass left to P4.8 (human decisions); 14 of 56 dev objects within 30%, exit criterion not met |
 | 2026-10-31 | P4.6 ticked: fill fractions per class and answer; 20 of 56 dev objects within 30% with objects held out (36%), exit criterion not met |
 | 2026-10-31 | P4.7 ticked under D-021: settling in MuJoCo, 10 of 13 rigid dev scenes pass (77%), exit criterion not met; `mujoco` added by human approval |
+| 2026-10-31 | P4.8 ticked under D-023: physics stage emits `SimAssets` on 13 rigid dev runs, 61 of 61 valid; all Phase 4 tasks done, the mass and settling exit criteria are not met and the gate stays Open |
 | 2026-10-31 | D-022: collision fit ignores surfaces inside the sealed body, primitive fallback and vertex thinning fixed; 61 of 61 dev objects pass the collision checks |
 | 2026-10-31 | D-020: tags-on-table layer on the plane fit; s05 rerun, all 4 objects now SAM 3D with fit 0.95 to 0.98 and `lift.max_extent_m` back at 1.5 |

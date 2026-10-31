@@ -1,4 +1,4 @@
-"""Stage 5: physics preparation. Implemented in Phase 4 (P4.1 to P4.8).
+"""Stage 5: physics preparation, the material half. ``stages/physics_stage.py`` runs the stage.
 
 Input:  ``RegisteredObjects`` and keyframe crops.
 Output: ``SimAssets``: repaired visual mesh, collision geometry, mass, inertia, friction and

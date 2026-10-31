@@ -292,7 +292,10 @@ class PhysicalProperties(Model):
     friction_coefficient: Estimate
     restitution: Estimate
     inertia_kg_m2: list[list[float]] = Field(
-        description="3x3 about the center of mass, in the object frame, at nominal mass"
+        description=(
+            "3x3 about the center of mass, in the object frame, at nominal mass. Low and high "
+            "follow from mass_kg, since the same body scales linearly (D-023)"
+        )
     )
     confidence: float = Field(ge=0, le=1)
 
@@ -313,9 +316,14 @@ class PhysicalProperties(Model):
 
 
 class SimAsset(Model):
-    """One simulation-ready object. Export is blocked unless every check passed."""
+    """One simulation-ready object. Export is blocked unless every check passed.
+
+    Meshes are in the asset's own frame, whose origin is the center of mass, so this pose differs
+    from ``RegisteredObject.T_world_from_object`` by that offset.
+    """
 
     object_id: str
+    T_world_from_object: SE3
     visual_mesh_path: RelPath
     collision_mesh_paths: list[RelPath] = Field(min_length=1)
     properties: PhysicalProperties

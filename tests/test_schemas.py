@@ -155,6 +155,7 @@ def test_sim_asset_validity_requires_all_checks() -> None:
     def asset(checks: dict[str, bool]) -> SimAsset:
         return SimAsset(
             object_id="obj_000",
+            T_world_from_object=SE3.identity(),
             visual_mesh_path="meshes/obj_000.glb",
             collision_mesh_paths=["collision/obj_000_0.obj"],
             properties=props,

@@ -97,7 +97,9 @@ scene in the browser, and `python scripts/view_glb.py FILE.glb` shows one mesh.
 scores `stages/mass.py` against the weighed masses (P4.5); it makes no hosted call.
 `python benchmark/fit_fill_fractions.py --out FILE.json` fits the fill fractions from that output and scores
 them with each object held out (P4.6); the table values in `configs/material_table.yaml` are copied from it by hand.
-`python benchmark/run_settling.py --runs runs_instances --out FILE.json` settles the rigid dev scenes in
+`python benchmark/run_physics.py --out FILE.json` runs the physics stage on the rigid dev scenes and writes `physics/`
+(`output.json` as `SimAssets`, meshes, collision parts, `report.json`, `settling.json`) in each run, then sums up the checks and the settling; it
+makes no hosted call (P4.8). `python benchmark/run_settling.py --runs runs_instances --out FILE.json` settles the rigid dev scenes in
 MuJoCo for the nominal, low and high friction and mass (P4.7, D-021), caching each object in `<run>/physics.work/`; it makes no hosted call.
 
 Commands that arrive with their task: `video2sim run` (P5.5).
