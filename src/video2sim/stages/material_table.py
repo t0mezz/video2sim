@@ -2,8 +2,9 @@
 
 ``configs/material_table.yaml`` is the only source of material numbers. The vision-language model
 picks a class (``stages/material_pass.py``); ``lookup`` turns it into density, friction and
-restitution ``Estimate`` s. A value with no source is listed in the entry's ``unsourced`` field,
-and the lookup tells the caller so, so the object can carry ``Flag.LOW_CONFIDENCE_MATERIAL``.
+restitution ``Estimate`` s. A value with no source is listed in the entry's ``unsourced`` field.
+Friction and restitution are accepted as wide placeholders (D-019), so only an unsourced density
+tells the caller to raise ``Flag.LOW_CONFIDENCE_MATERIAL``.
 
 A class that is not in the table, or none at all, maps to the ``other`` entry: a wide range and an
 ``unsourced`` verdict, never a guess.
@@ -58,8 +59,8 @@ class MaterialNumbers:
     fell_back: bool
 
     @property
-    def has_unsourced_value(self) -> bool:
-        return bool(self.unsourced)
+    def density_unsourced(self) -> bool:
+        return "density_kg_m3" in self.unsourced
 
 
 class MaterialTable(Model):

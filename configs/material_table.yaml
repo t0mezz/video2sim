@@ -2,8 +2,10 @@
 # table; code reads the numbers from here. The model never writes a number.
 #
 # Every value needs a source. Where none could be found the field is named in `unsourced` and
-# its range is a deliberately wide placeholder, not a measurement: the object then carries
-# Flag.LOW_CONFIDENCE_MATERIAL downstream, and P4.6 narrows what the benchmark can support.
+# its range is a deliberately wide educated placeholder, not a measurement. Friction and
+# restitution placeholders are accepted as they are (D-019): the benchmark has no measurement
+# that could narrow them. An unsourced density makes the object carry
+# Flag.LOW_CONFIDENCE_MATERIAL downstream, and P4.6 narrows what the weighed objects support.
 # Do not fill a value from memory without listing it in `unsourced`. The values and where each
 # was found are in docs/research/material_sources.md (source files in docs/sources/, not in git).
 #

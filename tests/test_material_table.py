@@ -46,6 +46,12 @@ def test_unknown_or_missing_class_falls_back_wide_and_unsourced(table: MaterialT
         assert set(n.unsourced) == set(QUANTITIES)
 
 
+def test_only_an_unsourced_density_counts_against_a_class(table: MaterialTable) -> None:
+    assert not table.lookup("plastic_hard").density_unsourced  # friction, restitution placeholders
+    assert table.lookup("foam").density_unsourced
+    assert table.lookup(None).density_unsourced
+
+
 def test_a_table_without_the_fallback_is_rejected() -> None:
     entry = {
         "density_kg_m3": {"low": 1, "nominal": 2, "high": 3},

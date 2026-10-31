@@ -1,8 +1,8 @@
 # Material table sources (P4.3)
 
-Values read from the source files by hand, with where they are. Nothing here is in
-`configs/material_table.yaml` yet: an entry needs density, friction and restitution, and
-restitution has no source so far. Source PDFs are in `docs/sources/` (git-ignored):
+Values read from the source files by hand, with where they are. The sourced values are in
+`configs/material_table.yaml`; what is still missing there is listed per class in `unsourced`
+and stays a wide placeholder (D-019). Source PDFs are in `docs/sources/` (git-ignored):
 `wood_handbook_fpl_gtr_190.pdf`, `natureworks_ingeo_4043d_tds.pdf`, and Marks' Standard Handbook
 for Mechanical Engineers, 10th ed. ("Marks" below; page numbers are PDF pages).
 

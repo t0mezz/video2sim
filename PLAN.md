@@ -6,7 +6,7 @@ roadmap: update it as work happens. Numbers that gate a decision live in
 
 ## Status
 
-Last updated: 2026-10-30. Start date: not set (decision D-002).
+Last updated: 2026-10-31. Start date: not set (decision D-002).
 
 | Phase | Weeks | Focus | Status | Gate |
 | --- | --- | --- | --- | --- |
@@ -14,7 +14,7 @@ Last updated: 2026-10-30. Start date: not set (decision D-002).
 | 1 | 3 to 4 | Reconstruction, metric scale, world frame | Done | Passed |
 | 2 | 5 to 6 | Segmentation, tracking, 3D lifting | Done | Passed |
 | 3 | 7 to 8 | Shape completion and pose fusion | Done | Passed |
-| 4 | 9 to 10 | Physics readiness, material properties | Not started | Open |
+| 4 | 9 to 10 | Physics readiness, material properties | In progress | Open |
 | 5 | 11 to 12 | Export, simulator validation, demo | Not started | Open |
 
 Status values: Not started, In progress, Done. Gate values: Open, Passed, Failed.
@@ -450,9 +450,13 @@ Tasks
       78 s per object. The fit check is surface-based because a volume ratio fails on shells.
       Not yet run on registered, metric meshes (none on disk).
 
-- [ ] **P4.3** Build `configs/material_table.yaml`: density, friction and restitution ranges per
+- [x] **P4.3** Build `configs/material_table.yaml`: density, friction and restitution ranges per
 
       material class, every value with a source.
+      Evidence: `configs/material_table.yaml`, `docs/research/material_sources.md`,
+      `tests/test_material_table.py`; 14 classes. Amended by D-019: values with no source are
+      listed in `unsourced` as wide placeholders (density 6 of 14 classes, friction 13, restitution
+      12), and only an unsourced density raises `Flag.LOW_CONFIDENCE_MATERIAL`.
 
 - [ ] **P4.4** Material inference. A vision-language model sees keyframe crops and returns
 
@@ -571,6 +575,7 @@ one that supersedes.
 | D-016 | Reconstruction back end for the MVP: pycolmap on CPU (`reconstruction.backend: pycolmap`). Evidence 2026-10-26, mean reprojection error and frames registered: s01_b 0.50 px 28/28, s02_a 0.72 px 108/108, s05_b 0.54 px 20/20, s10_a 0.46 px 187/187, s19_a 0.58 px 193/193, s23_a 0.47 px 68/68, at 3 fps and 1280 px on an Apple M4 CPU, 3 s to 281 s per video. Pose and scale accuracy not yet measured. VGGT, MASt3R and `pycolmap-cuda12` are deferred past the MVP | Decided | Week 3 | Run was in a scratchpad script, not committed. `pycolmap-cuda12` is a separate Linux-only package with the same module name, so it would be a mutually exclusive extra |
 | D-017 | Material pass pulled forward (2026-10-28, human decision). The classification half of P4.4 (category, material class, surface finish, solid or hollow, confidence) runs in Phase 2 as one hosted VLM request per object on its best 2 keyframe crops (`segmentation.material_pass.keyframes`), and it also raises `Flag.TRANSPARENT_OR_REFLECTIVE` (P2.5). The class list in `configs/default.yaml` is provisional, made from the materials seen on the dev scenes, with no numbers; P4.3 completes the list and the values with sources, and the mapping to numbers stays in P4.4. Reason: the geometry-only gate cleared a mirror cube and a foil figure, and asking every object is cheaper than two separate calls | Decided | Week 5 | `src/video2sim/stages/material_pass.py`, `benchmark/run_material_pass.py` |
 | D-018 | Shape stage geometry path: SAM 3D Objects only (`shape.backend: sam3d`). TRELLIS.2 is dropped from the project (human decision 2026-10-30, after the P3.3 dev-split bake-off). Evidence: `benchmark/results/p3_3_bakeoff_dev.json`, 42 objects matched by all three arms: median size error 4.5% for SAM 3D, 8.7% for TRELLIS.2, 8.4% for TRELLIS.2 geometry on SAM 3D's pose; objects over 15%: 5, 15, 15; proxy hulls: 1, 20, 11. Removed: `models/trellis2.py`, `models/trellis2_modal.py`, `models/hybrid.py`, `shape.trellis2`, their tests. Kept: the results, `benchmark/compare_shape_arms.py`, `shape.parallel_samples`, `SampleFailed`. Consequences: `nvdiffrast` and `nvdiffrec` (research use only, D-005) are no longer in the pipeline; the DINOv3 and RMBG-2.0 licenses no longer apply; the SAM License terms remain. Not done: the test split and the Phase 4 stability measure were not run for the bake-off. `GeometrySource` in `schemas.py` still lists `trellis2` (schema change left for a human). The Modal app `video2sim-trellis2` and its weights volume are still deployed | Decided | Week 8 | Commands to remove them are in the 2026-10-30 changelog row |
+| D-019 | Unsourced friction and restitution are accepted as wide educated placeholders (human decision 2026-10-31). Every one of the 14 classes has at least one unsourced value, so flagging on any of them would flag every object and say nothing. `Flag.LOW_CONFIDENCE_MATERIAL` is raised only for an unsourced density or a low model confidence. The benchmark records mass only, so P4.6 cannot narrow friction or restitution | Decided | Week 9 | `configs/material_table.yaml`, `src/video2sim/stages/material_table.py` |
 
 ## 12. After the MVP
 
@@ -661,3 +666,4 @@ In order:
 | 2026-10-28 | P2.5 and P4.4: D-017 pulls the VLM material classification forward as a single per-object pass that also raises the reflective flag; geometry kept as a cross-check, `segmentation.material_pass` config added, no hosted run yet |
 | 2026-10-29 | Phase 2 cluster box criterion ticked by human decision (test split 6.0% median on s07 to s09, s10 unscored); Phase 2 gate passed; Phase 3 is the current focus |
 | 2026-10-29 | Cleanup before Phase 3: evidence narratives of Phases 0 to 2 and the section 12 reconstruction experiments moved verbatim to `docs/history/`; P2.1 discovery code removed (eef52b6) |
+| 2026-10-31 | P4.3 ticked under D-019: friction and restitution placeholders accepted, only an unsourced density flags an object; Phase 4 set to In progress |
