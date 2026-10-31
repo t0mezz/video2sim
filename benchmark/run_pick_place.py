@@ -70,7 +70,7 @@ def main() -> None:
             continue
         folders += [
             r
-            for r in sorted(args.runs.glob(f"{scene.scene_id}_*"))
+            for r in [args.runs / scene.scene_id, *sorted(args.runs.glob(f"{scene.scene_id}_*"))]
             if (r / "export" / OUTPUT_FILE).exists()
         ][:1]
     with ProcessPoolExecutor(args.workers) as pool:

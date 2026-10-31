@@ -621,18 +621,21 @@ Tasks
       and asset validity now (`benchmark/results/p5_eval_dev.json`, 12 dev scenes: stability 100%,
       validity 100%, size error 5.05%, mass 52%, s05 unscored).
 
-- [ ] **P5.6** Final benchmark run on the test split and a write-up of every target, met or
+- [x] **P5.6** Final benchmark run on the test split and a write-up of every target, met or
 
       missed, with causes.
+      Evidence: `docs/final_benchmark.md`, `benchmark/results/p5_6_eval/`,
+      `benchmark/results/p5_6_pick_place_test.json`, code 21d34de.
 
 Exit criteria
 
-- [ ] Final benchmark run meets every target, or the misses are documented with causes
+- [x] Final benchmark run meets every target, or the misses are documented with causes. Evidence: `docs/final_benchmark.md`; size 5.7% against 5% and mass 29% against 50% are missed
 - [ ] USD scenes read back with the units, axes, mass and inertia of `SimAssets`; URDF loads in MuJoCo (D-027)
 - [x] Scripted pick-and-place demo in MuJoCo recorded on at least three scenes. Evidence: `benchmark/results/p5_4_pick_place.json`, `demo/pick_place.mp4` in the 7 dev runs with a chosen object
 - [ ] A new person can reproduce a scene from the README alone
 
-Evidence:
+Evidence: final run in `docs/final_benchmark.md`. Open: the last exit criterion needs a new person,
+so the gate stays Open.
 
 ## 10. Risks and kill criteria
 
@@ -798,6 +801,7 @@ In order:
 | 2026-10-31 | D-020: tags-on-table layer on the plane fit; s05 rerun, all 4 objects now SAM 3D with fit 0.95 to 0.98 and `lift.max_extent_m` back at 1.5 |
 | 2026-10-31 | D-027: Phase 5 validates in MuJoCo on the Mac; a parallel Isaac Sim verifier follows on the GPU workstation (section 12 item 8) |
 | 2026-10-31 | Phase 5 goal, P5.1, P5.2, P5.4 and exit criteria reworded for MuJoCo under D-027 by human approval |
+| 2026-10-31 | P5.6 ticked: final test run on 8 rigid scenes, 7 scored; size 5.7% and mass 29% missed, every other target met; mass fell from 45% with no code change, see `docs/final_benchmark.md` |
 | 2026-10-31 | P5.5 ticked: fresh run of s01 `video_a` through `video2sim run`, 8.7 min, no manual steps |
 | 2026-10-31 | P5.4 ticked under D-029: 7 of 7 chosen dev objects pass nominal, 5 pass every case; demo exit criterion ticked |
 | 2026-10-31 | P5.1 to P5.3 ticked: export stage writes USD, URDF and the QA report on 13 rigid dev scenes, 61 objects; `video2sim run` added, P5.5 stays open until a run from a fresh video |
