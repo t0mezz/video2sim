@@ -7,8 +7,9 @@ of convex parts in the same frame, the way a simulator wants them.
   the three box axes and a sphere are fitted to the mesh and the best is kept if its outline is
   close (95th percentile of the surface distances in both directions, as a share of the mesh's
   bounding-box diagonal, at most ``primitive_tolerance``) and its volume is within
-  ``primitive_volume_ratio`` of the mesh's. The test uses surfaces, not inside-outside points,
-  because that needs ``rtree``.
+  ``primitive_volume_ratio`` of the sealed body's (``stages/mass.py``). The outline test uses
+  surfaces, not inside-outside points, because that needs ``rtree``. A primitive that then fails
+  a check is dropped for the decomposition, with ``steps["primitive_rejected"]``.
 * Otherwise the mesh is split into at most ``physics.max_convex_parts`` convex parts by CoACD.
   Without ``coacd`` the single convex hull stands in and ``steps["coacd_unavailable"]`` says so;
   the ``collision_fit`` check then decides whether the hull is too fat to use.
@@ -21,17 +22,19 @@ of convex parts in the same frame, the way a simulator wants them.
 The fit is two numbers, both as a share of the visual mesh's bounding-box diagonal. Coverage is
 the share of visual surface points inside a part or within ``fit_cover_tolerance`` of one; below
 ``fit_min_coverage`` the object would sink into what it touches. Tightness is the 95th percentile
-of the distance from the parts' surfaces to the visual surface, counting only the part outside
-the object's material (the cuts between parts of a solid lie inside it); above ``fit_tolerance``
-the parts fill in concavities, so a convex hull of a cup or a case fails. A volume ratio was tried
-first and does not work: the meshes SAM 3D gives are often thin shells (walls under 2% of the
-object's size), whose enclosed volume says nothing about their shape.
+of the distance from the parts' surfaces to the visual surface, counting only what lies outside
+the sealed body. The cuts between parts lie inside it; above ``fit_tolerance`` the parts fill in
+concavities, so a convex hull of a cup or a case fails. A volume ratio was tried first and does
+not work: the meshes SAM 3D gives are often thin shells (walls under 2% of the object's size),
+whose enclosed volume says nothing about their shape. Asking which side of the nearest visual
+surface a point is on does not work either: a cut through the cavity of a shell faces an inner
+wall and read as outside, which failed 11 of 61 dev objects whose plain hulls were tight
+(D-022). The body seals mouths under about 8% of the longest side, so parts that fill such a
+narrow neck are not caught.
 
-The primitive test still compares volumes, against the filled volume of the outer surface: a
-hollow container's inner surface is a separate closed component with negative signed volume,
-which is left out. A thin open shell never matches a primitive that way, which is right.
 Convex hulls with more than ``max_part_vertices`` vertices are thinned by edge collapse and
-re-hulled, which shrinks them slightly.
+re-hulled, which shrinks them slightly. Edge collapse stalls on long smooth hulls, and farthest
+point selection then takes over.
 """
 
 from __future__ import annotations
@@ -43,6 +46,8 @@ from typing import Any, Literal, cast
 import numpy as np
 import trimesh
 from numpy.typing import NDArray
+
+from video2sim.stages.mass import MassConfig, SealedBody, sealed_body
 
 F64 = NDArray[np.float64]
 Kind = Literal["box", "cylinder", "sphere", "convex_decomposition", "convex_hull"]
@@ -63,6 +68,7 @@ class CollisionConfig:
     max_part_vertices: int
     coacd_threshold: float
     seed: int
+    sealing: MassConfig
 
     @classmethod
     def from_config(cls, cfg: dict[str, Any]) -> CollisionConfig:
@@ -81,6 +87,7 @@ class CollisionConfig:
             max_part_vertices=int(c["max_part_vertices"]),
             coacd_threshold=float(c["coacd_threshold"]),
             seed=int(c["seed"]),
+            sealing=MassConfig.from_config(cfg),
         )
         if out.max_convex_parts < 1:
             raise ValueError("physics.max_convex_parts must be at least 1")
@@ -113,21 +120,17 @@ class CollisionResult:
         return all(self.checks.values())
 
 
-def filled_volume(mesh: trimesh.Trimesh) -> float:
-    """Volume of the outer surface: closed components with positive signed volume, summed."""
-    from scipy.sparse import coo_matrix  # type: ignore[import-untyped]  # heavy import
-    from scipy.sparse.csgraph import connected_components  # type: ignore[import-untyped]
-
-    f = np.asarray(mesh.faces)
-    v = np.asarray(mesh.vertices, dtype=np.float64)
-    n = len(v)
-    graph = coo_matrix(
-        (np.ones(3 * len(f)), (f.reshape(-1), np.roll(f, -1, axis=1).reshape(-1))), shape=(n, n)
-    )
-    count, label = connected_components(graph, directed=False)
-    tet = np.einsum("ij,ij->i", v[f[:, 0]], np.cross(v[f[:, 1]], v[f[:, 2]])) / 6.0
-    signed = np.bincount(label[f[:, 0]], weights=tet, minlength=count)
-    return float(signed[signed > 0].sum())
+def _farthest_vertices(hull: trimesh.Trimesh, max_vertices: int) -> trimesh.Trimesh:
+    """The hull of ``max_vertices`` vertices picked by farthest point selection."""
+    v = np.asarray(hull.vertices, dtype=np.float64)
+    picked = int(np.argmax(np.linalg.norm(v - v.mean(axis=0), axis=1)))
+    chosen = [picked]
+    distance = np.linalg.norm(v - v[picked], axis=1)
+    for _ in range(max_vertices - 1):
+        picked = int(np.argmax(distance))
+        chosen.append(picked)
+        distance = np.minimum(distance, np.linalg.norm(v - v[picked], axis=1))
+    return cast(trimesh.Trimesh, trimesh.convex.convex_hull(v[chosen]))
 
 
 def _limit_vertices(hull: trimesh.Trimesh, max_vertices: int) -> trimesh.Trimesh:
@@ -137,7 +140,7 @@ def _limit_vertices(hull: trimesh.Trimesh, max_vertices: int) -> trimesh.Trimesh
     try:
         import fast_simplification  # type: ignore[import-untyped]  # heavy import
     except ImportError:
-        return hull
+        return _farthest_vertices(hull, max_vertices)
     target = 2 * max_vertices - 4  # faces of a triangulated convex polyhedron
     for _ in range(6):
         v, _f = fast_simplification.simplify(
@@ -150,7 +153,7 @@ def _limit_vertices(hull: trimesh.Trimesh, max_vertices: int) -> trimesh.Trimesh
         if len(out.vertices) <= max_vertices:
             return out
         target = int(target * 0.8)
-    return hull
+    return _farthest_vertices(hull, max_vertices)
 
 
 def _part_loads(p: trimesh.Trimesh, cfg: CollisionConfig, min_volume_m3: float) -> bool:
@@ -177,23 +180,27 @@ def _plane_distance(part: trimesh.Trimesh, points: F64) -> F64:
 
 
 def surface_fit(
-    parts: list[trimesh.Trimesh], visual: trimesh.Trimesh, cfg: CollisionConfig
+    parts: list[trimesh.Trimesh],
+    visual: trimesh.Trimesh,
+    cfg: CollisionConfig,
+    body: SealedBody | None = None,
 ) -> tuple[float, float]:
-    """``(coverage, tightness)`` of ``parts`` on ``visual``; see the module docstring."""
+    """``(coverage, tightness)`` of ``parts`` on ``visual``; see the module docstring.
+
+    ``body`` is the sealed body of ``visual``, for a caller that already has it.
+    """
     from scipy.spatial import cKDTree  # type: ignore[import-untyped]  # heavy import
 
     diag = float(np.linalg.norm(visual.extents))
-    vis, vis_face = trimesh.sample.sample_surface(visual, FIT_VISUAL_SAMPLES, seed=cfg.seed)
+    body = sealed_body(visual, cfg.sealing) if body is None else body
+    vis = trimesh.sample.sample_surface(visual, FIT_VISUAL_SAMPLES, seed=cfg.seed)[0]
     outside = np.min([_plane_distance(p, vis) for p in parts], axis=0)
     covered = outside <= cfg.fit_cover_tolerance * diag
     surf = np.concatenate(
         [trimesh.sample.sample_surface(p, FIT_PART_SAMPLES, seed=cfg.seed)[0] for p in parts]
     )
-    dist, nearest = cKDTree(vis).query(surf)
-    # a part surface behind the nearest visual surface point is inside the object's material,
-    # like the cut between two parts of a solid; only the part outside it is a deviation
-    behind = np.einsum("pk,pk->p", surf - vis[nearest], visual.face_normals[vis_face[nearest]]) < 0
-    tightness = float(np.percentile(np.where(behind, 0.0, dist), 95)) / diag
+    dist = cKDTree(vis).query(surf)[0]
+    tightness = float(np.percentile(np.where(body.contains(surf), 0.0, dist), 95)) / diag
     return float(covered.mean()), tightness
 
 
@@ -202,6 +209,7 @@ def check_parts(
     visual: trimesh.Trimesh,
     cfg: CollisionConfig,
     min_volume_m3: float = 1e-12,
+    body: SealedBody | None = None,
 ) -> dict[str, bool]:
     """The ``collision_loads`` and ``collision_fit`` checks for ``parts`` against ``visual``."""
     loads = 1 <= len(parts) <= cfg.max_convex_parts and all(
@@ -209,7 +217,7 @@ def check_parts(
     )
     fit = False
     if loads and len(visual.faces) > 0:
-        coverage, tightness = surface_fit(parts, visual, cfg)
+        coverage, tightness = surface_fit(parts, visual, cfg, body)
         fit = coverage >= cfg.fit_min_coverage and tightness <= cfg.fit_tolerance
     return {"collision_loads": bool(loads), "collision_fit": bool(fit)}
 
@@ -259,16 +267,15 @@ def _best_cylinder(mesh: trimesh.Trimesh, cylinders: list[trimesh.Trimesh]) -> t
 
 
 def primitive_for(
-    mesh: trimesh.Trimesh, cfg: CollisionConfig
+    mesh: trimesh.Trimesh, cfg: CollisionConfig, body: SealedBody
 ) -> tuple[Kind, trimesh.Trimesh, float] | None:
     """The best close primitive for ``mesh``, or None when the object is none of them."""
-    outer = filled_volume(mesh) if mesh.is_watertight else 0.0
-    if outer <= 0:
+    if not mesh.is_watertight or body.volume_m3 <= 0:
         return None
     best: tuple[Kind, trimesh.Trimesh, float] | None = None
     for kind, prim in fit_primitives(mesh).items():
         score = _surface_error(mesh, prim, cfg.seed)
-        ratio = float(prim.volume) / outer
+        ratio = float(prim.volume) / body.volume_m3
         lo, hi = cfg.primitive_volume_ratio
         close = score <= cfg.primitive_tolerance and lo <= ratio <= hi
         if close and (best is None or score < best[2]):
@@ -297,17 +304,21 @@ def _decompose(
 def collision_geometry(mesh: trimesh.Trimesh, cfg: CollisionConfig) -> CollisionResult:
     """Convex collision parts for the repaired ``mesh``, with their checks."""
     steps: dict[str, int] = {}
-    prim = primitive_for(mesh, cfg)
+    body = sealed_body(mesh, cfg.sealing)
+    prim = primitive_for(mesh, cfg, body)
     if prim is not None:
         kind, part, score = prim
-        return CollisionResult([part], kind, check_parts([part], mesh, cfg), score, steps)
+        checks = check_parts([part], mesh, cfg, body=body)
+        if all(checks.values()):
+            return CollisionResult([part], kind, checks, score, steps)
+        steps["primitive_rejected"] = 1
     parts = _decompose(mesh, cfg, steps)
     kind = (
         "convex_hull"
         if steps.get("coacd_unavailable") or len(parts) == 1
         else "convex_decomposition"
     )
-    return CollisionResult(parts, kind, check_parts(parts, mesh, cfg), None, steps)
+    return CollisionResult(parts, kind, check_parts(parts, mesh, cfg, body=body), None, steps)
 
 
 def write_collision(result: CollisionResult, out_dir: Path, stem: str) -> list[Path]:

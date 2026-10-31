@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import time
+from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
@@ -56,7 +57,7 @@ def main() -> None:
         "meshes": len(rows),
         "pass": sum(all(r["checks"].values()) for r in rows),
         "by_kind": {k: sum(r["kind"] == k for r in rows) for k in {r["kind"] for r in rows}},
-        "config": coll_cfg.__dict__,
+        "config": asdict(coll_cfg),
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps({"summary": summary, "meshes": rows}, indent=2), "utf-8")

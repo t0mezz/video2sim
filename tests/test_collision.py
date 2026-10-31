@@ -13,6 +13,7 @@ from video2sim.stages.collision import (
     CollisionConfig,
     check_parts,
     collision_geometry,
+    surface_fit,
     write_collision,
 )
 
@@ -137,17 +138,44 @@ def test_config_ranges_are_validated() -> None:
         CollisionConfig.from_config(base)
 
 
-def test_a_hollow_shell_is_judged_by_its_outer_volume(cfg: CollisionConfig) -> None:
-    from video2sim.stages.collision import filled_volume
-
+def hollow_box(wall_m: float = 0.005) -> trimesh.Trimesh:
     outer = trimesh.creation.box(extents=(0.1, 0.1, 0.1))
-    inner = trimesh.creation.box(extents=(0.09, 0.09, 0.09))
+    inner = trimesh.creation.box(extents=(0.1 - 2 * wall_m,) * 3)
     inner.invert()
-    shell = cast(trimesh.Trimesh, trimesh.util.concatenate([outer, inner]))
-    assert shell.volume == pytest.approx(1e-3 - 0.09**3, rel=1e-3)
-    assert filled_volume(shell) == pytest.approx(1e-3, rel=1e-3)
-    res = collision_geometry(shell, cfg)
+    return cast(trimesh.Trimesh, trimesh.util.concatenate([outer, inner]))
+
+
+def test_a_hollow_shell_is_judged_by_its_outer_volume(cfg: CollisionConfig) -> None:
+    res = collision_geometry(hollow_box(), cfg)
     assert res.kind == "box" and res.ok
+
+
+def test_cuts_through_the_cavity_of_a_shell_do_not_count_as_loose(cfg: CollisionConfig) -> None:
+    left = trimesh.creation.box(extents=(0.05, 0.1, 0.1))
+    left.apply_translation([-0.025, 0, 0])
+    right = trimesh.creation.box(extents=(0.05, 0.1, 0.1))
+    right.apply_translation([0.025, 0, 0])
+    assert surface_fit([left, right], hollow_box(), cfg)[1] <= cfg.fit_tolerance
+
+
+def test_the_hull_of_a_cup_still_fails_the_fit(cfg: CollisionConfig) -> None:
+    profile = [[0, -0.05], [0.04, -0.05], [0.04, 0.05], [0.035, 0.05], [0.035, -0.04], [0, -0.04]]
+    cup = trimesh.creation.revolve(np.array(profile), sections=48)
+    assert cup.is_watertight
+    assert not check_parts([cast(trimesh.Trimesh, cup.convex_hull)], cup, cfg)["collision_fit"]
+
+
+def test_a_primitive_that_fails_a_check_gives_way_to_the_decomposition(
+    cfg: CollisionConfig, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setitem(sys.modules, "coacd", None)
+    m = trimesh.creation.box(extents=(0.1, 0.06, 0.03))
+    monkeypatch.setattr(
+        "video2sim.stages.collision.check_parts",
+        lambda parts, visual, c, min_volume_m3=1e-12, body=None: {"collision_fit": len(parts) > 1},
+    )
+    res = collision_geometry(m, cfg)
+    assert res.steps["primitive_rejected"] == 1 and res.kind == "convex_hull"
 
 
 def test_a_hull_over_the_vertex_cap_is_thinned_and_still_convex(cfg: CollisionConfig) -> None:
@@ -159,3 +187,16 @@ def test_a_hull_over_the_vertex_cap_is_thinned_and_still_convex(cfg: CollisionCo
     assert len(out.vertices) <= cfg.max_part_vertices
     assert trimesh.convex.is_convex(out)  # type: ignore[no-untyped-call]
     assert out.volume == pytest.approx(ball.volume, rel=0.1)
+
+
+def test_a_smooth_hull_edge_collapse_cannot_thin_still_meets_the_cap(
+    cfg: CollisionConfig, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from video2sim.stages.collision import _limit_vertices
+
+    monkeypatch.setitem(sys.modules, "fast_simplification", None)
+    can = trimesh.creation.cylinder(radius=0.03, height=0.2, sections=800)
+    out = _limit_vertices(can, cfg.max_part_vertices)
+    assert len(out.vertices) <= cfg.max_part_vertices
+    assert trimesh.convex.is_convex(out)  # type: ignore[no-untyped-call]
+    assert out.volume == pytest.approx(can.volume, rel=0.02)

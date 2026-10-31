@@ -83,6 +83,15 @@ class SealedBody:
     def volume_m3(self) -> float:
         return float(self.voxels.sum()) * self.pitch_m**3
 
+    def contains(self, points_m: F64) -> NDArray[np.bool_]:
+        """Whether each point lies in a filled voxel."""
+        index = np.floor((points_m - self.origin_m) / self.pitch_m).astype(int)
+        known = ((index >= 0) & (index < np.array(self.voxels.shape))).all(axis=1)
+        inside = np.zeros(len(index), dtype=bool)
+        i, j, k = index[known].T
+        inside[known] = self.voxels[i, j, k]
+        return inside
+
 
 @dataclass(frozen=True)
 class MassEstimate:
