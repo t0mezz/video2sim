@@ -116,6 +116,7 @@ def evaluate(
         "scale_spread_pct": round(100 * res.scale.spread, 2),
         "reference_tag": res.reference_tag,
         "plane_inlier_fraction": round(res.table.inlier_fraction, 3),
+        "tag_plane_distance_m": round(res.tag_plane_distance_m, 4),
         "plane_rms_mm": round(1000 * res.table.rms_m, 2),
         "flags": res.flags + (["sfm_fragmented"] if sfm.fragmented else []),
         "azimuth_coverage_deg": round(camera_coverage(sfm, res).azimuth_deg, 1),

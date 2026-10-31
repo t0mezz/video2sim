@@ -15,6 +15,9 @@ that its projected outline matches the masks, starting from the box of the trimm
 * An object that is none of the three (a mug with its handle, a toy car) fits badly. When the
   best cost is above ``max_cost``, the cluster is the union of the primitive outline and the
   trimmed points, so parts outside the primitive still count. The result says which.
+* A stacked object is the exception to standing on the table. When most of its footprint lies
+  over another object, and its lowest points start near that object's top, the cluster is moved
+  to span from there to its highest points. The masks cannot tell, because they do not see depth.
 
 On the dev scenes this took the easy-tier median box error from 8.9% (trimmed points) to 4.3%,
 15 of 19 objects within 10% (``docs/research/cluster_box_accuracy.md``). The result is the
@@ -24,7 +27,7 @@ cluster of ``ObjectInstance.point_cluster_path`` (human decision 2026-10-29).
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Literal
 
 import numpy as np
@@ -62,6 +65,10 @@ class PrimitiveConfig:
     min_size_m: float
     max_cost: float
     seed: int
+    stack_min_overlap: float
+    stack_gap_m: float
+    stack_min_points: int
+    stack_percentile: float
 
     @classmethod
     def from_config(cls, cfg: dict[str, Any]) -> PrimitiveConfig:
@@ -78,6 +85,10 @@ class PrimitiveConfig:
             float(c["min_size_m"]),
             float(c["max_cost"]),
             int(c["seed"]),
+            float(c["stack_min_overlap"]),
+            float(c["stack_gap_m"]),
+            int(c["stack_min_points"]),
+            float(c["stack_percentile"]),
         )
         if min(out.mask_downscale, out.min_views, out.iterations, out.shrink_every) < 1:
             raise ValueError("primitive_fit counts must be at least 1")
@@ -264,6 +275,47 @@ def fit_primitive(
     return best
 
 
+def _footprint_overlap(a: F64, b: F64) -> float:
+    """The share of the box of ``a`` seen from above that lies inside the box of ``b``."""
+    low, high = a[:, :2].min(axis=0), a[:, :2].max(axis=0)
+    sides = np.minimum(high, b[:, :2].max(axis=0)) - np.maximum(low, b[:, :2].min(axis=0))
+    return float(np.prod(np.clip(sides, 0.0, None)) / np.prod(high - low))
+
+
+def seat_stacked(
+    fits: Mapping[int, FitResult],
+    points: Mapping[int, F64],
+    table_z: float,
+    cfg: PrimitiveConfig,
+) -> dict[int, FitResult]:
+    """Move clusters that stand on another object off the table; see the module docstring."""
+    out = dict(fits)
+    for track_id, fit in sorted(fits.items(), key=lambda kv: float(np.max(kv[1].cluster[:, 2]))):
+        cloud = points.get(track_id)
+        if cloud is None or len(cloud) < cfg.stack_min_points:
+            continue
+        cluster = out[track_id].cluster
+        base, top = float(np.min(cluster[:, 2])), float(np.max(cluster[:, 2]))
+        first = float(np.percentile(cloud[:, 2], cfg.stack_percentile))
+        supports = [
+            float(np.max(other.cluster[:, 2]))
+            for k, other in out.items()
+            if k != track_id
+            and _footprint_overlap(cluster, other.cluster) >= cfg.stack_min_overlap
+            and abs(float(np.max(other.cluster[:, 2])) - first) <= cfg.stack_gap_m
+        ]
+        if not supports or base - table_z > cfg.stack_gap_m:
+            continue
+        bottom = max(supports)
+        last = max(top, float(np.percentile(cloud[:, 2], 100.0 - cfg.stack_percentile)))
+        if last <= bottom:
+            continue
+        moved = cluster.copy()
+        moved[:, 2] = bottom + (cluster[:, 2] - base) * (last - bottom) / (top - base)
+        out[track_id] = replace(fit, cluster=moved, reason=f"{fit.reason}; stacked at {bottom:.3f}")
+    return out
+
+
 def fit_clusters(
     tracks: Sequence[Track],
     points: Mapping[int, F64],
@@ -301,4 +353,4 @@ def fit_clusters(
                 f"best fit {prim.kind} has mask cost {prim.cost:.3f} above {cfg.max_cost}: "
                 "union with the points",
             )
-    return out
+    return seat_stacked(out, points, table_z, cfg)

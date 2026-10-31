@@ -5,10 +5,18 @@ from typing import Any
 
 import numpy as np
 import pytest
+from numpy.typing import NDArray
 
 from video2sim.schemas import SE3, CameraFrame, Intrinsics, Plane, WorldModel
 from video2sim.stages.lift import LiftConfig
-from video2sim.stages.primitive_fit import Kind, PrimitiveConfig, _outline, fit_clusters
+from video2sim.stages.primitive_fit import (
+    FitResult,
+    Kind,
+    PrimitiveConfig,
+    _outline,
+    fit_clusters,
+    seat_stacked,
+)
 from video2sim.stages.segmentation import BoolMask
 from video2sim.stages.tracking import Track
 
@@ -41,6 +49,10 @@ CFG = PrimitiveConfig(
     min_size_m=0.005,
     max_cost=0.10,
     seed=0,
+    stack_min_overlap=0.8,
+    stack_gap_m=0.015,
+    stack_min_points=20,
+    stack_percentile=2.0,
 )
 
 
@@ -205,3 +217,48 @@ def test_config_rejects_bad_values() -> None:
     for key, value in (("iterations", 0), ("shrink", 1.0), ("max_cost", 0.0)):
         with pytest.raises(ValueError):
             PrimitiveConfig.from_config({"segmentation": {"primitive_fit": {**base, key: value}}})
+
+
+F64 = NDArray[np.float64]
+
+
+def _box(low: list[float], high: list[float]) -> F64:
+    corners = [
+        [x, y, z] for x in (low[0], high[0]) for y in (low[1], high[1]) for z in (low[2], high[2])
+    ]
+    return np.array(corners, dtype=np.float64)
+
+
+def _fit(cluster: F64) -> FitResult:
+    return FitResult(cluster, None, "points", "test")
+
+
+def _cloud(z_low: float, z_high: float) -> F64:
+    z = np.linspace(z_low, z_high, 50)
+    return np.column_stack([np.full(50, 0.1), np.full(50, 0.1), z])
+
+
+def test_an_object_on_another_is_moved_up_to_its_support_and_its_points() -> None:
+    low = _fit(_box([0.0, 0.0, 0.0], [0.3, 0.2, 0.04]))
+    top = _fit(_box([0.05, 0.05, 0.0], [0.15, 0.15, 0.09]))
+    out = seat_stacked({0: low, 1: top}, {1: _cloud(0.037, 0.124)}, 0.0, CFG)
+    assert np.min(out[1].cluster[:, 2]) == pytest.approx(0.04)
+    assert np.max(out[1].cluster[:, 2]) == pytest.approx(0.122, abs=0.002)
+    assert np.array_equal(out[0].cluster, low.cluster)
+    assert "stacked" in out[1].reason
+
+
+def test_an_object_beside_another_or_with_low_points_stays_on_the_table() -> None:
+    low = _fit(_box([0.0, 0.0, 0.0], [0.3, 0.2, 0.04]))
+    beside = _fit(_box([0.5, 0.0, 0.0], [0.6, 0.1, 0.09]))
+    above = _fit(_box([0.05, 0.05, 0.0], [0.15, 0.15, 0.09]))
+    for fit, cloud in ((beside, _cloud(0.037, 0.09)), (above, _cloud(0.002, 0.09))):
+        out = seat_stacked({0: low, 1: fit}, {1: cloud}, 0.0, CFG)
+        assert np.array_equal(out[1].cluster, fit.cluster)
+
+
+def test_too_few_points_say_nothing_about_a_stack() -> None:
+    low = _fit(_box([0.0, 0.0, 0.0], [0.3, 0.2, 0.04]))
+    top = _fit(_box([0.05, 0.05, 0.0], [0.15, 0.15, 0.09]))
+    out = seat_stacked({0: low, 1: top}, {1: _cloud(0.037, 0.124)[:5]}, 0.0, CFG)
+    assert np.array_equal(out[1].cluster, top.cluster)

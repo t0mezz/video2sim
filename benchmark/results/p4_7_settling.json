@@ -1,0 +1,3013 @@
+{
+ "summary": {
+  "simulator": "mujoco (D-021)",
+  "scenes": 13,
+  "objects": 61,
+  "objects_failed_preparation": 0,
+  "objects_all_checks_pass": 61,
+  "collision_kinds": {
+   "box": 24,
+   "convex_decomposition": 29,
+   "cylinder": 6,
+   "sphere": 2
+  },
+  "gate": 0.95,
+  "pass_fraction": {
+   "nominal": 0.7692307692307693,
+   "friction_low": 0.7692307692307693,
+   "friction_high": 0.7692307692307693,
+   "mass_low": 0.7692307692307693,
+   "mass_high": 0.7692307692307693
+  },
+  "scenes_stable_in_every_case": [
+   "s01",
+   "s02",
+   "s04",
+   "s05",
+   "s06",
+   "s11",
+   "s12",
+   "s14",
+   "s18",
+   "s24"
+  ]
+ },
+ "failed_checks": {},
+ "failed": {
+  "s01": [],
+  "s02": [],
+  "s03": [],
+  "s04": [],
+  "s05": [],
+  "s06": [],
+  "s11": [],
+  "s12": [],
+  "s13": [],
+  "s14": [],
+  "s17": [],
+  "s18": [],
+  "s24": []
+ },
+ "rows": [
+  {
+   "scene": "s01",
+   "case": "nominal",
+   "stable": true,
+   "residual_penetration_m": 6.75259897982769e-05,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0003449314507130907,
+     "final_drift_m": 0.00016724916969519392,
+     "rotation_deg": 0.06575401015074013,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00010419679285227467,
+     "final_drift_m": 0.00010419679283373393,
+     "rotation_deg": 0.07138478315984498,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0002449643779696601,
+     "final_drift_m": 0.0001300524335222958,
+     "rotation_deg": 0.12580482642907645,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00018830842221850453,
+     "final_drift_m": 0.00011632316845893886,
+     "rotation_deg": 0.07021457745983008,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0007663262186797117,
+     "final_drift_m": 0.0004252421459004166,
+     "rotation_deg": 0.2502813381897931,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s01",
+   "case": "friction_low",
+   "stable": true,
+   "residual_penetration_m": 6.75259897982769e-05,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00025482419276870086,
+     "final_drift_m": 0.00022910795166358278,
+     "rotation_deg": 0.06575908377076248,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00010419564537402297,
+     "final_drift_m": 0.00010419564535436175,
+     "rotation_deg": 0.07138478328238025,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0002008612116508383,
+     "final_drift_m": 0.00018670223123253108,
+     "rotation_deg": 0.1258047659615157,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00019239307387027075,
+     "final_drift_m": 0.00012646130372229769,
+     "rotation_deg": 0.07021342525419844,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0007515706464675606,
+     "final_drift_m": 0.00045916401691293126,
+     "rotation_deg": 0.24614781221833845,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s01",
+   "case": "friction_high",
+   "stable": true,
+   "residual_penetration_m": 6.75259897982769e-05,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00034453226861820866,
+     "final_drift_m": 0.00016717914979276526,
+     "rotation_deg": 0.06575041883892581,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00010419679285219463,
+     "final_drift_m": 0.00010419679283336945,
+     "rotation_deg": 0.07138478315984498,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00026548352006826683,
+     "final_drift_m": 0.0001503857130300878,
+     "rotation_deg": 0.1258045076471991,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00019699756641700092,
+     "final_drift_m": 0.00011871070627540094,
+     "rotation_deg": 0.07021330956126877,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0007660726342154367,
+     "final_drift_m": 0.00041823387281012453,
+     "rotation_deg": 0.25197435907933785,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s01",
+   "case": "mass_low",
+   "stable": true,
+   "residual_penetration_m": 6.75259897982769e-05,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0003449314507130907,
+     "final_drift_m": 0.00016724916969519392,
+     "rotation_deg": 0.06575401015074013,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.000104196792852317,
+     "final_drift_m": 0.00010419679283400742,
+     "rotation_deg": 0.07138478315984498,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0002449643779696601,
+     "final_drift_m": 0.00013005243352375733,
+     "rotation_deg": 0.12580482645225297,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00018830842221850453,
+     "final_drift_m": 0.0001163231684588493,
+     "rotation_deg": 0.07021457745983008,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0007663262186797117,
+     "final_drift_m": 0.0004252421459011227,
+     "rotation_deg": 0.2502813381839682,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s01",
+   "case": "mass_high",
+   "stable": true,
+   "residual_penetration_m": 6.75259897982769e-05,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0003449314507130907,
+     "final_drift_m": 0.00016724916969517985,
+     "rotation_deg": 0.06575401017291153,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00010419679285537042,
+     "final_drift_m": 0.00010419679283338598,
+     "rotation_deg": 0.07138478315984498,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0002449643779696601,
+     "final_drift_m": 0.00013005243352390053,
+     "rotation_deg": 0.12580482642907645,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00018830842221850453,
+     "final_drift_m": 0.00011632316845886859,
+     "rotation_deg": 0.07021457743906716,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0007663262186797117,
+     "final_drift_m": 0.00042524214590106704,
+     "rotation_deg": 0.2502813381897931,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s02",
+   "case": "nominal",
+   "stable": true,
+   "residual_penetration_m": 0.0003986862498785611,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0003177399171564949,
+     "final_drift_m": 0.0003177399171484024,
+     "rotation_deg": 0.1636881917284628,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0006277383039384188,
+     "max_drift_m": 0.0009346193522887226,
+     "final_drift_m": 0.0006869120767588272,
+     "rotation_deg": 0.7255089738183282,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0007289738652227762,
+     "max_drift_m": 0.0007289738652227762,
+     "final_drift_m": 0.0005181167105912819,
+     "rotation_deg": 0.1341060905185253,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0014941169537720743,
+     "final_drift_m": 0.0008529693225820023,
+     "rotation_deg": 1.0175721355840401,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 1.4502222232920472e-05,
+     "final_drift_m": 1.4502222220872316e-05,
+     "rotation_deg": 0.03953413276676279,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s02",
+   "case": "friction_low",
+   "stable": true,
+   "residual_penetration_m": 0.0003986862498785611,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0003177399171561801,
+     "final_drift_m": 0.00031773991714839547,
+     "rotation_deg": 0.1636881917284628,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0006277383039384188,
+     "max_drift_m": 0.0007587666727369066,
+     "final_drift_m": 0.0007572781550788499,
+     "rotation_deg": 0.7243050000004326,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0007289738652227762,
+     "max_drift_m": 0.0007289738652227762,
+     "final_drift_m": 0.0005064604694433424,
+     "rotation_deg": 0.13482558001644324,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0014899625731417399,
+     "final_drift_m": 0.0009192639310478903,
+     "rotation_deg": 1.0175842788478142,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 1.4502222232947544e-05,
+     "final_drift_m": 1.4502222221025504e-05,
+     "rotation_deg": 0.03953413276676279,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s02",
+   "case": "friction_high",
+   "stable": true,
+   "residual_penetration_m": 0.0003986862498785611,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00031773991715694977,
+     "final_drift_m": 0.0003177399171467752,
+     "rotation_deg": 0.16368819174627544,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0006277383039384188,
+     "max_drift_m": 0.0009319725456170396,
+     "final_drift_m": 0.0006871090750482097,
+     "rotation_deg": 0.7257985335833922,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0007289738652227762,
+     "max_drift_m": 0.0007289738652227762,
+     "final_drift_m": 0.0005180995956972983,
+     "rotation_deg": 0.13440967623230446,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0016699113877659143,
+     "final_drift_m": 0.0009931392103439752,
+     "rotation_deg": 1.0175724473844479,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 1.4502222232947544e-05,
+     "final_drift_m": 1.4502222221093302e-05,
+     "rotation_deg": 0.03953413276676279,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s02",
+   "case": "mass_low",
+   "stable": true,
+   "residual_penetration_m": 0.0003986862498785611,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00031773991715642886,
+     "final_drift_m": 0.000317739917148722,
+     "rotation_deg": 0.1636881917284628,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0006277383039384188,
+     "max_drift_m": 0.0009346193522887226,
+     "final_drift_m": 0.00068691207675888,
+     "rotation_deg": 0.7255089738183282,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0007289738652227762,
+     "max_drift_m": 0.0007289738652227762,
+     "final_drift_m": 0.000518116710591287,
+     "rotation_deg": 0.1341060905185253,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0014941169537719256,
+     "final_drift_m": 0.000852969322581659,
+     "rotation_deg": 1.0175721355711458,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 1.4502222232951608e-05,
+     "final_drift_m": 1.4502222220942602e-05,
+     "rotation_deg": 0.03953413276676279,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s02",
+   "case": "mass_high",
+   "stable": true,
+   "residual_penetration_m": 0.0003986862498785611,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.000317739917156332,
+     "final_drift_m": 0.00031773991714854335,
+     "rotation_deg": 0.16368819175518173,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0006277383039384188,
+     "max_drift_m": 0.0009346193522887226,
+     "final_drift_m": 0.0006869120767588272,
+     "rotation_deg": 0.7255089738183282,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0007289738652227762,
+     "max_drift_m": 0.0007289738652227762,
+     "final_drift_m": 0.0005181167105912819,
+     "rotation_deg": 0.1341060905185253,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.001494116953772096,
+     "final_drift_m": 0.0008529693225810067,
+     "rotation_deg": 1.0175721355668477,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 1.4502222232941635e-05,
+     "final_drift_m": 1.4502222220974364e-05,
+     "rotation_deg": 0.03953413291426661,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s03",
+   "case": "nominal",
+   "stable": false,
+   "residual_penetration_m": -0.0,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0007649073692908431,
+     "max_drift_m": 0.02836722161421455,
+     "final_drift_m": 0.027409997913719505,
+     "rotation_deg": 20.89974956890948,
+     "stable": false
+    }
+   ]
+  },
+  {
+   "scene": "s03",
+   "case": "friction_low",
+   "stable": false,
+   "residual_penetration_m": -0.0,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0007649073692908431,
+     "max_drift_m": 0.028373543816643823,
+     "final_drift_m": 0.0274101150351716,
+     "rotation_deg": 20.89976249903954,
+     "stable": false
+    }
+   ]
+  },
+  {
+   "scene": "s03",
+   "case": "friction_high",
+   "stable": false,
+   "residual_penetration_m": -0.0,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0007649073692908431,
+     "max_drift_m": 0.028355109326631853,
+     "final_drift_m": 0.02740909832341477,
+     "rotation_deg": 20.89980719853405,
+     "stable": false
+    }
+   ]
+  },
+  {
+   "scene": "s03",
+   "case": "mass_low",
+   "stable": false,
+   "residual_penetration_m": -0.0,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0007649073692908431,
+     "max_drift_m": 0.02836722161421478,
+     "final_drift_m": 0.027409997913718967,
+     "rotation_deg": 20.899749568909126,
+     "stable": false
+    }
+   ]
+  },
+  {
+   "scene": "s03",
+   "case": "mass_high",
+   "stable": false,
+   "residual_penetration_m": -0.0,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0007649073692908431,
+     "max_drift_m": 0.028367221614214552,
+     "final_drift_m": 0.02740999791371974,
+     "rotation_deg": 20.899749568909552,
+     "stable": false
+    }
+   ]
+  },
+  {
+   "scene": "s04",
+   "case": "nominal",
+   "stable": true,
+   "residual_penetration_m": 0.00031703328857271996,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.017868084934781536,
+     "final_drift_m": 0.013900674969699949,
+     "rotation_deg": 10.566829808250942,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0002948826915362875,
+     "final_drift_m": 0.00013836801130025794,
+     "rotation_deg": 0.13332913236856556,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00017143898706335352,
+     "final_drift_m": 0.0001714389870310568,
+     "rotation_deg": 0.11049313662733398,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0027357298356030825,
+     "final_drift_m": 0.0014872009851579404,
+     "rotation_deg": 0.6267313155357902,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 9.923990755685825e-05,
+     "final_drift_m": 9.922393865620087e-05,
+     "rotation_deg": 0.03525928149502096,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s04",
+   "case": "friction_low",
+   "stable": true,
+   "residual_penetration_m": 0.00031703328857271996,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.017868084934781547,
+     "final_drift_m": 0.013900674969700001,
+     "rotation_deg": 10.566829808249562,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0003012778883939302,
+     "final_drift_m": 0.00016487421812558746,
+     "rotation_deg": 0.133327300687701,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0001714401362331377,
+     "final_drift_m": 0.00017144013619406083,
+     "rotation_deg": 0.11049313373782285,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0018527077836922585,
+     "final_drift_m": 0.0005371270139635355,
+     "rotation_deg": 0.6146794027185044,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 9.998307044126925e-05,
+     "final_drift_m": 9.993546407462535e-05,
+     "rotation_deg": 0.03525928281811894,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s04",
+   "case": "friction_high",
+   "stable": true,
+   "residual_penetration_m": 0.00031703328857271996,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.017868084934781536,
+     "final_drift_m": 0.013900674969700478,
+     "rotation_deg": 10.566829808250112,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0003160119560183849,
+     "final_drift_m": 0.00015220611849139232,
+     "rotation_deg": 0.13332460641476288,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0001714390106788107,
+     "final_drift_m": 0.0001714390106450356,
+     "rotation_deg": 0.11049313681205158,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.002736334179076367,
+     "final_drift_m": 0.001482506098847675,
+     "rotation_deg": 0.6300844680195612,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 9.985858327255305e-05,
+     "final_drift_m": 9.974131680445339e-05,
+     "rotation_deg": 0.035259281329633706,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s04",
+   "case": "mass_low",
+   "stable": true,
+   "residual_penetration_m": 0.00031703328857271996,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.01786808493478155,
+     "final_drift_m": 0.013900674969699397,
+     "rotation_deg": 10.566829808250805,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0002948826915362875,
+     "final_drift_m": 0.0001383680113004135,
+     "rotation_deg": 0.13332913235763125,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00017143898706252746,
+     "final_drift_m": 0.00017143898702906625,
+     "rotation_deg": 0.11049313670649867,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.002735729835603158,
+     "final_drift_m": 0.0014872009851371315,
+     "rotation_deg": 0.6267313155450948,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 9.923990755685825e-05,
+     "final_drift_m": 9.922393865623708e-05,
+     "rotation_deg": 0.035259281743101833,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s04",
+   "case": "mass_high",
+   "stable": true,
+   "residual_penetration_m": 0.00031703328857271996,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.017868084934781547,
+     "final_drift_m": 0.013900674969699895,
+     "rotation_deg": 10.566829808249837,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0002948826915362838,
+     "final_drift_m": 0.00013836801130033053,
+     "rotation_deg": 0.1333291324013684,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00017143898706310068,
+     "final_drift_m": 0.0001714389870315939,
+     "rotation_deg": 0.11049313671969277,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.002735729835603073,
+     "final_drift_m": 0.0014872009851579335,
+     "rotation_deg": 0.6267313155381163,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 9.923990755685825e-05,
+     "final_drift_m": 9.922393865623065e-05,
+     "rotation_deg": 0.035259281743101833,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s05",
+   "case": "nominal",
+   "stable": true,
+   "residual_penetration_m": 0.0003850167968685557,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0020747709858622313,
+     "final_drift_m": 0.00196837608369431,
+     "rotation_deg": 4.623851129218223,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0002116651602112241,
+     "final_drift_m": 0.00019086413418533868,
+     "rotation_deg": 0.11231894595920461,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00015313496972442785,
+     "final_drift_m": 0.0001531349696817149,
+     "rotation_deg": 0.24203523662585907,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0014696556923516724,
+     "final_drift_m": 0.0008587946385716965,
+     "rotation_deg": 0.44816635277794875,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s05",
+   "case": "friction_low",
+   "stable": true,
+   "residual_penetration_m": 0.0003850167968685557,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0021583378090584628,
+     "final_drift_m": 0.0020455064275373123,
+     "rotation_deg": 4.633421054091188,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0002116651602112241,
+     "final_drift_m": 0.00019086413418533483,
+     "rotation_deg": 0.11231894595920461,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00015311747155521385,
+     "final_drift_m": 0.00015311747151241026,
+     "rotation_deg": 0.24203523554165826,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0014521480008373644,
+     "final_drift_m": 0.0008413293496486309,
+     "rotation_deg": 0.448177632652144,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s05",
+   "case": "friction_high",
+   "stable": true,
+   "residual_penetration_m": 0.0003850167968685557,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0020669935536162453,
+     "final_drift_m": 0.001971654847000191,
+     "rotation_deg": 4.632391155181535,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0002116651602112241,
+     "final_drift_m": 0.0001908641341853425,
+     "rotation_deg": 0.11231894595920461,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00015313496972439763,
+     "final_drift_m": 0.00015313496968130476,
+     "rotation_deg": 0.2420352366499524,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0014696556923516724,
+     "final_drift_m": 0.0008587946385717084,
+     "rotation_deg": 0.4481663527714429,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s05",
+   "case": "mass_low",
+   "stable": true,
+   "residual_penetration_m": 0.0003850167968685557,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00207477098820699,
+     "final_drift_m": 0.0019683761232800433,
+     "rotation_deg": 4.6238511289785365,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0002116651602112241,
+     "final_drift_m": 0.00019086413418515543,
+     "rotation_deg": 0.11231894595920461,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0001531349697245082,
+     "final_drift_m": 0.00015313496968136155,
+     "rotation_deg": 0.2420352366499524,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0014696556923516724,
+     "final_drift_m": 0.0008587946385723326,
+     "rotation_deg": 0.44816635278445466,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s05",
+   "case": "mass_high",
+   "stable": true,
+   "residual_penetration_m": 0.0003850167968685557,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.002074770985602917,
+     "final_drift_m": 0.0019683760816116246,
+     "rotation_deg": 4.623851128942899,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0002116651602112241,
+     "final_drift_m": 0.00019086413418515543,
+     "rotation_deg": 0.11231894595920461,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0001531349697243994,
+     "final_drift_m": 0.00015313496968150512,
+     "rotation_deg": 0.2420352366619991,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0014696556923516724,
+     "final_drift_m": 0.0008587946385719981,
+     "rotation_deg": 0.4481663527942135,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s06",
+   "case": "nominal",
+   "stable": true,
+   "residual_penetration_m": 6.917298169104545e-05,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00013563742163701697,
+     "final_drift_m": 0.00010255397637030467,
+     "rotation_deg": 0.026337901020761723,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0011365893416823934,
+     "final_drift_m": 0.0006284794272379976,
+     "rotation_deg": 0.7889548714102553,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0004964974319994587,
+     "final_drift_m": 0.00018072037249976876,
+     "rotation_deg": 0.045752195418638446,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00018602539166015102,
+     "final_drift_m": 0.00010424041042784201,
+     "rotation_deg": 0.1357202896308539,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s06",
+   "case": "friction_low",
+   "stable": true,
+   "residual_penetration_m": 6.917298169104545e-05,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00013776439191294526,
+     "final_drift_m": 0.00010592721077167029,
+     "rotation_deg": 0.026337893271462545,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0011093423043170363,
+     "final_drift_m": 0.00063598890311216,
+     "rotation_deg": 0.7875344699177841,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0005830595621345205,
+     "final_drift_m": 0.0005178753180819506,
+     "rotation_deg": 0.04652817994701309,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00018993269665705845,
+     "final_drift_m": 0.0001151544610679823,
+     "rotation_deg": 0.1357202927674143,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s06",
+   "case": "friction_high",
+   "stable": true,
+   "residual_penetration_m": 6.917298169104545e-05,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00013780554303001005,
+     "final_drift_m": 0.00010337146950070235,
+     "rotation_deg": 0.026337884193709176,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.001124643477541249,
+     "final_drift_m": 0.0006343667395438133,
+     "rotation_deg": 0.7905958703877132,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0004964443335382266,
+     "final_drift_m": 0.00018079487165473268,
+     "rotation_deg": 0.04575166079730296,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00019176596080881713,
+     "final_drift_m": 0.00010772781408326531,
+     "rotation_deg": 0.13572029149990014,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s06",
+   "case": "mass_low",
+   "stable": true,
+   "residual_penetration_m": 6.917298169104545e-05,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0001356374216370204,
+     "final_drift_m": 0.00010255397637033839,
+     "rotation_deg": 0.026337901020761723,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0011365893416824763,
+     "final_drift_m": 0.0006284794272367305,
+     "rotation_deg": 0.78895487147493,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0004964974319994587,
+     "final_drift_m": 0.00018072037249976876,
+     "rotation_deg": 0.045752195418638446,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00018602539166015934,
+     "final_drift_m": 0.0001042404104278116,
+     "rotation_deg": 0.1357202896308539,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s06",
+   "case": "mass_high",
+   "stable": true,
+   "residual_penetration_m": 6.917298169104545e-05,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00013563742163701697,
+     "final_drift_m": 0.00010255397637029823,
+     "rotation_deg": 0.026337901020761723,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0011365893416823956,
+     "final_drift_m": 0.0006284794272394343,
+     "rotation_deg": 0.7889548714102553,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0004964974319994587,
+     "final_drift_m": 0.00018072037249977318,
+     "rotation_deg": 0.04575219548236692,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00018602539166076012,
+     "final_drift_m": 0.00010424041042876876,
+     "rotation_deg": 0.13572028965233715,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s11",
+   "case": "nominal",
+   "stable": true,
+   "residual_penetration_m": 0.0001893527674414787,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00016238611423575924,
+     "final_drift_m": 0.00012097705283618964,
+     "rotation_deg": 0.007668319040839666,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00012220328688287074,
+     "final_drift_m": 0.0001222032868118838,
+     "rotation_deg": 0.050155096773409055,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 2.6624992958012557e-05,
+     "final_drift_m": 2.6443327783747533e-05,
+     "rotation_deg": 0.0714579323028879,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0001151659194837616,
+     "final_drift_m": 0.0001151659194594027,
+     "rotation_deg": 0.021902062840686132,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0012352499262074834,
+     "final_drift_m": 0.0012192100228810906,
+     "rotation_deg": 0.10706399019650846,
+     "stable": true
+    },
+    {
+     "object_id": "obj_005",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0001314530821771852,
+     "final_drift_m": 0.00011370457785899672,
+     "rotation_deg": 0.06888983943654942,
+     "stable": true
+    },
+    {
+     "object_id": "obj_006",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0003199305932850951,
+     "final_drift_m": 0.00021218903964731651,
+     "rotation_deg": 0.09471471887598341,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s11",
+   "case": "friction_low",
+   "stable": true,
+   "residual_penetration_m": 0.0001893527674414787,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00016509572143125534,
+     "final_drift_m": 0.00012292419940836214,
+     "rotation_deg": 0.007650542499479982,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00012220328688268274,
+     "final_drift_m": 0.00012220328681157022,
+     "rotation_deg": 0.0501550968606101,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 2.6589137539611166e-05,
+     "final_drift_m": 2.633181755404788e-05,
+     "rotation_deg": 0.0694301573535198,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00011880523628032499,
+     "final_drift_m": 0.00011880523625526756,
+     "rotation_deg": 0.021898678535147733,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.004448766444349658,
+     "final_drift_m": 0.004448766444349658,
+     "rotation_deg": 0.9684433146339744,
+     "stable": true
+    },
+    {
+     "object_id": "obj_005",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0001363503353732004,
+     "final_drift_m": 0.0001221749939329237,
+     "rotation_deg": 0.06888996971078698,
+     "stable": true
+    },
+    {
+     "object_id": "obj_006",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00034399540425110795,
+     "final_drift_m": 0.00024158771092321857,
+     "rotation_deg": 0.08971629226329604,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s11",
+   "case": "friction_high",
+   "stable": true,
+   "residual_penetration_m": 0.0001893527674414787,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00016103556725134363,
+     "final_drift_m": 0.00011863442997059922,
+     "rotation_deg": 0.007671126708581484,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00012220328688285252,
+     "final_drift_m": 0.0001222032868117414,
+     "rotation_deg": 0.050155096773409055,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 2.6624992958008322e-05,
+     "final_drift_m": 2.6443327783743227e-05,
+     "rotation_deg": 0.0714579323028879,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0001264637103111538,
+     "final_drift_m": 0.00011249784392878856,
+     "rotation_deg": 0.021903645043795047,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0006244034232986103,
+     "final_drift_m": 0.0006045842773410832,
+     "rotation_deg": 1.0593336455642164,
+     "stable": true
+    },
+    {
+     "object_id": "obj_005",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00013659581531297977,
+     "final_drift_m": 0.00011363925311889627,
+     "rotation_deg": 0.06888971747881623,
+     "stable": true
+    },
+    {
+     "object_id": "obj_006",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00029164023028427556,
+     "final_drift_m": 0.00021163810910080602,
+     "rotation_deg": 0.0881067989519352,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s11",
+   "case": "mass_low",
+   "stable": true,
+   "residual_penetration_m": 0.0001893527674414787,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00016238611423575924,
+     "final_drift_m": 0.00012097705283587937,
+     "rotation_deg": 0.007668319040839666,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00012220328688295043,
+     "final_drift_m": 0.00012220328681204596,
+     "rotation_deg": 0.050155096773409055,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 2.662499295801152e-05,
+     "final_drift_m": 2.6443327783745643e-05,
+     "rotation_deg": 0.07145793234369117,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00011516591948327522,
+     "final_drift_m": 0.0001151659194448854,
+     "rotation_deg": 0.021902062840686132,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0012352346812313111,
+     "final_drift_m": 0.001219193983923968,
+     "rotation_deg": 0.10708691469726833,
+     "stable": true
+    },
+    {
+     "object_id": "obj_005",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0001314530821771852,
+     "final_drift_m": 0.0001137045778588748,
+     "rotation_deg": 0.06888983947887377,
+     "stable": true
+    },
+    {
+     "object_id": "obj_006",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0003199305932892475,
+     "final_drift_m": 0.00021218903964620572,
+     "rotation_deg": 0.09471471893755185,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s11",
+   "case": "mass_high",
+   "stable": true,
+   "residual_penetration_m": 0.0001893527674414787,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00016238611423575924,
+     "final_drift_m": 0.00012097705283594435,
+     "rotation_deg": 0.007668319421068718,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00012220328688302784,
+     "final_drift_m": 0.00012220328681207112,
+     "rotation_deg": 0.05015509683154309,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 2.6624992958009122e-05,
+     "final_drift_m": 2.6443327783744907e-05,
+     "rotation_deg": 0.0714579323028879,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00011516591948367579,
+     "final_drift_m": 0.0001151659194593429,
+     "rotation_deg": 0.021902062374747722,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0012352496995631187,
+     "final_drift_m": 0.0012192097480111324,
+     "rotation_deg": 0.10705772879236747,
+     "stable": true
+    },
+    {
+     "object_id": "obj_005",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00013145308218261308,
+     "final_drift_m": 0.00011370457786860261,
+     "rotation_deg": 0.06888983947887377,
+     "stable": true
+    },
+    {
+     "object_id": "obj_006",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0003199305932850951,
+     "final_drift_m": 0.00021218903964730887,
+     "rotation_deg": 0.09471471886059131,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s12",
+   "case": "nominal",
+   "stable": true,
+   "residual_penetration_m": 0.0004705166884699796,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0002897252506863959,
+     "final_drift_m": 0.0002897252506465002,
+     "rotation_deg": 0.1419377821426668,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0007256793490676505,
+     "final_drift_m": 0.0007091502538513137,
+     "rotation_deg": 0.49714221124548175,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0006528584060850572,
+     "max_drift_m": 0.0006528584060850572,
+     "final_drift_m": 0.0005679338782109629,
+     "rotation_deg": 0.43058052053533413,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0004004142730018987,
+     "final_drift_m": 0.00018364809011109777,
+     "rotation_deg": 0.120494301076877,
+     "stable": true
+    },
+    {
+     "object_id": "obj_005",
+     "separation_m": 0.0008243814148426731,
+     "max_drift_m": 0.0024256417546206833,
+     "final_drift_m": 0.0017783429593325605,
+     "rotation_deg": 0.8058986927473671,
+     "stable": true
+    },
+    {
+     "object_id": "obj_006",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0014119015743164493,
+     "final_drift_m": 0.0008171094110749111,
+     "rotation_deg": 0.8183271451115773,
+     "stable": true
+    },
+    {
+     "object_id": "obj_007",
+     "separation_m": 0.0013494886690862268,
+     "max_drift_m": 0.0013494886690862268,
+     "final_drift_m": 8.933943499349247e-05,
+     "rotation_deg": 0.5224429446861671,
+     "stable": true
+    },
+    {
+     "object_id": "obj_008",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00020381010054624748,
+     "final_drift_m": 0.0002035459821291794,
+     "rotation_deg": 0.3337791995918187,
+     "stable": true
+    },
+    {
+     "object_id": "obj_009",
+     "separation_m": 0.0,
+     "max_drift_m": 6.538684812095148e-05,
+     "final_drift_m": 3.093150862152048e-05,
+     "rotation_deg": 0.010049712546703386,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s12",
+   "case": "friction_low",
+   "stable": true,
+   "residual_penetration_m": 0.0004705166884699796,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00028972587348289057,
+     "final_drift_m": 0.00028972587344262916,
+     "rotation_deg": 0.14193778211185343,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0006619703427456664,
+     "final_drift_m": 0.0006402221499020092,
+     "rotation_deg": 0.4948137998519062,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0006528584060850572,
+     "max_drift_m": 0.0006528584060850572,
+     "final_drift_m": 0.0005652546981913671,
+     "rotation_deg": 0.430569594839422,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0004059050593775846,
+     "final_drift_m": 0.00020269102244478503,
+     "rotation_deg": 0.12049311399088514,
+     "stable": true
+    },
+    {
+     "object_id": "obj_005",
+     "separation_m": 0.0008243814148426731,
+     "max_drift_m": 0.002229740888349696,
+     "final_drift_m": 0.0015093918713207134,
+     "rotation_deg": 0.8008705283830055,
+     "stable": true
+    },
+    {
+     "object_id": "obj_006",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0014655921973027383,
+     "final_drift_m": 0.0008747625860855455,
+     "rotation_deg": 0.8180457061062709,
+     "stable": true
+    },
+    {
+     "object_id": "obj_007",
+     "separation_m": 0.0013494886690862268,
+     "max_drift_m": 0.0013494886690862268,
+     "final_drift_m": 0.0001236467218828454,
+     "rotation_deg": 0.5213914421360216,
+     "stable": true
+    },
+    {
+     "object_id": "obj_008",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0002038163087937579,
+     "final_drift_m": 0.00020355924508540485,
+     "rotation_deg": 0.3337780908259393,
+     "stable": true
+    },
+    {
+     "object_id": "obj_009",
+     "separation_m": 0.0,
+     "max_drift_m": 6.672160155069387e-05,
+     "final_drift_m": 6.672160143067654e-05,
+     "rotation_deg": 0.010048655694543763,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s12",
+   "case": "friction_high",
+   "stable": true,
+   "residual_penetration_m": 0.0004705166884699796,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0002897249779813869,
+     "final_drift_m": 0.00028972497794218935,
+     "rotation_deg": 0.14193778217348013,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0007256793993459526,
+     "final_drift_m": 0.0007091502977015833,
+     "rotation_deg": 0.4971422112396167,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0006528584060850572,
+     "max_drift_m": 0.0006528584060850572,
+     "final_drift_m": 0.0005679324861183077,
+     "rotation_deg": 0.4305795759823263,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0004111967880894425,
+     "final_drift_m": 0.00019467399156053423,
+     "rotation_deg": 0.1204920653324712,
+     "stable": true
+    },
+    {
+     "object_id": "obj_005",
+     "separation_m": 0.0008243814148426731,
+     "max_drift_m": 0.0024247134734275986,
+     "final_drift_m": 0.0017783201247750153,
+     "rotation_deg": 0.8059119163543579,
+     "stable": true
+    },
+    {
+     "object_id": "obj_006",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0015718336330686694,
+     "final_drift_m": 0.0008820437471113013,
+     "rotation_deg": 0.8178685304429655,
+     "stable": true
+    },
+    {
+     "object_id": "obj_007",
+     "separation_m": 0.0013494886690862268,
+     "max_drift_m": 0.0013494886690862268,
+     "final_drift_m": 0.00018257373601884844,
+     "rotation_deg": 0.5228078342817547,
+     "stable": true
+    },
+    {
+     "object_id": "obj_008",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00020385454338306226,
+     "final_drift_m": 0.00020349329001984187,
+     "rotation_deg": 0.33374432562908746,
+     "stable": true
+    },
+    {
+     "object_id": "obj_009",
+     "separation_m": 0.0,
+     "max_drift_m": 6.539515554456126e-05,
+     "final_drift_m": 3.093150635907488e-05,
+     "rotation_deg": 0.010049710080602603,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s12",
+   "case": "mass_low",
+   "stable": true,
+   "residual_penetration_m": 0.0004705166884699796,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00028972537427129127,
+     "final_drift_m": 0.0002897253742249564,
+     "rotation_deg": 0.14193778209131122,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0007256793490676505,
+     "final_drift_m": 0.0007091502538513625,
+     "rotation_deg": 0.49714221124548175,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0006528584060850572,
+     "max_drift_m": 0.0006528584060850572,
+     "final_drift_m": 0.0005679338782115617,
+     "rotation_deg": 0.43058052053194834,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0004004142730018987,
+     "final_drift_m": 0.00018364809011111233,
+     "rotation_deg": 0.120494301076877,
+     "stable": true
+    },
+    {
+     "object_id": "obj_005",
+     "separation_m": 0.0008243814148426731,
+     "max_drift_m": 0.002425641754620695,
+     "final_drift_m": 0.0017783429593324711,
+     "rotation_deg": 0.8058986927473671,
+     "stable": true
+    },
+    {
+     "object_id": "obj_006",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0014119015743165272,
+     "final_drift_m": 0.0008171094110747621,
+     "rotation_deg": 0.8183271451044513,
+     "stable": true
+    },
+    {
+     "object_id": "obj_007",
+     "separation_m": 0.0013494886690862268,
+     "max_drift_m": 0.0013494886690862268,
+     "final_drift_m": 8.933943499654824e-05,
+     "rotation_deg": 0.5224429446945386,
+     "stable": true
+    },
+    {
+     "object_id": "obj_008",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00020381010048677934,
+     "final_drift_m": 0.00020354598206147114,
+     "rotation_deg": 0.33377919958745095,
+     "stable": true
+    },
+    {
+     "object_id": "obj_009",
+     "separation_m": 0.0,
+     "max_drift_m": 6.538684812095148e-05,
+     "final_drift_m": 3.0931508624727967e-05,
+     "rotation_deg": 0.010049712546703386,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s12",
+   "case": "mass_high",
+   "stable": true,
+   "residual_penetration_m": 0.0004705166884699796,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0002897252505753419,
+     "final_drift_m": 0.00028972525053213996,
+     "rotation_deg": 0.14193778209131122,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0007256793490676505,
+     "final_drift_m": 0.0007091502538513625,
+     "rotation_deg": 0.49714221124548175,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0006528584060850572,
+     "max_drift_m": 0.0006528584060850572,
+     "final_drift_m": 0.0005679338782091161,
+     "rotation_deg": 0.43058052054887735,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0004004142730018987,
+     "final_drift_m": 0.00018364809011114596,
+     "rotation_deg": 0.12049430108897598,
+     "stable": true
+    },
+    {
+     "object_id": "obj_005",
+     "separation_m": 0.0008243814148426731,
+     "max_drift_m": 0.0024256417546206833,
+     "final_drift_m": 0.0017783429593325453,
+     "rotation_deg": 0.8058986927455581,
+     "stable": true
+    },
+    {
+     "object_id": "obj_006",
+     "separation_m": 0.0,
+     "max_drift_m": 0.001411901574316472,
+     "final_drift_m": 0.0008171094110747137,
+     "rotation_deg": 0.8183271451133589,
+     "stable": true
+    },
+    {
+     "object_id": "obj_007",
+     "separation_m": 0.0013494886690862268,
+     "max_drift_m": 0.0013494886690862268,
+     "final_drift_m": 8.93394349927314e-05,
+     "rotation_deg": 0.5224429446861671,
+     "stable": true
+    },
+    {
+     "object_id": "obj_008",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00020381010052332823,
+     "final_drift_m": 0.000203545982105581,
+     "rotation_deg": 0.33377919957871544,
+     "stable": true
+    },
+    {
+     "object_id": "obj_009",
+     "separation_m": 0.0,
+     "max_drift_m": 6.538684812095148e-05,
+     "final_drift_m": 3.09315086222743e-05,
+     "rotation_deg": 0.010049712546703386,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s13",
+   "case": "nominal",
+   "stable": false,
+   "residual_penetration_m": 0.00034764246303237503,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.00033535167510098315,
+     "max_drift_m": 0.00034670185617038615,
+     "final_drift_m": 0.00034670131091948323,
+     "rotation_deg": 0.1079734216435269,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.04413746717985543,
+     "max_drift_m": 0.04413746717985543,
+     "final_drift_m": 0.043827530789008286,
+     "rotation_deg": 0.0046879121047597614,
+     "stable": false
+    }
+   ]
+  },
+  {
+   "scene": "s13",
+   "case": "friction_low",
+   "stable": false,
+   "residual_penetration_m": 0.00034764246303237503,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.00033535167510098315,
+     "max_drift_m": 0.0003467069084975016,
+     "final_drift_m": 0.0003467064190738553,
+     "rotation_deg": 0.10809541302488332,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.04413746717985543,
+     "max_drift_m": 0.04413746717985543,
+     "final_drift_m": 0.04382825549738522,
+     "rotation_deg": 0.004139876132668298,
+     "stable": false
+    }
+   ]
+  },
+  {
+   "scene": "s13",
+   "case": "friction_high",
+   "stable": false,
+   "residual_penetration_m": 0.00034764246303237503,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.00033535167510098315,
+     "max_drift_m": 0.0003466976431842722,
+     "final_drift_m": 0.0003466970449995748,
+     "rotation_deg": 0.10787532139952809,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.04413746717985543,
+     "max_drift_m": 0.04413746717985543,
+     "final_drift_m": 0.04382719449996902,
+     "rotation_deg": 0.00407556163007572,
+     "stable": false
+    }
+   ]
+  },
+  {
+   "scene": "s13",
+   "case": "mass_low",
+   "stable": false,
+   "residual_penetration_m": 0.00034764246303237503,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.00033535167510098315,
+     "max_drift_m": 0.00034670185617039433,
+     "final_drift_m": 0.00034670131091949,
+     "rotation_deg": 0.1079734216435269,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.04413746717985543,
+     "max_drift_m": 0.04413746717985543,
+     "final_drift_m": 0.043827530789008286,
+     "rotation_deg": 0.0046879121047597614,
+     "stable": false
+    }
+   ]
+  },
+  {
+   "scene": "s13",
+   "case": "mass_high",
+   "stable": false,
+   "residual_penetration_m": 0.00034764246303237503,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.00033535167510098315,
+     "max_drift_m": 0.00034670185617038615,
+     "final_drift_m": 0.0003467013109194763,
+     "rotation_deg": 0.1079734216435269,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.04413746717985543,
+     "max_drift_m": 0.04413746717985543,
+     "final_drift_m": 0.043827530789008286,
+     "rotation_deg": 0.0046879121047597614,
+     "stable": false
+    }
+   ]
+  },
+  {
+   "scene": "s14",
+   "case": "nominal",
+   "stable": true,
+   "residual_penetration_m": 0.00015976021836410469,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00016365174970816283,
+     "final_drift_m": 0.00010542319978616111,
+     "rotation_deg": 0.1482003326700817,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0015731191397791696,
+     "final_drift_m": 0.0010276565500436277,
+     "rotation_deg": 3.199310769529415,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0008253746089238456,
+     "max_drift_m": 0.005060657335076892,
+     "final_drift_m": 0.003577234274165296,
+     "rotation_deg": 6.574367100217628,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0005923819523219269,
+     "final_drift_m": 0.0003799722046147313,
+     "rotation_deg": 0.21365059437006,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0010439840954660736,
+     "final_drift_m": 0.0005748543283394819,
+     "rotation_deg": 0.24059582910072275,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s14",
+   "case": "friction_low",
+   "stable": true,
+   "residual_penetration_m": 0.00015976021836410469,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00016878860183715784,
+     "final_drift_m": 0.00012542173990718336,
+     "rotation_deg": 0.14819965341779884,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00153678784644706,
+     "final_drift_m": 0.0009529642958774184,
+     "rotation_deg": 3.199321705427655,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0008253746089238456,
+     "max_drift_m": 0.004303450335348198,
+     "final_drift_m": 0.0031978991355663127,
+     "rotation_deg": 6.573310608210735,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0004017272671750753,
+     "final_drift_m": 0.0004010123813391172,
+     "rotation_deg": 0.2136740588805765,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.001040387090591575,
+     "final_drift_m": 0.0005746092851026078,
+     "rotation_deg": 0.24059580530556252,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s14",
+   "case": "friction_high",
+   "stable": true,
+   "residual_penetration_m": 0.00015976021836410469,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0001756957481477018,
+     "final_drift_m": 0.00011145032594263471,
+     "rotation_deg": 0.1481982425895462,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0016974370596364841,
+     "final_drift_m": 0.0010747914526092663,
+     "rotation_deg": 3.1997965435042595,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0008253746089238456,
+     "max_drift_m": 0.005717160966447235,
+     "final_drift_m": 0.0043923116536289985,
+     "rotation_deg": 6.573772427306201,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0005922769062304257,
+     "final_drift_m": 0.0003799176767923956,
+     "rotation_deg": 0.2136023884499384,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0010439840954660736,
+     "final_drift_m": 0.0005748543283395912,
+     "rotation_deg": 0.24059582910678215,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s14",
+   "case": "mass_low",
+   "stable": true,
+   "residual_penetration_m": 0.00015976021836410469,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00016365174970706963,
+     "final_drift_m": 0.00010542319978208176,
+     "rotation_deg": 0.14820033270943006,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0015731191398088238,
+     "final_drift_m": 0.001027656561250019,
+     "rotation_deg": 3.1993107743041844,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0008253746089238456,
+     "max_drift_m": 0.005060657334562028,
+     "final_drift_m": 0.0035772343154107694,
+     "rotation_deg": 6.574367096838538,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0005923819523219269,
+     "final_drift_m": 0.00037997220461471863,
+     "rotation_deg": 0.21365059430864788,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0010439840954660736,
+     "final_drift_m": 0.0005748543283394491,
+     "rotation_deg": 0.24059582910678215,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s14",
+   "case": "mass_high",
+   "stable": true,
+   "residual_penetration_m": 0.00015976021836410469,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00016365174970816283,
+     "final_drift_m": 0.00010542319978616761,
+     "rotation_deg": 0.14820033268975588,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0015731191397917923,
+     "final_drift_m": 0.001027656549250838,
+     "rotation_deg": 3.1993107695549368,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0008253746089238456,
+     "max_drift_m": 0.005060657335077204,
+     "final_drift_m": 0.0035772342741691356,
+     "rotation_deg": 6.574367100216739,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0005923819523219269,
+     "final_drift_m": 0.00037997220461474004,
+     "rotation_deg": 0.21365059437006,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0010439840954660736,
+     "final_drift_m": 0.0005748543283323639,
+     "rotation_deg": 0.24059582921585088,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s17",
+   "case": "nominal",
+   "stable": false,
+   "residual_penetration_m": 0.00035696917329750694,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0005176036513507426,
+     "max_drift_m": 0.0005176036513507426,
+     "final_drift_m": 0.00035632271221095434,
+     "rotation_deg": 0.029976266031139218,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00036658873599240677,
+     "final_drift_m": 0.0002070025100259294,
+     "rotation_deg": 0.40992143659794505,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00017044853885275193,
+     "final_drift_m": 0.00017037627581123664,
+     "rotation_deg": 0.04789751043999366,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0013009716201618504,
+     "max_drift_m": 0.0013009716201618504,
+     "final_drift_m": 0.0011033204519998916,
+     "rotation_deg": 0.09807935695442818,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.05742236762441994,
+     "final_drift_m": 0.05164922936048104,
+     "rotation_deg": 110.29862010990358,
+     "stable": false
+    }
+   ]
+  },
+  {
+   "scene": "s17",
+   "case": "friction_low",
+   "stable": false,
+   "residual_penetration_m": 0.00035696917329750694,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0005176036513507426,
+     "max_drift_m": 0.0005176036513507426,
+     "final_drift_m": 0.0003567399369282786,
+     "rotation_deg": 0.028277826943168004,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00035696868874015105,
+     "final_drift_m": 0.0002937082691621215,
+     "rotation_deg": 0.4101127256341192,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0001703273640508543,
+     "final_drift_m": 0.00017002490277864696,
+     "rotation_deg": 0.045611966789972036,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0013009716201618504,
+     "max_drift_m": 0.0013009716201618504,
+     "final_drift_m": 0.0011033204519998929,
+     "rotation_deg": 0.09807935695442818,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.06218689870400144,
+     "final_drift_m": 0.061703194825236646,
+     "rotation_deg": 112.83861533694417,
+     "stable": false
+    }
+   ]
+  },
+  {
+   "scene": "s17",
+   "case": "friction_high",
+   "stable": false,
+   "residual_penetration_m": 0.00035696917329750694,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0005176036513507426,
+     "max_drift_m": 0.0005176036513507426,
+     "final_drift_m": 0.00035632271221095553,
+     "rotation_deg": 0.029976266031139218,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0004499457559261233,
+     "final_drift_m": 0.0002483502950282768,
+     "rotation_deg": 0.40992336963365056,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00017045105720877248,
+     "final_drift_m": 0.00017025888996916635,
+     "rotation_deg": 0.04560222283886298,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0013009716201618504,
+     "max_drift_m": 0.0013009716201618504,
+     "final_drift_m": 0.001103320451999894,
+     "rotation_deg": 0.09807935695442818,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.05742508953213483,
+     "final_drift_m": 0.05094108043990111,
+     "rotation_deg": 108.75347872927912,
+     "stable": false
+    }
+   ]
+  },
+  {
+   "scene": "s17",
+   "case": "mass_low",
+   "stable": false,
+   "residual_penetration_m": 0.00035696917329750694,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0005176036513507426,
+     "max_drift_m": 0.0005176036513507426,
+     "final_drift_m": 0.0003563227122109573,
+     "rotation_deg": 0.029976266031139218,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00036658873599240677,
+     "final_drift_m": 0.000207002510025008,
+     "rotation_deg": 0.40992143659794505,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00017044853887685727,
+     "final_drift_m": 0.00017037627583457566,
+     "rotation_deg": 0.04789751019649725,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0013009716201618504,
+     "max_drift_m": 0.0013009716201618504,
+     "final_drift_m": 0.001103320451999892,
+     "rotation_deg": 0.09807935695442818,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.05742232711313021,
+     "final_drift_m": 0.05168610477777808,
+     "rotation_deg": 110.47128037743632,
+     "stable": false
+    }
+   ]
+  },
+  {
+   "scene": "s17",
+   "case": "mass_high",
+   "stable": false,
+   "residual_penetration_m": 0.00035696917329750694,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0005176036513507426,
+     "max_drift_m": 0.0005176036513507426,
+     "final_drift_m": 0.0003563227122109566,
+     "rotation_deg": 0.029976266031139218,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00036658873599240677,
+     "final_drift_m": 0.0002070025100256848,
+     "rotation_deg": 0.40992143659794505,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00017044853885062435,
+     "final_drift_m": 0.00017037627580924732,
+     "rotation_deg": 0.04789751040955661,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0013009716201618504,
+     "max_drift_m": 0.0013009716201618504,
+     "final_drift_m": 0.0011033204519998916,
+     "rotation_deg": 0.09807935695442818,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0,
+     "max_drift_m": 0.05742236763444395,
+     "final_drift_m": 0.05164237307932988,
+     "rotation_deg": 110.44866554049447,
+     "stable": false
+    }
+   ]
+  },
+  {
+   "scene": "s18",
+   "case": "nominal",
+   "stable": true,
+   "residual_penetration_m": 0.00025044832065255346,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0009581054528379506,
+     "final_drift_m": 0.0008010428164771581,
+     "rotation_deg": 2.1150701185393106,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0006559617993808203,
+     "max_drift_m": 0.0006559617993808203,
+     "final_drift_m": 0.0004431507257410743,
+     "rotation_deg": 2.242013919796817,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.000627806115315609,
+     "final_drift_m": 0.000337538341476259,
+     "rotation_deg": 0.2576684948471361,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0005600118651405521,
+     "max_drift_m": 0.0005600118651405521,
+     "final_drift_m": 0.00047668287089725717,
+     "rotation_deg": 0.17515891141771825,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0009369910413770145,
+     "max_drift_m": 0.005113959497420078,
+     "final_drift_m": 0.003553546108077037,
+     "rotation_deg": 6.961775683937769,
+     "stable": true
+    },
+    {
+     "object_id": "obj_005",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00010771931564105343,
+     "final_drift_m": 0.00010771931275323858,
+     "rotation_deg": 7.636383641665691e-06,
+     "stable": true
+    },
+    {
+     "object_id": "obj_006",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00016578631834233992,
+     "final_drift_m": 0.0001657778908102087,
+     "rotation_deg": 0.06300186220231264,
+     "stable": true
+    },
+    {
+     "object_id": "obj_007",
+     "separation_m": 0.0007422222490752611,
+     "max_drift_m": 0.0007422222490752611,
+     "final_drift_m": 0.0007024854177403896,
+     "rotation_deg": 0.22928742883724978,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s18",
+   "case": "friction_low",
+   "stable": true,
+   "residual_penetration_m": 0.00025044832065255346,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0007886522226834143,
+     "final_drift_m": 0.00066365400442837,
+     "rotation_deg": 2.115735057924888,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0006559617993808203,
+     "max_drift_m": 0.0006559617993808203,
+     "final_drift_m": 0.00043813843105444553,
+     "rotation_deg": 2.2420125355362366,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0006195770937935569,
+     "final_drift_m": 0.0003359175216573575,
+     "rotation_deg": 0.25625511960464337,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0005600118651405521,
+     "max_drift_m": 0.001488599578505796,
+     "final_drift_m": 0.001488599578505796,
+     "rotation_deg": 0.3706385948967564,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0009369910413770145,
+     "max_drift_m": 0.004499187980741801,
+     "final_drift_m": 0.0032336907646050976,
+     "rotation_deg": 6.960796328914913,
+     "stable": true
+    },
+    {
+     "object_id": "obj_005",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00010771931559369216,
+     "final_drift_m": 0.00010771931275323862,
+     "rotation_deg": 7.636383641665691e-06,
+     "stable": true
+    },
+    {
+     "object_id": "obj_006",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00016578631834233992,
+     "final_drift_m": 0.0001657778908102087,
+     "rotation_deg": 0.06300186220231264,
+     "stable": true
+    },
+    {
+     "object_id": "obj_007",
+     "separation_m": 0.0007422222490752611,
+     "max_drift_m": 0.0007422222490752611,
+     "final_drift_m": 0.0006953627380834518,
+     "rotation_deg": 0.22928897849547175,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s18",
+   "case": "friction_high",
+   "stable": true,
+   "residual_penetration_m": 0.00025044832065255346,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.000958178811120429,
+     "final_drift_m": 0.0008013533615657304,
+     "rotation_deg": 2.1150694332424838,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0006559617993808203,
+     "max_drift_m": 0.0006559617993808203,
+     "final_drift_m": 0.00044314523716967576,
+     "rotation_deg": 2.2420139566134503,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0006284385672930819,
+     "final_drift_m": 0.0003379786202916792,
+     "rotation_deg": 0.25624205084223534,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0005600118651405521,
+     "max_drift_m": 0.0005600118651405521,
+     "final_drift_m": 0.00035476890187685183,
+     "rotation_deg": 0.05222708886373175,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0009369910413770145,
+     "max_drift_m": 0.0058917363842508315,
+     "final_drift_m": 0.004485739791021779,
+     "rotation_deg": 6.960741094327817,
+     "stable": true
+    },
+    {
+     "object_id": "obj_005",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00010771931554667924,
+     "final_drift_m": 0.00010771931275328775,
+     "rotation_deg": 7.636383641665691e-06,
+     "stable": true
+    },
+    {
+     "object_id": "obj_006",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0001657863183423473,
+     "final_drift_m": 0.00016577789081020577,
+     "rotation_deg": 0.06300186241057207,
+     "stable": true
+    },
+    {
+     "object_id": "obj_007",
+     "separation_m": 0.0007422222490752611,
+     "max_drift_m": 0.0007422222490752611,
+     "final_drift_m": 0.0007024855105708342,
+     "rotation_deg": 0.22928742823957715,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s18",
+   "case": "mass_low",
+   "stable": true,
+   "residual_penetration_m": 0.00025044832065255346,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0009581054525713065,
+     "final_drift_m": 0.0008010428159617109,
+     "rotation_deg": 2.1150701185351743,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0006559617993808203,
+     "max_drift_m": 0.0006559617993808203,
+     "final_drift_m": 0.0004431507257401013,
+     "rotation_deg": 2.242013919798118,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0006278061153082393,
+     "final_drift_m": 0.0003375383486569782,
+     "rotation_deg": 0.2576685030284455,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0005600118651405521,
+     "max_drift_m": 0.0005600118651405521,
+     "final_drift_m": 0.00047668287092348364,
+     "rotation_deg": 0.17515891123461075,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0009369910413770145,
+     "max_drift_m": 0.005113959497114361,
+     "final_drift_m": 0.0035535461430753735,
+     "rotation_deg": 6.961775682190642,
+     "stable": true
+    },
+    {
+     "object_id": "obj_005",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00010771931562005286,
+     "final_drift_m": 0.00010771931275329465,
+     "rotation_deg": 7.636383641665691e-06,
+     "stable": true
+    },
+    {
+     "object_id": "obj_006",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0001657863183423473,
+     "final_drift_m": 0.00016577789081020577,
+     "rotation_deg": 0.06300186241057207,
+     "stable": true
+    },
+    {
+     "object_id": "obj_007",
+     "separation_m": 0.0007422222490752611,
+     "max_drift_m": 0.0007422222490752611,
+     "final_drift_m": 0.0007024854177394445,
+     "rotation_deg": 0.22928742883724978,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s18",
+   "case": "mass_high",
+   "stable": true,
+   "residual_penetration_m": 0.00025044832065255346,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0009581054529622466,
+     "final_drift_m": 0.0008010428166883207,
+     "rotation_deg": 2.1150701185448253,
+     "stable": true
+    },
+    {
+     "object_id": "obj_001",
+     "separation_m": 0.0006559617993808203,
+     "max_drift_m": 0.0006559617993808203,
+     "final_drift_m": 0.00044315072573971107,
+     "rotation_deg": 2.24201391980202,
+     "stable": true
+    },
+    {
+     "object_id": "obj_002",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0006278061153156166,
+     "final_drift_m": 0.0003375383413291351,
+     "rotation_deg": 0.257668494700031,
+     "stable": true
+    },
+    {
+     "object_id": "obj_003",
+     "separation_m": 0.0005600118651405521,
+     "max_drift_m": 0.0005600118651405521,
+     "final_drift_m": 0.0004766828708973003,
+     "rotation_deg": 0.17515891141771825,
+     "stable": true
+    },
+    {
+     "object_id": "obj_004",
+     "separation_m": 0.0009369910413770145,
+     "max_drift_m": 0.005113959497421273,
+     "final_drift_m": 0.0035535461080713916,
+     "rotation_deg": 6.96177568393714,
+     "stable": true
+    },
+    {
+     "object_id": "obj_005",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00010771931564097019,
+     "final_drift_m": 0.00010771931275323511,
+     "rotation_deg": 7.636383641665691e-06,
+     "stable": true
+    },
+    {
+     "object_id": "obj_006",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00016578631834233992,
+     "final_drift_m": 0.0001657778908102087,
+     "rotation_deg": 0.06300186220231264,
+     "stable": true
+    },
+    {
+     "object_id": "obj_007",
+     "separation_m": 0.0007422222490752611,
+     "max_drift_m": 0.0007422222490752611,
+     "final_drift_m": 0.0007024854177394882,
+     "rotation_deg": 0.22928742883724978,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s24",
+   "case": "nominal",
+   "stable": true,
+   "residual_penetration_m": 3.3759516296458236e-05,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00011921607350171748,
+     "final_drift_m": 0.00010044518788575741,
+     "rotation_deg": 0.05319560896238167,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s24",
+   "case": "friction_low",
+   "stable": true,
+   "residual_penetration_m": 3.3759516296458236e-05,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0001256584268475363,
+     "final_drift_m": 0.00011244569644410428,
+     "rotation_deg": 0.053195650509293514,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s24",
+   "case": "friction_high",
+   "stable": true,
+   "residual_penetration_m": 3.3759516296458236e-05,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0001247553361498862,
+     "final_drift_m": 9.946057401839605e-05,
+     "rotation_deg": 0.05319553888615145,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s24",
+   "case": "mass_low",
+   "stable": true,
+   "residual_penetration_m": 3.3759516296458236e-05,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.0001192160735017278,
+     "final_drift_m": 0.00010044518788581515,
+     "rotation_deg": 0.0531956088801648,
+     "stable": true
+    }
+   ]
+  },
+  {
+   "scene": "s24",
+   "case": "mass_high",
+   "stable": true,
+   "residual_penetration_m": 3.3759516296458236e-05,
+   "bodies": [
+    {
+     "object_id": "obj_000",
+     "separation_m": 0.0,
+     "max_drift_m": 0.00011921607350161752,
+     "final_drift_m": 0.00010044518788558295,
+     "rotation_deg": 0.053195609099409805,
+     "stable": true
+    }
+   ]
+  }
+ ]
+}

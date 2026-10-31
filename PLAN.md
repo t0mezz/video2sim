@@ -6,7 +6,7 @@ roadmap: update it as work happens. Numbers that gate a decision live in
 
 ## Status
 
-Last updated: 2026-10-30. Start date: not set (decision D-002).
+Last updated: 2026-10-31. Start date: not set (decision D-002).
 
 | Phase | Weeks | Focus | Status | Gate |
 | --- | --- | --- | --- | --- |
@@ -14,11 +14,11 @@ Last updated: 2026-10-30. Start date: not set (decision D-002).
 | 1 | 3 to 4 | Reconstruction, metric scale, world frame | Done | Passed |
 | 2 | 5 to 6 | Segmentation, tracking, 3D lifting | Done | Passed |
 | 3 | 7 to 8 | Shape completion and pose fusion | Done | Passed |
-| 4 | 9 to 10 | Physics readiness, material properties | Not started | Open |
+| 4 | 9 to 10 | Physics readiness, material properties | Done | Passed by human decision (D-026) |
 | 5 | 11 to 12 | Export, simulator validation, demo | Not started | Open |
 
 Status values: Not started, In progress, Done. Gate values: Open, Passed, Failed.
-**Current focus:** Phase 4.
+**Current focus:** Phase 5.
 
 ## How to use this file
 
@@ -29,7 +29,8 @@ Status values: Not started, In progress, Done. Gate values: Open, Passed, Failed
 
 * A phase gate passes only when every exit criterion is ticked with evidence. A phase starts
 
-  when the previous gate has passed, except where Phase 0 notes say otherwise.
+  when the previous gate has passed or a human has waived it (D-026), except where Phase 0 notes
+  say otherwise.
 
 * Humans change scope, targets, exit criteria and decisions. Agents propose changes in a pull
 
@@ -83,7 +84,7 @@ readable copy is `configs/targets.yaml`.
 | Object size error | Median 5% or less | Caliper measurements |
 | Position error | Median 1.5 cm or less | Objects placed on a printed grid with known coordinates |
 | Orientation error | Median 10 degrees or less | Same grid |
-| Mass error | Within 30% for 70% of objects | Kitchen-scale weights |
+| Mass error | Within 30% for 50% of objects (D-025) | Kitchen-scale weights |
 | Simulation stability | 95% of scenes settle, max drift 2 cm in 5 s | Automated drop-under-gravity test |
 | Asset validity | 100% of exported meshes pass every validator | Automated validators |
 | Runtime | 60 minutes or less per scene on one GPU | Pipeline logs |
@@ -242,7 +243,7 @@ Tasks
       raw mesh (no pose, unitless, up axis assumed z, UNVERIFIED), so the start rotation is a
       canonical guess and registration's yaw starts do the rest. Single view first,
       MV-SAM3D only as a P3.3 arm (`docs/research/sam3d_multiview.md`)
-      Evidence: SAM 3D adapter and Modal worker, `benchmark/results/p3_6_dev_stretch.json` and `benchmark/results/p3_eval_shape_test.json`, commits 5ec1636, c9f6dbd; the TRELLIS.2 half was built, measured and dropped (D-018, `benchmark/results/p3_3_bakeoff_dev.json`, commit df4cf16).
+      Evidence: SAM 3D adapter and Modal worker, `benchmark/results/p3_6_dev_stretch.json` and `benchmark/results/p3_eval_shape_test.json`, commits 5401dec, 69b9d04; the TRELLIS.2 half was built, measured and dropped (D-018, `benchmark/results/p3_3_bakeoff_dev.json`, commit 509cf09).
 
 - [x] **P3.2** Registration. SAM 3D's predicted layout is the starting pose. Refine a
 
@@ -286,7 +287,7 @@ Tasks
   the table. Left: sizes run 3 to 9% large on all but the earbud box, from SAM 3D's
   proportions and loose masks. Open: weights are untuned first guesses, one sample per
   object, not yet wired into a stage.
-  Evidence: commits 72dd631, c44e77c; `benchmark/results/p3_6_dev_stretch.json` and `benchmark/results/p3_eval_shape_test.json`. Still open as noted above: untuned weights, one sample per object.
+  Evidence: commits abf530b, acc2a36; `benchmark/results/p3_6_dev_stretch.json` and `benchmark/results/p3_eval_shape_test.json`. Still open as noted above: untuned weights, one sample per object.
 
 - [x] **P3.3** Bake-off, time-boxed to one week: SAM 3D, TRELLIS.2, and SAM 3D pose with
 
@@ -328,17 +329,17 @@ Tasks
   MV-SAM3D, and the Phase 4 stability measure. Fixes made on the way: `shape.parallel_samples`
   (hosted draws in flight at once), the worker now reports an empty sparse structure as a
   failed draw whether torch raises `RuntimeError` or `IndexError`.
-  Evidence: `benchmark/results/p3_3_bakeoff_dev.json`, D-018, commits c0cd015, df4cf16. Dev split only (the test split ran SAM 3D alone), no stability measure.
+  Evidence: `benchmark/results/p3_3_bakeoff_dev.json`, D-018, commits 3e531bd, 509cf09. Dev split only (the test split ran SAM 3D alone), no stability measure.
 
 - [x] **P3.4** Pick the best sample per object by fit score. Below the threshold, fall back to
 
       a convex hull or oriented box of the observed points and set `PROXY_GEOMETRY`.
-      Evidence: `benchmark/results/p3_6_dev_stretch.json` (1 proxy among the 43 objects on dev), `benchmark/results/p3_shape_checks_test.json` (5 proxies of 32 on test), commit 72dd631.
+      Evidence: `benchmark/results/p3_6_dev_stretch.json` (1 proxy among the 43 objects on dev), `benchmark/results/p3_shape_checks_test.json` (5 proxies of 32 on test), commit abf530b.
 
 - [x] **P3.5** Snap resting objects to the table: choose the stable face from the convex hull,
 
       align the up axis, remove the small gap or penetration.
-      Evidence: `benchmark/results/p3_shape_checks_dev.json` and `p3_shape_checks_test.json`: lowest vertex of every resting mesh at the support height (68 meshes, max gap 0.0 mm), commit 72dd631.
+      Evidence: `benchmark/results/p3_shape_checks_dev.json` and `p3_shape_checks_test.json`: lowest vertex of every resting mesh at the support height (68 meshes, max gap 0.0 mm), commit abf530b.
 
 - [x] **P3.6** Emit `RegisteredObjects`.
 
@@ -390,7 +391,7 @@ Tasks
   s04 water bottle 29%, the white cuboid in s11 (29%) and s14 (21%). The size target is
   provisional and the settings are tuned on dev, so the test split may read higher.
   Open: a fit score that ranks samples, stacked clusters in P2, and the bake-off.
-  Evidence: `benchmark/results/p3_eval_shape_test.json` (test split, run once 2026-10-30) and `p3_6_dev_stretch.json`, commit 72dd631.
+  Evidence: `benchmark/results/p3_eval_shape_test.json` (test split, run once 2026-10-30) and `p3_6_dev_stretch.json`, commit abf530b.
 
 Exit criteria
 
@@ -430,49 +431,130 @@ stated uncertainty.
 
 Tasks
 
-- [ ] **P4.1** Mesh repair: remove floaters, fill holes, make each mesh watertight and
+- [x] **P4.1** Mesh repair: remove floaters, fill holes, make each mesh watertight and
 
       manifold, decimate to a triangle budget. Validators block export on failure.
+      Evidence: `src/video2sim/stages/mesh_repair.py`, `tests/test_mesh_repair.py`; on the 5 raw
+      SAM 3D meshes of `runs/s01_b` (410k to 1.4M faces) all 5 pass the checks after repair and
+      decimation to 20000 faces, volume within 0.7% (`benchmark/results/p4_1_mesh_repair.json`,
+      `benchmark/run_mesh_repair.py`). Only s01 has raw meshes on disk; the exit criterion over all
+      exported meshes is checked in P4.8.
 
-- [ ] **P4.2** Collision geometry by convex decomposition (CoACD or V-HACD) with a cap on parts
+- [x] **P4.2** Collision geometry by convex decomposition (CoACD or V-HACD) with a cap on parts
 
       per object. Use a box, cylinder or sphere primitive where the object is close to one.
+      Evidence: `src/video2sim/stages/collision.py`, `tests/test_collision.py`; on the 5 raw SAM 3D
+      meshes of `runs/s01_b` (thin-walled shells, walls 0.4 to 1.2% of the object size) 4 pass
+      `collision_loads` and `collision_fit` (1 box, 3 CoACD with 16 parts) and 1 failed fit
+      (8 parts, tightness 0.12 against a limit of 0.05). Superseded by D-022: all 5 pass (2 boxes,
+      1 cylinder, 2 CoACD with 16 parts) (`benchmark/results/p4_2_collision.json`,
+      `benchmark/run_collision.py`). CoACD takes 12 to 99 s per object. The fit check is
+      surface-based because a volume ratio fails on shells. On the 61 registered, metric meshes
+      of the 13 rigid dev scenes all pass (`benchmark/results/p4_7_settling.json`).
 
-- [ ] **P4.3** Build `configs/material_table.yaml`: density, friction and restitution ranges per
+- [x] **P4.3** Build `configs/material_table.yaml`: density, friction and restitution ranges per
 
       material class, every value with a source.
+      Evidence: `configs/material_table.yaml`, `docs/research/material_sources.md`,
+      `tests/test_material_table.py`; 14 classes. Amended by D-019: values with no source are
+      listed in `unsourced` as wide placeholders (density 6 of 14 classes, friction 13, restitution
+      12), and only an unsourced density raises `Flag.LOW_CONFIDENCE_MATERIAL`.
 
-- [ ] **P4.4** Material inference. A vision-language model sees keyframe crops and returns
+- [x] **P4.4** Material inference. A vision-language model sees keyframe crops and returns
 
       structured fields only: category, material class, solid or hollow, confidence. Code
       maps the class to numbers through the table. The classification half already runs in
       Phase 2 (D-017, `stages/material_pass.py`, plus a surface-finish field); this task is
       done when the numbers half exists and the class list is final (P4.3).
+      Evidence: `object_material` in `src/video2sim/stages/physics.py`, `tests/test_physics.py`;
+      the 14 classes of P4.3 are the final list. On 56 matched dev objects (12 scenes, s05 has no
+      ground-truth origin) the class agrees with the inventory on 40 and hollow on 38
+      (`benchmark/results/p4_4_material_numbers.json`, `benchmark/run_material_numbers.py`), after
+      the four cardboard packages obj_002, 003, 014 and 029 were marked hollow in the inventory
+      by human decision (2026-10-31, ground truth regenerated, hollow fields only). Coffee can
+      obj_004 is settled by human check (2026-10-31): a cardboard can with a metal bottom, about
+      80% filled, so the inventory stays cardboard and not hollow. The model says steel and hollow;
+      the filling cannot be seen, the wall can.
 
-- [ ] **P4.5** Mass and inertia from the repaired mesh under uniform density, with a hollow
+- [x] **P4.5** Mass and inertia from the repaired mesh under uniform density, with a hollow
 
       correction. Store low, nominal and high.
+      Evidence: `src/video2sim/stages/mass.py`, `tests/test_mass.py` (box, cylinder, sphere, voxel
+      block and s^5 scaling against closed forms), `docs/research/mesh_volume.md`,
+      `benchmark/results/p4_5_mesh_volume.json`, `benchmark/results/p4_5_mass.json`
+      (`benchmark/run_mass.py`). Mesh volume is a median 0.13 of true on shells, so the body is a
+      voxel fill after sealing gaps up to 4% of the longest side: 1.01 of true, 32 of 39 within
+      20%, and the mouth of a cup stays open. Hollow correction `f` is one dev-measured value for
+      all classes (0.024, 0.22, 0.61) until P4.6, in `configs/material_table.yaml`. On 56 dev
+      objects 14 are within 30% (4 without the correction), in sample because `f` came from the
+      same objects, against a 70% exit criterion. Solid answers are the gap: 1 of 21, median 2.4
+      times too heavy. Truth is inside low to high on 31 of 56. `MassEstimate.center_of_mass_m`
+      is left for P4.8 to move the origin to (median offset 1.7 mm). Inertia has no measured truth.
 
   $$m = \rho\,V_{\text{eff}}, \qquad \mathbf{I} = \rho \int_V \left(\lVert\mathbf{r}\rVert^2 \mathbf{1} - \mathbf{r}\mathbf{r}^{\top}\right) dV$$
 
-- [ ] **P4.6** Calibrate on the weighed benchmark objects: fit per-material corrections (for
+- [x] **P4.6** Calibrate on the weighed benchmark objects: fit per-material corrections (for
 
       example the wall fraction of hollow containers) and report mass error before and after.
+      Evidence: `benchmark/fit_fill_fractions.py`, `benchmark/results/p4_6_fill_fit.json`,
+      `benchmark/results/p4_6_mass.json`, `configs/material_table.yaml`, `tests/test_physics.py`,
+      `docs/research/mesh_volume.md`. A fill fraction per class and solid-or-hollow answer, from 3
+      distinct objects, else one global value per answer. Only 4 pairs qualify; the 56 rows are 35
+      distinct objects. Within 30%, leave one object out: 4 of 56 uncorrected, 17 with the global
+      values, 20 (36%) per class; 26 (46%) in sample. The 70% exit criterion is not met. Friction
+      and restitution stay as placeholders (D-019). No test split was run.
 
-- [ ] **P4.7** Scene settling: resolve interpenetrations, drop the scene under gravity in the
+- [x] **P4.7** Scene settling: resolve interpenetrations, drop the scene under gravity in the
 
       simulator, compare final poses with the observed ones.
+      Evidence: `src/video2sim/stages/settling.py`, `tests/test_settling.py` (rest, free fall,
+      slope, tipping and overlaps against closed forms), `benchmark/run_settling.py`,
+      `benchmark/results/p4_7_settling.json`. MuJoCo stands in for Isaac Sim (D-021), so the result
+      is provisional. All 61 objects of the 13 rigid dev scenes load and run, and all pass every
+      collision check after D-022. 10 of 13 scenes (77%) settle within 2 cm over 5 s against the
+      95% exit criterion, and the same 10 in all five cases (nominal, low and high friction, low
+      and high mass), so those ranges do not decide it. Each failing scene has one object: the
+      s03 basketball rolls (2.8 cm), because nothing resists rolling and no sourced value is
+      available to add; s13 obj_001 was placed on the table through the box beside it, and
+      separation moves it 4.4 cm (one of the 3 objects of that scene is also missing); s17
+      obj_004, a chocolate egg standing on end, falls over (5.7 cm, 110 degrees). The s04
+      basketball passes since it became a sphere primitive under D-022, which is not a fix for
+      rolling. No test split was run.
 
-- [ ] **P4.8** Emit `SimAssets`.
+- [x] **P4.8** Emit `SimAssets`.
+      Evidence: `src/video2sim/stages/physics_stage.py`, `tests/test_physics_stage.py`,
+      `benchmark/run_physics.py`, `benchmark/results/p4_8_physics.json`. All 13 rigid dev runs
+      finish the stage (61 assets, all valid). The origin moves to the center of mass with the new
+      `SimAsset.T_world_from_object`, and vertex colors are carried over from the registered mesh
+      because repair drops them (D-023). `physics/settling.json` gives 10 of 13 scenes (77%) in
+      every case; the failing objects are those of P4.7, now measured at the center of mass
+      (s17 obj_004 5.9 cm). `video2sim eval` reads the masses: 29 of 56 within 30% (52%) under
+      D-024, in sample because the fill fractions were fitted on these objects, with 40 of 61
+      objects taking the model's mass and none left without an answer; size error 0.0505 against
+      0.05. Settling under D-025 is in the exit evidence below. No test split was run.
 
 Exit criteria
 
-- [ ] 100% of exported meshes pass the watertight, manifold and collision-load validators
-- [ ] Mass within 30% for 70% of benchmark objects
-- [ ] 95% of scenes settle with maximum drift of 2 cm in 5 s
-- [ ] Every property in the export carries a low, nominal and high value
+- [x] 100% of exported meshes pass the watertight, manifold and collision-load validators
+- [ ] Mass within 30% for 50% of benchmark objects (D-025)
+- [x] 95% of scenes settle with maximum drift of 2 cm in 5 s, round objects not counted (D-025)
+- [x] Every property in the export carries a low, nominal and high value
 
-Evidence:
+Evidence: gate run once on the test split, `benchmark/results/p4_gate_test.json` and
+`benchmark/results/p4_gate_eval_test.json` (8 rigid scenes, s23 left out as deformable, code
+68e06bf, nothing tuned afterwards).
+
+* Meshes: 35 of 35 test objects pass, 61 of 61 on dev.
+* Mass: **not met, 14 of 31 (45%) on test against 50%**; 29 of 56 (52%) on dev. s10 has no scored
+  masses (clean board). Pooled, 43 of 87 (49%).
+* Settling: 8 of 8 test scenes in every case, 13 of 13 on dev, in MuJoCo (D-021) with round objects
+  not counted (D-025). Largest counted drift on test 1.3 cm. The two round objects on test, a plate
+  and a container, did not move, so ignoring them changed nothing there.
+* Ranges: friction, restitution, mass and density carry low, nominal and high, and inertia follows
+  from mass (D-023).
+* The gate run failed on mass, and the human marked the gate Passed (D-026). The target stays 50%
+  and the box stays unticked, because no number was changed after seeing the test.
+  s15 now has a shape result, and its fifth object is missing (4 tracks of 5).
 
 ## 9. Phase 5: Export, simulator validation, demo (weeks 11 to 12)
 
@@ -559,6 +641,14 @@ one that supersedes.
 | D-016 | Reconstruction back end for the MVP: pycolmap on CPU (`reconstruction.backend: pycolmap`). Evidence 2026-10-26, mean reprojection error and frames registered: s01_b 0.50 px 28/28, s02_a 0.72 px 108/108, s05_b 0.54 px 20/20, s10_a 0.46 px 187/187, s19_a 0.58 px 193/193, s23_a 0.47 px 68/68, at 3 fps and 1280 px on an Apple M4 CPU, 3 s to 281 s per video. Pose and scale accuracy not yet measured. VGGT, MASt3R and `pycolmap-cuda12` are deferred past the MVP | Decided | Week 3 | Run was in a scratchpad script, not committed. `pycolmap-cuda12` is a separate Linux-only package with the same module name, so it would be a mutually exclusive extra |
 | D-017 | Material pass pulled forward (2026-10-28, human decision). The classification half of P4.4 (category, material class, surface finish, solid or hollow, confidence) runs in Phase 2 as one hosted VLM request per object on its best 2 keyframe crops (`segmentation.material_pass.keyframes`), and it also raises `Flag.TRANSPARENT_OR_REFLECTIVE` (P2.5). The class list in `configs/default.yaml` is provisional, made from the materials seen on the dev scenes, with no numbers; P4.3 completes the list and the values with sources, and the mapping to numbers stays in P4.4. Reason: the geometry-only gate cleared a mirror cube and a foil figure, and asking every object is cheaper than two separate calls | Decided | Week 5 | `src/video2sim/stages/material_pass.py`, `benchmark/run_material_pass.py` |
 | D-018 | Shape stage geometry path: SAM 3D Objects only (`shape.backend: sam3d`). TRELLIS.2 is dropped from the project (human decision 2026-10-30, after the P3.3 dev-split bake-off). Evidence: `benchmark/results/p3_3_bakeoff_dev.json`, 42 objects matched by all three arms: median size error 4.5% for SAM 3D, 8.7% for TRELLIS.2, 8.4% for TRELLIS.2 geometry on SAM 3D's pose; objects over 15%: 5, 15, 15; proxy hulls: 1, 20, 11. Removed: `models/trellis2.py`, `models/trellis2_modal.py`, `models/hybrid.py`, `shape.trellis2`, their tests. Kept: the results, `benchmark/compare_shape_arms.py`, `shape.parallel_samples`, `SampleFailed`. Consequences: `nvdiffrast` and `nvdiffrec` (research use only, D-005) are no longer in the pipeline; the DINOv3 and RMBG-2.0 licenses no longer apply; the SAM License terms remain. Not done: the test split and the Phase 4 stability measure were not run for the bake-off. `GeometrySource` in `schemas.py` still lists `trellis2` (schema change left for a human). The Modal app `video2sim-trellis2` and its weights volume are still deployed | Decided | Week 8 | Commands to remove them are in the 2026-10-30 changelog row |
+| D-019 | Unsourced friction and restitution are accepted as wide educated placeholders (human decision 2026-10-31). Every one of the 14 classes has at least one unsourced value, so flagging on any of them would flag every object and say nothing. `Flag.LOW_CONFIDENCE_MATERIAL` is raised only for an unsourced density or a low model confidence. The benchmark records mass only, so P4.6 cannot narrow friction or restitution | Decided | Week 9 | `configs/material_table.yaml`, `src/video2sim/stages/material_table.py` |
+| D-020 | Optional tags-on-table layer on the table plane fit (human decision 2026-10-31, `reconstruction.world_frame.tags_on_table`, on by default). On s05 RANSAC settled on the object tops, 3 to 7 cm above a bare white table, which cut the objects off in lifting and sent two of them to proxy hulls, with no flag. A plane more than 15 mm from a tag corner is refitted on the points near the plane through the tags; a refit that cannot hold all the tags is dropped and `tags_off_table` is raised (s24, 23 cm). Disable it for scenes whose markers are not on the table plane. Dev scenes: good ones up to 8.2 mm, s05 64 mm before and 1.1 mm after; the test split was not measured | Decided | Week 9 | `src/video2sim/stages/world_frame.py`, `src/video2sim/stages/reconstruction.py` |
+| D-021 | MuJoCo settles the scenes for P4.7, in place of Isaac Sim (human decision 2026-10-31). Isaac Sim does not run on the development Mac and P5.2 needs a second simulator anyway. Stability numbers from MuJoCo are provisional: the contact solver is not PhysX, and the gate is repeated in Isaac Sim in P5.1. Drift is the distance of the object-frame origin from the observed pose, the largest in the window, including separation; rotation is reported and does not gate. Restitution is not simulated, and the pair friction is the object's own or the larger of two objects' (MuJoCo's rule) | Decided | Week 9 | `configs/default.yaml` `physics.settling`, `src/video2sim/stages/settling.py` |
+| D-022 | `collision_fit` tightness ignores part surfaces inside the sealed body of `stages/mass.py` (human decision 2026-10-31). The old test, which side of the nearest visual surface a point is on, read cuts through the cavity of a shell as outside and failed 11 of 61 dev objects whose plain hulls were mostly tight. Plain hulls fail on 8 of 61 objects under both tests, and the hull of an open cup still fails (`tests/test_collision.py`). Known gap: mouths under about 8% of the longest side are sealed, so parts filling a narrow neck are not caught. With it: primitives compare against the sealed volume, a primitive that fails a check falls back to the decomposition, and hulls that edge collapse cannot thin use farthest point selection. Result: 47 to 61 of 61 objects pass, and 13 objects changed to primitives | Decided | Week 9 | `src/video2sim/stages/collision.py`, `benchmark/results/p4_7_settling.json` |
+| D-023 | `SimAssets` contract for P4.8 (human decisions 2026-10-31). `SimAsset` gains `T_world_from_object`, because moving the origin to the center of mass changes the pose. Inertia stays one matrix at nominal mass: the body is the same, so low and high are the matrix scaled by `mass_kg`, and this is how the "every property" criterion is read. An object that fails settling is reported in `physics/settling.json` and not blocked, so the QA report of P5.3 shows it | Decided | Week 9 | `src/video2sim/schemas.py`, `src/video2sim/stages/physics_stage.py` |
+| D-024 | Mass combines geometry with the vision-language model (human decision 2026-10-31), an exception to the rule that a model writes no number. One hosted request per object on 2 keyframe crops returns a low, nominal and high mass; the geometry mass stands when it falls inside that range, otherwise the model's mass and range are used, and inertia scales with the mass because the body is unchanged. Without a readable answer the geometry mass stands with `Flag.LOW_CONFIDENCE_MATERIAL`. On 56 weighed dev objects within 30%: geometry 36% held out, model alone 46%, the rule 52% held out (90% interval 38 to 66%, resampling objects). Measured size made the model worse (41%), so it is not sent. `physics.vlm_mass.enabled: false` turns it off to save calls: no request, no key, geometry mass only, no flag. The mass target is unchanged; only a human changes `configs/targets.yaml` | Decided | Week 9 | `src/video2sim/stages/vlm_mass.py`, `benchmark/run_vlm_mass.py`, `benchmark/results/p4_vlm_mass.json` |
+| D-025 | Phase 4 gate terms (human decisions 2026-10-31). The mass target is 50% within 30%, down from 70%, because no method on these inputs reached it (D-024). Round objects do not count towards settling: they really roll and fall over on the table (the s17 egg stands only through a dent made by hand). `Flag.IGNORED_ROUND` marks an object within `physics.settling.round_tolerance` of the ellipsoid in its bounding box, 0.04 from the dev gap between the egg (0.028) and the nearest other object (0.053); it stays in the scene and its drift is reported. The Phase 2 box fit now seats stacked objects: most of the footprint over another object and the lowest points near its top. This fixes s13 obj_001. The stack rule was scanned on all scenes' points without scores, and it also fires on s16 obj_002, a real stack in the test split | Decided | Week 9 | `configs/targets.yaml`, `src/video2sim/stages/settling.py`, `src/video2sim/stages/primitive_fit.py` |
+| D-026 | Phase 4 gate marked Passed by human decision (2026-10-31), with the mass miss waived. The gate run failed on mass at 45% on test against 50%. The target and the failed result stand as recorded, and the exit box stays unticked. Reason: mass carries low and high values, so the simulator work is not blocked, and no cheap fix remains on these inputs. Consequence: masses may be wrong by more than 30% on about half of objects, so the QA report of P5.3 must show the mass source and range, and a future mass method is built on dev only, because the test split has been seen | Decided | Week 10 | `benchmark/results/p4_gate_eval_test.json` |
 
 ## 12. After the MVP
 
@@ -649,3 +739,17 @@ In order:
 | 2026-10-28 | P2.5 and P4.4: D-017 pulls the VLM material classification forward as a single per-object pass that also raises the reflective flag; geometry kept as a cross-check, `segmentation.material_pass` config added, no hosted run yet |
 | 2026-10-29 | Phase 2 cluster box criterion ticked by human decision (test split 6.0% median on s07 to s09, s10 unscored); Phase 2 gate passed; Phase 3 is the current focus |
 | 2026-10-29 | Cleanup before Phase 3: evidence narratives of Phases 0 to 2 and the section 12 reconstruction experiments moved verbatim to `docs/history/`; P2.1 discovery code removed (eef52b6) |
+| 2026-10-31 | P4.3 ticked under D-019: friction and restitution placeholders accepted, only an unsourced density flags an object; Phase 4 set to In progress |
+| 2026-10-31 | P4.4 ticked: class to numbers mapping in `stages/physics.py`, checked against the inventory on 56 dev objects |
+| 2026-10-31 | Inventory: obj_002, obj_003, obj_014 and obj_029 marked hollow by human decision; ground truth regenerated, only the 23 hollow fields changed |
+| 2026-10-31 | P4.5: volume test written up in `docs/research/mesh_volume.md`; meshes are shells, the outer volume is right and density is the main mass error |
+| 2026-10-31 | P4.5 ticked: `stages/mass.py`, sealed voxel body, one dev-measured hollow fill fraction and the center of mass left to P4.8 (human decisions); 14 of 56 dev objects within 30%, exit criterion not met |
+| 2026-10-31 | P4.6 ticked: fill fractions per class and answer; 20 of 56 dev objects within 30% with objects held out (36%), exit criterion not met |
+| 2026-10-31 | P4.7 ticked under D-021: settling in MuJoCo, 10 of 13 rigid dev scenes pass (77%), exit criterion not met; `mujoco` added by human approval |
+| 2026-10-31 | P4.8 ticked under D-023: physics stage emits `SimAssets` on 13 rigid dev runs, 61 of 61 valid; all Phase 4 tasks done, the mass and settling exit criteria are not met and the gate stays Open |
+| 2026-10-31 | P4 gate run once on the test split: meshes 35 of 35, settling 8 of 8, mass 45% against 50%; gate Failed on mass |
+| 2026-10-31 | D-026: mass miss waived and the Phase 4 gate marked Passed by human decision; Phase 5 is the current focus |
+| 2026-10-31 | D-025: mass target 50%, round objects ignored in settling, stacked objects seated; 13 of 13 rigid dev scenes settle and mass is 52% on dev, gate still Open until the test split runs |
+| 2026-10-31 | D-024: mass combines geometry with the vision-language model; 52% of dev objects within 30%, exit criterion not met, `AGENTS.md` rule amended by human decision |
+| 2026-10-31 | D-022: collision fit ignores surfaces inside the sealed body, primitive fallback and vertex thinning fixed; 61 of 61 dev objects pass the collision checks |
+| 2026-10-31 | D-020: tags-on-table layer on the plane fit; s05 rerun, all 4 objects now SAM 3D with fit 0.95 to 0.98 and `lift.max_extent_m` back at 1.5 |

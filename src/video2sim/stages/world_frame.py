@@ -251,6 +251,42 @@ def fit_plane_ransac(
     return PlaneFit(plane, mask, float(mask.mean()), rms)
 
 
+def tag_plane_distance_m(tag_corners_scaled: dict[int, F64], table: Plane) -> float:
+    """Largest distance of any tag corner from the plane, in metres."""
+    corners = np.vstack(list(tag_corners_scaled.values()))
+    return float(np.abs(corners @ np.asarray(table.normal) - table.offset_m).max())
+
+
+def fit_table_on_tags(
+    points: F64,
+    tag_corners_scaled: dict[int, F64],
+    *,
+    band_m: float,
+    inlier_threshold_m: float,
+    iterations: int,
+    seed: int,
+    up_hint: F64,
+) -> PlaneFit:
+    """RANSAC again on the points within ``band_m`` of the plane through the tag corners.
+
+    For a bare table, where the tops of objects can hold more points than the table does. The
+    tags say roughly where the table is and the points say it precisely.
+    """
+    corners = np.vstack(list(tag_corners_scaled.values()))
+    centroid = corners.mean(axis=0)
+    normal = np.linalg.svd(corners - centroid, full_matrices=False)[2][-1]
+    band = points[np.abs((points - centroid) @ normal) < band_m]
+    if len(band) < 3:
+        raise ValueError(f"only {len(band)} reconstructed points near the plane of the tags")
+    return fit_plane_ransac(
+        band,
+        inlier_threshold_m=inlier_threshold_m,
+        iterations=iterations,
+        seed=seed,
+        up_hint=up_hint,
+    )
+
+
 def world_from_recon(fit: SimilarityFit, table: Plane) -> F64:
     """Build the gravity-aligned world frame (P1.3). Returns ``T_world_from_scaled_recon``.
 

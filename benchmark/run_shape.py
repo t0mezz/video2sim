@@ -22,7 +22,7 @@ from typing import Any
 import yaml
 
 from video2sim.runner import OUTPUT_FILE, Runner, StageFailed, sha256_file
-from video2sim.schemas import RegisteredObjects, RunManifest
+from video2sim.schemas import RegisteredObjects, RunManifest, StageName
 from video2sim.stages.capture import CaptureStage
 from video2sim.stages.reconstruction import ReconstructionStage, reconstruction_stage_config
 from video2sim.stages.segmentation_stage import SegmentationStage
@@ -31,13 +31,15 @@ from video2sim.stages.shape import ShapeStage
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def accept_finished_stages(runner: Runner, run_dir: Path, video: Path) -> None:
-    """Record today's cache keys for every stage before ``shape``, as ``run_instances.py`` does
+def accept_finished_stages(
+    runner: Runner, run_dir: Path, video: Path, until: StageName = "shape"
+) -> None:
+    """Record today's cache keys for every stage before ``until``, as ``run_instances.py`` does
     for the stages before ``segmentation``. A harness shortcut: a real run executes them."""
     manifest = RunManifest.model_validate_json((run_dir / "manifest.json").read_text())
     video_sha = sha256_file(video)
     for stage in runner.stages:
-        if stage.name == "shape":
+        if stage.name == until:
             break
         key = runner._cache_key(stage, manifest, video_sha)
         record = manifest.stages[stage.name].model_copy(update={"input_sha256": key})

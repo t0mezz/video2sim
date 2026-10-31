@@ -1,0 +1,1964 @@
+{
+ "summary": {
+  "tolerance": 0.3,
+  "physics_in_sample": {
+   "objects": 56,
+   "answered": 56,
+   "within_tolerance": 26,
+   "fraction": 0.4642857142857143,
+   "median_ratio": 0.9954030029387495,
+   "mean_mnre": 0.6559753432280354
+  },
+  "crops": {
+   "objects": 56,
+   "answered": 56,
+   "within_tolerance": 26,
+   "fraction": 0.4642857142857143,
+   "median_ratio": 1.0745265224989562,
+   "mean_mnre": 0.662073388852346,
+   "truth_inside_low_high": 36
+  },
+  "measured": {
+   "objects": 56,
+   "answered": 55,
+   "within_tolerance": 23,
+   "fraction": 0.4107142857142857,
+   "median_ratio": 1.1680375739244833,
+   "mean_mnre": 0.6661899226615886,
+   "truth_inside_low_high": 31
+  },
+  "blend_in_sample": {
+   "objects": 56,
+   "answered": 55,
+   "within_tolerance": 23,
+   "fraction": 0.4107142857142857,
+   "median_ratio": 1.1072852370144037,
+   "mean_mnre": 0.6848190248039103
+  },
+  "physics_held_out": {
+   "objects": 56,
+   "answered": 56,
+   "within_tolerance": 20,
+   "fraction": 0.35714285714285715,
+   "median_ratio": 0.965755910458288,
+   "mean_mnre": 0.6028725090988383
+  },
+  "rule_held_out": {
+   "objects": 56,
+   "answered": 56,
+   "within_tolerance": 29,
+   "fraction": 0.5178571428571429,
+   "median_ratio": 1.0385887052003304,
+   "mean_mnre": 0.6878938423126856
+  },
+  "rule_used_physics": 22,
+  "rule_held_out_interval_90": [
+   0.38095238095238093,
+   0.65625
+  ]
+ },
+ "objects": [
+  {
+   "scene": "s01",
+   "object": "obj_007",
+   "label": "rubiks cube",
+   "pred_id": "obj_002",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s01_b",
+   "category": "Rubik's cube",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s01_b/segmentation.work/material_crops/track_002_f00022.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s01_b/segmentation.work/material_crops/track_002_f00008.png"
+   ],
+   "extents_cm": [
+    7.269473373889923,
+    7.0847999304533005,
+    6.944562122225761
+   ],
+   "volume_cm3": 356.45650818394824,
+   "mass_true_kg": 0.249,
+   "mass_physics_kg": 0.1399804707638365,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.115,
+    "nominal_kg": 0.145,
+    "high_kg": 0.18
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.13,
+    "nominal_kg": 0.18,
+    "high_kg": 0.24
+   },
+   "mass_physics_held_out_kg": 0.13846337373836726,
+   "mass_rule_held_out_kg": 0.13846337373836726
+  },
+  {
+   "scene": "s01",
+   "object": "obj_021",
+   "label": "rubiks cube smaller",
+   "pred_id": "obj_001",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s01_b",
+   "category": "rubik's cube",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s01_b/segmentation.work/material_crops/track_001_f00024.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s01_b/segmentation.work/material_crops/track_001_f00013.png"
+   ],
+   "extents_cm": [
+    5.803629197180271,
+    5.641834996640682,
+    5.572844296693802
+   ],
+   "volume_cm3": 177.41179153840312,
+   "mass_true_kg": 0.081333,
+   "mass_physics_kg": 0.0696696105371309,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.075,
+    "nominal_kg": 0.095,
+    "high_kg": 0.12
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.07,
+    "nominal_kg": 0.092,
+    "high_kg": 0.115
+   },
+   "mass_physics_held_out_kg": 0.0689145369305433,
+   "mass_rule_held_out_kg": 0.095
+  },
+  {
+   "scene": "s01",
+   "object": "obj_029",
+   "label": "empty phone packaging",
+   "pred_id": "obj_004",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s01_b",
+   "category": "box",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s01_b/segmentation.work/material_crops/track_004_f00013.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s01_b/segmentation.work/material_crops/track_004_f00026.png"
+   ],
+   "extents_cm": [
+    16.805702447891235,
+    9.072961658239365,
+    6.369190290570259
+   ],
+   "volume_cm3": 962.0406170854228,
+   "mass_true_kg": 0.184667,
+   "mass_physics_kg": 0.22164646185154474,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.09,
+    "nominal_kg": 0.42,
+    "high_kg": 0.55
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.31,
+    "nominal_kg": 0.4,
+    "high_kg": 0.51
+   },
+   "mass_physics_held_out_kg": 0.24887929199115785,
+   "mass_rule_held_out_kg": 0.24887929199115785
+  },
+  {
+   "scene": "s01",
+   "object": "obj_004",
+   "label": "coffee powder can",
+   "pred_id": "obj_000",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s01_b",
+   "category": "can",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s01_b/segmentation.work/material_crops/track_000_f00013.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s01_b/segmentation.work/material_crops/track_000_f00041.png"
+   ],
+   "extents_cm": [
+    16.048409044742584,
+    10.559405386447906,
+    10.396971181035042
+   ],
+   "volume_cm3": 1270.7970904994443,
+   "mass_true_kg": 0.232,
+   "mass_physics_kg": 0.7282302727107065,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.21,
+    "nominal_kg": 0.235,
+    "high_kg": 0.26
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.075,
+    "nominal_kg": 0.285,
+    "high_kg": 0.33
+   },
+   "mass_physics_held_out_kg": 1.055672408816692,
+   "mass_rule_held_out_kg": 0.235
+  },
+  {
+   "scene": "s01",
+   "object": "obj_003",
+   "label": "packaging for in ear headphones",
+   "pred_id": "obj_003",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s01_b",
+   "category": "box",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s01_b/segmentation.work/material_crops/track_003_f00037.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s01_b/segmentation.work/material_crops/track_003_f00013.png"
+   ],
+   "extents_cm": [
+    10.088491439819336,
+    8.678612112998962,
+    4.38318345695734
+   ],
+   "volume_cm3": 383.2110096033,
+   "mass_true_kg": 0.094667,
+   "mass_physics_kg": 0.08828875092452348,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.12,
+    "nominal_kg": 0.165,
+    "high_kg": 0.21
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.09,
+    "nominal_kg": 0.14,
+    "high_kg": 0.185
+   },
+   "mass_physics_held_out_kg": 0.07729287890117123,
+   "mass_rule_held_out_kg": 0.165
+  },
+  {
+   "scene": "s02",
+   "object": "obj_041",
+   "label": "mug",
+   "pred_id": "obj_002",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s02_b",
+   "category": "mug",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s02_b/segmentation.work/material_crops/track_002_f00026.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s02_b/segmentation.work/material_crops/track_002_f00017.png"
+   ],
+   "extents_cm": [
+    12.237659096717834,
+    9.77519378066063,
+    8.51391963660717
+   ],
+   "volume_cm3": 126.2157388143526,
+   "mass_true_kg": 0.22,
+   "mass_physics_kg": 0.30291777315444623,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.26,
+    "nominal_kg": 0.34,
+    "high_kg": 0.43
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.23,
+    "nominal_kg": 0.31,
+    "high_kg": 0.4
+   },
+   "mass_physics_held_out_kg": 0.30291777315444623,
+   "mass_rule_held_out_kg": 0.30291777315444623
+  },
+  {
+   "scene": "s02",
+   "object": "obj_046",
+   "label": "mug",
+   "pred_id": "obj_001",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s02_b",
+   "category": "mug",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s02_b/segmentation.work/material_crops/track_001_f00034.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s02_b/segmentation.work/material_crops/track_001_f00021.png"
+   ],
+   "extents_cm": [
+    11.829786375164986,
+    10.526782646775246,
+    8.480609208345413
+   ],
+   "volume_cm3": 118.32732001370074,
+   "mass_true_kg": 0.250667,
+   "mass_physics_kg": 0.2839855680328818,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.3,
+    "nominal_kg": 0.39,
+    "high_kg": 0.5
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.28,
+    "nominal_kg": 0.36,
+    "high_kg": 0.46
+   },
+   "mass_physics_held_out_kg": 0.2839855680328818,
+   "mass_rule_held_out_kg": 0.39
+  },
+  {
+   "scene": "s02",
+   "object": "obj_039",
+   "label": "action camera",
+   "pred_id": "obj_000",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s02_b",
+   "category": "camera",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s02_b/segmentation.work/material_crops/track_000_f00029.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s02_b/segmentation.work/material_crops/track_000_f00006.png"
+   ],
+   "extents_cm": [
+    7.316040992736816,
+    5.098952353000641,
+    3.456837870180607
+   ],
+   "volume_cm3": 102.00393679833694,
+   "mass_true_kg": 0.159,
+   "mass_physics_kg": 0.06747560419209989,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.148,
+    "nominal_kg": 0.159,
+    "high_kg": 0.17
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.148,
+    "nominal_kg": 0.159,
+    "high_kg": 0.168
+   },
+   "mass_physics_held_out_kg": 0.06501762852024039,
+   "mass_rule_held_out_kg": 0.159
+  },
+  {
+   "scene": "s02",
+   "object": "obj_060",
+   "label": "deodorant cap",
+   "pred_id": "obj_004",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s02_b",
+   "category": "earplug",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s02_b/segmentation.work/material_crops/track_004_f00023.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s02_b/segmentation.work/material_crops/track_004_f00037.png"
+   ],
+   "extents_cm": [
+    3.8935864344239235,
+    3.006595652550459,
+    2.8998779132962227
+   ],
+   "volume_cm3": 3.3667055887660027,
+   "mass_true_kg": 0.003,
+   "mass_physics_kg": 8.908302987874843e-05,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.00015,
+    "nominal_kg": 0.00035,
+    "high_kg": 0.0007
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 8e-05,
+    "nominal_kg": 0.00025,
+    "high_kg": 0.0006
+   },
+   "mass_physics_held_out_kg": 8.58379471138114e-05,
+   "mass_rule_held_out_kg": 0.00035
+  },
+  {
+   "scene": "s02",
+   "object": "obj_014",
+   "label": "packaging for electronics",
+   "pred_id": "obj_003",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s02_b",
+   "category": "box",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s02_b/segmentation.work/material_crops/track_003_f00034.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s02_b/segmentation.work/material_crops/track_003_f00021.png"
+   ],
+   "extents_cm": [
+    12.089294195175171,
+    11.351947858929634,
+    6.185829825699329
+   ],
+   "volume_cm3": 786.485998538246,
+   "mass_true_kg": 0.234667,
+   "mass_physics_kg": 0.18120008217522357,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.08,
+    "nominal_kg": 0.16,
+    "high_kg": 0.27
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.16,
+    "nominal_kg": 0.28,
+    "high_kg": 0.43
+   },
+   "mass_physics_held_out_kg": 0.15863262150378438,
+   "mass_rule_held_out_kg": 0.15863262150378438
+  },
+  {
+   "scene": "s03",
+   "object": "obj_027",
+   "label": "toy air basketball",
+   "pred_id": "obj_000",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s03_b",
+   "category": "basketball",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s03_b/segmentation.work/material_crops/track_000_f00030.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s03_b/segmentation.work/material_crops/track_000_f00056.png"
+   ],
+   "extents_cm": [
+    15.254166722297668,
+    15.089469403028488,
+    14.777486026287079
+   ],
+   "volume_cm3": 1793.9919482597238,
+   "mass_true_kg": 0.079333,
+   "mass_physics_kg": 0.5984757139394439,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.018,
+    "nominal_kg": 0.05,
+    "high_kg": 0.12
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.04,
+    "nominal_kg": 0.09,
+    "high_kg": 0.18
+   },
+   "mass_physics_held_out_kg": 0.63595935457488,
+   "mass_rule_held_out_kg": 0.05
+  },
+  {
+   "scene": "s04",
+   "object": "obj_027",
+   "label": "toy air basketball",
+   "pred_id": "obj_000",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s04_b",
+   "category": "basketball",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s04_b/segmentation.work/material_crops/track_000_f00026.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s04_b/segmentation.work/material_crops/track_000_f00040.png"
+   ],
+   "extents_cm": [
+    15.240596234798431,
+    15.04601314663887,
+    14.798302203416824
+   ],
+   "volume_cm3": 1792.314329157965,
+   "mass_true_kg": 0.079333,
+   "mass_physics_kg": 0.5979160602070971,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.05,
+    "nominal_kg": 0.1,
+    "high_kg": 0.18
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.09,
+    "nominal_kg": 0.16,
+    "high_kg": 0.26
+   },
+   "mass_physics_held_out_kg": 0.6353646486943928,
+   "mass_rule_held_out_kg": 0.1
+  },
+  {
+   "scene": "s04",
+   "object": "obj_022",
+   "label": "metal insulated water bottle",
+   "pred_id": "obj_003",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s04_b",
+   "category": "bottle",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s04_b/segmentation.work/material_crops/track_003_f00024.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s04_b/segmentation.work/material_crops/track_003_f00051.png"
+   ],
+   "extents_cm": [
+    25.523823499679565,
+    10.775119438767433,
+    8.298080787062645
+   ],
+   "volume_cm3": 1294.804155193373,
+   "mass_true_kg": 0.414,
+   "mass_physics_kg": 0.7419875211335624,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.24,
+    "nominal_kg": 0.34,
+    "high_kg": 0.48
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.27,
+    "nominal_kg": 0.36,
+    "high_kg": 0.48
+   },
+   "mass_physics_held_out_kg": 1.075615479196321,
+   "mass_rule_held_out_kg": 0.34
+  },
+  {
+   "scene": "s04",
+   "object": "obj_014",
+   "label": "packaging for electronics",
+   "pred_id": "obj_001",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s04_b",
+   "category": "box",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s04_b/segmentation.work/material_crops/track_001_f00032.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s04_b/segmentation.work/material_crops/track_001_f00009.png"
+   ],
+   "extents_cm": [
+    12.227899953722954,
+    11.513732001185417,
+    5.4940240457654
+   ],
+   "volume_cm3": 724.1283306722779,
+   "mass_true_kg": 0.234667,
+   "mass_physics_kg": 0.16683337436024745,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.025,
+    "nominal_kg": 0.055,
+    "high_kg": 0.11
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.05,
+    "nominal_kg": 0.13,
+    "high_kg": 0.28
+   },
+   "mass_physics_held_out_kg": 0.14605520710247796,
+   "mass_rule_held_out_kg": 0.055
+  },
+  {
+   "scene": "s04",
+   "object": "obj_021",
+   "label": "rubiks cube smaller",
+   "pred_id": "obj_002",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s04_b",
+   "category": "Rubik's cube",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s04_b/segmentation.work/material_crops/track_002_f00061.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s04_b/segmentation.work/material_crops/track_002_f00005.png"
+   ],
+   "extents_cm": [
+    5.760614201426506,
+    5.748332105576992,
+    5.6143807247281075
+   ],
+   "volume_cm3": 184.10277138199706,
+   "mass_true_kg": 0.081333,
+   "mass_physics_kg": 0.07229715832171024,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.08,
+    "nominal_kg": 0.1,
+    "high_kg": 0.12
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.07,
+    "nominal_kg": 0.09,
+    "high_kg": 0.115
+   },
+   "mass_physics_held_out_kg": 0.07151360756465648,
+   "mass_rule_held_out_kg": 0.1
+  },
+  {
+   "scene": "s04",
+   "object": "obj_003",
+   "label": "packaging for in ear headphones",
+   "pred_id": "obj_004",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s04_b",
+   "category": "box",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s04_b/segmentation.work/material_crops/track_004_f00040.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s04_b/segmentation.work/material_crops/track_004_f00027.png"
+   ],
+   "extents_cm": [
+    10.007050260901451,
+    8.597437664866447,
+    4.1065894067287445
+   ],
+   "volume_cm3": 353.5958337740943,
+   "mass_true_kg": 0.094667,
+   "mass_physics_kg": 0.08146565133488112,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.115,
+    "nominal_kg": 0.155,
+    "high_kg": 0.195
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.135,
+    "nominal_kg": 0.18,
+    "high_kg": 0.23
+   },
+   "mass_physics_held_out_kg": 0.07131955835024731,
+   "mass_rule_held_out_kg": 0.155
+  },
+  {
+   "scene": "s06",
+   "object": "obj_029",
+   "label": "empty phone packaging",
+   "pred_id": "obj_000",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s06_b",
+   "category": "box",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s06_b/segmentation.work/material_crops/track_000_f00047.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s06_b/segmentation.work/material_crops/track_000_f00017.png"
+   ],
+   "extents_cm": [
+    17.047759890556335,
+    8.990897610783577,
+    6.297537311911583
+   ],
+   "volume_cm3": 986.4222084231704,
+   "mass_true_kg": 0.184667,
+   "mass_physics_kg": 0.22726378544303108,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.085,
+    "nominal_kg": 0.36,
+    "high_kg": 0.46
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.3,
+    "nominal_kg": 0.4,
+    "high_kg": 0.52
+   },
+   "mass_physics_held_out_kg": 0.2551867940674632,
+   "mass_rule_held_out_kg": 0.2551867940674632
+  },
+  {
+   "scene": "s06",
+   "object": "obj_004",
+   "label": "coffee powder can",
+   "pred_id": "obj_002",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s06_b",
+   "category": "can",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s06_b/segmentation.work/material_crops/track_002_f00042.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s06_b/segmentation.work/material_crops/track_002_f00017.png"
+   ],
+   "extents_cm": [
+    15.951021760702133,
+    10.483402758836746,
+    10.450752452015877
+   ],
+   "volume_cm3": 1280.4886451837215,
+   "mass_true_kg": 0.232,
+   "mass_physics_kg": 0.7337840181225316,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.2,
+    "nominal_kg": 0.25,
+    "high_kg": 0.275
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.22,
+    "nominal_kg": 0.27,
+    "high_kg": 0.31
+   },
+   "mass_physics_held_out_kg": 1.0637233454730775,
+   "mass_rule_held_out_kg": 0.25
+  },
+  {
+   "scene": "s06",
+   "object": "obj_018",
+   "label": "3d printed car body",
+   "pred_id": "obj_001",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s06_b",
+   "category": "model car",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s06_b/segmentation.work/material_crops/track_001_f00016.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s06_b/segmentation.work/material_crops/track_001_f00008.png"
+   ],
+   "extents_cm": [
+    20.470448583364487,
+    8.419010043144226,
+    4.42651342600584
+   ],
+   "volume_cm3": 438.54258381797877,
+   "mass_true_kg": 0.157667,
+   "mass_physics_kg": 0.10830247649968804,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.012,
+    "nominal_kg": 0.028,
+    "high_kg": 0.05
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.09,
+    "nominal_kg": 0.21,
+    "high_kg": 0.4
+   },
+   "mass_physics_held_out_kg": 0.10435727503575605,
+   "mass_rule_held_out_kg": 0.028
+  },
+  {
+   "scene": "s11",
+   "object": "obj_047",
+   "label": "cube",
+   "pred_id": "obj_003",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b",
+   "category": "cube",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b/segmentation.work/material_crops/track_003_f00026.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b/segmentation.work/material_crops/track_003_f00054.png"
+   ],
+   "extents_cm": [
+    3.068614099174738,
+    3.0301351100206375,
+    2.97138886526227
+   ],
+   "volume_cm3": 27.55053699273732,
+   "mass_true_kg": 0.009333,
+   "mass_physics_kg": 0.010819095877047945,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.004,
+    "nominal_kg": 0.01,
+    "high_kg": 0.025
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.008,
+    "nominal_kg": 0.022,
+    "high_kg": 0.045
+   },
+   "mass_physics_held_out_kg": 0.010928107606470453,
+   "mass_rule_held_out_kg": 0.010928107606470453
+  },
+  {
+   "scene": "s11",
+   "object": "obj_040",
+   "label": "white 3d print cuboid",
+   "pred_id": "obj_005",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b",
+   "category": "cube",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b/segmentation.work/material_crops/track_005_f00044.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b/segmentation.work/material_crops/track_005_f00022.png"
+   ],
+   "extents_cm": [
+    5.271155200898647,
+    5.026307888329029,
+    2.822573948651552
+   ],
+   "volume_cm3": 75.1276985967487,
+   "mass_true_kg": 0.022333,
+   "mass_physics_kg": 0.001987878904869971,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.014,
+    "nominal_kg": 0.028,
+    "high_kg": 0.055
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.045,
+    "nominal_kg": 0.065,
+    "high_kg": 0.085
+   },
+   "mass_physics_held_out_kg": 0.0019154652074266333,
+   "mass_rule_held_out_kg": 0.028
+  },
+  {
+   "scene": "s11",
+   "object": "obj_048",
+   "label": "square pyramid",
+   "pred_id": "obj_001",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b",
+   "category": "pyramid",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b/segmentation.work/material_crops/track_001_f00021.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b/segmentation.work/material_crops/track_001_f00042.png"
+   ],
+   "extents_cm": [
+    3.16117350012064,
+    3.1145707704126835,
+    2.881364244967699
+   ],
+   "volume_cm3": 7.563571662975804,
+   "mass_true_kg": 0.003667,
+   "mass_physics_kg": 0.002970214592050598,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.0015,
+    "nominal_kg": 0.004,
+    "high_kg": 0.01
+   },
+   "measured": {
+    "arm": "measured",
+    "error": "unreadable answer: None"
+   },
+   "mass_physics_held_out_kg": 0.00293802364642785,
+   "mass_rule_held_out_kg": 0.00293802364642785
+  },
+  {
+   "scene": "s11",
+   "object": "obj_049",
+   "label": "triangular prism",
+   "pred_id": "obj_002",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b",
+   "category": "pyramid",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b/segmentation.work/material_crops/track_002_f00044.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b/segmentation.work/material_crops/track_002_f00023.png"
+   ],
+   "extents_cm": [
+    3.4231912344694138,
+    2.502860128879547,
+    2.161656226962805
+   ],
+   "volume_cm3": 8.906486415998291,
+   "mass_true_kg": 0.004,
+   "mass_physics_kg": 0.0034975772155625287,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.012,
+    "nominal_kg": 0.035,
+    "high_kg": 0.09
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.006,
+    "nominal_kg": 0.014,
+    "high_kg": 0.026
+   },
+   "mass_physics_held_out_kg": 0.0034596707564605944,
+   "mass_rule_held_out_kg": 0.035
+  },
+  {
+   "scene": "s11",
+   "object": "obj_056",
+   "label": "hexagonal prism",
+   "pred_id": "obj_004",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b",
+   "category": "game piece",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b/segmentation.work/material_crops/track_004_f00032.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b/segmentation.work/material_crops/track_004_f00091.png"
+   ],
+   "extents_cm": [
+    3.0173717066645622,
+    3.0137142166495323,
+    2.6906320825219154
+   ],
+   "volume_cm3": 18.283324038740112,
+   "mass_true_kg": 0.006667,
+   "mass_physics_kg": 0.007179861350013242,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.0015,
+    "nominal_kg": 0.004,
+    "high_kg": 0.008
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.005,
+    "nominal_kg": 0.01,
+    "high_kg": 0.02
+   },
+   "mass_physics_held_out_kg": 0.007252204650384504,
+   "mass_rule_held_out_kg": 0.007252204650384504
+  },
+  {
+   "scene": "s11",
+   "object": "obj_050",
+   "label": "cuboid",
+   "pred_id": "obj_000",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b",
+   "category": "cube",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b/segmentation.work/material_crops/track_000_f00038.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b/segmentation.work/material_crops/track_000_f00019.png"
+   ],
+   "extents_cm": [
+    3.049298282712698,
+    2.987306844443083,
+    1.9139752723276615
+   ],
+   "volume_cm3": 17.64749816656032,
+   "mass_true_kg": 0.007,
+   "mass_physics_kg": 0.006930172530008239,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.008,
+    "nominal_kg": 0.018,
+    "high_kg": 0.03
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.008,
+    "nominal_kg": 0.018,
+    "high_kg": 0.032
+   },
+   "mass_physics_held_out_kg": 0.006855063880395237,
+   "mass_rule_held_out_kg": 0.018
+  },
+  {
+   "scene": "s11",
+   "object": "obj_052",
+   "label": "cylinder",
+   "pred_id": "obj_006",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b",
+   "category": "knob",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b/segmentation.work/material_crops/track_006_f00042.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s11_b/segmentation.work/material_crops/track_006_f00064.png"
+   ],
+   "extents_cm": [
+    3.091716952621937,
+    3.04540628567338,
+    3.0439228750765324
+   ],
+   "volume_cm3": 21.122672372591094,
+   "mass_true_kg": 0.004,
+   "mass_physics_kg": 0.008294873440716522,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.002,
+    "nominal_kg": 0.005,
+    "high_kg": 0.011
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.006,
+    "nominal_kg": 0.011,
+    "high_kg": 0.018
+   },
+   "mass_physics_held_out_kg": 0.008378451450320044,
+   "mass_rule_held_out_kg": 0.008378451450320044
+  },
+  {
+   "scene": "s12",
+   "object": "obj_004",
+   "label": "coffee powder can",
+   "pred_id": "obj_001",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b",
+   "category": "can",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b/segmentation.work/material_crops/track_001_f00004.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b/segmentation.work/material_crops/track_001_f00042.png"
+   ],
+   "extents_cm": [
+    16.1735437810421,
+    10.456813126802444,
+    9.719233214855194
+   ],
+   "volume_cm3": 1211.8706909747125,
+   "mass_true_kg": 0.232,
+   "mass_physics_kg": 0.6944624994630589,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.215,
+    "nominal_kg": 0.245,
+    "high_kg": 0.275
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.22,
+    "nominal_kg": 0.265,
+    "high_kg": 0.31
+   },
+   "mass_physics_held_out_kg": 1.0067212626469129,
+   "mass_rule_held_out_kg": 0.245
+  },
+  {
+   "scene": "s12",
+   "object": "obj_029",
+   "label": "empty phone packaging",
+   "pred_id": "obj_004",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b",
+   "category": "box",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b/segmentation.work/material_crops/track_004_f00018.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b/segmentation.work/material_crops/track_004_f00075.png"
+   ],
+   "extents_cm": [
+    17.008843272924423,
+    8.71901847422123,
+    6.197431311011314
+   ],
+   "volume_cm3": 930.8544762978568,
+   "mass_true_kg": 0.184667,
+   "mass_physics_kg": 0.21446142450321581,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.08,
+    "nominal_kg": 0.4,
+    "high_kg": 0.55
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.285,
+    "nominal_kg": 0.365,
+    "high_kg": 0.445
+   },
+   "mass_physics_held_out_kg": 0.2408114573266919,
+   "mass_rule_held_out_kg": 0.2408114573266919
+  },
+  {
+   "scene": "s12",
+   "object": "obj_001",
+   "label": "spray can",
+   "pred_id": "obj_005",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b",
+   "category": "aerosol can",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b/segmentation.work/material_crops/track_005_f00057.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b/segmentation.work/material_crops/track_005_f00000.png"
+   ],
+   "extents_cm": [
+    23.977643251419067,
+    6.86643049120903,
+    6.761013716459274
+   ],
+   "volume_cm3": 813.7596909040121,
+   "mass_true_kg": 0.473333,
+   "mass_physics_kg": 0.6108080239925515,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.3,
+    "nominal_kg": 0.44,
+    "high_kg": 0.54
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.31,
+    "nominal_kg": 0.44,
+    "high_kg": 0.56
+   },
+   "mass_physics_held_out_kg": 0.6490640600109059,
+   "mass_rule_held_out_kg": 0.44
+  },
+  {
+   "scene": "s12",
+   "object": "obj_014",
+   "label": "packaging for electronics",
+   "pred_id": "obj_006",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b",
+   "category": "box",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b/segmentation.work/material_crops/track_006_f00017.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b/segmentation.work/material_crops/track_006_f00031.png"
+   ],
+   "extents_cm": [
+    11.99326291680336,
+    10.512829944491386,
+    5.591014958918095
+   ],
+   "volume_cm3": 666.3099620675273,
+   "mass_true_kg": 0.234667,
+   "mass_physics_kg": 0.15351248478066176,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.03,
+    "nominal_kg": 0.075,
+    "high_kg": 0.17
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.085,
+    "nominal_kg": 0.165,
+    "high_kg": 0.26
+   },
+   "mass_physics_held_out_kg": 0.13439336010216207,
+   "mass_rule_held_out_kg": 0.13439336010216207
+  },
+  {
+   "scene": "s12",
+   "object": "obj_002",
+   "label": "packaging for breakfast bags",
+   "pred_id": "obj_007",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b",
+   "category": "box",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b/segmentation.work/material_crops/track_007_f00039.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b/segmentation.work/material_crops/track_007_f00013.png"
+   ],
+   "extents_cm": [
+    23.97434487938881,
+    13.990452140569687,
+    3.979004919528961
+   ],
+   "volume_cm3": 1343.7501439582045,
+   "mass_true_kg": 0.274,
+   "mass_physics_kg": 0.3095892831668186,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.19,
+    "nominal_kg": 0.31,
+    "high_kg": 0.45
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.19,
+    "nominal_kg": 0.285,
+    "high_kg": 0.4
+   },
+   "mass_physics_held_out_kg": 0.34762730232172623,
+   "mass_rule_held_out_kg": 0.34762730232172623
+  },
+  {
+   "scene": "s12",
+   "object": "obj_060",
+   "label": "deodorant cap",
+   "pred_id": "obj_009",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b",
+   "category": "pawn",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b/segmentation.work/material_crops/track_009_f00051.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b/segmentation.work/material_crops/track_009_f00072.png"
+   ],
+   "extents_cm": [
+    4.161778651177883,
+    2.8313444927334785,
+    2.7809998020529747
+   ],
+   "volume_cm3": 17.870196441643557,
+   "mass_true_kg": 0.003,
+   "mass_physics_kg": 0.007017626142633425,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.001,
+    "nominal_kg": 0.0025,
+    "high_kg": 0.005
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.005,
+    "nominal_kg": 0.011,
+    "high_kg": 0.019
+   },
+   "mass_physics_held_out_kg": 0.007088334783257637,
+   "mass_rule_held_out_kg": 0.0025
+  },
+  {
+   "scene": "s12",
+   "object": "obj_003",
+   "label": "packaging for in ear headphones",
+   "pred_id": "obj_002",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b",
+   "category": "box",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b/segmentation.work/material_crops/track_002_f00042.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b/segmentation.work/material_crops/track_002_f00031.png"
+   ],
+   "extents_cm": [
+    11.90364807844162,
+    8.73708687722683,
+    4.213997721672058
+   ],
+   "volume_cm3": 361.6301764084863,
+   "mass_true_kg": 0.094667,
+   "mass_physics_kg": 0.08331669960310396,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.12,
+    "nominal_kg": 0.165,
+    "high_kg": 0.21
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.12,
+    "nominal_kg": 0.15,
+    "high_kg": 0.185
+   },
+   "mass_physics_held_out_kg": 0.07294006886985226,
+   "mass_rule_held_out_kg": 0.165
+  },
+  {
+   "scene": "s12",
+   "object": "obj_021",
+   "label": "rubiks cube smaller",
+   "pred_id": "obj_008",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b",
+   "category": "Rubik's cube",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b/segmentation.work/material_crops/track_008_f00020.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b/segmentation.work/material_crops/track_008_f00009.png"
+   ],
+   "extents_cm": [
+    5.730295367538929,
+    5.72989359498024,
+    5.544024892151356
+   ],
+   "volume_cm3": 179.83887413439592,
+   "mass_true_kg": 0.081333,
+   "mass_physics_kg": 0.11889147969024914,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.075,
+    "nominal_kg": 0.095,
+    "high_kg": 0.125
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.075,
+    "nominal_kg": 0.095,
+    "high_kg": 0.115
+   },
+   "mass_physics_held_out_kg": 0.13220249515511046,
+   "mass_rule_held_out_kg": 0.095
+  },
+  {
+   "scene": "s12",
+   "object": "obj_007",
+   "label": "rubiks cube",
+   "pred_id": "obj_000",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b",
+   "category": "Rubik's cube",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b/segmentation.work/material_crops/track_000_f00009.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s12_b/segmentation.work/material_crops/track_000_f00048.png"
+   ],
+   "extents_cm": [
+    7.258394733071327,
+    7.137686386704445,
+    6.913099437952042
+   ],
+   "volume_cm3": 356.47936220209226,
+   "mass_true_kg": 0.249,
+   "mass_physics_kg": 0.13998944553676163,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.12,
+    "nominal_kg": 0.155,
+    "high_kg": 0.195
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.11,
+    "nominal_kg": 0.14,
+    "high_kg": 0.175
+   },
+   "mass_physics_held_out_kg": 0.138472251243429,
+   "mass_rule_held_out_kg": 0.138472251243429
+  },
+  {
+   "scene": "s13",
+   "object": "obj_002",
+   "label": "packaging for breakfast bags",
+   "pred_id": "obj_000",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s13_b",
+   "category": "box",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s13_b/segmentation.work/material_crops/track_000_f00039.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s13_b/segmentation.work/material_crops/track_000_f00072.png"
+   ],
+   "extents_cm": [
+    23.51176291704178,
+    13.50599005818367,
+    4.448790103197098
+   ],
+   "volume_cm3": 1372.1616078780996,
+   "mass_true_kg": 0.274,
+   "mass_physics_kg": 0.3161350571622511,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.18,
+    "nominal_kg": 0.3,
+    "high_kg": 0.45
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.19,
+    "nominal_kg": 0.28,
+    "high_kg": 0.4
+   },
+   "mass_physics_held_out_kg": 0.3549773298561541,
+   "mass_rule_held_out_kg": 0.3549773298561541
+  },
+  {
+   "scene": "s13",
+   "object": "obj_014",
+   "label": "packaging for electronics",
+   "pred_id": "obj_001",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s13_b",
+   "category": "box",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s13_b/segmentation.work/material_crops/track_001_f00016.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s13_b/segmentation.work/material_crops/track_001_f00061.png"
+   ],
+   "extents_cm": [
+    12.089348584413528,
+    10.350024700164795,
+    9.121838957071304
+   ],
+   "volume_cm3": 1127.1515671773327,
+   "mass_true_kg": 0.234667,
+   "mass_physics_kg": 0.25968670386512005,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.045,
+    "nominal_kg": 0.135,
+    "high_kg": 0.27
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.085,
+    "nominal_kg": 0.26,
+    "high_kg": 0.52
+   },
+   "mass_physics_held_out_kg": 0.2273441717535474,
+   "mass_rule_held_out_kg": 0.2273441717535474
+  },
+  {
+   "scene": "s14",
+   "object": "obj_004",
+   "label": "coffee powder can",
+   "pred_id": "obj_003",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s14_b",
+   "category": "can",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s14_b/segmentation.work/material_crops/track_003_f00050.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s14_b/segmentation.work/material_crops/track_003_f00034.png"
+   ],
+   "extents_cm": [
+    16.25616028904915,
+    10.478045046329498,
+    10.350959748029709
+   ],
+   "volume_cm3": 1342.0050458560772,
+   "mass_true_kg": 0.232,
+   "mass_physics_kg": 0.769035991527825,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.11,
+    "nominal_kg": 0.235,
+    "high_kg": 0.265
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.18,
+    "nominal_kg": 0.285,
+    "high_kg": 0.33
+   },
+   "mass_physics_held_out_kg": 1.114826048937716,
+   "mass_rule_held_out_kg": 0.235
+  },
+  {
+   "scene": "s14",
+   "object": "obj_036",
+   "label": "single breadboard module",
+   "pred_id": "obj_001",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s14_b",
+   "category": "breadboard",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s14_b/segmentation.work/material_crops/track_001_f00010.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s14_b/segmentation.work/material_crops/track_001_f00004.png"
+   ],
+   "extents_cm": [
+    8.496616035699844,
+    5.682723596692085,
+    1.7359746620059013
+   ],
+   "volume_cm3": 55.043902718293495,
+   "mass_true_kg": 0.033,
+   "mass_physics_kg": 0.021615740597473856,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.025,
+    "nominal_kg": 0.04,
+    "high_kg": 0.06
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.024,
+    "nominal_kg": 0.036,
+    "high_kg": 0.05
+   },
+   "mass_physics_held_out_kg": 0.021381470948394966,
+   "mass_rule_held_out_kg": 0.04
+  },
+  {
+   "scene": "s14",
+   "object": "obj_040",
+   "label": "white 3d print cuboid",
+   "pred_id": "obj_000",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s14_b",
+   "category": "cube",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s14_b/segmentation.work/material_crops/track_000_f00015.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s14_b/segmentation.work/material_crops/track_000_f00050.png"
+   ],
+   "extents_cm": [
+    5.162580497562885,
+    4.990172944962978,
+    3.1469784677028656
+   ],
+   "volume_cm3": 80.64686830946877,
+   "mass_true_kg": 0.022333,
+   "mass_physics_kg": 0.03167002518512839,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.004,
+    "nominal_kg": 0.008,
+    "high_kg": 0.014
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.045,
+    "nominal_kg": 0.06,
+    "high_kg": 0.075
+   },
+   "mass_physics_held_out_kg": 0.03198912802472973,
+   "mass_rule_held_out_kg": 0.008
+  },
+  {
+   "scene": "s14",
+   "object": "obj_006",
+   "label": "gamepad controller",
+   "pred_id": "obj_002",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s14_b",
+   "category": "controller",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s14_b/segmentation.work/material_crops/track_002_f00011.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s14_b/segmentation.work/material_crops/track_002_f00049.png"
+   ],
+   "extents_cm": [
+    14.925241470336914,
+    10.188034549355507,
+    5.586664378643036
+   ],
+   "volume_cm3": 284.30990580292575,
+   "mass_true_kg": 0.288,
+   "mass_physics_kg": 0.11855723071982006,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.235,
+    "nominal_kg": 0.285,
+    "high_kg": 0.31
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.25,
+    "nominal_kg": 0.28,
+    "high_kg": 0.31
+   },
+   "mass_physics_held_out_kg": 0.1056745307122246,
+   "mass_rule_held_out_kg": 0.285
+  },
+  {
+   "scene": "s14",
+   "object": "obj_002",
+   "label": "packaging for breakfast bags",
+   "pred_id": "obj_004",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s14_b",
+   "category": "box",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s14_b/segmentation.work/material_crops/track_004_f00045.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s14_b/segmentation.work/material_crops/track_004_f00014.png"
+   ],
+   "extents_cm": [
+    24.13889989256859,
+    13.769929856061935,
+    4.287564009428024
+   ],
+   "volume_cm3": 1359.6382797097665,
+   "mass_true_kg": 0.274,
+   "mass_physics_kg": 0.3132497825388925,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.21,
+    "nominal_kg": 0.3,
+    "high_kg": 0.4
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.27,
+    "nominal_kg": 0.37,
+    "high_kg": 0.47
+   },
+   "mass_physics_held_out_kg": 0.35173755287319236,
+   "mass_rule_held_out_kg": 0.35173755287319236
+  },
+  {
+   "scene": "s17",
+   "object": "obj_026",
+   "label": "glass water bottle",
+   "pred_id": "obj_003",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s17_b",
+   "category": "bottle",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s17_b/segmentation.work/material_crops/track_003_f00040.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s17_b/segmentation.work/material_crops/track_003_f00012.png"
+   ],
+   "extents_cm": [
+    24.4359590113163,
+    9.068834036588669,
+    8.978066220879555
+   ],
+   "volume_cm3": 330.1232838770417,
+   "mass_true_kg": 0.611667,
+   "mass_physics_kg": 0.8550193052415379,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.12,
+    "nominal_kg": 0.18,
+    "high_kg": 0.25
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.2,
+    "nominal_kg": 0.32,
+    "high_kg": 0.45
+   },
+   "mass_physics_held_out_kg": 0.8550193052415379,
+   "mass_rule_held_out_kg": 0.18
+  },
+  {
+   "scene": "s17",
+   "object": "obj_019",
+   "label": "small paint can",
+   "pred_id": "obj_002",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s17_b",
+   "category": "can",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s17_b/segmentation.work/material_crops/track_002_f00033.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s17_b/segmentation.work/material_crops/track_002_f00008.png"
+   ],
+   "extents_cm": [
+    7.063787803053856,
+    5.996359698474407,
+    5.959944054484367
+   ],
+   "volume_cm3": 158.81007276083534,
+   "mass_true_kg": 0.161333,
+   "mass_physics_kg": 0.09100611219559668,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.13,
+    "nominal_kg": 0.175,
+    "high_kg": 0.215
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.13,
+    "nominal_kg": 0.18,
+    "high_kg": 0.22
+   },
+   "mass_physics_held_out_kg": 0.05077784918999333,
+   "mass_rule_held_out_kg": 0.175
+  },
+  {
+   "scene": "s17",
+   "object": "obj_059",
+   "label": "deodorant spray, no cap",
+   "pred_id": "obj_000",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s17_b",
+   "category": "bottle",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s17_b/segmentation.work/material_crops/track_000_f00044.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s17_b/segmentation.work/material_crops/track_000_f00017.png"
+   ],
+   "extents_cm": [
+    9.723541140556335,
+    3.019695170223713,
+    2.95689245685935
+   ],
+   "volume_cm3": 60.734774145081666,
+   "mass_true_kg": 0.072667,
+   "mass_physics_kg": 0.04015175918731349,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.07,
+    "nominal_kg": 0.135,
+    "high_kg": 0.22
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.022,
+    "nominal_kg": 0.036,
+    "high_kg": 0.055
+   },
+   "mass_physics_held_out_kg": 0.03409788770717002,
+   "mass_rule_held_out_kg": 0.135
+  },
+  {
+   "scene": "s17",
+   "object": "obj_035",
+   "label": "reflective puzzle toy",
+   "pred_id": "obj_001",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s17_b",
+   "category": "cube",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s17_b/segmentation.work/material_crops/track_001_f00031.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s17_b/segmentation.work/material_crops/track_001_f00072.png"
+   ],
+   "extents_cm": [
+    3.9418403059244156,
+    3.9391839876770973,
+    3.894132748246193
+   ],
+   "volume_cm3": 59.12883418577359,
+   "mass_true_kg": 0.027333,
+   "mass_physics_kg": 0.039090072280214924,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.045,
+    "nominal_kg": 0.07,
+    "high_kg": 0.095
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.018,
+    "nominal_kg": 0.038,
+    "high_kg": 0.062
+   },
+   "mass_physics_held_out_kg": 0.043466572244721315,
+   "mass_rule_held_out_kg": 0.07
+  },
+  {
+   "scene": "s17",
+   "object": "obj_015",
+   "label": "chocolate egg",
+   "pred_id": "obj_004",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s17_b",
+   "category": "chocolate egg",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s17_b/segmentation.work/material_crops/track_004_f00025.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s17_b/segmentation.work/material_crops/track_004_f00046.png"
+   ],
+   "extents_cm": [
+    6.189410202205181,
+    4.83387503772974,
+    4.754161648452282
+   ],
+   "volume_cm3": 76.09863148271566,
+   "mass_true_kg": 0.033333,
+   "mass_physics_kg": 0.016924335641755966,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.018,
+    "nominal_kg": 0.02,
+    "high_kg": 0.022
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.018,
+    "nominal_kg": 0.02,
+    "high_kg": 0.022
+   },
+   "mass_physics_held_out_kg": 0.015085298599672392,
+   "mass_rule_held_out_kg": 0.02
+  },
+  {
+   "scene": "s18",
+   "object": "obj_006",
+   "label": "gamepad controller",
+   "pred_id": "obj_004",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b",
+   "category": "controller",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b/segmentation.work/material_crops/track_004_f00037.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b/segmentation.work/material_crops/track_004_f00076.png"
+   ],
+   "extents_cm": [
+    15.535672754049301,
+    11.240240558981895,
+    5.283978022634983
+   ],
+   "volume_cm3": 312.85548433124353,
+   "mass_true_kg": 0.288,
+   "mass_physics_kg": 0.13046073696612856,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.26,
+    "nominal_kg": 0.285,
+    "high_kg": 0.31
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.24,
+    "nominal_kg": 0.28,
+    "high_kg": 0.31
+   },
+   "mass_physics_held_out_kg": 0.11628457472869973,
+   "mass_rule_held_out_kg": 0.285
+  },
+  {
+   "scene": "s18",
+   "object": "obj_032",
+   "label": "round hair brush",
+   "pred_id": "obj_000",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b",
+   "category": "hairbrush",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b/segmentation.work/material_crops/track_000_f00037.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b/segmentation.work/material_crops/track_000_f00076.png"
+   ],
+   "extents_cm": [
+    22.672288864850998,
+    4.576283693313599,
+    4.198522865772247
+   ],
+   "volume_cm3": 144.16494354687163,
+   "mass_true_kg": 0.056,
+   "mass_physics_kg": 0.05661357333085649,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.03,
+    "nominal_kg": 0.05,
+    "high_kg": 0.08
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.04,
+    "nominal_kg": 0.065,
+    "high_kg": 0.095
+   },
+   "mass_physics_held_out_kg": 0.05718400394795427,
+   "mass_rule_held_out_kg": 0.05718400394795427
+  },
+  {
+   "scene": "s18",
+   "object": "obj_008",
+   "label": "round tube, packaging for cold medicine rub",
+   "pred_id": "obj_006",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b",
+   "category": "jar",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b/segmentation.work/material_crops/track_006_f00069.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b/segmentation.work/material_crops/track_006_f00050.png"
+   ],
+   "extents_cm": [
+    4.585119895637035,
+    4.272780567407608,
+    4.194110445678234
+   ],
+   "volume_cm3": 59.54278200433123,
+   "mass_true_kg": 0.039333,
+   "mass_physics_kg": 0.039363733183063375,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.03,
+    "nominal_kg": 0.06,
+    "high_kg": 0.11
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.015,
+    "nominal_kg": 0.03,
+    "high_kg": 0.045
+   },
+   "mass_physics_held_out_kg": 0.03786654817776429,
+   "mass_rule_held_out_kg": 0.03786654817776429
+  },
+  {
+   "scene": "s18",
+   "object": "obj_000",
+   "label": "lego toy car",
+   "pred_id": "obj_005",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b",
+   "category": "toy car",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b/segmentation.work/material_crops/track_005_f00043.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b/segmentation.work/material_crops/track_005_f00077.png"
+   ],
+   "extents_cm": [
+    13.197827339172363,
+    6.804803013801575,
+    2.2513289004564285
+   ],
+   "volume_cm3": 200.49803435749504,
+   "mass_true_kg": 0.162333,
+   "mass_physics_kg": 0.13254925051373997,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.06,
+    "nominal_kg": 0.11,
+    "high_kg": 0.17
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.04,
+    "nominal_kg": 0.07,
+    "high_kg": 0.11
+   },
+   "mass_physics_held_out_kg": 0.11256417031697827,
+   "mass_rule_held_out_kg": 0.11256417031697827
+  },
+  {
+   "scene": "s18",
+   "object": "obj_018",
+   "label": "3d printed car body",
+   "pred_id": "obj_002",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b",
+   "category": "model car",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b/segmentation.work/material_crops/track_002_f00074.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b/segmentation.work/material_crops/track_002_f00037.png"
+   ],
+   "extents_cm": [
+    20.50771266222,
+    8.56047086417675,
+    4.370693117380142
+   ],
+   "volume_cm3": 475.4100028502912,
+   "mass_true_kg": 0.157667,
+   "mass_physics_kg": 0.20965581125697844,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.015,
+    "nominal_kg": 0.032,
+    "high_kg": 0.065
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.28,
+    "nominal_kg": 0.52,
+    "high_kg": 0.78
+   },
+   "mass_physics_held_out_kg": 0.20201854902414978,
+   "mass_rule_held_out_kg": 0.032
+  },
+  {
+   "scene": "s18",
+   "object": "obj_024",
+   "label": "hole punch",
+   "pred_id": "obj_003",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b",
+   "category": "hole punch",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b/segmentation.work/material_crops/track_003_f00029.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b/segmentation.work/material_crops/track_003_f00042.png"
+   ],
+   "extents_cm": [
+    10.394100099802017,
+    10.019785538315773,
+    8.420042879879475
+   ],
+   "volume_cm3": 291.31470457353385,
+   "mass_true_kg": 0.242,
+   "mass_physics_kg": 0.16693789145586355,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.19,
+    "nominal_kg": 0.31,
+    "high_kg": 0.48
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.19,
+    "nominal_kg": 0.32,
+    "high_kg": 0.5
+   },
+   "mass_physics_held_out_kg": 0.09314481051802871,
+   "mass_rule_held_out_kg": 0.31
+  },
+  {
+   "scene": "s18",
+   "object": "obj_012",
+   "label": "chocolate santa blue",
+   "pred_id": "obj_007",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b",
+   "category": "chocolate figure",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b/segmentation.work/material_crops/track_007_f00029.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b/segmentation.work/material_crops/track_007_f00043.png"
+   ],
+   "extents_cm": [
+    16.845519095659256,
+    7.1022879332304,
+    6.5196869894862175
+   ],
+   "volume_cm3": 118.75293154284869,
+   "mass_true_kg": 0.129333,
+   "mass_physics_kg": 0.09500234523427895,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.04,
+    "nominal_kg": 0.07,
+    "high_kg": 0.12
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.06,
+    "nominal_kg": 0.09,
+    "high_kg": 0.125
+   },
+   "mass_physics_held_out_kg": 0.09500234523427895,
+   "mass_rule_held_out_kg": 0.09500234523427895
+  },
+  {
+   "scene": "s18",
+   "object": "obj_045",
+   "label": "plier",
+   "pred_id": "obj_001",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b",
+   "category": "pliers",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b/segmentation.work/material_crops/track_001_f00043.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s18_b/segmentation.work/material_crops/track_001_f00029.png"
+   ],
+   "extents_cm": [
+    12.29449212551117,
+    10.015400126576424,
+    1.0769569780677557
+   ],
+   "volume_cm3": 19.274408417785562,
+   "mass_true_kg": 0.074,
+   "mass_physics_kg": 0.06672511078111094,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.06,
+    "nominal_kg": 0.09,
+    "high_kg": 0.125
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.07,
+    "nominal_kg": 0.105,
+    "high_kg": 0.145
+   },
+   "mass_physics_held_out_kg": 0.06429447379807371,
+   "mass_rule_held_out_kg": 0.06429447379807371
+  },
+  {
+   "scene": "s24",
+   "object": "obj_040",
+   "label": "white 3d print cuboid",
+   "pred_id": "obj_000",
+   "run_dir": "/Users/tomkorbmacher/src/video2sim/runs_instances/s24_b",
+   "category": "cube",
+   "crop_paths": [
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s24_b/segmentation.work/material_crops/track_000_f00022.png",
+    "/Users/tomkorbmacher/src/video2sim/runs_instances/s24_b/segmentation.work/material_crops/track_000_f00004.png"
+   ],
+   "extents_cm": [
+    5.226292833685875,
+    5.1619455218315125,
+    3.2050717622041702
+   ],
+   "volume_cm3": 87.31726271532631,
+   "mass_true_kg": 0.022333,
+   "mass_physics_kg": 0.002310414771447534,
+   "crops": {
+    "arm": "crops",
+    "low_kg": 0.002,
+    "nominal_kg": 0.004,
+    "high_kg": 0.007
+   },
+   "measured": {
+    "arm": "measured",
+    "low_kg": 0.06,
+    "nominal_kg": 0.085,
+    "high_kg": 0.11
+   },
+   "mass_physics_held_out_kg": 0.00222625186000542,
+   "mass_rule_held_out_kg": 0.00222625186000542
+  }
+ ]
+}

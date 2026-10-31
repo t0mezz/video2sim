@@ -1,0 +1,74 @@
+{
+ "objects": 56,
+ "distinct_objects": 35,
+ "tolerance": 0.3,
+ "min_objects": 3,
+ "fit": {
+  "global": {
+   "hollow": {
+    "low": 0.039186080155732606,
+    "nominal": 0.27847078585512275,
+    "high": 0.6806820816216492
+   },
+   "solid": {
+    "low": 0.31737750695290307,
+    "nominal": 0.440748962550952,
+    "high": 1.0
+   }
+  },
+  "classes": {
+   "cardboard": {
+    "hollow": {
+     "low": 0.21015312831961722,
+     "nominal": 0.24779188379850706,
+     "high": 0.3021880013471585
+    }
+   },
+   "metal_steel": {
+    "hollow": {
+     "low": 0.028439340156016978,
+     "nominal": 0.07327746551262901,
+     "high": 0.12233573639011688
+    }
+   },
+   "plastic_hard": {
+    "hollow": {
+     "low": 0.41477964626437386,
+     "nominal": 0.6005307700381163,
+     "high": 0.9470347476970061
+    },
+    "solid": {
+     "low": 0.18011392175351354,
+     "nominal": 0.35686397300235895,
+     "high": 0.5345924407355799
+    }
+   }
+  }
+ },
+ "scores": {
+  "uncorrected": {
+   "within_tolerance": 4,
+   "share": 0.07142857142857142,
+   "median_ratio": 2.8492457459072584,
+   "median_abs_log2_ratio": 1.6157394422608784
+  },
+  "global_held_out": {
+   "within_tolerance": 17,
+   "share": 0.30357142857142855,
+   "median_ratio": 1.1144346651621042,
+   "median_abs_log2_ratio": 0.5656682528287389
+  },
+  "per_class_held_out": {
+   "within_tolerance": 20,
+   "share": 0.35714285714285715,
+   "median_ratio": 0.965755910458288,
+   "median_abs_log2_ratio": 0.5465670612163129
+  },
+  "per_class_in_sample": {
+   "within_tolerance": 26,
+   "share": 0.4642857142857143,
+   "median_ratio": 0.9948237100141155,
+   "median_abs_log2_ratio": 0.48831439598807813
+  }
+ }
+}

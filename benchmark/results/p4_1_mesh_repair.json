@@ -1,0 +1,151 @@
+{
+  "summary": {
+    "meshes": 5,
+    "pass_before": 0,
+    "pass_after": 5,
+    "config": {
+      "min_component_area_frac": 0.02,
+      "min_volume_m3": 1e-09,
+      "max_triangles": 20000,
+      "max_volume_change_frac": 0.02,
+      "decimation_aggression": 5
+    }
+  },
+  "meshes": [
+    {
+      "mesh": "s01_b/shape.work/sam3d_cache/46ae828382d92bf67e1c95d974025a8dd468201641b5bb92d5d240a7f7bdd843.glb",
+      "faces_in": 409900,
+      "faces_out": 19600,
+      "checks_before": {
+        "finite": true,
+        "watertight": true,
+        "manifold": true,
+        "positive_volume": true,
+        "within_triangle_budget": false
+      },
+      "checks_after": {
+        "finite": true,
+        "watertight": true,
+        "manifold": true,
+        "positive_volume": true,
+        "within_triangle_budget": true
+      },
+      "steps": {
+        "faces_dropped": 0,
+        "floaters_removed": 0,
+        "faces_added": 0,
+        "faces_removed_by_decimation": 390300
+      },
+      "ok": true,
+      "volume_change_frac": -0.0011101863640852127
+    },
+    {
+      "mesh": "s01_b/shape.work/sam3d_cache/921110a5c04e7e9d3d53e6f12d34fe943a307d030cf7a4572c3711f13563f3b5.glb",
+      "faces_in": 960196,
+      "faces_out": 19730,
+      "checks_before": {
+        "finite": true,
+        "watertight": true,
+        "manifold": true,
+        "positive_volume": true,
+        "within_triangle_budget": false
+      },
+      "checks_after": {
+        "finite": true,
+        "watertight": true,
+        "manifold": true,
+        "positive_volume": true,
+        "within_triangle_budget": true
+      },
+      "steps": {
+        "faces_dropped": 0,
+        "floaters_removed": 58,
+        "faces_added": 0,
+        "faces_removed_by_decimation": 934378
+      },
+      "ok": true,
+      "volume_change_frac": -0.006223544914184163
+    },
+    {
+      "mesh": "s01_b/shape.work/sam3d_cache/a5d5636532f3bd735fd838c6c6d75ad2384895a1518545e1639b6d2f1aa8a078.glb",
+      "faces_in": 1404052,
+      "faces_out": 19604,
+      "checks_before": {
+        "finite": true,
+        "watertight": true,
+        "manifold": true,
+        "positive_volume": true,
+        "within_triangle_budget": false
+      },
+      "checks_after": {
+        "finite": true,
+        "watertight": true,
+        "manifold": true,
+        "positive_volume": true,
+        "within_triangle_budget": true
+      },
+      "steps": {
+        "faces_dropped": 0,
+        "floaters_removed": 0,
+        "faces_added": 0,
+        "faces_removed_by_decimation": 1384448
+      },
+      "ok": true,
+      "volume_change_frac": 0.0008430311104529266
+    },
+    {
+      "mesh": "s01_b/shape.work/sam3d_cache/abb2ae9c27b731b9680566280440716f99d60ea673afef152b46d8576ba4825e.glb",
+      "faces_in": 712468,
+      "faces_out": 19614,
+      "checks_before": {
+        "finite": true,
+        "watertight": true,
+        "manifold": true,
+        "positive_volume": true,
+        "within_triangle_budget": false
+      },
+      "checks_after": {
+        "finite": true,
+        "watertight": true,
+        "manifold": true,
+        "positive_volume": true,
+        "within_triangle_budget": true
+      },
+      "steps": {
+        "faces_dropped": 2,
+        "floaters_removed": 0,
+        "faces_added": 4,
+        "faces_removed_by_decimation": 692856
+      },
+      "ok": true,
+      "volume_change_frac": -0.003768807052107856
+    },
+    {
+      "mesh": "s01_b/shape.work/sam3d_cache/deb140e7c3f313e45d3a4a102e6fbb7bb1d957cec9f3d03324edabfddd39d014.glb",
+      "faces_in": 584760,
+      "faces_out": 19600,
+      "checks_before": {
+        "finite": true,
+        "watertight": true,
+        "manifold": true,
+        "positive_volume": true,
+        "within_triangle_budget": false
+      },
+      "checks_after": {
+        "finite": true,
+        "watertight": true,
+        "manifold": true,
+        "positive_volume": true,
+        "within_triangle_budget": true
+      },
+      "steps": {
+        "faces_dropped": 0,
+        "floaters_removed": 0,
+        "faces_added": 0,
+        "faces_removed_by_decimation": 565160
+      },
+      "ok": true,
+      "volume_change_frac": 0.00018798248987159053
+    }
+  ]
+}

@@ -38,6 +38,10 @@ reconstruction:
     plane_inlier_threshold_m: 0.004   # TODO(P1.6): tune on dev scenes; a guess, not yet measured
     plane_ransac_iterations: 500      # TODO(P1.6): tune on dev scenes
     plane_radius_m: 1.0               # TODO(P1.6): points this close to the reference tag fit the table; a guess
+    tags_on_table:                    # optional layer: the tags lie on the table, so a plane away from them is wrong (s05: plane through the object tops, 3 to 7 cm up). A refit that cannot hold all tags is dropped and flagged (s24). Disable for scenes whose markers are not on the table plane
+      enabled: true
+      max_distance_m: 0.015           # farthest tag corner from the plane before a refit; dev scenes: good ones up to 8.2 mm, s05 64 mm
+      refit_band_m: 0.02              # refit uses points this close to the plane through the tag corners; a guess
     max_tag_reprojection_px: 3.0      # TODO(P1.6): per-view limit when triangulating tag corners; a guess
     max_tag_scale_spread: 0.03        # TODO(P1.6): tag-to-tag scale disagreement that is flagged; a guess
     max_tag_fit_rms_m: 0.005          # TODO(P1.6): grid-board fit residual, benchmark check only
@@ -91,6 +95,10 @@ segmentation:
     step_m: 0.005              # starting step of centre and sizes
     step_deg: 5.0              # starting step of the yaw
     min_size_m: 0.005          # a primitive side below this is rejected
+    stack_min_overlap: 0.8     # stacked: this share of the footprint lies over another object ...
+    stack_gap_m: 0.015         # ... and the lowest points are this close to that object's top; s13 is 1.0 cm off
+    stack_min_points: 20       # fewer points say nothing about where an object starts
+    stack_percentile: 2.0      # the lowest points, without strays
     max_cost: 0.10             # above this mask disagreement the cluster is the union of primitive and points; chosen on the dev scenes (cluster_box_accuracy.md)
     seed: 0
   keyframes_per_object: 5
@@ -130,7 +138,7 @@ segmentation:
     retries: 4                 # attempts on HTTP 429 and 5xx, with 2, 4, 8 s waits between them
     finishes: [matte, glossy, metallic, mirror, transparent, translucent]
     reflective_finishes: [metallic, mirror, transparent, translucent]   # flag the object when the model names one of these
-    classes:                   # PROVISIONAL keys from the materials seen on the dev scenes; P4.3 owns the final list and the numbers
+    classes:                   # final list (P4.3); the numbers are in configs/material_table.yaml
       - cardboard
       - paper
       - plastic_hard
@@ -184,6 +192,42 @@ shape:
 physics:
   material_table: configs/material_table.yaml
   max_convex_parts: 16
+  collision:                   # P4.2, stages/collision.py
+    primitive_tolerance: 0.04       # a primitive is used if its surface is within this share of the bbox diagonal (95th percentile)
+    primitive_volume_ratio: [0.8, 1.25]   # and its volume is this close to the mesh's
+    fit_tolerance: 0.05             # collision_fit: parts' surfaces within this share of the bbox diagonal of the visual surface (95th percentile)
+    fit_min_coverage: 0.95          # and at least this share of the visual surface inside or near a part
+    fit_cover_tolerance: 0.01       # near, as a share of the bbox diagonal
+    max_part_vertices: 255          # per convex part; assumed PhysX limit, verify in P5.1
+    coacd_threshold: 0.05           # CoACD concavity threshold
+    seed: 0
+  mass:                        # P4.5, stages/mass.py; values from docs/research/mesh_volume.md
+    seal_radius: 0.04               # gaps up to this share of the longest side are closed; 2% misses cracks, 8% closes a bottle neck
+    open_vessel_hull_ratio: 0.5     # a sealed body under this share of its hull has an open cavity, so no hollow correction
+    grid: 128                       # voxels along the longest side
+    samples_per_voxel_area: 8.0     # surface samples per voxel face area
+    max_surface_samples: 3000000
+    seed: 0
+  vlm_mass:                    # D-024, stages/vlm_mass.py; one hosted call per object
+    enabled: true              # false makes no call and needs no key: geometry mass only, 36% within 30% held out against 52%
+    keyframes: 2               # as segmentation.material_pass
+    crop_pad_px: 40
+    timeout_s: 120
+    retries: 4
+  settling:                    # P4.7, stages/settling.py; window and drift limit are in targets.yaml
+    round_tolerance: 0.04           # within this share of the bbox diagonal of an ellipsoid an object cannot be expected to rest (D-025); dev: egg 0.028, nearest other 0.053
+    timestep_s: 0.001               # stable on the closed-form tests in tests/test_settling.py
+    gravity_m_s2: 9.80665           # standard gravity, CGPM 1901
+    penetration_tolerance_m: 0.0005 # overlaps deeper than this are separated before the drop
+    max_separation_iterations: 200
+    noslip_iterations: 5            # removes the creep of soft friction on a slope
+    drift_sample_s: 0.02            # how often drift is read during the window
+  repair:                      # P4.1, stages/mesh_repair.py
+    min_component_area_frac: 0.02   # a piece smaller than this share of the largest piece's area is a floater
+    min_volume_m3: 1.0e-9           # below this the mesh is not a solid
+    max_triangles: 20000            # triangle budget per visual mesh; above it the mesh is decimated
+    max_volume_change_frac: 0.02    # decimation that moves the volume more than this is rejected
+    decimation_aggression: 5        # fast_simplification agg, 3 to 10; below 3 it stops short of the budget
 
 export:
   simulator: isaac_sim         # assumed, see PLAN.md decision D-001

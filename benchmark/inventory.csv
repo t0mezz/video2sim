@@ -1,9 +1,9 @@
 obj_id,label,length_mm_1,length_mm_2,length_mm_3,width_mm_1,width_mm_2,width_mm_3,height_mm_1,height_mm_2,height_mm_3,mass_g_1,mass_g_2,mass_g_3,material_class,hollow,deformable,shape_primitive,date,person,tool_id,notes
 obj_000,lego toy car,160,160,160,76,76,76,43,43,43,163,163,161,hard plastic,FALSE,FALSE,,2026-10-23,T. K.,folding rule,
 obj_001,spray can,67,68,67,67,68,67,240,240,240,474,473,473,metal,TRUE,FALSE,cylinder,2026-10-23,T. K.,folding rule,"Spray can, filled with bike cleaner fluid."
-obj_002,packaging for breakfast bags,237,237,237,136,136,136,39,39,39,275,274,273,cardboard,FALSE,FALSE,cuboid,2026-10-23,T. K.,folding rule,"damaged, content: small paper breakfast bags"
-obj_003,packaging for in ear headphones,115,116,116,85,87,87,45,45,45,95,95,94,cardboard,FALSE,FALSE,cuboid,2026-10-23,T. K.,folding rule,thicker and polished cardboard
-obj_004,coffee powder can,101,101,101,101,101,101,159,159,159,232,231,233,cardboard,FALSE,FALSE,cylinder,2026-10-23,T. K.,folding rule,lid made out of plastic and ground feels like aluminium
+obj_002,packaging for breakfast bags,237,237,237,136,136,136,39,39,39,275,274,273,cardboard,TRUE,FALSE,cuboid,2026-10-23,T. K.,folding rule,"damaged, content: small paper breakfast bags"
+obj_003,packaging for in ear headphones,115,116,116,85,87,87,45,45,45,95,95,94,cardboard,TRUE,FALSE,cuboid,2026-10-23,T. K.,folding rule,thicker and polished cardboard
+obj_004,coffee powder can,101,101,101,101,101,101,159,159,159,232,231,233,cardboard,FALSE,FALSE,cylinder,2026-10-23,T. K.,folding rule,cardboard can with plastic lid and metal bottom; about 80% filled with coffee powder (human check 2026-10-31); filling not visible from outside
 obj_005,plastic plate,280,280,280,280,280,280,18,18,18,144,144,144,hard plastic,FALSE,FALSE,cylinder,2026-10-23,T. K.,folding rule,
 obj_006,gamepad controller,154,153,153,108,107,108,64,64,64,289,288,287,hard plastic,FALSE,FALSE,,2026-10-23,T. K.,folding rule,xbox gamepad controller white
 obj_007,rubiks cube,70,70,70,70,70,70,70,70,70,249,249,249,hard plastic,FALSE,FALSE,cube,2026-10-23,T. K.,folding rule,"5x5 rubic cube, unsolved"
@@ -13,7 +13,7 @@ obj_010,small wooden toy brick,60,60,60,15,15,15,30,30,30,11,12,11,wood,FALSE,FA
 obj_011,sunscreen spray,35,35,35,35,35,35,133,133,133,80,80,80,hard plastic,FALSE,FALSE,cylinder,2026-10-23,T. K.,folding rule,sunscreen spray
 obj_012,chocolate santa blue,62,63,62,45,44,44,173,173,173,129,130,129,aluminium foil,TRUE,FALSE,,2026-10-23,T. K.,folding rule,aluminium foil wrapped chocolate santa claude blue
 obj_013,round deodorant,47,47,47,47,47,47,101,101,101,101,102,101,hard plastic,FALSE,FALSE,cylinder,2026-10-23,T. K.,folding rule,dark blue cylinder shaped deodorant black cap
-obj_014,packaging for electronics,118,118,118,109,109,109,55,55,55,234,236,234,cardboard,FALSE,FALSE,cuboid,2026-10-23,T. K.,folding rule,"blue packaging for pololu robot, with robot inside"
+obj_014,packaging for electronics,118,118,118,109,109,109,55,55,55,234,236,234,cardboard,TRUE,FALSE,cuboid,2026-10-23,T. K.,folding rule,"blue packaging for pololu robot, with robot inside"
 obj_015,chocolate egg,46,46,46,46,46,46,65,65,65,34,33,33,aluminium foil,TRUE,FALSE,egg,2026-10-23,T. K.,folding rule,"aluminium foil wrapped children chocolate egg, positioned like real egg (longest side towards sky, Z+)"
 obj_016,fidget spinner,74,74,74,74,74,74,12,12,12,40,39,41,hard plastic,FALSE,FALSE,,2026-10-23,T. K.,folding rule,"fidget spinner, yellow, made of hard plastic, ball bearing in center and metal weights in each wing"
 obj_017,electric tape,49,49,49,49,49,49,15,15,15,17,16,17,plastic,TRUE,FALSE,hollow cylinder,2026-10-23,T. K.,folding rule,"abt. 50% used, blue tesa® electric tape"
@@ -28,7 +28,7 @@ obj_025,sponge,160,160,160,160,160,160,170,170,170,45,44,43,plastic mesh,FALSE,T
 obj_026,glass water bottle,93,93,93,93,93,93,246,246,246,611,611,613,glass,TRUE,FALSE,cone,2026-10-23,T. K.,folding rule,"thick glass water bottle, no cap, open, not filled"
 obj_027,toy air basketball,150,150,150,150,150,150,150,150,150,80,79,79,plastic,TRUE,FALSE,ball,2026-10-23,T. K.,folding rule,"light air filled waterball like basketball, bouncy, red"
 obj_028,fascia roll,147,147,147,147,147,147,300,300,300,103,102,101,foam,TRUE,FALSE,hollow cylinder,2026-10-23,T. K.,folding rule,"light, white and green fascia roll"
-obj_029,empty phone packaging,170,170,170,86,87,86,63,62,62,184,185,185,cardboard,FALSE,FALSE,cuboid,2026-10-23,T. K.,folding rule,"phone packaging made of cardboard, no phone inside "
+obj_029,empty phone packaging,170,170,170,86,87,86,63,62,62,184,185,185,cardboard,TRUE,FALSE,cuboid,2026-10-23,T. K.,folding rule,"phone packaging made of cardboard, no phone inside "
 obj_030,folded up towel,280,280,280,260,260,260,70,70,70,211,212,213,fabric,FALSE,TRUE,cuboid cloth,2026-10-23,T. K.,folding rule,"folded up medium sized blue towel, folder to abt. a quarter of the size, cloth"
 obj_031,car navigation system,115,115,115,104,104,104,75,75,75,220,219,219,hard plastic,FALSE,FALSE,,2026-10-23,T. K.,folding rule,"navigation system with stand towards Y+, standing upright, plastic with plastic screen, black"
 obj_032,round hair brush,229,229,229,41,41,41,41,41,41,57,55,56,hard plastic,FALSE,FALSE,cylinder,2026-10-23,T. K.,folding rule,"black, round hair brush"

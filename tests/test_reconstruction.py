@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
@@ -46,7 +47,9 @@ def _look_at(eye: F64, target: F64) -> F64:
     return t
 
 
-def _scene(unit: float, seed: int = 0) -> tuple[list[TagView], F64]:
+def _scene(
+    unit: float, seed: int = 0, n_table: int = 2000, n_tops: int = 0, tag_7_z: float = 0.0
+) -> tuple[list[TagView], F64]:
     """A table scene seen in a reconstruction frame that is rotated, shifted and ``unit`` x too big.
 
     Returns the views (ideal tag detections plus 0.2 px noise) and sparse points (table plus
@@ -62,6 +65,7 @@ def _scene(unit: float, seed: int = 0) -> tuple[list[TagView], F64]:
         i: np.array([[x, y, 0], [x + TAG_M, y, 0], [x + TAG_M, y + TAG_M, 0], [x, y + TAG_M, 0.0]])
         for i, (x, y) in TAG_ORIGINS.items()
     }
+    corners_m[7] = corners_m[7] + [0, 0, tag_7_z]
     views = []
     for eye in ([0.3, -0.5, 0.8], [0.9, 0.7, 0.7], [-0.1, 0.5, 0.9], [0.6, 0.1, 1.0]):
         t_wc = _look_at(to_recon(np.array(eye)), to_recon(np.array([0.35, 0.3, 0.0])))
@@ -72,10 +76,11 @@ def _scene(unit: float, seed: int = 0) -> tuple[list[TagView], F64]:
             px = (K @ cam.T).T
             det[i] = px[:, :2] / px[:, 2:] + rng.normal(scale=0.2, size=(4, 2))
         views.append(TagView(K, np.zeros(0), t_wc, det))
-    table = np.column_stack([rng.uniform(-0.2, 1.0, (2000, 2)), rng.normal(0, 0.001, 2000)])
+    table = np.column_stack([rng.uniform(-0.2, 1.0, (n_table, 2)), rng.normal(0, 0.001, n_table)])
+    tops = np.column_stack([rng.uniform(0, 0.8, (n_tops, 2)), rng.normal(0.05, 0.001, n_tops)])
     clutter = np.column_stack([rng.uniform(0, 0.8, (300, 2)), rng.uniform(0.02, 0.2, 300)])
     far = rng.uniform(-5, 5, (200, 3))  # the room: must not influence the table fit
-    return views, to_recon(np.vstack([table, clutter, far]))
+    return views, to_recon(np.vstack([table, tops, clutter, far]))
 
 
 CFG = WorldFrameConfig(
@@ -85,6 +90,9 @@ CFG = WorldFrameConfig(
     plane_inlier_threshold_m=0.004,
     plane_ransac_iterations=300,
     plane_radius_m=1.0,
+    tags_on_table=True,
+    max_tag_plane_distance_m=0.01,
+    tag_refit_band_m=0.02,
     seed=0,
 )
 
@@ -112,6 +120,30 @@ def test_single_tag_is_flagged_but_still_works() -> None:
     res = solve_world_frame(only, points, CFG)
     assert res.scale.scale == pytest.approx(0.5, rel=0.02)
     assert any(f.startswith("single_tag") for f in res.flags)
+
+
+def test_plane_on_object_tops_is_refitted_through_the_tags() -> None:
+    views, points = _scene(2.0, n_table=150, n_tops=600)
+    res = solve_world_frame(views, points, CFG)
+    assert res.tag_plane_distance_m < 0.005
+    assert any(f.startswith("table_refit_from_tags") for f in res.flags)
+    assert np.allclose(res.tag_centers_world_m[7][2], 0.0, atol=5e-3)
+
+
+def test_tags_at_different_heights_keep_the_first_plane() -> None:
+    views, points = _scene(2.0, tag_7_z=0.2)
+    res = solve_world_frame(views, points, CFG)
+    assert any(f.startswith("tags_off_table") for f in res.flags)
+    assert not any(f.startswith("table_refit") for f in res.flags)
+    assert np.allclose(res.tag_centers_world_m[3], 0.0, atol=2e-3)
+    assert res.tag_centers_world_m[7][2] == pytest.approx(0.2, abs=5e-3)
+
+
+def test_tag_check_can_be_disabled_for_tags_off_the_table() -> None:
+    views, points = _scene(2.0, n_table=150, n_tops=600)
+    res = solve_world_frame(views, points, replace(CFG, tags_on_table=False))
+    assert res.tag_plane_distance_m == pytest.approx(0.05, abs=0.01)  # still reported
+    assert not any(f.startswith("table_refit") for f in res.flags)
 
 
 def test_no_tag_is_a_user_facing_error() -> None:
