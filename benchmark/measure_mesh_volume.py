@@ -37,6 +37,7 @@ from video2sim.stages.physics import object_material
 ROOT = Path(__file__).resolve().parent.parent
 GRID = 128  # voxels along the longest side
 SAMPLES_PER_VOXEL_AREA = 8.0
+SEAL_RADII = (0.01, 0.02, 0.04, 0.08, 0.16)  # gap closing radius, share of the longest side
 
 
 def enclosed_volume(mesh: trimesh.Trimesh) -> tuple[float, float]:
@@ -56,6 +57,30 @@ def enclosed_volume(mesh: trimesh.Trimesh) -> tuple[float, float]:
     filled = ndimage.binary_fill_holes(closed)
     solid = ndimage.binary_erosion(filled, iterations=1)
     return float(solid.sum()) * pitch**3, float(closed.sum()) / float(filled.sum())
+
+
+def sealed_volumes(mesh: trimesh.Trimesh, radii: tuple[float, ...]) -> dict[str, float]:
+    """Enclosed volume after closing gaps, per radius as a share of the longest side.
+
+    A crack in a shell seals at a small radius and the volume jumps to the solid. The opening of
+    a cup stays open until the radius reaches about half its width, so the volume stays at the
+    wall. Closing is dilation then erosion by the same distance, so nothing else grows.
+    """
+    pitch = float(mesh.extents.max()) / GRID
+    pad = int(max(radii) * GRID) + 4
+    count = min(int(mesh.area / pitch**2 * SAMPLES_PER_VOXEL_AREA), 3_000_000)
+    points = trimesh.sample.sample_surface(mesh, count, seed=0)[0]
+    index = np.floor((points - (mesh.bounds[0] - pad * pitch)) / pitch).astype(int)
+    grid: NDArray[np.bool_] = np.ones(tuple(index.max(axis=0) + pad + 1), dtype=bool)
+    grid[index[:, 0], index[:, 1], index[:, 2]] = False
+    to_surface = ndimage.distance_transform_edt(grid)
+    out = {}
+    for radius in radii:
+        r = radius * GRID
+        filled = ndimage.binary_fill_holes(to_surface <= max(r, 1.0))
+        solid = ndimage.distance_transform_edt(filled) > max(r, 1.0)
+        out[f"{radius:g}"] = float(solid.sum()) * pitch**3
+    return out
 
 
 def self_check() -> dict[str, float]:
@@ -96,6 +121,7 @@ def measure(path: Path, cfg: RepairConfig) -> dict[str, Any]:
         "volume_fill_m3": fill,
         "volume_hull_m3": float(repaired.mesh.convex_hull.volume),
         "surface_share": surface_share,
+        "volume_sealed_m3": sealed_volumes(repaired.mesh, SEAL_RADII),
     }
 
 
@@ -202,6 +228,12 @@ def main() -> None:
         "with_primitive_truth": len(primitive),
         "median_ratio_to_true_volume": {
             k: median(f"volume_{k}_m3", primitive) for k in ("mesh", "fill", "hull")
+        },
+        "median_ratio_sealed_to_true_volume": {
+            f"{r:g}": statistics.median(
+                x["volume_sealed_m3"][f"{r:g}"] / x["volume_true_m3"] for x in primitive
+            )
+            for r in SEAL_RADII
         },
         "mass_within_30pct_all": {
             "mesh": within("mass_from_mesh_kg", rows),

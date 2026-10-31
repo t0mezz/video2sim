@@ -472,13 +472,20 @@ Tasks
       by human decision (2026-10-31, ground truth regenerated, hollow fields only). Coffee can
       obj_004 is open: inventory cardboard and not hollow, model steel and hollow.
 
-- [ ] **P4.5** Mass and inertia from the repaired mesh under uniform density, with a hollow
+- [x] **P4.5** Mass and inertia from the repaired mesh under uniform density, with a hollow
 
       correction. Store low, nominal and high.
-      Status 2026-10-31: volume test done, not implemented. 43 of 56 dev meshes are shells, mesh
-      volume is a median 0.13 of true; voxel fill, or the hull where the fill leaks, gives 1.01
-      (34 of 39 within 20%). Density is now the main mass error. `docs/research/mesh_volume.md`,
-      `benchmark/results/p4_5_mesh_volume.json`.
+      Evidence: `src/video2sim/stages/mass.py`, `tests/test_mass.py` (box, cylinder, sphere, voxel
+      block and s^5 scaling against closed forms), `docs/research/mesh_volume.md`,
+      `benchmark/results/p4_5_mesh_volume.json`, `benchmark/results/p4_5_mass.json`
+      (`benchmark/run_mass.py`). Mesh volume is a median 0.13 of true on shells, so the body is a
+      voxel fill after sealing gaps up to 4% of the longest side: 1.01 of true, 32 of 39 within
+      20%, and the mouth of a cup stays open. Hollow correction `f` is one dev-measured value for
+      all classes (0.024, 0.22, 0.61) until P4.6, in `configs/material_table.yaml`. On 56 dev
+      objects 14 are within 30% (4 without the correction), in sample because `f` came from the
+      same objects, against a 70% exit criterion. Solid answers are the gap: 1 of 21, median 2.4
+      times too heavy. Truth is inside low to high on 31 of 56. `MassEstimate.center_of_mass_m`
+      is left for P4.8 to move the origin to (median offset 1.7 mm). Inertia has no measured truth.
 
   $$m = \rho\,V_{\text{eff}}, \qquad \mathbf{I} = \rho \int_V \left(\lVert\mathbf{r}\rVert^2 \mathbf{1} - \mathbf{r}\mathbf{r}^{\top}\right) dV$$
 
@@ -682,4 +689,5 @@ In order:
 | 2026-10-31 | P4.4 ticked: class to numbers mapping in `stages/physics.py`, checked against the inventory on 56 dev objects |
 | 2026-10-31 | Inventory: obj_002, obj_003, obj_014 and obj_029 marked hollow by human decision; ground truth regenerated, only the 23 hollow fields changed |
 | 2026-10-31 | P4.5: volume test written up in `docs/research/mesh_volume.md`; meshes are shells, the outer volume is right and density is the main mass error |
+| 2026-10-31 | P4.5 ticked: `stages/mass.py`, sealed voxel body, one dev-measured hollow fill fraction and the center of mass left to P4.8 (human decisions); 14 of 56 dev objects within 30%, exit criterion not met |
 | 2026-10-31 | D-020: tags-on-table layer on the plane fit; s05 rerun, all 4 objects now SAM 3D with fit 0.95 to 0.98 and `lift.max_extent_m` back at 1.5 |

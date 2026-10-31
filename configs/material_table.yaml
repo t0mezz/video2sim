@@ -21,6 +21,13 @@
 #
 # Keys must equal segmentation.material_pass.classes in configs/default.yaml (a test checks it).
 
+# Share of a closed hollow object's sealed volume that holds material at the density below (P4.5).
+# Not a material property and not from a reference: the 10th, 50th and 90th percentile of weighed
+# mass / (nominal density * sealed volume) on the 31 closed dev objects the model calls hollow
+# (fill_needed_percentiles in benchmark/results/p4_5_mass.json). One value for all classes until
+# P4.6 fits per class. Because it divides by nominal density it also absorbs density errors.
+hollow_fill_fraction: {low: 0.024, nominal: 0.22, high: 0.61}
+
 materials:
   cardboard:
     density_kg_m3:        {low: 700, nominal: 929, high: 1150}

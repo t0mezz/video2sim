@@ -197,6 +197,13 @@ physics:
     max_part_vertices: 255          # per convex part; assumed PhysX limit, verify in P5.1
     coacd_threshold: 0.05           # CoACD concavity threshold
     seed: 0
+  mass:                        # P4.5, stages/mass.py; values from docs/research/mesh_volume.md
+    seal_radius: 0.04               # gaps up to this share of the longest side are closed; 2% misses cracks, 8% closes a bottle neck
+    open_vessel_hull_ratio: 0.5     # a sealed body under this share of its hull has an open cavity, so no hollow correction
+    grid: 128                       # voxels along the longest side
+    samples_per_voxel_area: 8.0     # surface samples per voxel face area
+    max_surface_samples: 3000000
+    seed: 0
   repair:                      # P4.1, stages/mesh_repair.py
     min_component_area_frac: 0.02   # a piece smaller than this share of the largest piece's area is a floater
     min_volume_m3: 1.0e-9           # below this the mesh is not a solid

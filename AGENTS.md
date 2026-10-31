@@ -93,6 +93,9 @@ each object costs `keyframes_per_object x samples_per_keyframe` SAM 3D calls on 
 `shape.work/`. `python scripts/view_scene.py RUN/scene.json` shows the registered meshes in the
 scene in the browser, and `python scripts/view_glb.py FILE.glb` shows one mesh.
 
+`python benchmark/run_mass.py --runs runs_instances --out FILE.json` repairs the matched dev meshes and
+scores `stages/mass.py` against the weighed masses (P4.5); it makes no hosted call.
+
 Commands that arrive with their task: `video2sim run` (P5.5).
 Never document a command that does not exist. When you add one, add it here in the same
 change.

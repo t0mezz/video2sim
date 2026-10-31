@@ -64,12 +64,15 @@ class MaterialNumbers:
 
 
 class MaterialTable(Model):
+    hollow_fill_fraction: Estimate
     materials: dict[str, MaterialEntry]
 
     @model_validator(mode="after")
     def _has_fallback(self) -> MaterialTable:
         if FALLBACK_CLASS not in self.materials:
             raise ValueError(f"the table needs a '{FALLBACK_CLASS}' entry")
+        if self.hollow_fill_fraction.low <= 0 or self.hollow_fill_fraction.high > 1:
+            raise ValueError("hollow_fill_fraction must lie in (0, 1]")
         return self
 
     def lookup(self, material_class: str | None) -> MaterialNumbers:
