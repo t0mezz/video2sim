@@ -1,0 +1,6898 @@
+{
+ "scenes": [
+  "s01",
+  "s02",
+  "s03",
+  "s04",
+  "s05",
+  "s06",
+  "s11",
+  "s12",
+  "s13",
+  "s14",
+  "s17",
+  "s18",
+  "s24"
+ ],
+ "n_common_objects": 56,
+ "arms": {
+  "n6": {
+   "harness_summary": {
+    "pooled": [
+     {
+      "name": "object_recall",
+      "status": "measured",
+      "value": 0.9491525423728814,
+      "n": 59,
+      "target": 0.9,
+      "passed": true
+     },
+     {
+      "name": "size_error_median",
+      "status": "measured",
+      "value": 0.05047792695870022,
+      "n": 56,
+      "target": 0.05,
+      "passed": false
+     },
+     {
+      "name": "position_error_median_m",
+      "status": "measured",
+      "value": 0.005459479912805326,
+      "n": 56,
+      "target": 0.015,
+      "passed": true
+     },
+     {
+      "name": "orientation_error_median_deg",
+      "status": "measured",
+      "value": 1.0582482745181565,
+      "n": 28,
+      "target": 10.0,
+      "passed": true
+     },
+     {
+      "name": "mass_within_tolerance_fraction",
+      "status": "measured",
+      "value": 0.0,
+      "n": 56,
+      "target": 0.5,
+      "passed": false
+     },
+     {
+      "name": "runtime_max_minutes",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 60,
+      "passed": null
+     },
+     {
+      "name": "stability_pass_fraction",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 0.95,
+      "passed": null
+     },
+     {
+      "name": "asset_validity_fraction",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 1.0,
+      "passed": null
+     },
+     {
+      "name": "manual_steps",
+      "status": "not_measured",
+      "value": null,
+      "n": 0,
+      "target": null,
+      "passed": null,
+      "reason": "needs run logs of the full pipeline (Phase 5)"
+     }
+    ],
+    "per_tier": {
+     "easy": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.95,
+       "n": 20,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.046429849261114944,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.004372466681127849,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 0.9019455866564812,
+       "n": 10,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ],
+     "medium": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.92,
+       "n": 25,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.04282514063529506,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.007648691298138406,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.6537253308248694,
+       "n": 11,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ],
+     "hard": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 1.0,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.0998854047528019,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.004897456873491749,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.055569433179343,
+       "n": 7,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ]
+    },
+    "n_scenes": 12,
+    "n_evaluable_objects": 59,
+    "n_excluded_objects": 0,
+    "n_false_positives": 1
+   },
+   "paired": {
+    "all": {
+     "n": 56,
+     "size_error_median": 0.05047792695870022,
+     "position_error_median_m": 0.005459479912805326,
+     "orientation_error_median_deg": 1.0582482745181565,
+     "cluster_to_mesh_median_m": 0.0011888407571042647,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 10,
+     "proxies": 2
+    },
+    "easy": {
+     "n": 19,
+     "size_error_median": 0.046429849261114944,
+     "position_error_median_m": 0.004372466681127849,
+     "orientation_error_median_deg": 0.9019455866564812,
+     "cluster_to_mesh_median_m": 0.0012635037911032008,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 1,
+     "proxies": 0
+    },
+    "hard": {
+     "n": 14,
+     "size_error_median": 0.0998854047528019,
+     "position_error_median_m": 0.004897456873491749,
+     "orientation_error_median_deg": 1.055569433179343,
+     "cluster_to_mesh_median_m": 0.000980403512548184,
+     "cluster_within_5mm_median": 0.9642357665773374,
+     "size_error_over_15pct": 5,
+     "proxies": 1
+    },
+    "medium": {
+     "n": 23,
+     "size_error_median": 0.04282514063529506,
+     "position_error_median_m": 0.007648691298138406,
+     "orientation_error_median_deg": 1.6537253308248694,
+     "cluster_to_mesh_median_m": 0.0011444897525795708,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 4,
+     "proxies": 1
+    }
+   }
+  },
+  "n1_r0": {
+   "harness_summary": {
+    "pooled": [
+     {
+      "name": "object_recall",
+      "status": "measured",
+      "value": 0.9491525423728814,
+      "n": 59,
+      "target": 0.9,
+      "passed": true
+     },
+     {
+      "name": "size_error_median",
+      "status": "measured",
+      "value": 0.056993082968737376,
+      "n": 56,
+      "target": 0.05,
+      "passed": false
+     },
+     {
+      "name": "position_error_median_m",
+      "status": "measured",
+      "value": 0.005831763808253421,
+      "n": 56,
+      "target": 0.015,
+      "passed": true
+     },
+     {
+      "name": "orientation_error_median_deg",
+      "status": "measured",
+      "value": 1.1641854813030132,
+      "n": 28,
+      "target": 10.0,
+      "passed": true
+     },
+     {
+      "name": "mass_within_tolerance_fraction",
+      "status": "measured",
+      "value": 0.0,
+      "n": 56,
+      "target": 0.5,
+      "passed": false
+     },
+     {
+      "name": "runtime_max_minutes",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 60,
+      "passed": null
+     },
+     {
+      "name": "stability_pass_fraction",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 0.95,
+      "passed": null
+     },
+     {
+      "name": "asset_validity_fraction",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 1.0,
+      "passed": null
+     },
+     {
+      "name": "manual_steps",
+      "status": "not_measured",
+      "value": null,
+      "n": 0,
+      "target": null,
+      "passed": null,
+      "reason": "needs run logs of the full pipeline (Phase 5)"
+     }
+    ],
+    "per_tier": {
+     "easy": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.95,
+       "n": 20,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.06762659666788193,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.004616813382220661,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.2234394742437615,
+       "n": 10,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ],
+     "medium": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.92,
+       "n": 25,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.05031680310507226,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.007640119226389532,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.0103501570823994,
+       "n": 11,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ],
+     "hard": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 1.0,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.07972671195640454,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.004976216932733361,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 2.7306778871988513,
+       "n": 7,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ]
+    },
+    "n_scenes": 12,
+    "n_evaluable_objects": 59,
+    "n_excluded_objects": 0,
+    "n_false_positives": 1
+   },
+   "paired": {
+    "all": {
+     "n": 56,
+     "size_error_median": 0.056993082968737376,
+     "position_error_median_m": 0.005831763808253421,
+     "orientation_error_median_deg": 1.1641854813030132,
+     "cluster_to_mesh_median_m": 0.0012472087278147526,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 12,
+     "proxies": 2
+    },
+    "easy": {
+     "n": 19,
+     "size_error_median": 0.06762659666788193,
+     "position_error_median_m": 0.004616813382220661,
+     "orientation_error_median_deg": 1.2234394742437615,
+     "cluster_to_mesh_median_m": 0.0012920845808806864,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 1,
+     "proxies": 0
+    },
+    "hard": {
+     "n": 14,
+     "size_error_median": 0.07972671195640454,
+     "position_error_median_m": 0.004976216932733361,
+     "orientation_error_median_deg": 2.7306778871988513,
+     "cluster_to_mesh_median_m": 0.0009947791364149016,
+     "cluster_within_5mm_median": 0.9738399574970116,
+     "size_error_over_15pct": 6,
+     "proxies": 1
+    },
+    "medium": {
+     "n": 23,
+     "size_error_median": 0.05031680310507226,
+     "position_error_median_m": 0.007640119226389532,
+     "orientation_error_median_deg": 1.0103501570823994,
+     "cluster_to_mesh_median_m": 0.0012837872268927008,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 5,
+     "proxies": 1
+    }
+   }
+  },
+  "n1_r1": {
+   "harness_summary": {
+    "pooled": [
+     {
+      "name": "object_recall",
+      "status": "measured",
+      "value": 0.9491525423728814,
+      "n": 59,
+      "target": 0.9,
+      "passed": true
+     },
+     {
+      "name": "size_error_median",
+      "status": "measured",
+      "value": 0.0608092749862404,
+      "n": 56,
+      "target": 0.05,
+      "passed": false
+     },
+     {
+      "name": "position_error_median_m",
+      "status": "measured",
+      "value": 0.005755959651991813,
+      "n": 56,
+      "target": 0.015,
+      "passed": true
+     },
+     {
+      "name": "orientation_error_median_deg",
+      "status": "measured",
+      "value": 1.103243350683087,
+      "n": 28,
+      "target": 10.0,
+      "passed": true
+     },
+     {
+      "name": "mass_within_tolerance_fraction",
+      "status": "measured",
+      "value": 0.0,
+      "n": 56,
+      "target": 0.5,
+      "passed": false
+     },
+     {
+      "name": "runtime_max_minutes",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 60,
+      "passed": null
+     },
+     {
+      "name": "stability_pass_fraction",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 0.95,
+      "passed": null
+     },
+     {
+      "name": "asset_validity_fraction",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 1.0,
+      "passed": null
+     },
+     {
+      "name": "manual_steps",
+      "status": "not_measured",
+      "value": null,
+      "n": 0,
+      "target": null,
+      "passed": null,
+      "reason": "needs run logs of the full pipeline (Phase 5)"
+     }
+    ],
+    "per_tier": {
+     "easy": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.95,
+       "n": 20,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.051727389913771245,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.004435853294487052,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 0.8566035056862802,
+       "n": 10,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ],
+     "medium": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.92,
+       "n": 25,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.07818223417059905,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.008184294584125191,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.0661614120802767,
+       "n": 11,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ],
+     "hard": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 1.0,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.0637015521535609,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.004896717076122987,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.9258708927282555,
+       "n": 7,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ]
+    },
+    "n_scenes": 12,
+    "n_evaluable_objects": 59,
+    "n_excluded_objects": 0,
+    "n_false_positives": 1
+   },
+   "paired": {
+    "all": {
+     "n": 56,
+     "size_error_median": 0.0608092749862404,
+     "position_error_median_m": 0.005755959651991813,
+     "orientation_error_median_deg": 1.103243350683087,
+     "cluster_to_mesh_median_m": 0.0012801268452271493,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 9,
+     "proxies": 5
+    },
+    "easy": {
+     "n": 19,
+     "size_error_median": 0.051727389913771245,
+     "position_error_median_m": 0.004435853294487052,
+     "orientation_error_median_deg": 0.8566035056862802,
+     "cluster_to_mesh_median_m": 0.001303987064785427,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 0,
+     "proxies": 1
+    },
+    "hard": {
+     "n": 14,
+     "size_error_median": 0.0637015521535609,
+     "position_error_median_m": 0.004896717076122987,
+     "orientation_error_median_deg": 1.9258708927282555,
+     "cluster_to_mesh_median_m": 0.0010219557378877845,
+     "cluster_within_5mm_median": 0.9635449627968633,
+     "size_error_over_15pct": 4,
+     "proxies": 2
+    },
+    "medium": {
+     "n": 23,
+     "size_error_median": 0.07818223417059905,
+     "position_error_median_m": 0.008184294584125191,
+     "orientation_error_median_deg": 1.0661614120802767,
+     "cluster_to_mesh_median_m": 0.0013928783537657252,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 5,
+     "proxies": 2
+    }
+   }
+  },
+  "n1_r2": {
+   "harness_summary": {
+    "pooled": [
+     {
+      "name": "object_recall",
+      "status": "measured",
+      "value": 0.9491525423728814,
+      "n": 59,
+      "target": 0.9,
+      "passed": true
+     },
+     {
+      "name": "size_error_median",
+      "status": "measured",
+      "value": 0.06870500052720946,
+      "n": 56,
+      "target": 0.05,
+      "passed": false
+     },
+     {
+      "name": "position_error_median_m",
+      "status": "measured",
+      "value": 0.0056013208672035875,
+      "n": 56,
+      "target": 0.015,
+      "passed": true
+     },
+     {
+      "name": "orientation_error_median_deg",
+      "status": "measured",
+      "value": 1.3825396457317112,
+      "n": 28,
+      "target": 10.0,
+      "passed": true
+     },
+     {
+      "name": "mass_within_tolerance_fraction",
+      "status": "measured",
+      "value": 0.0,
+      "n": 56,
+      "target": 0.5,
+      "passed": false
+     },
+     {
+      "name": "runtime_max_minutes",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 60,
+      "passed": null
+     },
+     {
+      "name": "stability_pass_fraction",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 0.95,
+      "passed": null
+     },
+     {
+      "name": "asset_validity_fraction",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 1.0,
+      "passed": null
+     },
+     {
+      "name": "manual_steps",
+      "status": "not_measured",
+      "value": null,
+      "n": 0,
+      "target": null,
+      "passed": null,
+      "reason": "needs run logs of the full pipeline (Phase 5)"
+     }
+    ],
+    "per_tier": {
+     "easy": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.95,
+       "n": 20,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.07200395882923889,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.0050192425750584845,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 2.2682530068581457,
+       "n": 10,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ],
+     "medium": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.92,
+       "n": 25,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.05994649318359294,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.008507021268595429,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.0750470486215988,
+       "n": 11,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ],
+     "hard": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 1.0,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.07415526253429455,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.004469529865924282,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.055569433179343,
+       "n": 7,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ]
+    },
+    "n_scenes": 12,
+    "n_evaluable_objects": 59,
+    "n_excluded_objects": 0,
+    "n_false_positives": 1
+   },
+   "paired": {
+    "all": {
+     "n": 56,
+     "size_error_median": 0.06870500052720946,
+     "position_error_median_m": 0.0056013208672035875,
+     "orientation_error_median_deg": 1.3825396457317112,
+     "cluster_to_mesh_median_m": 0.0014265225663043792,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 14,
+     "proxies": 3
+    },
+    "easy": {
+     "n": 19,
+     "size_error_median": 0.07200395882923889,
+     "position_error_median_m": 0.0050192425750584845,
+     "orientation_error_median_deg": 2.2682530068581457,
+     "cluster_to_mesh_median_m": 0.0015106901971939145,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 2,
+     "proxies": 0
+    },
+    "hard": {
+     "n": 14,
+     "size_error_median": 0.07415526253429455,
+     "position_error_median_m": 0.004469529865924282,
+     "orientation_error_median_deg": 1.055569433179343,
+     "cluster_to_mesh_median_m": 0.0011844992027307691,
+     "cluster_within_5mm_median": 0.9588252298989772,
+     "size_error_over_15pct": 5,
+     "proxies": 1
+    },
+    "medium": {
+     "n": 23,
+     "size_error_median": 0.05994649318359294,
+     "position_error_median_m": 0.008507021268595429,
+     "orientation_error_median_deg": 1.0750470486215988,
+     "cluster_to_mesh_median_m": 0.0014054507383233093,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 7,
+     "proxies": 2
+    }
+   }
+  },
+  "n2_r0": {
+   "harness_summary": {
+    "pooled": [
+     {
+      "name": "object_recall",
+      "status": "measured",
+      "value": 0.9491525423728814,
+      "n": 59,
+      "target": 0.9,
+      "passed": true
+     },
+     {
+      "name": "size_error_median",
+      "status": "measured",
+      "value": 0.0619185978837279,
+      "n": 56,
+      "target": 0.05,
+      "passed": false
+     },
+     {
+      "name": "position_error_median_m",
+      "status": "measured",
+      "value": 0.005475146506376777,
+      "n": 56,
+      "target": 0.015,
+      "passed": true
+     },
+     {
+      "name": "orientation_error_median_deg",
+      "status": "measured",
+      "value": 1.0356386364696846,
+      "n": 28,
+      "target": 10.0,
+      "passed": true
+     },
+     {
+      "name": "mass_within_tolerance_fraction",
+      "status": "measured",
+      "value": 0.0,
+      "n": 56,
+      "target": 0.5,
+      "passed": false
+     },
+     {
+      "name": "runtime_max_minutes",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 60,
+      "passed": null
+     },
+     {
+      "name": "stability_pass_fraction",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 0.95,
+      "passed": null
+     },
+     {
+      "name": "asset_validity_fraction",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 1.0,
+      "passed": null
+     },
+     {
+      "name": "manual_steps",
+      "status": "not_measured",
+      "value": null,
+      "n": 0,
+      "target": null,
+      "passed": null,
+      "reason": "needs run logs of the full pipeline (Phase 5)"
+     }
+    ],
+    "per_tier": {
+     "easy": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.95,
+       "n": 20,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.05448947810021786,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.004616813382220661,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.1103616098261142,
+       "n": 10,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ],
+     "medium": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.92,
+       "n": 25,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.05207347605959057,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.007640119226389532,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.0103501570823994,
+       "n": 11,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ],
+     "hard": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 1.0,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.0998854047528019,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.004897456873491749,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 0.8004819502481411,
+       "n": 7,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ]
+    },
+    "n_scenes": 12,
+    "n_evaluable_objects": 59,
+    "n_excluded_objects": 0,
+    "n_false_positives": 1
+   },
+   "paired": {
+    "all": {
+     "n": 56,
+     "size_error_median": 0.0619185978837279,
+     "position_error_median_m": 0.005475146506376777,
+     "orientation_error_median_deg": 1.0356386364696846,
+     "cluster_to_mesh_median_m": 0.0012690043481921882,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 11,
+     "proxies": 2
+    },
+    "easy": {
+     "n": 19,
+     "size_error_median": 0.05448947810021786,
+     "position_error_median_m": 0.004616813382220661,
+     "orientation_error_median_deg": 1.1103616098261142,
+     "cluster_to_mesh_median_m": 0.0012707057559482007,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 1,
+     "proxies": 0
+    },
+    "hard": {
+     "n": 14,
+     "size_error_median": 0.0998854047528019,
+     "position_error_median_m": 0.004897456873491749,
+     "orientation_error_median_deg": 0.8004819502481411,
+     "cluster_to_mesh_median_m": 0.0009947791364149016,
+     "cluster_within_5mm_median": 0.9642357665773374,
+     "size_error_over_15pct": 6,
+     "proxies": 1
+    },
+    "medium": {
+     "n": 23,
+     "size_error_median": 0.05207347605959057,
+     "position_error_median_m": 0.007640119226389532,
+     "orientation_error_median_deg": 1.0103501570823994,
+     "cluster_to_mesh_median_m": 0.0012837872268927008,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 4,
+     "proxies": 1
+    }
+   }
+  },
+  "n2_r1": {
+   "harness_summary": {
+    "pooled": [
+     {
+      "name": "object_recall",
+      "status": "measured",
+      "value": 0.9491525423728814,
+      "n": 59,
+      "target": 0.9,
+      "passed": true
+     },
+     {
+      "name": "size_error_median",
+      "status": "measured",
+      "value": 0.05268202414875074,
+      "n": 56,
+      "target": 0.05,
+      "passed": false
+     },
+     {
+      "name": "position_error_median_m",
+      "status": "measured",
+      "value": 0.005910876331810986,
+      "n": 56,
+      "target": 0.015,
+      "passed": true
+     },
+     {
+      "name": "orientation_error_median_deg",
+      "status": "measured",
+      "value": 1.0673289938994295,
+      "n": 28,
+      "target": 10.0,
+      "passed": true
+     },
+     {
+      "name": "mass_within_tolerance_fraction",
+      "status": "measured",
+      "value": 0.0,
+      "n": 56,
+      "target": 0.5,
+      "passed": false
+     },
+     {
+      "name": "runtime_max_minutes",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 60,
+      "passed": null
+     },
+     {
+      "name": "stability_pass_fraction",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 0.95,
+      "passed": null
+     },
+     {
+      "name": "asset_validity_fraction",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 1.0,
+      "passed": null
+     },
+     {
+      "name": "manual_steps",
+      "status": "not_measured",
+      "value": null,
+      "n": 0,
+      "target": null,
+      "passed": null,
+      "reason": "needs run logs of the full pipeline (Phase 5)"
+     }
+    ],
+    "per_tier": {
+     "easy": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.95,
+       "n": 20,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.051727389913771245,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.004372466681127849,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 0.7465017264529601,
+       "n": 10,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ],
+     "medium": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.92,
+       "n": 25,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.05363665838373024,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.007648691298138406,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.6537253308248694,
+       "n": 11,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ],
+     "hard": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 1.0,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.04842111070058379,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.004769781287053679,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.1403252892858973,
+       "n": 7,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ]
+    },
+    "n_scenes": 12,
+    "n_evaluable_objects": 59,
+    "n_excluded_objects": 0,
+    "n_false_positives": 1
+   },
+   "paired": {
+    "all": {
+     "n": 56,
+     "size_error_median": 0.05268202414875074,
+     "position_error_median_m": 0.005910876331810986,
+     "orientation_error_median_deg": 1.0673289938994295,
+     "cluster_to_mesh_median_m": 0.0012554084258550328,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 8,
+     "proxies": 3
+    },
+    "easy": {
+     "n": 19,
+     "size_error_median": 0.051727389913771245,
+     "position_error_median_m": 0.004372466681127849,
+     "orientation_error_median_deg": 0.7465017264529601,
+     "cluster_to_mesh_median_m": 0.001303987064785427,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 0,
+     "proxies": 1
+    },
+    "hard": {
+     "n": 14,
+     "size_error_median": 0.04842111070058379,
+     "position_error_median_m": 0.004769781287053679,
+     "orientation_error_median_deg": 1.1403252892858973,
+     "cluster_to_mesh_median_m": 0.001167253861999949,
+     "cluster_within_5mm_median": 0.9585973492927888,
+     "size_error_over_15pct": 5,
+     "proxies": 1
+    },
+    "medium": {
+     "n": 23,
+     "size_error_median": 0.05363665838373024,
+     "position_error_median_m": 0.007648691298138406,
+     "orientation_error_median_deg": 1.6537253308248694,
+     "cluster_to_mesh_median_m": 0.0011931325731797207,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 3,
+     "proxies": 1
+    }
+   }
+  },
+  "n2_r2": {
+   "harness_summary": {
+    "pooled": [
+     {
+      "name": "object_recall",
+      "status": "measured",
+      "value": 0.9491525423728814,
+      "n": 59,
+      "target": 0.9,
+      "passed": true
+     },
+     {
+      "name": "size_error_median",
+      "status": "measured",
+      "value": 0.0549469203677993,
+      "n": 56,
+      "target": 0.05,
+      "passed": false
+     },
+     {
+      "name": "position_error_median_m",
+      "status": "measured",
+      "value": 0.005764608802775408,
+      "n": 56,
+      "target": 0.015,
+      "passed": true
+     },
+     {
+      "name": "orientation_error_median_deg",
+      "status": "measured",
+      "value": 1.5385022623375946,
+      "n": 28,
+      "target": 10.0,
+      "passed": true
+     },
+     {
+      "name": "mass_within_tolerance_fraction",
+      "status": "measured",
+      "value": 0.0,
+      "n": 56,
+      "target": 0.5,
+      "passed": false
+     },
+     {
+      "name": "runtime_max_minutes",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 60,
+      "passed": null
+     },
+     {
+      "name": "stability_pass_fraction",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 0.95,
+      "passed": null
+     },
+     {
+      "name": "asset_validity_fraction",
+      "status": "no_data",
+      "value": null,
+      "n": 0,
+      "target": 1.0,
+      "passed": null
+     },
+     {
+      "name": "manual_steps",
+      "status": "not_measured",
+      "value": null,
+      "n": 0,
+      "target": null,
+      "passed": null,
+      "reason": "needs run logs of the full pipeline (Phase 5)"
+     }
+    ],
+    "per_tier": {
+     "easy": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.95,
+       "n": 20,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.046103211432348586,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.0050192425750584845,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.6879433924713214,
+       "n": 10,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 19,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ],
+     "medium": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 0.92,
+       "n": 25,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.05287589691265232,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.008507021268595429,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.4275510022311835,
+       "n": 11,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 23,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ],
+     "hard": [
+      {
+       "name": "object_recall",
+       "status": "measured",
+       "value": 1.0,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "size_error_median",
+       "status": "measured",
+       "value": 0.08574208952419132,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "position_error_median_m",
+       "status": "measured",
+       "value": 0.00485745693842716,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "orientation_error_median_deg",
+       "status": "measured",
+       "value": 1.4620179272473308,
+       "n": 7,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "mass_within_tolerance_fraction",
+       "status": "measured",
+       "value": 0.0,
+       "n": 14,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "runtime_max_minutes",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "stability_pass_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      },
+      {
+       "name": "asset_validity_fraction",
+       "status": "no_data",
+       "value": null,
+       "n": 0,
+       "target": null,
+       "passed": null
+      }
+     ]
+    },
+    "n_scenes": 12,
+    "n_evaluable_objects": 59,
+    "n_excluded_objects": 0,
+    "n_false_positives": 1
+   },
+   "paired": {
+    "all": {
+     "n": 56,
+     "size_error_median": 0.0549469203677993,
+     "position_error_median_m": 0.005764608802775408,
+     "orientation_error_median_deg": 1.5385022623375946,
+     "cluster_to_mesh_median_m": 0.0012531031653177397,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 11,
+     "proxies": 3
+    },
+    "easy": {
+     "n": 19,
+     "size_error_median": 0.046103211432348586,
+     "position_error_median_m": 0.0050192425750584845,
+     "orientation_error_median_deg": 1.6879433924713214,
+     "cluster_to_mesh_median_m": 0.0013121151366195798,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 1,
+     "proxies": 0
+    },
+    "hard": {
+     "n": 14,
+     "size_error_median": 0.08574208952419132,
+     "position_error_median_m": 0.00485745693842716,
+     "orientation_error_median_deg": 1.4620179272473308,
+     "cluster_to_mesh_median_m": 0.0012748953744753716,
+     "cluster_within_5mm_median": 0.9488138191471462,
+     "size_error_over_15pct": 5,
+     "proxies": 1
+    },
+    "medium": {
+     "n": 23,
+     "size_error_median": 0.05287589691265232,
+     "position_error_median_m": 0.008507021268595429,
+     "orientation_error_median_deg": 1.4275510022311835,
+     "cluster_to_mesh_median_m": 0.0011237652307567812,
+     "cluster_within_5mm_median": 1.0,
+     "size_error_over_15pct": 5,
+     "proxies": 2
+    }
+   }
+  }
+ },
+ "lowest_size_error_count": {
+  "n6": 19,
+  "n1_r0": 12,
+  "n1_r1": 8,
+  "n1_r2": 10,
+  "n2_r0": 3,
+  "n2_r1": 2,
+  "n2_r2": 2
+ },
+ "objects": [
+  {
+   "scene": "s01",
+   "object": "obj_003",
+   "label": "packaging for in ear headphones",
+   "n6": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.12579257864601232,
+    "position_error_m": 0.0051258502263265395,
+    "orientation_error_deg": 0.06687506431137535,
+    "cluster_to_mesh_median_m": 0.0009036490593856605,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.99625
+   },
+   "n1_r0": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.14609973624244627,
+    "position_error_m": 0.005549479155327948,
+    "orientation_error_deg": 0.19472711414194066,
+    "cluster_to_mesh_median_m": 0.0009884646276355335,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9920833333333333
+   },
+   "n1_r1": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.13092082493908763,
+    "position_error_m": 0.005284623956486609,
+    "orientation_error_deg": 0.541694088414431,
+    "cluster_to_mesh_median_m": 0.0006985360093653162,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9920833333333333
+   },
+   "n1_r2": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.10195317085023774,
+    "position_error_m": 0.005739735808753036,
+    "orientation_error_deg": 0.2989154683135382,
+    "cluster_to_mesh_median_m": 0.001043296510512346,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.989375
+   },
+   "n2_r0": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.12579257864601232,
+    "position_error_m": 0.0051258502263265395,
+    "orientation_error_deg": 0.06687506431137535,
+    "cluster_to_mesh_median_m": 0.0009036490593856605,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.99625
+   },
+   "n2_r1": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.13092082493908763,
+    "position_error_m": 0.005284623956486609,
+    "orientation_error_deg": 0.541694088414431,
+    "cluster_to_mesh_median_m": 0.0006985360093653162,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9920833333333333
+   },
+   "n2_r2": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.10195317085023774,
+    "position_error_m": 0.005739735808753036,
+    "orientation_error_deg": 0.2989154683135382,
+    "cluster_to_mesh_median_m": 0.001043296510512346,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.989375
+   }
+  },
+  {
+   "scene": "s01",
+   "object": "obj_004",
+   "label": "coffee powder can",
+   "n6": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.03983660706224664,
+    "position_error_m": 0.004372466681127849,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0014607033548845014,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9657031249999999
+   },
+   "n1_r0": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.03513967718901667,
+    "position_error_m": 0.004616813382220661,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013156792867344406,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9562369791666666
+   },
+   "n1_r1": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.04738093825097889,
+    "position_error_m": 0.004879896507137867,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001583323830833407,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9248046875
+   },
+   "n1_r2": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.019304484711866042,
+    "position_error_m": 0.0050192425750584845,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0015166091621078876,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8806206597222223
+   },
+   "n2_r0": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.03513967718901667,
+    "position_error_m": 0.004616813382220661,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013156792867344406,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9562369791666666
+   },
+   "n2_r1": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.03983660706224664,
+    "position_error_m": 0.004372466681127849,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0014607033548845014,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9657031249999999
+   },
+   "n2_r2": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.019304484711866042,
+    "position_error_m": 0.0050192425750584845,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0015166091621078876,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8806206597222223
+   }
+  },
+  {
+   "scene": "s01",
+   "object": "obj_007",
+   "label": "rubiks cube",
+   "n6": {
+    "tier": "easy",
+    "label": "rubiks cube",
+    "size_error": 0.03886689806252444,
+    "position_error_m": 0.0035238177621815616,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0010203292426623318,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9839583333333334
+   },
+   "n1_r0": {
+    "tier": "easy",
+    "label": "rubiks cube",
+    "size_error": 0.09452195680919911,
+    "position_error_m": 0.003596165033134444,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001468893363978303,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9670833333333333
+   },
+   "n1_r1": {
+    "tier": "easy",
+    "label": "rubiks cube",
+    "size_error": 0.0645970837422956,
+    "position_error_m": 0.003539088484375183,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001039574051634744,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9783333333333334
+   },
+   "n1_r2": {
+    "tier": "easy",
+    "label": "rubiks cube",
+    "size_error": 0.10708157469873239,
+    "position_error_m": 0.0033086034255722517,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0015627188523744996,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9745833333333334
+   },
+   "n2_r0": {
+    "tier": "easy",
+    "label": "rubiks cube",
+    "size_error": 0.027781634084835166,
+    "position_error_m": 0.0035257069415910894,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0010352550519990107,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.98375
+   },
+   "n2_r1": {
+    "tier": "easy",
+    "label": "rubiks cube",
+    "size_error": 0.04552445780251332,
+    "position_error_m": 0.002844466131226958,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0011870836588607572,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.985625
+   },
+   "n2_r2": {
+    "tier": "easy",
+    "label": "rubiks cube",
+    "size_error": 0.03886689806252444,
+    "position_error_m": 0.0035238177621815616,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0010203292426623318,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9839583333333334
+   }
+  },
+  {
+   "scene": "s01",
+   "object": "obj_021",
+   "label": "rubiks cube smaller",
+   "n6": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.05517636618763384,
+    "position_error_m": 0.00100269461907585,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0005091806841645239,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9914583333333333
+   },
+   "n1_r0": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.10101553335255417,
+    "position_error_m": 0.0008752772366242822,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0006971283254271083,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9854166666666667
+   },
+   "n1_r1": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.051727389913771245,
+    "position_error_m": 0.0012423392312404821,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007392376918797347,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.984375
+   },
+   "n1_r2": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.07200395882923889,
+    "position_error_m": 0.001982213294966116,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009002184781253007,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9783333333333334
+   },
+   "n2_r0": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.06336159234250639,
+    "position_error_m": 0.0008358447915544141,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0012546475325217893,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9879166666666667
+   },
+   "n2_r1": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.051727389913771245,
+    "position_error_m": 0.0012423392312404821,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007392376918797347,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.984375
+   },
+   "n2_r2": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.05517636618763384,
+    "position_error_m": 0.00100269461907585,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0005091806841645239,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9914583333333333
+   }
+  },
+  {
+   "scene": "s01",
+   "object": "obj_029",
+   "label": "empty phone packaging",
+   "n6": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.03595044122995085,
+    "position_error_m": 0.0018412060874290002,
+    "orientation_error_deg": 0.7429640574559926,
+    "cluster_to_mesh_median_m": 0.0025444377121810738,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.7334375
+   },
+   "n1_r0": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.013679417382621394,
+    "position_error_m": 0.001827294315257328,
+    "orientation_error_deg": 0.21314493220373265,
+    "cluster_to_mesh_median_m": 0.002484507805681292,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.8702604166666668
+   },
+   "n1_r1": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.041934353456325686,
+    "position_error_m": 0.0017233980697349749,
+    "orientation_error_deg": 0.11239871665803491,
+    "cluster_to_mesh_median_m": 0.0031253519995985586,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.6186197916666667
+   },
+   "n1_r2": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.07406875562401571,
+    "position_error_m": 0.0020165706353367104,
+    "orientation_error_deg": 0.5994434599679437,
+    "cluster_to_mesh_median_m": 0.002677280449080096,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.612109375
+   },
+   "n2_r0": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.013679417382621394,
+    "position_error_m": 0.001827294315257328,
+    "orientation_error_deg": 0.21314493220373265,
+    "cluster_to_mesh_median_m": 0.002484507805681292,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.8702604166666668
+   },
+   "n2_r1": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.041934353456325686,
+    "position_error_m": 0.0017233980697349749,
+    "orientation_error_deg": 0.11239871665803491,
+    "cluster_to_mesh_median_m": 0.0031253519995985586,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.6186197916666667
+   },
+   "n2_r2": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.03595044122995085,
+    "position_error_m": 0.0018412060874290002,
+    "orientation_error_deg": 0.7429640574559926,
+    "cluster_to_mesh_median_m": 0.0025444377121810738,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.7334375
+   }
+  },
+  {
+   "scene": "s02",
+   "object": "obj_014",
+   "label": "packaging for electronics",
+   "n6": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.11991505627429695,
+    "position_error_m": 0.004129194846231695,
+    "orientation_error_deg": 0.17259271014955857,
+    "cluster_to_mesh_median_m": 0.0016217716497757633,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9945833333333334
+   },
+   "n1_r0": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.06709539412440596,
+    "position_error_m": 0.003234678277901006,
+    "orientation_error_deg": 1.1597961037952587,
+    "cluster_to_mesh_median_m": 0.0017029798312985188,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9745833333333334
+   },
+   "n1_r1": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.0570214662301852,
+    "position_error_m": 0.0030522973403054945,
+    "orientation_error_deg": 0.9354802421195245,
+    "cluster_to_mesh_median_m": 0.0014272662795609676,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.975
+   },
+   "n1_r2": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.09038745209122175,
+    "position_error_m": 0.001953551549372187,
+    "orientation_error_deg": 89.77938637729987,
+    "cluster_to_mesh_median_m": 0.0019437154114707968,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9858333333333333
+   },
+   "n2_r0": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.06709539412440596,
+    "position_error_m": 0.003234678277901006,
+    "orientation_error_deg": 1.1597961037952587,
+    "cluster_to_mesh_median_m": 0.0017029798312985188,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9745833333333334
+   },
+   "n2_r1": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.0570214662301852,
+    "position_error_m": 0.0030522973403054945,
+    "orientation_error_deg": 0.9354802421195245,
+    "cluster_to_mesh_median_m": 0.0014272662795609676,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.975
+   },
+   "n2_r2": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.11991505627429695,
+    "position_error_m": 0.004129194846231695,
+    "orientation_error_deg": 0.17259271014955857,
+    "cluster_to_mesh_median_m": 0.0016217716497757633,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9945833333333334
+   }
+  },
+  {
+   "scene": "s02",
+   "object": "obj_039",
+   "label": "action camera",
+   "n6": {
+    "tier": "easy",
+    "label": "action camera",
+    "size_error": 0.016923982689173476,
+    "position_error_m": 0.004327191055467296,
+    "orientation_error_deg": 1.0609271158569697,
+    "cluster_to_mesh_median_m": 0.001154272532265294,
+    "cluster_within_5mm": 0.9491525423728814,
+    "proxy": false,
+    "fit_score": 0.9316631355932203
+   },
+   "n1_r0": {
+    "tier": "easy",
+    "label": "action camera",
+    "size_error": 0.08813173299003414,
+    "position_error_m": 0.004199846388028893,
+    "orientation_error_deg": 2.5122713640334666,
+    "cluster_to_mesh_median_m": 0.001199048534329603,
+    "cluster_within_5mm": 0.940677966101695,
+    "proxy": false,
+    "fit_score": 0.9073446327683616
+   },
+   "n1_r1": {
+    "tier": "easy",
+    "label": "action camera",
+    "size_error": 0.09315528128227402,
+    "position_error_m": 0.004207732083986779,
+    "orientation_error_deg": 0.7777267692530359,
+    "cluster_to_mesh_median_m": 0.0012104668697634057,
+    "cluster_within_5mm": 0.9491525423728814,
+    "proxy": false,
+    "fit_score": 0.907371115819209
+   },
+   "n1_r2": {
+    "tier": "easy",
+    "label": "action camera",
+    "size_error": 0.07484539373829181,
+    "position_error_m": 0.005342524738771629,
+    "orientation_error_deg": 2.69217057955305,
+    "cluster_to_mesh_median_m": 0.0012292349082810633,
+    "cluster_within_5mm": 0.940677966101695,
+    "proxy": false,
+    "fit_score": 0.9034604519774011
+   },
+   "n2_r0": {
+    "tier": "easy",
+    "label": "action camera",
+    "size_error": 0.016923982689173476,
+    "position_error_m": 0.004327191055467296,
+    "orientation_error_deg": 1.0609271158569697,
+    "cluster_to_mesh_median_m": 0.001154272532265294,
+    "cluster_within_5mm": 0.9491525423728814,
+    "proxy": false,
+    "fit_score": 0.9316631355932203
+   },
+   "n2_r1": {
+    "tier": "easy",
+    "label": "action camera",
+    "size_error": 0.06176156438316525,
+    "position_error_m": 0.004312112696221771,
+    "orientation_error_deg": 0.5575232107863956,
+    "cluster_to_mesh_median_m": 0.0010730912808970326,
+    "cluster_within_5mm": 0.9491525423728814,
+    "proxy": false,
+    "fit_score": 0.9305649717514125
+   },
+   "n2_r2": {
+    "tier": "easy",
+    "label": "action camera",
+    "size_error": 0.07484539373829181,
+    "position_error_m": 0.005342524738771629,
+    "orientation_error_deg": 2.69217057955305,
+    "cluster_to_mesh_median_m": 0.0012292349082810633,
+    "cluster_within_5mm": 0.940677966101695,
+    "proxy": false,
+    "fit_score": 0.9034604519774011
+   }
+  },
+  {
+   "scene": "s02",
+   "object": "obj_041",
+   "label": "mug",
+   "n6": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.01698642433860716,
+    "position_error_m": 0.01574862677078093,
+    "orientation_error_deg": 21.231049610698335,
+    "cluster_to_mesh_median_m": 0.00116861242464096,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9580403645833334
+   },
+   "n1_r0": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.01698642433860716,
+    "position_error_m": 0.01574862677078093,
+    "orientation_error_deg": 21.231049610698335,
+    "cluster_to_mesh_median_m": 0.00116861242464096,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9580403645833334
+   },
+   "n1_r1": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.029254932927016458,
+    "position_error_m": 0.01715676387848635,
+    "orientation_error_deg": 34.64276382350658,
+    "cluster_to_mesh_median_m": 0.001303987064785427,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9502061631944445
+   },
+   "n1_r2": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.016989639867028804,
+    "position_error_m": 0.017479450540772275,
+    "orientation_error_deg": 31.389333580094164,
+    "cluster_to_mesh_median_m": 0.0015106901971939145,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9397960069444444
+   },
+   "n2_r0": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.01698642433860716,
+    "position_error_m": 0.01574862677078093,
+    "orientation_error_deg": 21.231049610698335,
+    "cluster_to_mesh_median_m": 0.00116861242464096,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9580403645833334
+   },
+   "n2_r1": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.029254932927016458,
+    "position_error_m": 0.01715676387848635,
+    "orientation_error_deg": 34.64276382350658,
+    "cluster_to_mesh_median_m": 0.001303987064785427,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9502061631944445
+   },
+   "n2_r2": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.046103211432348586,
+    "position_error_m": 0.013258816091706298,
+    "orientation_error_deg": 23.149819719803645,
+    "cluster_to_mesh_median_m": 0.001019882794202235,
+    "cluster_within_5mm": 0.9895833333333334,
+    "proxy": false,
+    "fit_score": 0.9431966145833334
+   }
+  },
+  {
+   "scene": "s02",
+   "object": "obj_046",
+   "label": "mug",
+   "n6": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.05194563214267752,
+    "position_error_m": 0.012351215843191635,
+    "orientation_error_deg": 22.065417402842883,
+    "cluster_to_mesh_median_m": 0.0012427025395322787,
+    "cluster_within_5mm": 0.9572368421052632,
+    "proxy": false,
+    "fit_score": 0.9195394736842104
+   },
+   "n1_r0": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.06871648758056054,
+    "position_error_m": 0.011349263193545027,
+    "orientation_error_deg": 32.08424810959105,
+    "cluster_to_mesh_median_m": 0.001318600226423224,
+    "cluster_within_5mm": 0.962171052631579,
+    "proxy": false,
+    "fit_score": 0.9067091557017544
+   },
+   "n1_r1": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.048709394826273164,
+    "position_error_m": 0.012350546849332435,
+    "orientation_error_deg": 31.57777495930202,
+    "cluster_to_mesh_median_m": 0.0014461971597275283,
+    "cluster_within_5mm": 0.9555921052631579,
+    "proxy": false,
+    "fit_score": 0.9007031249999999
+   },
+   "n1_r2": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.05194563214267752,
+    "position_error_m": 0.012351215843191635,
+    "orientation_error_deg": 22.065417402842883,
+    "cluster_to_mesh_median_m": 0.0012427025395322787,
+    "cluster_within_5mm": 0.9572368421052632,
+    "proxy": false,
+    "fit_score": 0.9195394736842104
+   },
+   "n2_r0": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.06047560342494941,
+    "position_error_m": 0.010517056378085378,
+    "orientation_error_deg": 34.38862265482263,
+    "cluster_to_mesh_median_m": 0.0012707057559482007,
+    "cluster_within_5mm": 0.9506578947368421,
+    "proxy": false,
+    "fit_score": 0.8880838815789475
+   },
+   "n2_r1": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.05992191301412201,
+    "position_error_m": 0.011642759358432926,
+    "orientation_error_deg": 23.937619999655396,
+    "cluster_to_mesh_median_m": 0.001310015847096284,
+    "cluster_within_5mm": 0.9473684210526315,
+    "proxy": false,
+    "fit_score": 0.8876946271929824
+   },
+   "n2_r2": {
+    "tier": "easy",
+    "label": "mug",
+    "size_error": 0.05194563214267752,
+    "position_error_m": 0.012351215843191635,
+    "orientation_error_deg": 22.065417402842883,
+    "cluster_to_mesh_median_m": 0.0012427025395322787,
+    "cluster_within_5mm": 0.9572368421052632,
+    "proxy": false,
+    "fit_score": 0.9195394736842104
+   }
+  },
+  {
+   "scene": "s02",
+   "object": "obj_060",
+   "label": "deodorant cap",
+   "n6": {
+    "tier": "easy",
+    "label": "deodorant cap",
+    "size_error": 0.06762659666788193,
+    "position_error_m": 0.006001160465060095,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0008605519506242555,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.973125
+   },
+   "n1_r0": {
+    "tier": "easy",
+    "label": "deodorant cap",
+    "size_error": 0.06762659666788193,
+    "position_error_m": 0.006001160465060095,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0008605519506242555,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.973125
+   },
+   "n1_r1": {
+    "tier": "easy",
+    "label": "deodorant cap",
+    "size_error": 0.13513651942294047,
+    "position_error_m": 0.005726552134620777,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001112060653478436,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9664583333333333
+   },
+   "n1_r2": {
+    "tier": "easy",
+    "label": "deodorant cap",
+    "size_error": 0.1187669894305114,
+    "position_error_m": 0.0063696792405485494,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0010912012089462205,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.969375
+   },
+   "n2_r0": {
+    "tier": "easy",
+    "label": "deodorant cap",
+    "size_error": 0.06762659666788193,
+    "position_error_m": 0.006001160465060095,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0008605519506242555,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.973125
+   },
+   "n2_r1": {
+    "tier": "easy",
+    "label": "deodorant cap",
+    "size_error": 0.13513651942294047,
+    "position_error_m": 0.005726552134620777,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001112060653478436,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9664583333333333
+   },
+   "n2_r2": {
+    "tier": "easy",
+    "label": "deodorant cap",
+    "size_error": 0.1187669894305114,
+    "position_error_m": 0.0063696792405485494,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0010912012089462205,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.969375
+   }
+  },
+  {
+   "scene": "s03",
+   "object": "obj_027",
+   "label": "toy air basketball",
+   "n6": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.01736803593214653,
+    "position_error_m": 0.011064679159975648,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.00139806358691021,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9299457465277777
+   },
+   "n1_r0": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.015075862021405873,
+    "position_error_m": 0.011035004567453946,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001180574479996639,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9381611689814815
+   },
+   "n1_r1": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.014372458716126099,
+    "position_error_m": 0.010880137684823174,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0014064804256880585,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9341724537037038
+   },
+   "n1_r2": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.018283623327210452,
+    "position_error_m": 0.010903070033584516,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013121151366195798,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9530555555555555
+   },
+   "n2_r0": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.010437493495291291,
+    "position_error_m": 0.0104248338720064,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0011477167939974913,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9295862268518518
+   },
+   "n2_r1": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.01736803593214653,
+    "position_error_m": 0.011064679159975648,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.00139806358691021,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9299457465277777
+   },
+   "n2_r2": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.018283623327210452,
+    "position_error_m": 0.010903070033584516,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013121151366195798,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9530555555555555
+   }
+  },
+  {
+   "scene": "s04",
+   "object": "obj_003",
+   "label": "packaging for in ear headphones",
+   "n6": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.13385290673592495,
+    "position_error_m": 0.0036350524105775474,
+    "orientation_error_deg": 0.1487659575021496,
+    "cluster_to_mesh_median_m": 0.0010606449087040442,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9918392969240427
+   },
+   "n1_r0": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.13385290673592495,
+    "position_error_m": 0.0036350524105775474,
+    "orientation_error_deg": 0.1487659575021496,
+    "cluster_to_mesh_median_m": 0.0010606449087040442,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9918392969240427
+   },
+   "n1_r1": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.13876849715231848,
+    "position_error_m": 0.00384884707111384,
+    "orientation_error_deg": 0.44240060599662456,
+    "cluster_to_mesh_median_m": 0.0012068297869246387,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9861286254728878
+   },
+   "n1_r2": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.16284255396699412,
+    "position_error_m": 0.003372050714498668,
+    "orientation_error_deg": 0.305584666564215,
+    "cluster_to_mesh_median_m": 0.001502595044570041,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9867952211276462
+   },
+   "n2_r0": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.13385290673592495,
+    "position_error_m": 0.0036350524105775474,
+    "orientation_error_deg": 0.1487659575021496,
+    "cluster_to_mesh_median_m": 0.0010606449087040442,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9918392969240427
+   },
+   "n2_r1": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.13876849715231848,
+    "position_error_m": 0.00384884707111384,
+    "orientation_error_deg": 0.44240060599662456,
+    "cluster_to_mesh_median_m": 0.0012068297869246387,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9861286254728878
+   },
+   "n2_r2": {
+    "tier": "easy",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.14566804166425718,
+    "position_error_m": 0.003909619477465194,
+    "orientation_error_deg": 1.6149865974278583,
+    "cluster_to_mesh_median_m": 0.0014465694119380353,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9912023460410557
+   }
+  },
+  {
+   "scene": "s04",
+   "object": "obj_014",
+   "label": "packaging for electronics",
+   "n6": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.05644554498903468,
+    "position_error_m": 0.004435853294487052,
+    "orientation_error_deg": 1.200467579830325,
+    "cluster_to_mesh_median_m": 0.002170222605455554,
+    "cluster_within_5mm": 0.75,
+    "proxy": false,
+    "fit_score": 0.7388329319027809
+   },
+   "n1_r0": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.07086243470346232,
+    "position_error_m": 0.005287925861306806,
+    "orientation_error_deg": 1.2870828446922644,
+    "cluster_to_mesh_median_m": 0.0027354963280755464,
+    "cluster_within_5mm": 0.75,
+    "proxy": false,
+    "fit_score": 0.7370717870390574
+   },
+   "n1_r1": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.05644554498903468,
+    "position_error_m": 0.004435853294487052,
+    "orientation_error_deg": 1.200467579830325,
+    "cluster_to_mesh_median_m": 0.002170222605455554,
+    "cluster_within_5mm": 0.75,
+    "proxy": false,
+    "fit_score": 0.7388329319027809
+   },
+   "n1_r2": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.023579734894955837,
+    "position_error_m": 0.0047440618223445075,
+    "orientation_error_deg": 1.8443354341632414,
+    "cluster_to_mesh_median_m": 0.003206860838730078,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.7269027716673999
+   },
+   "n2_r0": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.07086243470346232,
+    "position_error_m": 0.005287925861306806,
+    "orientation_error_deg": 1.2870828446922644,
+    "cluster_to_mesh_median_m": 0.0027354963280755464,
+    "cluster_within_5mm": 0.75,
+    "proxy": false,
+    "fit_score": 0.7370717870390574
+   },
+   "n2_r1": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.05644554498903468,
+    "position_error_m": 0.004435853294487052,
+    "orientation_error_deg": 1.200467579830325,
+    "cluster_to_mesh_median_m": 0.002170222605455554,
+    "cluster_within_5mm": 0.75,
+    "proxy": false,
+    "fit_score": 0.7388329319027809
+   },
+   "n2_r2": {
+    "tier": "easy",
+    "label": "packaging for electronics",
+    "size_error": 0.025384162827186224,
+    "position_error_m": 0.004764545716234074,
+    "orientation_error_deg": 1.7609001875147847,
+    "cluster_to_mesh_median_m": 0.0016469915597682034,
+    "cluster_within_5mm": 0.75,
+    "proxy": false,
+    "fit_score": 0.7415915585843043
+   }
+  },
+  {
+   "scene": "s04",
+   "object": "obj_021",
+   "label": "rubiks cube smaller",
+   "n6": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.046429849261114944,
+    "position_error_m": 0.0016362003276551402,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0010079984921269765,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.98625
+   },
+   "n1_r0": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.05448947810021786,
+    "position_error_m": 0.0013131876270621207,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001045427447984699,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9825
+   },
+   "n1_r1": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.046429849261114944,
+    "position_error_m": 0.0016362003276551402,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0010079984921269765,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.98625
+   },
+   "n1_r2": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.06444361837155776,
+    "position_error_m": 0.0017214637181444089,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0010113405998475218,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9775
+   },
+   "n2_r0": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.05448947810021786,
+    "position_error_m": 0.0013131876270621207,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001045427447984699,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9825
+   },
+   "n2_r1": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.046429849261114944,
+    "position_error_m": 0.0016362003276551402,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0010079984921269765,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.98625
+   },
+   "n2_r2": {
+    "tier": "easy",
+    "label": "rubiks cube smaller",
+    "size_error": 0.043994339227770726,
+    "position_error_m": 0.0017327566805675962,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0008310064808373927,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9847916666666666
+   }
+  },
+  {
+   "scene": "s04",
+   "object": "obj_022",
+   "label": "metal insulated water bottle",
+   "n6": {
+    "tier": "easy",
+    "label": "metal insulated water bottle",
+    "size_error": 0.29009931365331176,
+    "position_error_m": 0.013314898126886465,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.002066414455929655,
+    "cluster_within_5mm": 0.9479166666666666,
+    "proxy": false,
+    "fit_score": 0.7388129834453842
+   },
+   "n1_r0": {
+    "tier": "easy",
+    "label": "metal insulated water bottle",
+    "size_error": 0.2320926551383013,
+    "position_error_m": 0.009756763220111157,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0025974679846544496,
+    "cluster_within_5mm": 0.8958333333333334,
+    "proxy": false,
+    "fit_score": 0.6368731003039514
+   },
+   "n1_r1": {
+    "tier": "easy",
+    "label": "metal insulated water bottle",
+    "size_error": 0.07322926419782243,
+    "position_error_m": 0.011038517203881089,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009300636554332165,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "n1_r2": {
+    "tier": "easy",
+    "label": "metal insulated water bottle",
+    "size_error": 0.29009931365331176,
+    "position_error_m": 0.013314898126886465,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.002066414455929655,
+    "cluster_within_5mm": 0.9479166666666666,
+    "proxy": false,
+    "fit_score": 0.7388129834453842
+   },
+   "n2_r0": {
+    "tier": "easy",
+    "label": "metal insulated water bottle",
+    "size_error": 0.2320926551383013,
+    "position_error_m": 0.009756763220111157,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0025974679846544496,
+    "cluster_within_5mm": 0.8958333333333334,
+    "proxy": false,
+    "fit_score": 0.6368731003039514
+   },
+   "n2_r1": {
+    "tier": "easy",
+    "label": "metal insulated water bottle",
+    "size_error": 0.07322926419782243,
+    "position_error_m": 0.011038517203881089,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009300636554332165,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "n2_r2": {
+    "tier": "easy",
+    "label": "metal insulated water bottle",
+    "size_error": 0.29009931365331176,
+    "position_error_m": 0.013314898126886465,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.002066414455929655,
+    "cluster_within_5mm": 0.9479166666666666,
+    "proxy": false,
+    "fit_score": 0.7388129834453842
+   }
+  },
+  {
+   "scene": "s04",
+   "object": "obj_027",
+   "label": "toy air basketball",
+   "n6": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.013404207715596214,
+    "position_error_m": 0.01060360471393516,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0012635037911032008,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9584167479052061
+   },
+   "n1_r0": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.013081896809762905,
+    "position_error_m": 0.010851655980799658,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001210630228736804,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9241359313384365
+   },
+   "n1_r1": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.01408951528454161,
+    "position_error_m": 0.010912716311816664,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0014850847025315533,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9585117307156781
+   },
+   "n1_r2": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.013404207715596214,
+    "position_error_m": 0.01060360471393516,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0012635037911032008,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9584167479052061
+   },
+   "n2_r0": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.009819398561382957,
+    "position_error_m": 0.010410925947133928,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013309600839011598,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8549102483823836
+   },
+   "n2_r1": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.013386249101968914,
+    "position_error_m": 0.010957634439975099,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013704685466604536,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9281697608121262
+   },
+   "n2_r2": {
+    "tier": "easy",
+    "label": "toy air basketball",
+    "size_error": 0.013404207715596214,
+    "position_error_m": 0.01060360471393516,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0012635037911032008,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9584167479052061
+   }
+  },
+  {
+   "scene": "s06",
+   "object": "obj_004",
+   "label": "coffee powder can",
+   "n6": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.036503524702350756,
+    "position_error_m": 0.002510658663705297,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013406852833071996,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9370915032679739
+   },
+   "n1_r0": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.03491233032093587,
+    "position_error_m": 0.0026204785139769737,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0015120213036308523,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9303970065956366
+   },
+   "n1_r1": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.036503524702350756,
+    "position_error_m": 0.002510658663705297,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013406852833071996,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9370915032679739
+   },
+   "n1_r2": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.04346662250420108,
+    "position_error_m": 0.002008947091273516,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001550286797118394,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9049881235154393
+   },
+   "n2_r0": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.03700103988687481,
+    "position_error_m": 0.0020305428728365077,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0020342362326702876,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9559797957853573
+   },
+   "n2_r1": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.036503524702350756,
+    "position_error_m": 0.002510658663705297,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013406852833071996,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9370915032679739
+   },
+   "n2_r2": {
+    "tier": "easy",
+    "label": "coffee powder can",
+    "size_error": 0.04346662250420108,
+    "position_error_m": 0.002008947091273516,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001550286797118394,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9049881235154393
+   }
+  },
+  {
+   "scene": "s06",
+   "object": "obj_018",
+   "label": "3d printed car body",
+   "n6": {
+    "tier": "easy",
+    "label": "3d printed car body",
+    "size_error": 0.07834910002171369,
+    "position_error_m": 0.033271900977523264,
+    "orientation_error_deg": 8.05259372763922,
+    "cluster_to_mesh_median_m": 0.0019449329828085907,
+    "cluster_within_5mm": 0.8954869358669834,
+    "proxy": false,
+    "fit_score": 0.8403581349085578
+   },
+   "n1_r0": {
+    "tier": "easy",
+    "label": "3d printed car body",
+    "size_error": 0.08364881007878498,
+    "position_error_m": 0.030852611409067223,
+    "orientation_error_deg": 6.600867971376346,
+    "cluster_to_mesh_median_m": 0.0020062283800903083,
+    "cluster_within_5mm": 0.8408551068883611,
+    "proxy": false,
+    "fit_score": 0.7725166351053947
+   },
+   "n1_r1": {
+    "tier": "easy",
+    "label": "3d printed car body",
+    "size_error": 0.07834910002171369,
+    "position_error_m": 0.033271900977523264,
+    "orientation_error_deg": 8.05259372763922,
+    "cluster_to_mesh_median_m": 0.0019449329828085907,
+    "cluster_within_5mm": 0.8954869358669834,
+    "proxy": false,
+    "fit_score": 0.8403581349085578
+   },
+   "n1_r2": {
+    "tier": "easy",
+    "label": "3d printed car body",
+    "size_error": 0.11051532967329601,
+    "position_error_m": 0.03397207230659831,
+    "orientation_error_deg": 8.390219368643422,
+    "cluster_to_mesh_median_m": 0.001978241357505333,
+    "cluster_within_5mm": 0.8883610451306413,
+    "proxy": false,
+    "fit_score": 0.8021034167732506
+   },
+   "n2_r0": {
+    "tier": "easy",
+    "label": "3d printed car body",
+    "size_error": 0.14095369508717165,
+    "position_error_m": 0.03385980521515384,
+    "orientation_error_deg": 11.539619448282238,
+    "cluster_to_mesh_median_m": 0.002498667822789847,
+    "cluster_within_5mm": 0.8147268408551069,
+    "proxy": false,
+    "fit_score": 0.6657999697955213
+   },
+   "n2_r1": {
+    "tier": "easy",
+    "label": "3d printed car body",
+    "size_error": 0.07834910002171369,
+    "position_error_m": 0.033271900977523264,
+    "orientation_error_deg": 8.05259372763922,
+    "cluster_to_mesh_median_m": 0.0019449329828085907,
+    "cluster_within_5mm": 0.8954869358669834,
+    "proxy": false,
+    "fit_score": 0.8403581349085578
+   },
+   "n2_r2": {
+    "tier": "easy",
+    "label": "3d printed car body",
+    "size_error": 0.11051532967329601,
+    "position_error_m": 0.03397207230659831,
+    "orientation_error_deg": 8.390219368643422,
+    "cluster_to_mesh_median_m": 0.001978241357505333,
+    "cluster_within_5mm": 0.8883610451306413,
+    "proxy": false,
+    "fit_score": 0.8021034167732506
+   }
+  },
+  {
+   "scene": "s06",
+   "object": "obj_029",
+   "label": "empty phone packaging",
+   "n6": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.042461623770297816,
+    "position_error_m": 0.003318716804042862,
+    "orientation_error_deg": 0.6208128581406811,
+    "cluster_to_mesh_median_m": 0.0014199651764370325,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9920833333333333
+   },
+   "n1_r0": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.035035967759025836,
+    "position_error_m": 0.0027575222954423586,
+    "orientation_error_deg": 0.2782732786046722,
+    "cluster_to_mesh_median_m": 0.0012920845808806864,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8554947916666666
+   },
+   "n1_r1": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.037807236118417666,
+    "position_error_m": 0.0037406750278682318,
+    "orientation_error_deg": 0.35195168661121556,
+    "cluster_to_mesh_median_m": 0.001241964592306213,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9820833333333333
+   },
+   "n1_r2": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.050064118506658144,
+    "position_error_m": 0.0035271267197453274,
+    "orientation_error_deg": 0.1235320047828452,
+    "cluster_to_mesh_median_m": 0.0016587992277073945,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9885416666666667
+   },
+   "n2_r0": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.03747566509891761,
+    "position_error_m": 0.0035313033320381634,
+    "orientation_error_deg": 0.2675877662368862,
+    "cluster_to_mesh_median_m": 0.0016362786858314187,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.864609375
+   },
+   "n2_r1": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.03566549610164641,
+    "position_error_m": 0.0029237823821765883,
+    "orientation_error_deg": 0.09436104724886718,
+    "cluster_to_mesh_median_m": 0.0011281335633292608,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.99
+   },
+   "n2_r2": {
+    "tier": "easy",
+    "label": "empty phone packaging",
+    "size_error": 0.042461623770297816,
+    "position_error_m": 0.003318716804042862,
+    "orientation_error_deg": 0.6208128581406811,
+    "cluster_to_mesh_median_m": 0.0014199651764370325,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9920833333333333
+   }
+  },
+  {
+   "scene": "s11",
+   "object": "obj_040",
+   "label": "white 3d print cuboid",
+   "n6": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.294308616735596,
+    "position_error_m": 0.006313646725633187,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007841879579103222,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9925
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.2822775119648343,
+    "position_error_m": 0.00623857941397698,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0011327904987822601,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9891666666666666
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.294308616735596,
+    "position_error_m": 0.006313646725633187,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007841879579103222,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9925
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.28648778532716357,
+    "position_error_m": 0.006076736288655725,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007021222705054183,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9872916666666667
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.2822775119648343,
+    "position_error_m": 0.00623857941397698,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0011327904987822601,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9891666666666666
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.294308616735596,
+    "position_error_m": 0.006313646725633187,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007841879579103222,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9925
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.28648778532716357,
+    "position_error_m": 0.006076736288655725,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007021222705054183,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9872916666666667
+   }
+  },
+  {
+   "scene": "s11",
+   "object": "obj_047",
+   "label": "cube",
+   "n6": {
+    "tier": "medium",
+    "label": "cube",
+    "size_error": 0.02298363474322792,
+    "position_error_m": 0.0007068946852579526,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0006584658884147096,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.990625
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "cube",
+    "size_error": 0.03872444358829774,
+    "position_error_m": 0.000927305342100036,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0006062840583803781,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9822916666666667
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "cube",
+    "size_error": 0.039551886967895133,
+    "position_error_m": 0.0007645203635891461,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0005844712203638639,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9885416666666667
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "cube",
+    "size_error": 0.02298363474322792,
+    "position_error_m": 0.0007068946852579526,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0006584658884147096,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.990625
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "cube",
+    "size_error": 0.023929282533344254,
+    "position_error_m": 0.0008136657156580431,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0005932802171296459,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.985625
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "cube",
+    "size_error": 0.039551886967895133,
+    "position_error_m": 0.0007645203635891461,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0005844712203638639,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9885416666666667
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "cube",
+    "size_error": 0.02298363474322792,
+    "position_error_m": 0.0007068946852579526,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0006584658884147096,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.990625
+   }
+  },
+  {
+   "scene": "s11",
+   "object": "obj_048",
+   "label": "square pyramid",
+   "n6": {
+    "tier": "medium",
+    "label": "square pyramid",
+    "size_error": 0.04205909762853173,
+    "position_error_m": 0.0032642086617070886,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009745782747784424,
+    "cluster_within_5mm": 0.95,
+    "proxy": false,
+    "fit_score": 0.9408958333333333
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "square pyramid",
+    "size_error": 0.05700093082113567,
+    "position_error_m": 0.003078665605351679,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0014236938035861115,
+    "cluster_within_5mm": 0.95,
+    "proxy": false,
+    "fit_score": 0.9430729166666666
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "square pyramid",
+    "size_error": 0.07919620217757563,
+    "position_error_m": 0.0031592266801770724,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001405568486201035,
+    "cluster_within_5mm": 0.95,
+    "proxy": false,
+    "fit_score": 0.9274374999999999
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "square pyramid",
+    "size_error": 0.032174676353757585,
+    "position_error_m": 0.0034223674306685667,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001447594394285449,
+    "cluster_within_5mm": 0.95,
+    "proxy": false,
+    "fit_score": 0.93278125
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "square pyramid",
+    "size_error": 0.05700093082113567,
+    "position_error_m": 0.003078665605351679,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0014236938035861115,
+    "cluster_within_5mm": 0.95,
+    "proxy": false,
+    "fit_score": 0.9430729166666666
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "square pyramid",
+    "size_error": 0.04205909762853173,
+    "position_error_m": 0.0032642086617070886,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009745782747784424,
+    "cluster_within_5mm": 0.95,
+    "proxy": false,
+    "fit_score": 0.9408958333333333
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "square pyramid",
+    "size_error": 0.032174676353757585,
+    "position_error_m": 0.0034223674306685667,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001447594394285449,
+    "cluster_within_5mm": 0.95,
+    "proxy": false,
+    "fit_score": 0.93278125
+   }
+  },
+  {
+   "scene": "s11",
+   "object": "obj_049",
+   "label": "triangular prism",
+   "n6": {
+    "tier": "medium",
+    "label": "triangular prism",
+    "size_error": 0.14630468072245606,
+    "position_error_m": 0.0016686783237644322,
+    "orientation_error_deg": 0.29751798158446263,
+    "cluster_to_mesh_median_m": 0.0011444897525795708,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9872916666666667
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "triangular prism",
+    "size_error": 0.10620283426836274,
+    "position_error_m": 0.0019109902116788585,
+    "orientation_error_deg": 0.7803559787374184,
+    "cluster_to_mesh_median_m": 0.0012837872268927008,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9822916666666667
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "triangular prism",
+    "size_error": 0.13043467021795208,
+    "position_error_m": 0.0017889146464965908,
+    "orientation_error_deg": 0.08812339112297707,
+    "cluster_to_mesh_median_m": 0.0012562666256688716,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.980625
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "triangular prism",
+    "size_error": 0.1317539495056271,
+    "position_error_m": 0.001763051222583946,
+    "orientation_error_deg": 0.027768531394883667,
+    "cluster_to_mesh_median_m": 0.0011237652307567812,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.985
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "triangular prism",
+    "size_error": 0.10620283426836274,
+    "position_error_m": 0.0019109902116788585,
+    "orientation_error_deg": 0.7803559787374184,
+    "cluster_to_mesh_median_m": 0.0012837872268927008,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9822916666666667
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "triangular prism",
+    "size_error": 0.14630468072245606,
+    "position_error_m": 0.0016686783237644322,
+    "orientation_error_deg": 0.29751798158446263,
+    "cluster_to_mesh_median_m": 0.0011444897525795708,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9872916666666667
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "triangular prism",
+    "size_error": 0.1317539495056271,
+    "position_error_m": 0.001763051222583946,
+    "orientation_error_deg": 0.027768531394883667,
+    "cluster_to_mesh_median_m": 0.0011237652307567812,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.985
+   }
+  },
+  {
+   "scene": "s11",
+   "object": "obj_050",
+   "label": "cuboid",
+   "n6": {
+    "tier": "medium",
+    "label": "cuboid",
+    "size_error": 0.04282514063529506,
+    "position_error_m": 0.0021312570227029924,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007942192667243807,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.995625
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "cuboid",
+    "size_error": 0.04282514063529506,
+    "position_error_m": 0.0021312570227029924,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007942192667243807,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.995625
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "cuboid",
+    "size_error": 0.06649354673783844,
+    "position_error_m": 0.0022647181230135882,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007545810407812611,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9941666666666666
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "cuboid",
+    "size_error": 0.02190636278187793,
+    "position_error_m": 0.002113009355802262,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0008173816066377561,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9935416666666667
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "cuboid",
+    "size_error": 0.04282514063529506,
+    "position_error_m": 0.0021312570227029924,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007942192667243807,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.995625
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "cuboid",
+    "size_error": 0.06649354673783844,
+    "position_error_m": 0.0022647181230135882,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007545810407812611,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9941666666666666
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "cuboid",
+    "size_error": 0.04731698204837303,
+    "position_error_m": 0.002175720027258359,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0008533405833595796,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9925
+   }
+  },
+  {
+   "scene": "s11",
+   "object": "obj_052",
+   "label": "cylinder",
+   "n6": {
+    "tier": "medium",
+    "label": "cylinder",
+    "size_error": 0.02877586461005055,
+    "position_error_m": 0.002311168335766742,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.00035078214432613427,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9941666666666666
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "cylinder",
+    "size_error": 0.038671473673162114,
+    "position_error_m": 0.002315947225421607,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0003551187404597815,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9704166666666667
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "cylinder",
+    "size_error": 0.055006390019538,
+    "position_error_m": 0.002186194413251719,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0006928241013146502,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.966875
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "cylinder",
+    "size_error": 0.02877586461005055,
+    "position_error_m": 0.002311168335766742,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.00035078214432613427,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9941666666666666
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "cylinder",
+    "size_error": 0.03276407448262973,
+    "position_error_m": 0.002296836238061461,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0004179542478312487,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9852083333333334
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "cylinder",
+    "size_error": 0.03949320931573852,
+    "position_error_m": 0.0021379646827500544,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007071229631033552,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.990625
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "cylinder",
+    "size_error": 0.02877586461005055,
+    "position_error_m": 0.002311168335766742,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.00035078214432613427,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9941666666666666
+   }
+  },
+  {
+   "scene": "s11",
+   "object": "obj_056",
+   "label": "hexagonal prism",
+   "n6": {
+    "tier": "medium",
+    "label": "hexagonal prism",
+    "size_error": 0.013559961961234414,
+    "position_error_m": 0.0020061852693692103,
+    "orientation_error_deg": 2.6253768194041527,
+    "cluster_to_mesh_median_m": 0.0006285490081957932,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9808333333333333
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "hexagonal prism",
+    "size_error": 0.014572870104891575,
+    "position_error_m": 0.0019476588143616045,
+    "orientation_error_deg": 2.620816965754358,
+    "cluster_to_mesh_median_m": 0.0005348161059758124,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.975
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "hexagonal prism",
+    "size_error": 0.10049221373257533,
+    "position_error_m": 0.0020040849112045508,
+    "orientation_error_deg": 58.683602564670565,
+    "cluster_to_mesh_median_m": 0.000863754603944324,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9760416666666667
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "hexagonal prism",
+    "size_error": 0.06917607328304302,
+    "position_error_m": 0.0019244472441697625,
+    "orientation_error_deg": 59.66923051302312,
+    "cluster_to_mesh_median_m": 0.00048012625211789285,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9702083333333333
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "hexagonal prism",
+    "size_error": 0.014572870104891575,
+    "position_error_m": 0.0019476588143616045,
+    "orientation_error_deg": 2.620816965754358,
+    "cluster_to_mesh_median_m": 0.0005348161059758124,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.975
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "hexagonal prism",
+    "size_error": 0.013559961961234414,
+    "position_error_m": 0.0020061852693692103,
+    "orientation_error_deg": 2.6253768194041527,
+    "cluster_to_mesh_median_m": 0.0006285490081957932,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9808333333333333
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "hexagonal prism",
+    "size_error": 0.06917607328304302,
+    "position_error_m": 0.0019244472441697625,
+    "orientation_error_deg": 59.66923051302312,
+    "cluster_to_mesh_median_m": 0.00048012625211789285,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9702083333333333
+   }
+  },
+  {
+   "scene": "s12",
+   "object": "obj_001",
+   "label": "spray can",
+   "n6": {
+    "tier": "medium",
+    "label": "spray can",
+    "size_error": 0.023438801157238707,
+    "position_error_m": 0.010653757516610424,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0014626579879746414,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9412176089517078
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "spray can",
+    "size_error": 0.018162966861856495,
+    "position_error_m": 0.010355002150583822,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0015512949117099505,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9252789438798056
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "spray can",
+    "size_error": 0.023438801157238707,
+    "position_error_m": 0.010653757516610424,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0014626579879746414,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9412176089517078
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "spray can",
+    "size_error": 0.029017464147256755,
+    "position_error_m": 0.01049159951069874,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001460242879982559,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9168347888569534
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "spray can",
+    "size_error": 0.025804066143683475,
+    "position_error_m": 0.01135406413409128,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013225576070762645,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9494692613887661
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "spray can",
+    "size_error": 0.023438801157238707,
+    "position_error_m": 0.010653757516610424,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0014626579879746414,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9412176089517078
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "spray can",
+    "size_error": 0.026645698606597,
+    "position_error_m": 0.011200087859981481,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001284230011860474,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.928712012772517
+   }
+  },
+  {
+   "scene": "s12",
+   "object": "obj_002",
+   "label": "packaging for breakfast bags",
+   "n6": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.08141845236645763,
+    "position_error_m": 0.00798743812420917,
+    "orientation_error_deg": 0.01264584703145033,
+    "cluster_to_mesh_median_m": 0.002638809640833357,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.609765625
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.08141845236645763,
+    "position_error_m": 0.00798743812420917,
+    "orientation_error_deg": 0.01264584703145033,
+    "cluster_to_mesh_median_m": 0.002638809640833357,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.609765625
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.07818223417059905,
+    "position_error_m": 0.008184294584125191,
+    "orientation_error_deg": 0.40667655528886826,
+    "cluster_to_mesh_median_m": 0.002251588470850912,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.6072916666666667
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.04210383600066048,
+    "position_error_m": 0.008507021268595429,
+    "orientation_error_deg": 0.5606562548937006,
+    "cluster_to_mesh_median_m": 0.0019450908546719701,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.7303125
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.08141845236645763,
+    "position_error_m": 0.00798743812420917,
+    "orientation_error_deg": 0.01264584703145033,
+    "cluster_to_mesh_median_m": 0.002638809640833357,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.609765625
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.07818223417059905,
+    "position_error_m": 0.008184294584125191,
+    "orientation_error_deg": 0.40667655528886826,
+    "cluster_to_mesh_median_m": 0.002251588470850912,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.6072916666666667
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.04210383600066048,
+    "position_error_m": 0.008507021268595429,
+    "orientation_error_deg": 0.5606562548937006,
+    "cluster_to_mesh_median_m": 0.0019450908546719701,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.7303125
+   }
+  },
+  {
+   "scene": "s12",
+   "object": "obj_003",
+   "label": "packaging for in ear headphones",
+   "n6": {
+    "tier": "medium",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.030384958999124065,
+    "position_error_m": 0.011267738565592333,
+    "orientation_error_deg": 1.6537253308248694,
+    "cluster_to_mesh_median_m": 0.0014345427525071699,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.85640625
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.04326150822548483,
+    "position_error_m": 0.011922152371098392,
+    "orientation_error_deg": 1.0103501570823994,
+    "cluster_to_mesh_median_m": 0.001461626028307596,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8622395833333334
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.21921283330509836,
+    "position_error_m": 0.011184606403939092,
+    "orientation_error_deg": 1.0661614120802767,
+    "cluster_to_mesh_median_m": 0.0030094095869087007,
+    "cluster_within_5mm": 0.75,
+    "proxy": false,
+    "fit_score": 0.6040364583333333
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.1686605995483879,
+    "position_error_m": 0.010458910834597298,
+    "orientation_error_deg": 0.4494466877578702,
+    "cluster_to_mesh_median_m": 0.0020804186112586788,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8445572916666667
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.04326150822548483,
+    "position_error_m": 0.011922152371098392,
+    "orientation_error_deg": 1.0103501570823994,
+    "cluster_to_mesh_median_m": 0.001461626028307596,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8622395833333334
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.030384958999124065,
+    "position_error_m": 0.011267738565592333,
+    "orientation_error_deg": 1.6537253308248694,
+    "cluster_to_mesh_median_m": 0.0014345427525071699,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.85640625
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "packaging for in ear headphones",
+    "size_error": 0.04505692814959001,
+    "position_error_m": 0.011567917623780481,
+    "orientation_error_deg": 1.344650853395649,
+    "cluster_to_mesh_median_m": 0.001096944960068555,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.979375
+   }
+  },
+  {
+   "scene": "s12",
+   "object": "obj_004",
+   "label": "coffee powder can",
+   "n6": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.027832565139095544,
+    "position_error_m": 0.009104474715168525,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0018804049921776807,
+    "cluster_within_5mm": 0.8958333333333334,
+    "proxy": false,
+    "fit_score": 0.7054513587742122
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.03040200706493437,
+    "position_error_m": 0.00861044242922829,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0017625194872378798,
+    "cluster_within_5mm": 0.8854166666666666,
+    "proxy": false,
+    "fit_score": 0.7655167280207882
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.027832565139095544,
+    "position_error_m": 0.009104474715168525,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0018804049921776807,
+    "cluster_within_5mm": 0.8958333333333334,
+    "proxy": false,
+    "fit_score": 0.7054513587742122
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.029246746261821797,
+    "position_error_m": 0.008869752409168508,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.002187450233709516,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.7420538666091706
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.03194868745554412,
+    "position_error_m": 0.009385349304631299,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.002509895941714906,
+    "cluster_within_5mm": 0.8958333333333334,
+    "proxy": false,
+    "fit_score": 0.7369932798612616
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.027832565139095544,
+    "position_error_m": 0.009104474715168525,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0018804049921776807,
+    "cluster_within_5mm": 0.8958333333333334,
+    "proxy": false,
+    "fit_score": 0.7054513587742122
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.029246746261821797,
+    "position_error_m": 0.008869752409168508,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.002187450233709516,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.7420538666091706
+   }
+  },
+  {
+   "scene": "s12",
+   "object": "obj_007",
+   "label": "rubiks cube",
+   "n6": {
+    "tier": "medium",
+    "label": "rubiks cube",
+    "size_error": 0.048428595714223546,
+    "position_error_m": 0.011348758005709999,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009874877252424512,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9722916666666667
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "rubiks cube",
+    "size_error": 0.04381137750170742,
+    "position_error_m": 0.010363556373334352,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0010801035278745835,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9666666666666667
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "rubiks cube",
+    "size_error": 0.054319309986409846,
+    "position_error_m": 0.011079458795336837,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013928783537657252,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9675
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "rubiks cube",
+    "size_error": 0.045069236256347775,
+    "position_error_m": 0.010741064103237755,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0014054507383233093,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9720833333333333
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "rubiks cube",
+    "size_error": 0.06800324994222327,
+    "position_error_m": 0.010770336718277167,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0012673029404361756,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9622916666666667
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "rubiks cube",
+    "size_error": 0.048428595714223546,
+    "position_error_m": 0.011348758005709999,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009874877252424512,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9722916666666667
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "rubiks cube",
+    "size_error": 0.05287589691265232,
+    "position_error_m": 0.011364726851579401,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001191765813352303,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.96875
+   }
+  },
+  {
+   "scene": "s12",
+   "object": "obj_014",
+   "label": "packaging for electronics",
+   "n6": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.03267389809663784,
+    "position_error_m": 0.01283662690095851,
+    "orientation_error_deg": 10.146482845814106,
+    "cluster_to_mesh_median_m": 0.002635425961124601,
+    "cluster_within_5mm": 0.782608695652174,
+    "proxy": false,
+    "fit_score": 0.693768115942029
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.05145814898093749,
+    "position_error_m": 0.014246162457380359,
+    "orientation_error_deg": 8.99931544665273,
+    "cluster_to_mesh_median_m": 0.002675604097926697,
+    "cluster_within_5mm": 0.6956521739130435,
+    "proxy": false,
+    "fit_score": 0.6928985507246377
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.03267389809663784,
+    "position_error_m": 0.01283662690095851,
+    "orientation_error_deg": 10.146482845814106,
+    "cluster_to_mesh_median_m": 0.002635425961124601,
+    "cluster_within_5mm": 0.782608695652174,
+    "proxy": false,
+    "fit_score": 0.693768115942029
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.06823392777137588,
+    "position_error_m": 0.011510023101467854,
+    "orientation_error_deg": 9.953409246520778,
+    "cluster_to_mesh_median_m": 0.0032952252365292807,
+    "cluster_within_5mm": 0.717391304347826,
+    "proxy": false,
+    "fit_score": 0.6471467391304349
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.05145814898093749,
+    "position_error_m": 0.014246162457380359,
+    "orientation_error_deg": 8.99931544665273,
+    "cluster_to_mesh_median_m": 0.002675604097926697,
+    "cluster_within_5mm": 0.6956521739130435,
+    "proxy": false,
+    "fit_score": 0.6928985507246377
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.03267389809663784,
+    "position_error_m": 0.01283662690095851,
+    "orientation_error_deg": 10.146482845814106,
+    "cluster_to_mesh_median_m": 0.002635425961124601,
+    "cluster_within_5mm": 0.782608695652174,
+    "proxy": false,
+    "fit_score": 0.693768115942029
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.06823392777137588,
+    "position_error_m": 0.011510023101467854,
+    "orientation_error_deg": 9.953409246520778,
+    "cluster_to_mesh_median_m": 0.0032952252365292807,
+    "cluster_within_5mm": 0.717391304347826,
+    "proxy": false,
+    "fit_score": 0.6471467391304349
+   }
+  },
+  {
+   "scene": "s12",
+   "object": "obj_021",
+   "label": "rubiks cube smaller",
+   "n6": {
+    "tier": "medium",
+    "label": "rubiks cube smaller",
+    "size_error": 0.05207347605959057,
+    "position_error_m": 0.009177624536121852,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007626001683107486,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9922916666666667
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "rubiks cube smaller",
+    "size_error": 0.05207347605959057,
+    "position_error_m": 0.009177624536121852,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007626001683107486,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9922916666666667
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "rubiks cube smaller",
+    "size_error": 0.06707296652096095,
+    "position_error_m": 0.009014432832715354,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0006663950586523957,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.985
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "rubiks cube smaller",
+    "size_error": 0.05994649318359294,
+    "position_error_m": 0.00901327829858411,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009486506413439687,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9895833333333334
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "rubiks cube smaller",
+    "size_error": 0.05207347605959057,
+    "position_error_m": 0.009177624536121852,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007626001683107486,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9922916666666667
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "rubiks cube smaller",
+    "size_error": 0.08044210720873345,
+    "position_error_m": 0.008527569452429135,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009855128290552674,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.981875
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "rubiks cube smaller",
+    "size_error": 0.05471747454796477,
+    "position_error_m": 0.008548783387351768,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0008651977633229305,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.993125
+   }
+  },
+  {
+   "scene": "s12",
+   "object": "obj_029",
+   "label": "empty phone packaging",
+   "n6": {
+    "tier": "medium",
+    "label": "empty phone packaging",
+    "size_error": 0.03651163141602338,
+    "position_error_m": 0.006407762218301705,
+    "orientation_error_deg": 0.49078914749011915,
+    "cluster_to_mesh_median_m": 0.0012090690895675692,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.989375
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "empty phone packaging",
+    "size_error": 0.03651163141602338,
+    "position_error_m": 0.006407762218301705,
+    "orientation_error_deg": 0.49078914749011915,
+    "cluster_to_mesh_median_m": 0.0012090690895675692,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.989375
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "empty phone packaging",
+    "size_error": 0.05363665838373024,
+    "position_error_m": 0.006095200529001193,
+    "orientation_error_deg": 0.0883760071278914,
+    "cluster_to_mesh_median_m": 0.0016940107587137617,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8600489685351115
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "empty phone packaging",
+    "size_error": 0.05135091876166,
+    "position_error_m": 0.006435051962184408,
+    "orientation_error_deg": 1.0750470486215988,
+    "cluster_to_mesh_median_m": 0.0022212493374703674,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8611429464471765
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "empty phone packaging",
+    "size_error": 0.03651163141602338,
+    "position_error_m": 0.006407762218301705,
+    "orientation_error_deg": 0.49078914749011915,
+    "cluster_to_mesh_median_m": 0.0012090690895675692,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.989375
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "empty phone packaging",
+    "size_error": 0.05363665838373024,
+    "position_error_m": 0.006095200529001193,
+    "orientation_error_deg": 0.0883760071278914,
+    "cluster_to_mesh_median_m": 0.0016940107587137617,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8600489685351115
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "empty phone packaging",
+    "size_error": 0.04822993389379292,
+    "position_error_m": 0.006545048234762898,
+    "orientation_error_deg": 1.4275510022311835,
+    "cluster_to_mesh_median_m": 0.001998577786099762,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9835416666666666
+   }
+  },
+  {
+   "scene": "s12",
+   "object": "obj_060",
+   "label": "deodorant cap",
+   "n6": {
+    "tier": "medium",
+    "label": "deodorant cap",
+    "size_error": 0.023717825438131186,
+    "position_error_m": 0.004282153392473804,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.00043157046861886614,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.985625
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "deodorant cap",
+    "size_error": 0.01951871230358984,
+    "position_error_m": 0.004253506517009608,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007366891408583182,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9875
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "deodorant cap",
+    "size_error": 0.024731823195208,
+    "position_error_m": 0.004326317388071029,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.000698074439293738,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9872916666666667
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "deodorant cap",
+    "size_error": 0.036650596568126914,
+    "position_error_m": 0.004237058648585021,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0008422436487008223,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9895833333333334
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "deodorant cap",
+    "size_error": 0.023717825438131186,
+    "position_error_m": 0.004282153392473804,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.00043157046861886614,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.985625
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "deodorant cap",
+    "size_error": 0.024731823195208,
+    "position_error_m": 0.004326317388071029,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.000698074439293738,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9872916666666667
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "deodorant cap",
+    "size_error": 0.036650596568126914,
+    "position_error_m": 0.004237058648585021,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0008422436487008223,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9895833333333334
+   }
+  },
+  {
+   "scene": "s13",
+   "object": "obj_002",
+   "label": "packaging for breakfast bags",
+   "n6": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.13458152498960224,
+    "position_error_m": 0.007648691298138406,
+    "orientation_error_deg": 0.3999258261299019,
+    "cluster_to_mesh_median_m": 0.002916048416730913,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.61796875
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.12761646425111128,
+    "position_error_m": 0.007640119226389532,
+    "orientation_error_deg": 0.5962453184535877,
+    "cluster_to_mesh_median_m": 0.002778042556591543,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.73890625
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.2050152391788503,
+    "position_error_m": 0.01276856692090861,
+    "orientation_error_deg": 1.00671083576907,
+    "cluster_to_mesh_median_m": 0.0006270893106950261,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.2050152391788503,
+    "position_error_m": 0.01276856692090861,
+    "orientation_error_deg": 1.00671083576907,
+    "cluster_to_mesh_median_m": 0.0006270893106950261,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.12761646425111128,
+    "position_error_m": 0.007640119226389532,
+    "orientation_error_deg": 0.5962453184535877,
+    "cluster_to_mesh_median_m": 0.002778042556591543,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.73890625
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.13458152498960224,
+    "position_error_m": 0.007648691298138406,
+    "orientation_error_deg": 0.3999258261299019,
+    "cluster_to_mesh_median_m": 0.002916048416730913,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.61796875
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.2050152391788503,
+    "position_error_m": 0.01276856692090861,
+    "orientation_error_deg": 1.00671083576907,
+    "cluster_to_mesh_median_m": 0.0006270893106950261,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   }
+  },
+  {
+   "scene": "s13",
+   "object": "obj_014",
+   "label": "packaging for electronics",
+   "n6": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.3270387596442597,
+    "position_error_m": 0.018016148457381066,
+    "orientation_error_deg": 0.9943326985129618,
+    "cluster_to_mesh_median_m": 0.000679313548381267,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.3270387596442597,
+    "position_error_m": 0.018016148457381066,
+    "orientation_error_deg": 0.9943326985129618,
+    "cluster_to_mesh_median_m": 0.000679313548381267,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.3270387596442597,
+    "position_error_m": 0.018016148457381066,
+    "orientation_error_deg": 0.9943326985129618,
+    "cluster_to_mesh_median_m": 0.000679313548381267,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.3270387596442597,
+    "position_error_m": 0.018016148457381066,
+    "orientation_error_deg": 0.9943326985129618,
+    "cluster_to_mesh_median_m": 0.000679313548381267,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.3270387596442597,
+    "position_error_m": 0.018016148457381066,
+    "orientation_error_deg": 0.9943326985129618,
+    "cluster_to_mesh_median_m": 0.000679313548381267,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.3270387596442597,
+    "position_error_m": 0.018016148457381066,
+    "orientation_error_deg": 0.9943326985129618,
+    "cluster_to_mesh_median_m": 0.000679313548381267,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "packaging for electronics",
+    "size_error": 0.3270387596442597,
+    "position_error_m": 0.018016148457381066,
+    "orientation_error_deg": 0.9943326985129618,
+    "cluster_to_mesh_median_m": 0.000679313548381267,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   }
+  },
+  {
+   "scene": "s14",
+   "object": "obj_002",
+   "label": "packaging for breakfast bags",
+   "n6": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.0993950989975749,
+    "position_error_m": 0.02282369967968757,
+    "orientation_error_deg": 2.1915873778948765,
+    "cluster_to_mesh_median_m": 0.003638720164886263,
+    "cluster_within_5mm": 0.75,
+    "proxy": false,
+    "fit_score": 0.7366805525104144
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.16491963467202828,
+    "position_error_m": 0.025147154767893986,
+    "orientation_error_deg": 2.4559681393401434,
+    "cluster_to_mesh_median_m": 0.0020373542597876344,
+    "cluster_within_5mm": 0.875,
+    "proxy": false,
+    "fit_score": 0.74443474465299
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.13630447861543718,
+    "position_error_m": 0.023428300522434983,
+    "orientation_error_deg": 2.283749702588551,
+    "cluster_to_mesh_median_m": 0.0027902051590634083,
+    "cluster_within_5mm": 0.75,
+    "proxy": false,
+    "fit_score": 0.6145765648689625
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.15487156145387626,
+    "position_error_m": 0.024345439133365267,
+    "orientation_error_deg": 1.6900322428418235,
+    "cluster_to_mesh_median_m": 0.0021912574664489544,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.7407975460122699
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.0993950989975749,
+    "position_error_m": 0.02282369967968757,
+    "orientation_error_deg": 2.1915873778948765,
+    "cluster_to_mesh_median_m": 0.003638720164886263,
+    "cluster_within_5mm": 0.75,
+    "proxy": false,
+    "fit_score": 0.7366805525104144
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.13936868074728326,
+    "position_error_m": 0.023349259597193094,
+    "orientation_error_deg": 1.9029216335554509,
+    "cluster_to_mesh_median_m": 0.002161567206055066,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.729756203744014
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "packaging for breakfast bags",
+    "size_error": 0.1075602212766613,
+    "position_error_m": 0.024401863728118856,
+    "orientation_error_deg": 2.240042587520122,
+    "cluster_to_mesh_median_m": 0.001553477106385153,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.6150273224043716
+   }
+  },
+  {
+   "scene": "s14",
+   "object": "obj_004",
+   "label": "coffee powder can",
+   "n6": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.03666323060844216,
+    "position_error_m": 0.01234918225366594,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0015376940924171152,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8449921452579278
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.03666323060844216,
+    "position_error_m": 0.01234918225366594,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0015376940924171152,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8449921452579278
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.044385409628903874,
+    "position_error_m": 0.012341515679908018,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0018637181002489397,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.7592674315975287
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.04266188422022751,
+    "position_error_m": 0.011862152715547152,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0019521448402343437,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8308542576419214
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.03666323060844216,
+    "position_error_m": 0.01234918225366594,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0015376940924171152,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8449921452579278
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.044385409628903874,
+    "position_error_m": 0.012341515679908018,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0018637181002489397,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.7592674315975287
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "coffee powder can",
+    "size_error": 0.04266188422022751,
+    "position_error_m": 0.011862152715547152,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0019521448402343437,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8308542576419214
+   }
+  },
+  {
+   "scene": "s14",
+   "object": "obj_006",
+   "label": "gamepad controller",
+   "n6": {
+    "tier": "medium",
+    "label": "gamepad controller",
+    "size_error": 0.133851296667521,
+    "position_error_m": 0.008929872096404123,
+    "orientation_error_deg": 9.138817421925864,
+    "cluster_to_mesh_median_m": 0.00191771699155275,
+    "cluster_within_5mm": 0.844,
+    "proxy": false,
+    "fit_score": 0.7355385920271417
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "gamepad controller",
+    "size_error": 0.05031680310507226,
+    "position_error_m": 0.007966787994134375,
+    "orientation_error_deg": 7.222319498735715,
+    "cluster_to_mesh_median_m": 0.0017716650585358114,
+    "cluster_within_5mm": 0.912,
+    "proxy": false,
+    "fit_score": 0.8117466101694915
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "gamepad controller",
+    "size_error": 0.133851296667521,
+    "position_error_m": 0.008929872096404123,
+    "orientation_error_deg": 9.138817421925864,
+    "cluster_to_mesh_median_m": 0.00191771699155275,
+    "cluster_within_5mm": 0.844,
+    "proxy": false,
+    "fit_score": 0.7355385920271417
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "gamepad controller",
+    "size_error": 0.1431404883396524,
+    "position_error_m": 0.009980572496453666,
+    "orientation_error_deg": 6.767905378902981,
+    "cluster_to_mesh_median_m": 0.0022095990285038837,
+    "cluster_within_5mm": 0.86,
+    "proxy": false,
+    "fit_score": 0.7125806451612904
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "gamepad controller",
+    "size_error": 0.14015138039792846,
+    "position_error_m": 0.010202414756485492,
+    "orientation_error_deg": 8.137177834491922,
+    "cluster_to_mesh_median_m": 0.0020744541295467864,
+    "cluster_within_5mm": 0.828,
+    "proxy": false,
+    "fit_score": 0.6898198770926044
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "gamepad controller",
+    "size_error": 0.133851296667521,
+    "position_error_m": 0.008929872096404123,
+    "orientation_error_deg": 9.138817421925864,
+    "cluster_to_mesh_median_m": 0.00191771699155275,
+    "cluster_within_5mm": 0.844,
+    "proxy": false,
+    "fit_score": 0.7355385920271417
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "gamepad controller",
+    "size_error": 0.1431404883396524,
+    "position_error_m": 0.009980572496453666,
+    "orientation_error_deg": 6.767905378902981,
+    "cluster_to_mesh_median_m": 0.0022095990285038837,
+    "cluster_within_5mm": 0.86,
+    "proxy": false,
+    "fit_score": 0.7125806451612904
+   }
+  },
+  {
+   "scene": "s14",
+   "object": "obj_036",
+   "label": "single breadboard module",
+   "n6": {
+    "tier": "medium",
+    "label": "single breadboard module",
+    "size_error": 0.7485206861603521,
+    "position_error_m": 0.0062453894381869985,
+    "orientation_error_deg": 1.683094920984426,
+    "cluster_to_mesh_median_m": 0.0022200596551306662,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8664501906577693
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "single breadboard module",
+    "size_error": 0.3334070552652028,
+    "position_error_m": 0.006042044669959301,
+    "orientation_error_deg": 1.168574858810768,
+    "cluster_to_mesh_median_m": 0.0029589099343762786,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9915690866510538
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "single breadboard module",
+    "size_error": 0.1434525969273152,
+    "position_error_m": 0.006357167330304906,
+    "orientation_error_deg": 1.7841268709562996,
+    "cluster_to_mesh_median_m": 0.004335048082258464,
+    "cluster_within_5mm": 0.5,
+    "proxy": false,
+    "fit_score": 0.7433067167684358
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "single breadboard module",
+    "size_error": 0.48370783331140116,
+    "position_error_m": 0.00483271167837689,
+    "orientation_error_deg": 2.0424615022499757,
+    "cluster_to_mesh_median_m": 0.002184003578440164,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9833411543876115
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "single breadboard module",
+    "size_error": 0.7485206861603521,
+    "position_error_m": 0.0062453894381869985,
+    "orientation_error_deg": 1.683094920984426,
+    "cluster_to_mesh_median_m": 0.0022200596551306662,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8664501906577693
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "single breadboard module",
+    "size_error": 0.1434525969273152,
+    "position_error_m": 0.006357167330304906,
+    "orientation_error_deg": 1.7841268709562996,
+    "cluster_to_mesh_median_m": 0.004335048082258464,
+    "cluster_within_5mm": 0.5,
+    "proxy": false,
+    "fit_score": 0.7433067167684358
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "single breadboard module",
+    "size_error": 0.48370783331140116,
+    "position_error_m": 0.00483271167837689,
+    "orientation_error_deg": 2.0424615022499757,
+    "cluster_to_mesh_median_m": 0.002184003578440164,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9833411543876115
+   }
+  },
+  {
+   "scene": "s14",
+   "object": "obj_040",
+   "label": "white 3d print cuboid",
+   "n6": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.21320037796699176,
+    "position_error_m": 0.005662367151446747,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001093153441477603,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9908051132540928
+   },
+   "n1_r0": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.21320037796699176,
+    "position_error_m": 0.005662367151446747,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001093153441477603,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9908051132540928
+   },
+   "n1_r1": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.2104516521614891,
+    "position_error_m": 0.005785367169362848,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0010181609243173737,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9848963029756538
+   },
+   "n1_r2": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.2089010720010555,
+    "position_error_m": 0.005685713895246517,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0011110624767343587,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9895856916459135
+   },
+   "n2_r0": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.21320037796699176,
+    "position_error_m": 0.005662367151446747,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001093153441477603,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9908051132540928
+   },
+   "n2_r1": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.22455675529038802,
+    "position_error_m": 0.006122327626812592,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0011931325731797207,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9885880510181249
+   },
+   "n2_r2": {
+    "tier": "medium",
+    "label": "white 3d print cuboid",
+    "size_error": 0.21908352664236447,
+    "position_error_m": 0.005789481796797779,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001068791218391732,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9896675651392632
+   }
+  },
+  {
+   "scene": "s17",
+   "object": "obj_015",
+   "label": "chocolate egg",
+   "n6": {
+    "tier": "hard",
+    "label": "chocolate egg",
+    "size_error": 0.04901022177472292,
+    "position_error_m": 0.0052565926741639036,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009591345890138457,
+    "cluster_within_5mm": 0.9428571428571428,
+    "proxy": false,
+    "fit_score": 0.8974821428571429
+   },
+   "n1_r0": {
+    "tier": "hard",
+    "label": "chocolate egg",
+    "size_error": 0.04901022177472292,
+    "position_error_m": 0.0052565926741639036,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009591345890138457,
+    "cluster_within_5mm": 0.9428571428571428,
+    "proxy": false,
+    "fit_score": 0.8974821428571429
+   },
+   "n1_r1": {
+    "tier": "hard",
+    "label": "chocolate egg",
+    "size_error": 0.0996519800059856,
+    "position_error_m": 0.00569159129579525,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0010422390396930465,
+    "cluster_within_5mm": 0.9428571428571428,
+    "proxy": false,
+    "fit_score": 0.8778392857142857
+   },
+   "n1_r2": {
+    "tier": "hard",
+    "label": "chocolate egg",
+    "size_error": 0.06320720100170281,
+    "position_error_m": 0.005516927839160658,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.001182238921832051,
+    "cluster_within_5mm": 0.9285714285714286,
+    "proxy": false,
+    "fit_score": 0.8898214285714285
+   },
+   "n2_r0": {
+    "tier": "hard",
+    "label": "chocolate egg",
+    "size_error": 0.04901022177472292,
+    "position_error_m": 0.0052565926741639036,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009591345890138457,
+    "cluster_within_5mm": 0.9428571428571428,
+    "proxy": false,
+    "fit_score": 0.8974821428571429
+   },
+   "n2_r1": {
+    "tier": "hard",
+    "label": "chocolate egg",
+    "size_error": 0.05422595618981712,
+    "position_error_m": 0.0054377197176566335,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013328352879173758,
+    "cluster_within_5mm": 0.9285714285714286,
+    "proxy": false,
+    "fit_score": 0.8761458333333333
+   },
+   "n2_r2": {
+    "tier": "hard",
+    "label": "chocolate egg",
+    "size_error": 0.0591249286637263,
+    "position_error_m": 0.005320310120179745,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0013630312653212559,
+    "cluster_within_5mm": 0.9285714285714286,
+    "proxy": false,
+    "fit_score": 0.8798095238095238
+   }
+  },
+  {
+   "scene": "s17",
+   "object": "obj_019",
+   "label": "small paint can",
+   "n6": {
+    "tier": "hard",
+    "label": "small paint can",
+    "size_error": 0.029924906536852546,
+    "position_error_m": 0.0009036450940146247,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007117748224086957,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.994375
+   },
+   "n1_r0": {
+    "tier": "hard",
+    "label": "small paint can",
+    "size_error": 0.022745962914922747,
+    "position_error_m": 0.0008470666310523299,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0008039238954372323,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9891666666666666
+   },
+   "n1_r1": {
+    "tier": "hard",
+    "label": "small paint can",
+    "size_error": 0.0331557973456312,
+    "position_error_m": 0.0008040108234515949,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0008013577375819685,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9875
+   },
+   "n1_r2": {
+    "tier": "hard",
+    "label": "small paint can",
+    "size_error": 0.015381470313242867,
+    "position_error_m": 0.0007519647427512328,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0008110785753580931,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9895833333333334
+   },
+   "n2_r0": {
+    "tier": "hard",
+    "label": "small paint can",
+    "size_error": 0.022745962914922747,
+    "position_error_m": 0.0008470666310523299,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0008039238954372323,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9891666666666666
+   },
+   "n2_r1": {
+    "tier": "hard",
+    "label": "small paint can",
+    "size_error": 0.0331557973456312,
+    "position_error_m": 0.0008040108234515949,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0008013577375819685,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9875
+   },
+   "n2_r2": {
+    "tier": "hard",
+    "label": "small paint can",
+    "size_error": 0.029924906536852546,
+    "position_error_m": 0.0009036450940146247,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007117748224086957,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.994375
+   }
+  },
+  {
+   "scene": "s17",
+   "object": "obj_026",
+   "label": "glass water bottle",
+   "n6": {
+    "tier": "hard",
+    "label": "glass water bottle",
+    "size_error": 0.03804851105421886,
+    "position_error_m": 0.003179510098010448,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.002309845193430456,
+    "cluster_within_5mm": 0.7295308187672493,
+    "proxy": false,
+    "fit_score": 0.6382308333333334
+   },
+   "n1_r0": {
+    "tier": "hard",
+    "label": "glass water bottle",
+    "size_error": 0.03804851105421886,
+    "position_error_m": 0.003179510098010448,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.002309845193430456,
+    "cluster_within_5mm": 0.7295308187672493,
+    "proxy": false,
+    "fit_score": 0.6382308333333334
+   },
+   "n1_r1": {
+    "tier": "hard",
+    "label": "glass water bottle",
+    "size_error": 0.039264777917952604,
+    "position_error_m": 0.002850053724864112,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0024241818736673764,
+    "cluster_within_5mm": 0.7019319227230911,
+    "proxy": false,
+    "fit_score": 0.596946875
+   },
+   "n1_r2": {
+    "tier": "hard",
+    "label": "glass water bottle",
+    "size_error": 0.031232563708786555,
+    "position_error_m": 0.0027464866394137618,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0024574529821685693,
+    "cluster_within_5mm": 0.7083716651333947,
+    "proxy": false,
+    "fit_score": 0.6176968749999999
+   },
+   "n2_r0": {
+    "tier": "hard",
+    "label": "glass water bottle",
+    "size_error": 0.03804851105421886,
+    "position_error_m": 0.003179510098010448,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.002309845193430456,
+    "cluster_within_5mm": 0.7295308187672493,
+    "proxy": false,
+    "fit_score": 0.6382308333333334
+   },
+   "n2_r1": {
+    "tier": "hard",
+    "label": "glass water bottle",
+    "size_error": 0.028347088304310052,
+    "position_error_m": 0.0026344661037262995,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0024796859906990962,
+    "cluster_within_5mm": 0.7111315547378105,
+    "proxy": false,
+    "fit_score": 0.6161210416666667
+   },
+   "n2_r2": {
+    "tier": "hard",
+    "label": "glass water bottle",
+    "size_error": 0.07247711142312999,
+    "position_error_m": 0.003267969347000431,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0024541861501462536,
+    "cluster_within_5mm": 0.6913523459061638,
+    "proxy": false,
+    "fit_score": 0.6145635416666667
+   }
+  },
+  {
+   "scene": "s17",
+   "object": "obj_035",
+   "label": "reflective puzzle toy",
+   "n6": {
+    "tier": "hard",
+    "label": "reflective puzzle toy",
+    "size_error": 0.03702783891883897,
+    "position_error_m": 0.002160207610406138,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.000713736574098305,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.996875
+   },
+   "n1_r0": {
+    "tier": "hard",
+    "label": "reflective puzzle toy",
+    "size_error": 0.06998423399483493,
+    "position_error_m": 0.002841743614235927,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0010053815832909768,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9914583333333333
+   },
+   "n1_r1": {
+    "tier": "hard",
+    "label": "reflective puzzle toy",
+    "size_error": 0.043538575432529425,
+    "position_error_m": 0.0022334511295554207,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009066336273284622,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9933333333333333
+   },
+   "n1_r2": {
+    "tier": "hard",
+    "label": "reflective puzzle toy",
+    "size_error": 0.04268500222554805,
+    "position_error_m": 0.002320276841712409,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007448472229094161,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9945833333333334
+   },
+   "n2_r0": {
+    "tier": "hard",
+    "label": "reflective puzzle toy",
+    "size_error": 0.06998423399483493,
+    "position_error_m": 0.002841743614235927,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0010053815832909768,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9914583333333333
+   },
+   "n2_r1": {
+    "tier": "hard",
+    "label": "reflective puzzle toy",
+    "size_error": 0.03702783891883897,
+    "position_error_m": 0.002160207610406138,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.000713736574098305,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.996875
+   },
+   "n2_r2": {
+    "tier": "hard",
+    "label": "reflective puzzle toy",
+    "size_error": 0.04268500222554805,
+    "position_error_m": 0.002320276841712409,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007448472229094161,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9945833333333334
+   }
+  },
+  {
+   "scene": "s17",
+   "object": "obj_059",
+   "label": "deodorant spray, no cap",
+   "n6": {
+    "tier": "hard",
+    "label": "deodorant spray, no cap",
+    "size_error": 0.02577539155211883,
+    "position_error_m": 0.0032318323836049464,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0010016724360825224,
+    "cluster_within_5mm": 0.8853267570900123,
+    "proxy": false,
+    "fit_score": 0.8582012946979037
+   },
+   "n1_r0": {
+    "tier": "hard",
+    "label": "deodorant spray, no cap",
+    "size_error": 0.02148493585293518,
+    "position_error_m": 0.003173039509442916,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009841766895388264,
+    "cluster_within_5mm": 0.872996300863132,
+    "proxy": false,
+    "fit_score": 0.8513077990135636
+   },
+   "n1_r1": {
+    "tier": "hard",
+    "label": "deodorant spray, no cap",
+    "size_error": 0.02577539155211883,
+    "position_error_m": 0.0032318323836049464,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0010016724360825224,
+    "cluster_within_5mm": 0.8853267570900123,
+    "proxy": false,
+    "fit_score": 0.8582012946979037
+   },
+   "n1_r2": {
+    "tier": "hard",
+    "label": "deodorant spray, no cap",
+    "size_error": 0.03677250408681754,
+    "position_error_m": 0.003163452872792157,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.00102147994884391,
+    "cluster_within_5mm": 0.8816276202219482,
+    "proxy": false,
+    "fit_score": 0.8525154130702837
+   },
+   "n2_r0": {
+    "tier": "hard",
+    "label": "deodorant spray, no cap",
+    "size_error": 0.02148493585293518,
+    "position_error_m": 0.003173039509442916,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0009841766895388264,
+    "cluster_within_5mm": 0.872996300863132,
+    "proxy": false,
+    "fit_score": 0.8513077990135636
+   },
+   "n2_r1": {
+    "tier": "hard",
+    "label": "deodorant spray, no cap",
+    "size_error": 0.02577539155211883,
+    "position_error_m": 0.0032318323836049464,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0010016724360825224,
+    "cluster_within_5mm": 0.8853267570900123,
+    "proxy": false,
+    "fit_score": 0.8582012946979037
+   },
+   "n2_r2": {
+    "tier": "hard",
+    "label": "deodorant spray, no cap",
+    "size_error": 0.01676681129285909,
+    "position_error_m": 0.003075970849680792,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0010020162277379976,
+    "cluster_within_5mm": 0.8766954377311961,
+    "proxy": false,
+    "fit_score": 0.8509425092478422
+   }
+  },
+  {
+   "scene": "s18",
+   "object": "obj_000",
+   "label": "lego toy car",
+   "n6": {
+    "tier": "hard",
+    "label": "lego toy car",
+    "size_error": 0.46748924447874013,
+    "position_error_m": 0.011815250372714728,
+    "orientation_error_deg": 0.8004819502481411,
+    "cluster_to_mesh_median_m": 0.0005789824072108187,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "n1_r0": {
+    "tier": "hard",
+    "label": "lego toy car",
+    "size_error": 0.46748924447874013,
+    "position_error_m": 0.011815250372714728,
+    "orientation_error_deg": 0.8004819502481411,
+    "cluster_to_mesh_median_m": 0.0005789824072108187,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "n1_r1": {
+    "tier": "hard",
+    "label": "lego toy car",
+    "size_error": 0.46748924447874013,
+    "position_error_m": 0.011815250372714728,
+    "orientation_error_deg": 0.8004819502481411,
+    "cluster_to_mesh_median_m": 0.0005789824072108187,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "n1_r2": {
+    "tier": "hard",
+    "label": "lego toy car",
+    "size_error": 0.46748924447874013,
+    "position_error_m": 0.011815250372714728,
+    "orientation_error_deg": 0.8004819502481411,
+    "cluster_to_mesh_median_m": 0.0005789824072108187,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "n2_r0": {
+    "tier": "hard",
+    "label": "lego toy car",
+    "size_error": 0.46748924447874013,
+    "position_error_m": 0.011815250372714728,
+    "orientation_error_deg": 0.8004819502481411,
+    "cluster_to_mesh_median_m": 0.0005789824072108187,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "n2_r1": {
+    "tier": "hard",
+    "label": "lego toy car",
+    "size_error": 0.46748924447874013,
+    "position_error_m": 0.011815250372714728,
+    "orientation_error_deg": 0.8004819502481411,
+    "cluster_to_mesh_median_m": 0.0005789824072108187,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   },
+   "n2_r2": {
+    "tier": "hard",
+    "label": "lego toy car",
+    "size_error": 0.46748924447874013,
+    "position_error_m": 0.011815250372714728,
+    "orientation_error_deg": 0.8004819502481411,
+    "cluster_to_mesh_median_m": 0.0005789824072108187,
+    "cluster_within_5mm": 1.0,
+    "proxy": true,
+    "fit_score": null
+   }
+  },
+  {
+   "scene": "s18",
+   "object": "obj_006",
+   "label": "gamepad controller",
+   "n6": {
+    "tier": "hard",
+    "label": "gamepad controller",
+    "size_error": 0.17410643389113334,
+    "position_error_m": 0.007537573497816851,
+    "orientation_error_deg": 7.119862450430286,
+    "cluster_to_mesh_median_m": 0.001637892777943914,
+    "cluster_within_5mm": 0.9317548746518106,
+    "proxy": false,
+    "fit_score": 0.8438022284122563
+   },
+   "n1_r0": {
+    "tier": "hard",
+    "label": "gamepad controller",
+    "size_error": 0.16730719864450513,
+    "position_error_m": 0.006318691068448694,
+    "orientation_error_deg": 7.571473225518451,
+    "cluster_to_mesh_median_m": 0.001511585479383377,
+    "cluster_within_5mm": 0.9415041782729805,
+    "proxy": false,
+    "fit_score": 0.8764623955431755
+   },
+   "n1_r1": {
+    "tier": "hard",
+    "label": "gamepad controller",
+    "size_error": 0.17690654897198138,
+    "position_error_m": 0.007838495263266326,
+    "orientation_error_deg": 6.8693138263459765,
+    "cluster_to_mesh_median_m": 0.0014696154428427686,
+    "cluster_within_5mm": 0.9387186629526463,
+    "proxy": false,
+    "fit_score": 0.8657462859795729
+   },
+   "n1_r2": {
+    "tier": "hard",
+    "label": "gamepad controller",
+    "size_error": 0.19259139288625585,
+    "position_error_m": 0.007930630134305684,
+    "orientation_error_deg": 6.410154888911951,
+    "cluster_to_mesh_median_m": 0.0015183358106865366,
+    "cluster_within_5mm": 0.9345403899721448,
+    "proxy": false,
+    "fit_score": 0.8484723189415041
+   },
+   "n2_r0": {
+    "tier": "hard",
+    "label": "gamepad controller",
+    "size_error": 0.17410643389113334,
+    "position_error_m": 0.007537573497816851,
+    "orientation_error_deg": 7.119862450430286,
+    "cluster_to_mesh_median_m": 0.001637892777943914,
+    "cluster_within_5mm": 0.9317548746518106,
+    "proxy": false,
+    "fit_score": 0.8438022284122563
+   },
+   "n2_r1": {
+    "tier": "hard",
+    "label": "gamepad controller",
+    "size_error": 0.17690654897198138,
+    "position_error_m": 0.007838495263266326,
+    "orientation_error_deg": 6.8693138263459765,
+    "cluster_to_mesh_median_m": 0.0014696154428427686,
+    "cluster_within_5mm": 0.9387186629526463,
+    "proxy": false,
+    "fit_score": 0.8657462859795729
+   },
+   "n2_r2": {
+    "tier": "hard",
+    "label": "gamepad controller",
+    "size_error": 0.19259139288625585,
+    "position_error_m": 0.007930630134305684,
+    "orientation_error_deg": 6.410154888911951,
+    "cluster_to_mesh_median_m": 0.0015183358106865366,
+    "cluster_within_5mm": 0.9345403899721448,
+    "proxy": false,
+    "fit_score": 0.8484723189415041
+   }
+  },
+  {
+   "scene": "s18",
+   "object": "obj_008",
+   "label": "round tube, packaging for cold medicine rub",
+   "n6": {
+    "tier": "hard",
+    "label": "round tube, packaging for cold medicine rub",
+    "size_error": 0.0677328784896106,
+    "position_error_m": 0.0027025268605567194,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0005565470683727789,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.97625
+   },
+   "n1_r0": {
+    "tier": "hard",
+    "label": "round tube, packaging for cold medicine rub",
+    "size_error": 0.056153742530645236,
+    "position_error_m": 0.0026802948209220883,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0005833871068924173,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.951875
+   },
+   "n1_r1": {
+    "tier": "hard",
+    "label": "round tube, packaging for cold medicine rub",
+    "size_error": 0.08386452887459236,
+    "position_error_m": 0.0027526397532411564,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0006427461417830955,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9508333333333333
+   },
+   "n1_r2": {
+    "tier": "hard",
+    "label": "round tube, packaging for cold medicine rub",
+    "size_error": 0.07460813721142881,
+    "position_error_m": 0.002713719856228759,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0005896805414116869,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9704166666666667
+   },
+   "n2_r0": {
+    "tier": "hard",
+    "label": "round tube, packaging for cold medicine rub",
+    "size_error": 0.0677328784896106,
+    "position_error_m": 0.0027025268605567194,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0005565470683727789,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.97625
+   },
+   "n2_r1": {
+    "tier": "hard",
+    "label": "round tube, packaging for cold medicine rub",
+    "size_error": 0.08386452887459236,
+    "position_error_m": 0.0027526397532411564,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0006427461417830955,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9508333333333333
+   },
+   "n2_r2": {
+    "tier": "hard",
+    "label": "round tube, packaging for cold medicine rub",
+    "size_error": 0.07460813721142881,
+    "position_error_m": 0.002713719856228759,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0005896805414116869,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9704166666666667
+   }
+  },
+  {
+   "scene": "s18",
+   "object": "obj_012",
+   "label": "chocolate santa blue",
+   "n6": {
+    "tier": "hard",
+    "label": "chocolate santa blue",
+    "size_error": 0.41688160092989546,
+    "position_error_m": 0.011444342890910479,
+    "orientation_error_deg": 6.769361541750612,
+    "cluster_to_mesh_median_m": 0.0014495322033792066,
+    "cluster_within_5mm": 0.9509345794392523,
+    "proxy": false,
+    "fit_score": 0.8875154166666666
+   },
+   "n1_r0": {
+    "tier": "hard",
+    "label": "chocolate santa blue",
+    "size_error": 0.34994786683894546,
+    "position_error_m": 0.006546850327363507,
+    "orientation_error_deg": 41.32594453036279,
+    "cluster_to_mesh_median_m": 0.0020797125623227253,
+    "cluster_within_5mm": 0.8940809968847352,
+    "proxy": false,
+    "fit_score": 0.769995
+   },
+   "n1_r1": {
+    "tier": "hard",
+    "label": "chocolate santa blue",
+    "size_error": 0.38414364421733777,
+    "position_error_m": 0.007771134831146432,
+    "orientation_error_deg": 6.066532539098375,
+    "cluster_to_mesh_median_m": 0.0017374080684825672,
+    "cluster_within_5mm": 0.9077102803738317,
+    "proxy": false,
+    "fit_score": 0.756125
+   },
+   "n1_r2": {
+    "tier": "hard",
+    "label": "chocolate santa blue",
+    "size_error": 0.23017483626552918,
+    "position_error_m": 0.007332349607980582,
+    "orientation_error_deg": 15.110176433000817,
+    "cluster_to_mesh_median_m": 0.0018917680562769794,
+    "cluster_within_5mm": 0.7679127725856698,
+    "proxy": false,
+    "fit_score": 0.6677270833333334
+   },
+   "n2_r0": {
+    "tier": "hard",
+    "label": "chocolate santa blue",
+    "size_error": 0.2666093740115134,
+    "position_error_m": 0.018956974031902194,
+    "orientation_error_deg": 53.088511156435516,
+    "cluster_to_mesh_median_m": 0.0015010393881252978,
+    "cluster_within_5mm": 0.9583333333333334,
+    "proxy": false,
+    "fit_score": 0.9085
+   },
+   "n2_r1": {
+    "tier": "hard",
+    "label": "chocolate santa blue",
+    "size_error": 0.41688160092989546,
+    "position_error_m": 0.011444342890910479,
+    "orientation_error_deg": 6.769361541750612,
+    "cluster_to_mesh_median_m": 0.0014495322033792066,
+    "cluster_within_5mm": 0.9509345794392523,
+    "proxy": false,
+    "fit_score": 0.8875154166666666
+   },
+   "n2_r2": {
+    "tier": "hard",
+    "label": "chocolate santa blue",
+    "size_error": 0.3448405819598005,
+    "position_error_m": 0.01872189780759515,
+    "orientation_error_deg": 57.001415707245854,
+    "cluster_to_mesh_median_m": 0.0017989087458886721,
+    "cluster_within_5mm": 0.9018691588785047,
+    "proxy": false,
+    "fit_score": 0.82421625
+   }
+  },
+  {
+   "scene": "s18",
+   "object": "obj_018",
+   "label": "3d printed car body",
+   "n6": {
+    "tier": "hard",
+    "label": "3d printed car body",
+    "size_error": 0.08946918991797415,
+    "position_error_m": 0.00469584119130282,
+    "orientation_error_deg": 0.7084013192014993,
+    "cluster_to_mesh_median_m": 0.0015783715849485027,
+    "cluster_within_5mm": 0.9697986577181208,
+    "proxy": false,
+    "fit_score": 0.9022231543624161
+   },
+   "n1_r0": {
+    "tier": "hard",
+    "label": "3d printed car body",
+    "size_error": 0.08946918991797415,
+    "position_error_m": 0.00469584119130282,
+    "orientation_error_deg": 0.7084013192014993,
+    "cluster_to_mesh_median_m": 0.0015783715849485027,
+    "cluster_within_5mm": 0.9697986577181208,
+    "proxy": false,
+    "fit_score": 0.9022231543624161
+   },
+   "n1_r1": {
+    "tier": "hard",
+    "label": "3d printed car body",
+    "size_error": 0.042616265211350465,
+    "position_error_m": 0.004101842856450725,
+    "orientation_error_deg": 1.1403252892858973,
+    "cluster_to_mesh_median_m": 0.001665690451830194,
+    "cluster_within_5mm": 0.9608501118568232,
+    "proxy": false,
+    "fit_score": 0.887751677852349
+   },
+   "n1_r2": {
+    "tier": "hard",
+    "label": "3d printed car body",
+    "size_error": 0.07370238785716031,
+    "position_error_m": 0.004220536792276543,
+    "orientation_error_deg": 0.17841699768843,
+    "cluster_to_mesh_median_m": 0.0015574630915537466,
+    "cluster_within_5mm": 0.9496644295302014,
+    "proxy": false,
+    "fit_score": 0.8864716163310961
+   },
+   "n2_r0": {
+    "tier": "hard",
+    "label": "3d printed car body",
+    "size_error": 0.08946918991797415,
+    "position_error_m": 0.00469584119130282,
+    "orientation_error_deg": 0.7084013192014993,
+    "cluster_to_mesh_median_m": 0.0015783715849485027,
+    "cluster_within_5mm": 0.9697986577181208,
+    "proxy": false,
+    "fit_score": 0.9022231543624161
+   },
+   "n2_r1": {
+    "tier": "hard",
+    "label": "3d printed car body",
+    "size_error": 0.042616265211350465,
+    "position_error_m": 0.004101842856450725,
+    "orientation_error_deg": 1.1403252892858973,
+    "cluster_to_mesh_median_m": 0.001665690451830194,
+    "cluster_within_5mm": 0.9608501118568232,
+    "proxy": false,
+    "fit_score": 0.887751677852349
+   },
+   "n2_r2": {
+    "tier": "hard",
+    "label": "3d printed car body",
+    "size_error": 0.09687604183695384,
+    "position_error_m": 0.004394603756674577,
+    "orientation_error_deg": 0.3935330436053164,
+    "cluster_to_mesh_median_m": 0.0016030215095810432,
+    "cluster_within_5mm": 0.9630872483221476,
+    "proxy": false,
+    "fit_score": 0.9032671513795675
+   }
+  },
+  {
+   "scene": "s18",
+   "object": "obj_024",
+   "label": "hole punch",
+   "n6": {
+    "tier": "hard",
+    "label": "hole punch",
+    "size_error": 0.17731271383905606,
+    "position_error_m": 0.005099072555680679,
+    "orientation_error_deg": 0.5889862748329892,
+    "cluster_to_mesh_median_m": 0.0022797514323983355,
+    "cluster_within_5mm": 0.765625,
+    "proxy": false,
+    "fit_score": 0.682011217948718
+   },
+   "n1_r0": {
+    "tier": "hard",
+    "label": "hole punch",
+    "size_error": 0.18174454734763407,
+    "position_error_m": 0.006781136652223976,
+    "orientation_error_deg": 89.45682256182812,
+    "cluster_to_mesh_median_m": 0.0027169095163820265,
+    "cluster_within_5mm": 0.7055288461538461,
+    "proxy": false,
+    "fit_score": 0.6205078125
+   },
+   "n1_r1": {
+    "tier": "hard",
+    "label": "hole punch",
+    "size_error": 0.09050406036935252,
+    "position_error_m": 0.005933795194290241,
+    "orientation_error_deg": 3.0647237250925343,
+    "cluster_to_mesh_median_m": 0.006983937722932933,
+    "cluster_within_5mm": 0.4110576923076923,
+    "proxy": true,
+    "fit_score": null
+   },
+   "n1_r2": {
+    "tier": "hard",
+    "label": "hole punch",
+    "size_error": 0.1842686564953228,
+    "position_error_m": 0.004718522939572019,
+    "orientation_error_deg": 0.29446550798343196,
+    "cluster_to_mesh_median_m": 0.003036039115329098,
+    "cluster_within_5mm": 0.6754807692307693,
+    "proxy": false,
+    "fit_score": 0.5853114983974359
+   },
+   "n2_r0": {
+    "tier": "hard",
+    "label": "hole punch",
+    "size_error": 0.17731271383905606,
+    "position_error_m": 0.005099072555680679,
+    "orientation_error_deg": 0.5889862748329892,
+    "cluster_to_mesh_median_m": 0.0022797514323983355,
+    "cluster_within_5mm": 0.765625,
+    "proxy": false,
+    "fit_score": 0.682011217948718
+   },
+   "n2_r1": {
+    "tier": "hard",
+    "label": "hole punch",
+    "size_error": 0.1873244163243338,
+    "position_error_m": 0.006645908624790934,
+    "orientation_error_deg": 0.9585017014227617,
+    "cluster_to_mesh_median_m": 0.0023589717807287044,
+    "cluster_within_5mm": 0.7403846153846154,
+    "proxy": false,
+    "fit_score": 0.6583906750801282
+   },
+   "n2_r2": {
+    "tier": "hard",
+    "label": "hole punch",
+    "size_error": 0.2281706317231531,
+    "position_error_m": 0.009395991323047992,
+    "orientation_error_deg": 88.52419854337943,
+    "cluster_to_mesh_median_m": 0.0022737763087061287,
+    "cluster_within_5mm": 0.7512019230769231,
+    "proxy": false,
+    "fit_score": 0.6528410456730769
+   }
+  },
+  {
+   "scene": "s18",
+   "object": "obj_032",
+   "label": "round hair brush",
+   "n6": {
+    "tier": "hard",
+    "label": "round hair brush",
+    "size_error": 0.11030161958762966,
+    "position_error_m": 0.00131094216103093,
+    "orientation_error_deg": 2.834129826970752,
+    "cluster_to_mesh_median_m": 0.0019830363368427504,
+    "cluster_within_5mm": 0.9586728754365541,
+    "proxy": false,
+    "fit_score": 0.9003392995731471
+   },
+   "n1_r0": {
+    "tier": "hard",
+    "label": "round hair brush",
+    "size_error": 0.05698523511633908,
+    "position_error_m": 0.0034786862991549724,
+    "orientation_error_deg": 2.7306778871988513,
+    "cluster_to_mesh_median_m": 0.0017645090656204553,
+    "cluster_within_5mm": 0.9778812572759022,
+    "proxy": false,
+    "fit_score": 0.9345652648428405
+   },
+   "n1_r1": {
+    "tier": "hard",
+    "label": "round hair brush",
+    "size_error": 0.02475986891000869,
+    "position_error_m": 0.0029547918301897724,
+    "orientation_error_deg": 1.9258708927282555,
+    "cluster_to_mesh_median_m": 0.0019805929686450997,
+    "cluster_within_5mm": 0.9662398137369034,
+    "proxy": false,
+    "fit_score": 0.9106701105937136
+   },
+   "n1_r2": {
+    "tier": "hard",
+    "label": "round hair brush",
+    "size_error": 0.05459957272406958,
+    "position_error_m": 0.0021843530403459596,
+    "orientation_error_deg": 3.058085924257341,
+    "cluster_to_mesh_median_m": 0.001729999871514186,
+    "cluster_within_5mm": 0.9679860302677532,
+    "proxy": false,
+    "fit_score": 0.927846575475359
+   },
+   "n2_r0": {
+    "tier": "hard",
+    "label": "round hair brush",
+    "size_error": 0.11030161958762966,
+    "position_error_m": 0.00131094216103093,
+    "orientation_error_deg": 2.834129826970752,
+    "cluster_to_mesh_median_m": 0.0019830363368427504,
+    "cluster_within_5mm": 0.9586728754365541,
+    "proxy": false,
+    "fit_score": 0.9003392995731471
+   },
+   "n2_r1": {
+    "tier": "hard",
+    "label": "round hair brush",
+    "size_error": 0.019569342345915102,
+    "position_error_m": 0.003082725803658395,
+    "orientation_error_deg": 2.420395615672305,
+    "cluster_to_mesh_median_m": 0.0021658098350566465,
+    "cluster_within_5mm": 0.9563445867287543,
+    "proxy": false,
+    "fit_score": 0.8961401338766007
+   },
+   "n2_r2": {
+    "tier": "hard",
+    "label": "round hair brush",
+    "size_error": 0.03840408896102605,
+    "position_error_m": 0.0039780757265783315,
+    "orientation_error_deg": 1.4620179272473308,
+    "cluster_to_mesh_median_m": 0.0020997611687500685,
+    "cluster_within_5mm": 0.9231664726426076,
+    "proxy": false,
+    "fit_score": 0.844530825572371
+   }
+  },
+  {
+   "scene": "s18",
+   "object": "obj_045",
+   "label": "plier",
+   "n6": {
+    "tier": "hard",
+    "label": "plier",
+    "size_error": 0.13973337767920957,
+    "position_error_m": 0.006874271253217472,
+    "orientation_error_deg": 1.055569433179343,
+    "cluster_to_mesh_median_m": 0.0008366060068814472,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8981123981123981
+   },
+   "n1_r0": {
+    "tier": "hard",
+    "label": "plier",
+    "size_error": 0.17300605616103545,
+    "position_error_m": 0.007217998513825785,
+    "orientation_error_deg": 0.2254584801017807,
+    "cluster_to_mesh_median_m": 0.0006989580460512118,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9352348273643577
+   },
+   "n1_r1": {
+    "tier": "hard",
+    "label": "plier",
+    "size_error": 0.039912400376266984,
+    "position_error_m": 0.00628365199606799,
+    "orientation_error_deg": 0.5586023638038284,
+    "cluster_to_mesh_median_m": 0.0007332354336461458,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8996798292422625
+   },
+   "n1_r2": {
+    "tier": "hard",
+    "label": "plier",
+    "size_error": 0.13973337767920957,
+    "position_error_m": 0.006874271253217472,
+    "orientation_error_deg": 1.055569433179343,
+    "cluster_to_mesh_median_m": 0.0008366060068814472,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8981123981123981
+   },
+   "n2_r0": {
+    "tier": "hard",
+    "label": "plier",
+    "size_error": 0.17300605616103545,
+    "position_error_m": 0.007217998513825785,
+    "orientation_error_deg": 0.2254584801017807,
+    "cluster_to_mesh_median_m": 0.0006989580460512118,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9352348273643577
+   },
+   "n2_r1": {
+    "tier": "hard",
+    "label": "plier",
+    "size_error": 0.039912400376266984,
+    "position_error_m": 0.00628365199606799,
+    "orientation_error_deg": 0.5586023638038284,
+    "cluster_to_mesh_median_m": 0.0007332354336461458,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8996798292422625
+   },
+   "n2_r2": {
+    "tier": "hard",
+    "label": "plier",
+    "size_error": 0.13973337767920957,
+    "position_error_m": 0.006874271253217472,
+    "orientation_error_deg": 1.055569433179343,
+    "cluster_to_mesh_median_m": 0.0008366060068814472,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.8981123981123981
+   }
+  },
+  {
+   "scene": "s24",
+   "object": "obj_040",
+   "label": "white 3d print cuboid",
+   "n6": {
+    "tier": "hard",
+    "label": "white 3d print cuboid",
+    "size_error": 0.19850721363800142,
+    "position_error_m": 0.01627605698185949,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0008074811912438125,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9883333333333333
+   },
+   "n1_r0": {
+    "tier": "hard",
+    "label": "white 3d print cuboid",
+    "size_error": 0.19059335911852243,
+    "position_error_m": 0.016407180248137327,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0007406866409778538,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.98375
+   },
+   "n1_r1": {
+    "tier": "hard",
+    "label": "white 3d print cuboid",
+    "size_error": 0.20627403028782368,
+    "position_error_m": 0.0164446718744691,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.00069283526463023,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9795833333333334
+   },
+   "n1_r2": {
+    "tier": "hard",
+    "label": "white 3d print cuboid",
+    "size_error": 0.1807988469369165,
+    "position_error_m": 0.016366244399447158,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0011867594836294875,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9877083333333333
+   },
+   "n2_r0": {
+    "tier": "hard",
+    "label": "white 3d print cuboid",
+    "size_error": 0.19850721363800142,
+    "position_error_m": 0.01627605698185949,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0008074811912438125,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9883333333333333
+   },
+   "n2_r1": {
+    "tier": "hard",
+    "label": "white 3d print cuboid",
+    "size_error": 0.1917489340899128,
+    "position_error_m": 0.016481088114503453,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0008655564897506326,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9804166666666667
+   },
+   "n2_r2": {
+    "tier": "hard",
+    "label": "white 3d print cuboid",
+    "size_error": 0.1807988469369165,
+    "position_error_m": 0.016366244399447158,
+    "orientation_error_deg": null,
+    "cluster_to_mesh_median_m": 0.0011867594836294875,
+    "cluster_within_5mm": 1.0,
+    "proxy": false,
+    "fit_score": 0.9877083333333333
+   }
+  }
+ ]
+}

@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from typing import Any, cast
@@ -41,7 +42,12 @@ from video2sim.schemas import (
     StageName,
     WorldModel,
 )
-from video2sim.stages.collision import CollisionConfig, collision_geometry, write_collision
+from video2sim.stages.collision import (
+    CollisionConfig,
+    collision_geometry,
+    prepare_coacd,
+    write_collision,
+)
 from video2sim.stages.mass import MassConfig, estimate_mass
 from video2sim.stages.material_pass import (
     BasetenMaterialClient,
@@ -68,6 +74,8 @@ class PhysicsConfig:
     settling: SettlingConfig
     vlm_mass: VlmMassConfig
     min_confidence: float
+    parallel_mass_calls: int
+    parallel_objects: int
 
     @classmethod
     def from_config(cls, cfg: Mapping[str, Any]) -> PhysicsConfig:
@@ -80,6 +88,8 @@ class PhysicsConfig:
             settling=SettlingConfig.from_config(full, {"targets": cfg["stability"]}),
             vlm_mass=VlmMassConfig.from_config(full),
             min_confidence=float(cfg["material_min_confidence"]),
+            parallel_mass_calls=int(cfg["physics"]["parallel_mass_calls"]),
+            parallel_objects=int(cfg["physics"]["parallel_objects"]),
         )
 
 
@@ -290,17 +300,29 @@ class PhysicsStage:
         work = ctx.run_dir / "physics.work"
         work.mkdir(exist_ok=True)
 
-        items, report = [], {}
-        for obj in registered.objects:
-            instance = instances[obj.object_id]
-            answer = None
-            if client is not None and cfg.vlm_mass.enabled:
-                answer = model_mass(instance, world, client, ctx.run_dir, work, cfg.vlm_mass)
-            item, entry = prepare_object(
-                obj, instance, table, answer, ctx.run_dir, ctx.out_dir, cfg
+        def ask(obj: RegisteredObject) -> Estimate | None:
+            if client is None or not cfg.vlm_mass.enabled:
+                return None
+            return model_mass(
+                instances[obj.object_id], world, client, ctx.run_dir, work, cfg.vlm_mass
             )
-            items.append(item)
-            report[obj.object_id] = entry
+
+        def prepare(job: tuple[RegisteredObject, Estimate | None]) -> tuple[PreparedObject, Any]:
+            obj, answer = job
+            return prepare_object(
+                obj, instances[obj.object_id], table, answer, ctx.run_dir, ctx.out_dir, cfg
+            )
+
+        with ThreadPoolExecutor(max_workers=cfg.parallel_mass_calls) as calls:
+            answers = list(calls.map(ask, registered.objects))
+        # CoACD runs in a compiled library that releases the GIL, so threads share the cores.
+        prepare_coacd()
+        with ThreadPoolExecutor(max_workers=cfg.parallel_objects) as workers:
+            done = list(workers.map(prepare, zip(registered.objects, answers, strict=True)))
+        items = [item for item, _ in done]
+        report = {
+            o.object_id: entry for o, (_, entry) in zip(registered.objects, done, strict=True)
+        }
         (ctx.out_dir / "report.json").write_text(
             json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
         )

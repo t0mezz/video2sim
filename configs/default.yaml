@@ -157,7 +157,7 @@ segmentation:
 shape:
   backend: sam3d               # the only adapter; chosen in the P3.3 bake-off (D-018)
   keyframes_per_object: 2      # P3.4: best keyframes the model is run on
-  samples_per_keyframe: 3      # seeds per keyframe
+  samples_per_keyframe: 1      # seeds per keyframe; 2 draws per object, 5.7% size error against 5.0% with 6 (D-030)
   max_views: 12                # frames whose masks enter registration, spread over the video
   min_fit_score: 0.5           # below this the convex hull of the cluster stands in; a guess
   support_gap_m: 0.01          # a cluster this close to the table rests on it (P3.5)
@@ -168,7 +168,10 @@ shape:
     # Off until the P3.3 A/B: the paper reports shape barely depends on it, and P3.2 sets
     # pose and scale from the metric cloud (docs/research/sam3d.md, section 5)
     use_pointmap: false
+    warm_containers: 2         # started when segmentation starts; 0 is off (D-032)
+    warm_hold_s: 30            # each stays busy this long, or both calls land on one container
   parallel_samples: 6          # hosted draws in flight at once; the result does not depend on it
+  parallel_registrations: 3    # meshes registered at once; the result does not depend on it
   stretch_samples: 1           # best samples per object that get the per-axis refinement
   registration:                # P3.2, stages/registration.py; first guesses, tune in P3.3
     surface_samples: 3000      # mesh points for the point term
@@ -192,6 +195,8 @@ shape:
 physics:
   material_table: configs/material_table.yaml
   max_convex_parts: 16
+  parallel_mass_calls: 6       # hosted mass requests in flight at once
+  parallel_objects: 2          # objects repaired and decomposed at once; low because CoACD is CPU heavy and three COLMAP runs at once crashed the Mac
   collision:                   # P4.2, stages/collision.py
     primitive_tolerance: 0.04       # a primitive is used if its surface is within this share of the bbox diagonal (95th percentile)
     primitive_volume_ratio: [0.8, 1.25]   # and its volume is this close to the mesh's

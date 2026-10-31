@@ -109,6 +109,12 @@ MuJoCo for the nominal, low and high friction and mass (P4.7, D-021), caching ea
 
 `scripts/fetch_panda.sh` fetches the Panda model into `data/` at a pinned commit, and `python benchmark/run_pick_place.py --out FILE.json` runs the scripted pick-and-place in MuJoCo on the exported dev scenes across the friction and mass cases, recording `demo/pick_place.mp4` in each run (P5.4, D-029); it makes no hosted call.
 
+`python benchmark/run_sample_counts.py` replays cached SAM 3D draws on the dev scenes with n = 1, 2 and 6 into `runs_samples/` for `benchmark/compare_shape_arms.py`; it makes no hosted call (`docs/research/sample_counts.md`).
+
+`python benchmark/profile_stages.py RUN_ID --arm sequential|pipelined --out FILE.json` times shape and physics on a dev run and tracks CPU use; from an empty cache every draw and mass request is a real hosted call, unless `--cached` is given. `python benchmark/profile_coacd.py RUN_ID --out FILE.json` measures CoACD alone with threads and objects at once; it makes no hosted call (`docs/research/parallel_timing.md`).
+
+`python benchmark/probe_sam3d.py RUN_ID --out FILE.json` makes ten hosted SAM 3D calls to measure cold and warm draw times and GPU memory (`docs/research/sam3d_cold_start.md`).
+
 `video2sim run VIDEO --out FOLDER` runs all six stages through `src/video2sim/pipeline.py` and copies the scene package and the manifest to `FOLDER` (P5.5). It uploads video frames and crops to the hosted models and needs their keys in `.env`.
 Never document a command that does not exist. When you add one, add it here in the same
 change.

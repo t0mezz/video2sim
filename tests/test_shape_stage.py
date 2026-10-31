@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import threading
 from pathlib import Path
 from typing import Any
 
@@ -10,7 +11,7 @@ import trimesh
 import yaml
 from numpy.typing import NDArray
 
-from video2sim.models.shape_model import ShapeSample, ShapeView
+from video2sim.models.shape_model import SampleFailed, ShapeSample, ShapeView
 from video2sim.runner import OUTPUT_FILE, StageContext
 from video2sim.schemas import (
     SE3,
@@ -24,7 +25,14 @@ from video2sim.schemas import (
     WorldModel,
 )
 from video2sim.stages.registration import rotation_from_vector
-from video2sim.stages.shape import ShapeStage, ShapeStageConfig, spread
+from video2sim.stages.shape import (
+    ShapeStage,
+    ShapeStageConfig,
+    load_masks,
+    shape_object,
+    shape_scene,
+    spread,
+)
 
 F64 = NDArray[np.float64]
 CONFIG = Path(__file__).resolve().parents[1] / "configs" / "default.yaml"
@@ -232,3 +240,66 @@ def test_spread_keeps_the_ends_and_at_most_count_frames() -> None:
 def test_config_rejects_a_fit_threshold_above_one() -> None:
     with pytest.raises(ValueError, match="min_fit_score"):
         ShapeStageConfig.from_config({"shape": _shape_config(min_fit_score=1.5)})
+
+
+class _Pipelined(FakeModel):
+    """Each call waits until ``width`` calls are in flight, so a sequential caller times out."""
+
+    def __init__(
+        self, cameras: dict[int, SE3], mesh: trimesh.Trimesh, width: int, fail: int | None
+    ) -> None:
+        super().__init__(cameras, mesh, 0.0)
+        self.barrier = threading.Barrier(width, timeout=20)
+        self.fail = fail
+
+    def sample(self, object_id: str, view: ShapeView, seed: int) -> ShapeSample:
+        self.barrier.wait()
+        if self.fail == view.frame_index and object_id == "obj_001":
+            raise SampleFailed("empty")
+        return super().sample(object_id, view, seed)
+
+
+def _two_objects(run: Path) -> tuple[WorldModel, list[ObjectInstance], dict[str, Any]]:
+    world = WorldModel.model_validate_json((run / "reconstruction" / OUTPUT_FILE).read_text())
+    first = Instances.model_validate_json((run / "segmentation" / OUTPUT_FILE).read_text())
+    objects = [first.objects[0], first.objects[0].model_copy(update={"object_id": "obj_001"})]
+    masks = load_masks(run, first.objects[0])
+    return world, objects, {"obj_000": masks, "obj_001": masks}
+
+
+def _stage_config(**overrides: object) -> ShapeStageConfig:
+    return ShapeStageConfig.from_config({"shape": _shape_config(**overrides)})
+
+
+def test_scene_draws_overlap_across_objects_and_match_the_sequential_path(tmp_path: Path) -> None:
+    run, cameras = _make_run(tmp_path)
+    world, objects, masks = _two_objects(run)
+    cfg = _stage_config(parallel_samples=4, parallel_registrations=3)
+    (run / "shape").mkdir()
+    together = shape_scene(
+        objects, world, run, run / "shape", masks, _Pipelined(cameras, MODEL, 4, None), cfg, 7
+    )
+    alone = [
+        shape_object(o, world, run, run / "shape", masks, FakeModel(cameras, MODEL, 0.0), cfg, 7)
+        for o in objects
+    ]
+    for (a, a_report, a_checkpoint), (b, b_report, b_checkpoint) in zip(
+        together, alone, strict=True
+    ):
+        assert a == b
+        assert a_report == b_report
+        assert a_checkpoint == b_checkpoint == "fake@1"
+
+
+def test_a_failed_draw_stays_with_its_object(tmp_path: Path) -> None:
+    run, cameras = _make_run(tmp_path)
+    world, objects, masks = _two_objects(run)
+    cfg = _stage_config(parallel_samples=4)
+    (run / "shape").mkdir()
+    out = shape_scene(
+        objects, world, run, run / "shape", masks, _Pipelined(cameras, MODEL, 4, 2), cfg, 7
+    )
+    assert out[0][1]["failed_samples"] == []
+    assert len(out[1][1]["failed_samples"]) == 1
+    assert len(out[0][1]["samples"]) == 2
+    assert len(out[1][1]["samples"]) == 1

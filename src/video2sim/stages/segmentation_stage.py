@@ -205,10 +205,18 @@ class SegmentationStage:
     dependencies: tuple[StageName, ...] = ("reconstruction",)
     extra_inputs: tuple[Path, ...] = ()
 
-    def __init__(self, clients: Callable[[dict[str, Any]], SegmentationClients] = default_clients):
+    def __init__(
+        self,
+        clients: Callable[[dict[str, Any]], SegmentationClients] = default_clients,
+        on_start: Callable[[], None] | None = None,
+    ):
+        """``on_start`` runs first, for work that should overlap this stage (D-032)."""
         self._clients = clients
+        self._on_start = on_start
 
     def run(self, ctx: StageContext) -> Instances:
+        if self._on_start is not None:
+            self._on_start()
         world = ctx.load("reconstruction", WorldModel)
         cfg: dict[str, Any] = {"segmentation": dict(ctx.config)}
         work = ctx.run_dir / "segmentation.work"

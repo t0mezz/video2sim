@@ -25,6 +25,9 @@ s23 is left out as deformable (D-014). The medium tier has 2 scenes and 9 object
 | Runtime, worst scene | 14.9 min | 60 min or less | Yes | SAM 3D on hosted GPUs, the rest on a laptop CPU |
 | Manual steps | 0 on 8 of 8 runs | None | Yes | From the run records; `eval` still reports `not_measured` |
 
+**Later change.** This run used 6 SAM 3D draws per object. D-030 then lowered the default to 2, which
+was measured on dev only (`docs/research/sample_counts.md`), so these numbers describe the old default.
+
 ## Size error
 
 The target is missed on the pooled median, and only there: the easy tier is at 3.3%. The misses are

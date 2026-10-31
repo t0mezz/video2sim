@@ -283,6 +283,16 @@ def primitive_for(
     return best
 
 
+def prepare_coacd() -> None:
+    """Call once before decomposing in threads. CoACD creates its logger on first use, and two
+    threads doing that at once abort the whole process (coacd 1.0.14, s02, 4 of 4 tries)."""
+    try:
+        import coacd  # type: ignore[import-untyped,import-not-found,unused-ignore]  # heavy import
+    except ImportError:
+        return
+    coacd.set_log_level("error")
+
+
 def _decompose(
     mesh: trimesh.Trimesh, cfg: CollisionConfig, steps: dict[str, int]
 ) -> list[trimesh.Trimesh]:

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import json
+import threading
 from pathlib import Path
 
 import cv2
@@ -21,6 +22,8 @@ from video2sim.models.sam3d import (
     camera_from_model,
     model_mesh_from_glb,
     quaternion_wxyz_to_matrix,
+    warm_containers,
+    warm_in_background,
 )
 from video2sim.models.sam3d_modal import REPO_ID, pose_json
 from video2sim.models.shape_model import (
@@ -58,6 +61,8 @@ def _config(**overrides: object) -> Sam3dConfig:
         "stage1_inference_steps": None,
         "stage2_inference_steps": None,
         "use_pointmap": False,
+        "warm_containers": 0,
+        "warm_hold_s": 0,
     }
     base.update(overrides)
     return Sam3dConfig.from_config({"shape": {"sam3d": base}})
@@ -324,3 +329,47 @@ def test_parallel_draws_give_the_same_samples_in_the_same_order(tmp_path: Path) 
     assert model.peak > 1
     with pytest.raises(ValueError, match="workers"):
         draw_samples(model, "o", [view], 1, base_seed=0, workers=0)
+
+
+class _WarmWorker:
+    def __init__(self, count: int, fail: bool = False) -> None:
+        self.barrier = threading.Barrier(count, timeout=10)
+        self.fail = fail
+        self.warm = self
+        self.done = threading.Event()
+
+    def remote(self, hold_s: float) -> dict[str, str]:
+        assert hold_s == 30
+        self.barrier.wait()  # times out unless every call is in flight together
+        self.done.set()
+        if self.fail:
+            raise RuntimeError("no GPU")
+        return {"container": "ta"}
+
+
+def test_warm_containers_overlaps_its_calls() -> None:
+    assert warm_containers(2, 30, lambda: _WarmWorker(2)) == [{"container": "ta"}] * 2
+
+
+def test_a_failed_warm_up_is_logged_and_does_not_reach_the_caller(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    worker = _WarmWorker(1, fail=True)
+    warm_in_background(1, 30, lambda: worker)
+    assert worker.done.wait(5)
+    for thread in threading.enumerate():
+        if thread.name == "sam3d-warm":
+            thread.join(5)
+    assert "warm-up failed" in caplog.text
+
+
+def test_no_warm_up_starts_no_thread() -> None:
+    def never() -> None:
+        raise AssertionError("must not look the worker up")
+
+    warm_in_background(0, 30, never)
+
+
+def test_config_reads_warm_containers() -> None:
+    cfg = yaml.safe_load(CONFIG.read_text())
+    assert Sam3dConfig.from_config(cfg).warm_containers == 2

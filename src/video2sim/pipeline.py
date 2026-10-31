@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from video2sim.models.sam3d import Sam3dConfig, warm_in_background
 from video2sim.runner import Runner
 from video2sim.stages.capture import CaptureStage
 from video2sim.stages.export import ExportStage, export_stage_config
@@ -18,12 +19,19 @@ def build_runner(
     runs_root: Path, cfg: dict[str, Any], targets: dict[str, Any], base_dir: Path
 ) -> Runner:
     """``cfg`` is ``configs/default.yaml`` and ``targets`` is ``configs/targets.yaml``."""
+    sam3d = Sam3dConfig.from_config(cfg)
+
+    # Segmentation takes about as long as a cold start, and the 5 minute scale-down window
+    # would close on containers started at the top of a long reconstruction.
+    def warm_shape_model() -> None:
+        warm_in_background(sam3d.warm_containers, sam3d.warm_hold_s)
+
     return Runner(
         runs_root,
         [
             CaptureStage(),
             ReconstructionStage(),
-            SegmentationStage(),
+            SegmentationStage(on_start=warm_shape_model),
             ShapeStage(),
             PhysicsStage(base_dir / cfg["physics"]["material_table"]),
             ExportStage(),
