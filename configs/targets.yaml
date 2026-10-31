@@ -28,3 +28,6 @@ gates:
   segmentation:
     id_switches_per_scene_max: 1.0
     cluster_bbox_error_max: 0.10
+  pick_place:                  # P5.4, set by the human 2026-10-31 (D-029)
+    lift_min_m: 0.10
+    place_error_max_m: 0.02

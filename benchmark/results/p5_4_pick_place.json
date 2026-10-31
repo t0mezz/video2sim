@@ -1,0 +1,324 @@
+{
+ "summary": {
+  "simulator": "mujoco (D-027)",
+  "scenes": 13,
+  "scenes_with_a_graspable_object": 7,
+  "success_every_case": [
+   "s01_b",
+   "s02_b",
+   "s04_b",
+   "s05_b",
+   "s24_b"
+  ]
+ },
+ "scenes": [
+  {
+   "run": "s01_b",
+   "object": "obj_001",
+   "clearance_m": 0.014369484399639296,
+   "success_every_case": true,
+   "cases": [
+    {
+     "case": "nominal",
+     "lifted_m": 0.13075099215198896,
+     "place_error_m": 0.0017123139151617205,
+     "success": true
+    },
+    {
+     "case": "friction_low",
+     "lifted_m": 0.13075628847452975,
+     "place_error_m": 0.0016160947678920746,
+     "success": true
+    },
+    {
+     "case": "friction_high",
+     "lifted_m": 0.13072098755907302,
+     "place_error_m": 0.0021708426223716526,
+     "success": true
+    },
+    {
+     "case": "mass_low",
+     "lifted_m": 0.1307968038547097,
+     "place_error_m": 0.0016880580297480455,
+     "success": true
+    },
+    {
+     "case": "mass_high",
+     "lifted_m": 0.13070698594345523,
+     "place_error_m": 0.0017287495735727404,
+     "success": true
+    }
+   ]
+  },
+  {
+   "run": "s02_b",
+   "object": "obj_000",
+   "clearance_m": 0.06532408936849696,
+   "success_every_case": true,
+   "cases": [
+    {
+     "case": "nominal",
+     "lifted_m": 0.1307994930398461,
+     "place_error_m": 0.0013501754661917056,
+     "success": true
+    },
+    {
+     "case": "friction_low",
+     "lifted_m": 0.13076054373357915,
+     "place_error_m": 0.00034452830957513607,
+     "success": true
+    },
+    {
+     "case": "friction_high",
+     "lifted_m": 0.13081654035654638,
+     "place_error_m": 0.0015322641937702585,
+     "success": true
+    },
+    {
+     "case": "mass_low",
+     "lifted_m": 0.13081472267971317,
+     "place_error_m": 0.0013459478048237338,
+     "success": true
+    },
+    {
+     "case": "mass_high",
+     "lifted_m": 0.13078453798056777,
+     "place_error_m": 0.0013512978887276694,
+     "success": true
+    }
+   ]
+  },
+  {
+   "run": "s03_b",
+   "object": null,
+   "clearance_m": null,
+   "success_every_case": false,
+   "cases": []
+  },
+  {
+   "run": "s04_b",
+   "object": "obj_002",
+   "clearance_m": 0.07826182191698217,
+   "success_every_case": true,
+   "cases": [
+    {
+     "case": "nominal",
+     "lifted_m": 0.13165467334187114,
+     "place_error_m": 0.00034228538381835195,
+     "success": true
+    },
+    {
+     "case": "friction_low",
+     "lifted_m": 0.13168253670871907,
+     "place_error_m": 0.0004125722975177831,
+     "success": true
+    },
+    {
+     "case": "friction_high",
+     "lifted_m": 0.13164008595600374,
+     "place_error_m": 0.0003570855698820065,
+     "success": true
+    },
+    {
+     "case": "mass_low",
+     "lifted_m": 0.13168657579960028,
+     "place_error_m": 0.0002975901982972437,
+     "success": true
+    },
+    {
+     "case": "mass_high",
+     "lifted_m": 0.13161741099099075,
+     "place_error_m": 0.0003988922807381474,
+     "success": true
+    }
+   ]
+  },
+  {
+   "run": "s05_b",
+   "object": "obj_000",
+   "clearance_m": 0.08900403313897035,
+   "success_every_case": true,
+   "cases": [
+    {
+     "case": "nominal",
+     "lifted_m": 0.12954043397272752,
+     "place_error_m": 0.009974598271344937,
+     "success": true
+    },
+    {
+     "case": "friction_low",
+     "lifted_m": 0.13075111952469687,
+     "place_error_m": 0.014736958990205003,
+     "success": true
+    },
+    {
+     "case": "friction_high",
+     "lifted_m": 0.13185135495584838,
+     "place_error_m": 0.010088866280178967,
+     "success": true
+    },
+    {
+     "case": "mass_low",
+     "lifted_m": 0.12978130858029074,
+     "place_error_m": 0.010338545617878074,
+     "success": true
+    },
+    {
+     "case": "mass_high",
+     "lifted_m": 0.12909621189063952,
+     "place_error_m": 0.009471626744987376,
+     "success": true
+    }
+   ]
+  },
+  {
+   "run": "s06_b",
+   "object": null,
+   "clearance_m": null,
+   "success_every_case": false,
+   "cases": []
+  },
+  {
+   "run": "s11_b",
+   "object": "obj_006",
+   "clearance_m": 0.10161988048109807,
+   "success_every_case": false,
+   "cases": [
+    {
+     "case": "nominal",
+     "lifted_m": 0.13289113090253196,
+     "place_error_m": 0.006281630103188381,
+     "success": true
+    },
+    {
+     "case": "friction_low",
+     "lifted_m": 0.1330888172081429,
+     "place_error_m": 0.13627424106505792,
+     "success": false
+    },
+    {
+     "case": "friction_high",
+     "lifted_m": 0.134483741808548,
+     "place_error_m": 0.14034823897150914,
+     "success": false
+    },
+    {
+     "case": "mass_low",
+     "lifted_m": 0.13522194873275614,
+     "place_error_m": 0.13844568394197176,
+     "success": false
+    },
+    {
+     "case": "mass_high",
+     "lifted_m": 0.13316705535373857,
+     "place_error_m": 0.13578319277241582,
+     "success": false
+    }
+   ]
+  },
+  {
+   "run": "s12_b",
+   "object": null,
+   "clearance_m": null,
+   "success_every_case": false,
+   "cases": []
+  },
+  {
+   "run": "s13_b",
+   "object": null,
+   "clearance_m": null,
+   "success_every_case": false,
+   "cases": []
+  },
+  {
+   "run": "s14_b",
+   "object": null,
+   "clearance_m": null,
+   "success_every_case": false,
+   "cases": []
+  },
+  {
+   "run": "s17_b",
+   "object": "obj_000",
+   "clearance_m": 0.12834489921862077,
+   "success_every_case": false,
+   "cases": [
+    {
+     "case": "nominal",
+     "lifted_m": 0.1320641635598649,
+     "place_error_m": 0.004832200891963391,
+     "success": true
+    },
+    {
+     "case": "friction_low",
+     "lifted_m": 0.05285771934473399,
+     "place_error_m": 0.14818287817983758,
+     "success": false
+    },
+    {
+     "case": "friction_high",
+     "lifted_m": 0.13208834131494526,
+     "place_error_m": 0.004830489830526172,
+     "success": true
+    },
+    {
+     "case": "mass_low",
+     "lifted_m": 0.1321886203645804,
+     "place_error_m": 0.005039432388280472,
+     "success": true
+    },
+    {
+     "case": "mass_high",
+     "lifted_m": 0.1319887624631851,
+     "place_error_m": 0.0047740281135886286,
+     "success": true
+    }
+   ]
+  },
+  {
+   "run": "s18_b",
+   "object": null,
+   "clearance_m": null,
+   "success_every_case": false,
+   "cases": []
+  },
+  {
+   "run": "s24_b",
+   "object": "obj_000",
+   "clearance_m": Infinity,
+   "success_every_case": true,
+   "cases": [
+    {
+     "case": "nominal",
+     "lifted_m": 0.13091474268881748,
+     "place_error_m": 0.001793800025858625,
+     "success": true
+    },
+    {
+     "case": "friction_low",
+     "lifted_m": 0.13085839762406398,
+     "place_error_m": 0.002193969716464637,
+     "success": true
+    },
+    {
+     "case": "friction_high",
+     "lifted_m": 0.1308458432138581,
+     "place_error_m": 0.0017107677645993961,
+     "success": true
+    },
+    {
+     "case": "mass_low",
+     "lifted_m": 0.1309951312960834,
+     "place_error_m": 0.001888843674085625,
+     "success": true
+    },
+    {
+     "case": "mass_high",
+     "lifted_m": 0.1307800088574941,
+     "place_error_m": 0.0017748219859856776,
+     "success": true
+    }
+   ]
+  }
+ ]
+}

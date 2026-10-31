@@ -15,7 +15,7 @@ Last updated: 2026-10-31. Start date: not set (decision D-002).
 | 2 | 5 to 6 | Segmentation, tracking, 3D lifting | Done | Passed |
 | 3 | 7 to 8 | Shape completion and pose fusion | Done | Passed |
 | 4 | 9 to 10 | Physics readiness, material properties | Done | Passed by human decision (D-026) |
-| 5 | 11 to 12 | Export, simulator validation, demo | Not started | Open |
+| 5 | 11 to 12 | Export, simulator validation, demo | In progress | Open |
 
 Status values: Not started, In progress, Done. Gate values: Open, Passed, Failed.
 **Current focus:** Phase 5.
@@ -566,28 +566,60 @@ behavior stay unverified until the verifier on the GPU workstation runs (section
 
 Tasks
 
-- [ ] **P5.1** USD writer: Z-up, meters, kilograms; per object a transform with rigid body and
+- [x] **P5.1** USD writer: Z-up, meters, kilograms; per object a transform with rigid body and
 
       mass properties, visual mesh with `displayColor` from its vertex colors, convex collision meshes, physics materials
       from the friction and restitution values; table and ground plane; physics scene.
       Checked by reading the USD back against `SimAssets`. Settling stays in MuJoCo (D-027).
+      Evidence: `src/video2sim/stages/usd_writer.py`, `tests/test_export.py`,
+      `benchmark/results/p5_export_dev.json`: 61 objects of the 13 rigid dev scenes read back, none
+      skipped. One infinite plane is both table and ground, since nothing says how far below a
+      floor would be. The friction combine mode is a PhysX attribute, unverified until the Isaac
+      Sim verifier (section 12 item 8), and so is the 255-vertex limit in `physics.collision`.
 
-- [ ] **P5.2** URDF writer per object (inertial, visual, collision), loaded in MuJoCo to
+- [x] **P5.2** URDF writer per object (inertial, visual, collision), loaded in MuJoCo to
 
       cross-check units, axes and inertia.
+      Evidence: `src/video2sim/stages/urdf_writer.py`, `tests/test_export.py`,
+      `benchmark/results/p5_export_dev.json`: mass, principal inertia and collision bounds match
+      on 61 objects, and settling a scene built from the URDF files gives the same stable result
+      as the physics stage for every object of the 13 scenes.
 
-- [ ] **P5.3** QA report per scene: status, confidence and fallbacks per object, stability
+- [x] **P5.3** QA report per scene: status, confidence and fallbacks per object, stability
 
       result, side-by-side renders of the real frame and the simulated scene from the same
       camera pose.
+      Evidence: `src/video2sim/stages/qa_report.py`, `src/video2sim/stages/scene_render.py`,
+      `tests/test_export.py`; `export/qa_report.html` in each of the 13 dev runs of
+      `runs_instances/`. It shows the mass source and range (D-026). 2 scenes read ok and 11
+      review, because any flag marks an object. Renders are a painter's drawing of the settled
+      scene with vertex colors and no table.
 
-- [ ] **P5.4** MuJoCo check: scripted pick-and-place with a manipulator on one object from
+- [x] **P5.4** MuJoCo check: scripted pick-and-place with a manipulator on one object from
 
       the twin, repeated across the stored friction and mass ranges. Stretch: a short RL run.
+      Evidence: `src/video2sim/pick_place.py`, `tests/test_pick_place.py`,
+      `benchmark/run_pick_place.py`, `benchmark/results/p5_4_pick_place.json`, `demo/pick_place.mp4`
+      in the runs. Panda from MuJoCo Menagerie at a pinned commit (`scripts/fetch_panda.sh`),
+      success as in D-029. 7 of the 13 rigid dev scenes have an object that fits the rules (a real
+      mesh, no round flag, fits the gripper, free room); all 7 pass the nominal case and 5 pass all
+      five cases (s01, s02, s04, s05, s24). s11 fails four of five on placing, by about 14 cm, and
+      s17 fails on low friction. These two were not investigated. Control is open loop, so this
+      shows the twin is graspable in simulation, not that a real robot would succeed. The RL
+      stretch was not attempted.
 
-- [ ] **P5.5** Command line (`video2sim run video.mp4 --out scene/`), README
+- [x] **P5.5** Command line (`video2sim run video.mp4 --out scene/`), README
 
       with the capture guide.
+      Evidence: `src/video2sim/pipeline.py`, `tests/test_cli_run.py`, README section "Make a
+      scene", `benchmark/results/p5_5_fresh_s01_a.json`. One fresh run, s01 `video_a`, dev split:
+      exit 0, 8.7 min, one command and no manual steps; 5 of 5 objects, size 4.1%, position 2.6 mm,
+      orientation 0.33°, 3 of 5 masses within 30%, stable in every case, QA status ok, with three
+      dropped tracks shown as scene flags. One video on an easy scene is not a benchmark. The
+      manifest gives commit 4d50a8d, but the run used uncommitted export code on top of it, and
+      `eval` still reports manual steps as `not_measured`. `video2sim eval` also measures stability
+      and asset validity now (`benchmark/results/p5_eval_dev.json`, 12 dev scenes: stability 100%,
+      validity 100%, size error 5.05%, mass 52%, s05 unscored).
 
 - [ ] **P5.6** Final benchmark run on the test split and a write-up of every target, met or
 
@@ -597,7 +629,7 @@ Exit criteria
 
 - [ ] Final benchmark run meets every target, or the misses are documented with causes
 - [ ] USD scenes read back with the units, axes, mass and inertia of `SimAssets`; URDF loads in MuJoCo (D-027)
-- [ ] Scripted pick-and-place demo in MuJoCo recorded on at least three scenes
+- [x] Scripted pick-and-place demo in MuJoCo recorded on at least three scenes. Evidence: `benchmark/results/p5_4_pick_place.json`, `demo/pick_place.mp4` in the 7 dev runs with a chosen object
 - [ ] A new person can reproduce a scene from the README alone
 
 Evidence:
@@ -654,6 +686,7 @@ one that supersedes.
 | D-025 | Phase 4 gate terms (human decisions 2026-10-31). The mass target is 50% within 30%, down from 70%, because no method on these inputs reached it (D-024). Round objects do not count towards settling: they really roll and fall over on the table (the s17 egg stands only through a dent made by hand). `Flag.IGNORED_ROUND` marks an object within `physics.settling.round_tolerance` of the ellipsoid in its bounding box, 0.04 from the dev gap between the egg (0.028) and the nearest other object (0.053); it stays in the scene and its drift is reported. The Phase 2 box fit now seats stacked objects: most of the footprint over another object and the lowest points near its top. This fixes s13 obj_001. The stack rule was scanned on all scenes' points without scores, and it also fires on s16 obj_002, a real stack in the test split | Decided | Week 9 | `configs/targets.yaml`, `src/video2sim/stages/settling.py`, `src/video2sim/stages/primitive_fit.py` |
 | D-026 | Phase 4 gate marked Passed by human decision (2026-10-31), with the mass miss waived. The gate run failed on mass at 45% on test against 50%. The target and the failed result stand as recorded, and the exit box stays unticked. Reason: mass carries low and high values, so the simulator work is not blocked, and no cheap fix remains on these inputs. Consequence: masses may be wrong by more than 30% on about half of objects, so the QA report of P5.3 must show the mass source and range, and a future mass method is built on dev only, because the test split has been seen | Decided | Week 10 | `benchmark/results/p4_gate_eval_test.json` |
 | D-027 | MuJoCo is the validation and demo simulator for Phase 5, because development is on a Mac (human decision 2026-10-31). Settling, the URDF checks and the scripted pick-and-place run in MuJoCo, and USD is still exported. After Phase 5, a parallel verifier that uses Isaac Sim is built on the human's NVIDIA GPU workstation. Supersedes for now: D-001 as the simulator Phase 5 validates in, and the repeat of the settling gate in Isaac Sim under D-021. Until the verifier runs, USD loading in Isaac Sim and all PhysX behavior are unverified | Decided | Week 11 | Phase 5 tasks and exit criteria reworded by human approval; section 12 item 8 |
+| D-029 | P5.4 pick-and-place terms (human decision 2026-10-31). The Panda of MuJoCo Menagerie is used (Apache-2.0, pinned commit, fetched to `data/`, not in git). Success: the object rises at least 10 cm and ends within 2 cm of the goal, stored in `gates.pick_place` of `configs/targets.yaml`. Panda geoms have zero friction, so MuJoCo's max rule leaves the object's own value. The gripper is stiffened to a 70 N pinch, because the model's servo gives about 2.5 N at a 5 cm width | Decided | Week 11 | `src/video2sim/pick_place.py`, `configs/default.yaml` `demo`. The 70 N comes from reseller listings, not from Franka's own hand datasheet |
 | D-028 | Phase 5 export contract (human decisions 2026-10-31). `schemas.py` gains `SceneExport` and `SkippedAsset`, the output of stage 6. `usd-core` is added below 26.11, because 26.11 drops Python 3.10, which the project and CI support; 26.8 is installed and imports on 3.10 and 3.14. USD visual meshes carry vertex colors as `displayColor` and no textures, so P5.1 is amended. The container image is removed from P5.5 and stays deferred with P0.8 | Decided | Week 11 | `src/video2sim/schemas.py`, `pyproject.toml`, `docs/licenses.md` |
 
 ## 12. After the MVP
@@ -765,4 +798,7 @@ In order:
 | 2026-10-31 | D-020: tags-on-table layer on the plane fit; s05 rerun, all 4 objects now SAM 3D with fit 0.95 to 0.98 and `lift.max_extent_m` back at 1.5 |
 | 2026-10-31 | D-027: Phase 5 validates in MuJoCo on the Mac; a parallel Isaac Sim verifier follows on the GPU workstation (section 12 item 8) |
 | 2026-10-31 | Phase 5 goal, P5.1, P5.2, P5.4 and exit criteria reworded for MuJoCo under D-027 by human approval |
+| 2026-10-31 | P5.5 ticked: fresh run of s01 `video_a` through `video2sim run`, 8.7 min, no manual steps |
+| 2026-10-31 | P5.4 ticked under D-029: 7 of 7 chosen dev objects pass nominal, 5 pass every case; demo exit criterion ticked |
+| 2026-10-31 | P5.1 to P5.3 ticked: export stage writes USD, URDF and the QA report on 13 rigid dev scenes, 61 objects; `video2sim run` added, P5.5 stays open until a run from a fresh video |
 | 2026-10-31 | D-028: `SceneExport` added to `schemas.py`, `usd-core` 26.8 added, P5.1 uses `displayColor`, container image removed from P5.5 |

@@ -1,12 +1,13 @@
 """Read a pipeline run folder into a ``Prediction`` (P0.6).
 
 Geometry comes from the ``shape`` stage (``RegisteredObjects``) and masses from the
-``physics`` stage (``SimAssets``). Paths inside them are relative to the run folder. Runtime
-is the sum of the stage times in ``manifest.json``.
+``physics`` stage (``SimAssets``), with its validators and ``settling.json``. Paths inside them
+are relative to the run folder. Runtime is the sum of the stage times in ``manifest.json``.
 """
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any
 
@@ -29,10 +30,17 @@ def load_run(run_dir: Path, T_board_from_world: NDArray[np.float64] | None = Non
 
     masses: dict[str, float] = {}
     notes: list[str] = []
+    stable = assets_valid = assets_total = None
     physics_file = run_dir / "physics" / OUTPUT_FILE
     if physics_file.exists():
         assets = SimAssets.model_validate_json(physics_file.read_text())
         masses = {a.object_id: a.properties.mass_kg.nominal for a in assets.assets}
+        assets_valid = sum(a.is_valid for a in assets.assets)
+        assets_total = len(assets.assets)
+        settling_file = run_dir / "physics" / "settling.json"
+        if settling_file.exists():
+            cases = json.loads(settling_file.read_text())
+            stable = all(c["stable"] for c in cases.values())
     else:
         notes.append("no physics output: masses are missing")
 
@@ -51,4 +59,11 @@ def load_run(run_dir: Path, T_board_from_world: NDArray[np.float64] | None = Non
         manifest = RunManifest.model_validate_json(manifest_file.read_text())
         seconds = [r.seconds for r in manifest.stages.values() if r.seconds is not None]
         runtime = float(sum(seconds)) if seconds else None
-    return Prediction(objects, runtime_s=runtime, notes=notes)
+    return Prediction(
+        objects,
+        runtime_s=runtime,
+        notes=notes,
+        stable=stable,
+        assets_valid=assets_valid,
+        assets_total=assets_total,
+    )

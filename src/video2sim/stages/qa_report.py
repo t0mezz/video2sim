@@ -1,0 +1,207 @@
+"""The QA report of a scene (P5.3): ``qa_report.json`` for tools, ``qa_report.html`` for people.
+
+It shows every object, exported or not, with what could be wrong with it. The mass source and
+range are always shown, since masses may be off by more than 30% on about half of the objects
+(D-026). Stability comes from the physics stage and the URDF check in MuJoCo only: Isaac Sim is
+not run (D-027), and the report says so.
+"""
+
+from __future__ import annotations
+
+import html
+import json
+from pathlib import Path
+from typing import Any
+
+from video2sim.schemas import (
+    Instances,
+    RegisteredObjects,
+    SimAssets,
+    SkippedAsset,
+    WorldModel,
+)
+
+VALIDATED_IN = "MuJoCo (D-027); Isaac Sim and PhysX not verified"
+
+
+def _object_row(
+    asset: Any,
+    instance: Any,
+    registered: Any,
+    physics: dict[str, Any],
+    settling: dict[str, dict[str, Any]],
+    skipped: dict[str, list[str]],
+) -> dict[str, Any]:
+    name = asset.object_id
+    p = asset.properties
+    drifts: dict[str, float] = {}
+    stable = True
+    for case, result in settling.items():
+        body = next((b for b in result.get("bodies", []) if b["object_id"] == name), None)
+        if body is None:
+            stable = False
+            continue
+        drifts[case] = body["max_drift_m"]
+        stable = stable and (body["stable"] or body["ignored"])
+    return {
+        "object_id": name,
+        "label": instance.category or instance.label,
+        "status": "skipped" if name in skipped else "exported",
+        "skip_reasons": skipped.get(name, []),
+        "geometry_source": registered.geometry_source,
+        "fit_score": registered.fit_score,
+        "collision_kind": physics["collision_kind"],
+        "collision_parts": physics["collision_parts"],
+        "material_class": p.material_class,
+        "is_hollow": p.is_hollow,
+        "confidence": p.confidence,
+        "mass_source": physics["mass_source"],
+        "mass_kg": p.mass_kg.model_dump(),
+        "friction": p.friction_coefficient.model_dump(),
+        "restitution": p.restitution.model_dump(),
+        "flags": [f.value for f in asset.flags],
+        "notes": [*instance.flag_reasons, *physics["reasons"]],
+        "stable_every_case": stable,
+        "largest_drift_m": max(drifts.values(), default=None),
+    }
+
+
+def build_report(
+    run_id: str,
+    world: WorldModel,
+    instances: Instances,
+    registered: RegisteredObjects,
+    assets: SimAssets,
+    physics: dict[str, dict[str, Any]],
+    settling: dict[str, dict[str, Any]],
+    skipped: list[SkippedAsset],
+    urdf_check: dict[str, Any],
+    views: list[str],
+) -> dict[str, Any]:
+    by_instance = {o.object_id: o for o in instances.objects}
+    by_shape = {o.object_id: o for o in registered.objects}
+    reasons = {s.object_id: s.reasons for s in skipped}
+    rows = [
+        _object_row(
+            a,
+            by_instance[a.object_id],
+            by_shape[a.object_id],
+            physics[a.object_id],
+            settling,
+            reasons,
+        )
+        for a in assets.assets
+    ]
+    missing = sorted(set(by_instance) - {r["object_id"] for r in rows})
+    review = [
+        r["object_id"]
+        for r in rows
+        if r["status"] == "skipped" or r["flags"] or not r["stable_every_case"]
+    ]
+    scene_stable = all(v.get("stable", False) for v in settling.values())
+    good = not skipped and not missing and scene_stable and not urdf_check["problems"]
+    return {
+        "run_id": run_id,
+        "status": "ok" if good and not review else "review",
+        "validated_in": VALIDATED_IN,
+        "objects_found": len(by_instance),
+        "objects_exported": len(rows) - len(skipped),
+        "objects_skipped": len(skipped),
+        "objects_without_asset": missing,
+        "objects_to_review": review,
+        "scene_flags": [*world.flags, *instances.flags],
+        "stable_every_case": scene_stable,
+        "stability_cases": {k: bool(v.get("stable", False)) for k, v in settling.items()},
+        "urdf_check": urdf_check,
+        "views": views,
+        "objects": rows,
+    }
+
+
+def _triple(value: dict[str, float], digits: str = ".3g") -> str:
+    return " / ".join(format(value[k], digits) for k in ("low", "nominal", "high"))
+
+
+def _cell(value: object) -> str:
+    return f"<td>{html.escape(str(value))}</td>"
+
+
+def _html(report: dict[str, Any]) -> str:
+    columns = (
+        "object", "label", "status", "geometry", "fit", "collision", "material", "confidence",
+        "mass source", "mass kg (low / nominal / high)", "friction", "restitution", "drift cm",
+        "stable", "flags and notes",
+    )  # fmt: skip
+    rows = []
+    for o in report["objects"]:
+        drift = o["largest_drift_m"]
+        cells = [
+            o["object_id"],
+            o["label"],
+            o["status"],
+            o["geometry_source"],
+            "-" if o["fit_score"] is None else f"{o['fit_score']:.2f}",
+            f"{o['collision_kind']} ({o['collision_parts']})",
+            o["material_class"] + (" hollow" if o["is_hollow"] else ""),
+            f"{o['confidence']:.2f}",
+            o["mass_source"],
+            _triple(o["mass_kg"]),
+            _triple(o["friction"]),
+            _triple(o["restitution"]),
+            "-" if drift is None else f"{drift * 100:.2f}",
+            "yes" if o["stable_every_case"] else "NO",
+            "; ".join([*o["flags"], *o["skip_reasons"], *o["notes"]]),
+        ]
+        marked = o["object_id"] in report["objects_to_review"]
+        rows.append(
+            f"<tr{' class=review' if marked else ''}>{''.join(_cell(c) for c in cells)}</tr>"
+        )
+    facts = {
+        "Status": report["status"],
+        "Validated in": report["validated_in"],
+        "Objects": (
+            f"{report['objects_exported']} exported, {report['objects_skipped']} skipped, "
+            f"{len(report['objects_without_asset'])} without an asset, of "
+            f"{report['objects_found']} found"
+        ),
+        "Without an asset": ", ".join(report["objects_without_asset"]) or "none",
+        "Settling": ", ".join(
+            f"{k} {'ok' if v else 'FAILED'}" for k, v in report["stability_cases"].items()
+        ),
+        "URDF settling": "agrees" if report["urdf_check"]["agrees"] else "DISAGREES",
+        "Scene flags": "; ".join(report["scene_flags"]) or "none",
+    }
+    summary = "".join(f"<tr><th>{html.escape(k)}</th>{_cell(v)}</tr>" for k, v in facts.items())
+    images = "".join(
+        f'<img src="{html.escape(v)}" alt="real frame beside the simulated scene">'
+        for v in report["views"]
+    )
+    header = "".join(f"<th>{html.escape(c)}</th>" for c in columns)
+    return f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>QA report {html.escape(report["run_id"])}</title>
+<style>
+body {{ font: 14px system-ui, sans-serif; margin: 24px; background: #fff; color: #222; }}
+table {{ border-collapse: collapse; margin-bottom: 24px; }}
+th, td {{ border: 1px solid #ccc; padding: 4px 8px; text-align: left; vertical-align: top; }}
+tr.review {{ background: #fff4d6; }}
+img {{ display: block; max-width: 100%; margin-bottom: 12px; }}
+</style></head><body>
+<h1>QA report {html.escape(report["run_id"])}</h1>
+<table>{summary}</table>
+<h2>Objects</h2>
+<table><tr>{header}</tr>{"".join(rows)}</table>
+<h2>Real frame and simulated scene, after settling</h2>
+{images}
+</body></html>
+"""
+
+
+def write_report(report: dict[str, Any], folder: Path) -> Path:
+    """Write both files and return the HTML path."""
+    (folder / "qa_report.json").write_text(json.dumps(report, indent=1) + "\n", encoding="utf-8")
+    path = folder / "qa_report.html"
+    path.write_text(_html(report), encoding="utf-8")
+    return path
+
+
+__all__ = ["VALIDATED_IN", "build_report", "write_report"]

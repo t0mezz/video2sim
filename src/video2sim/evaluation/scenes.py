@@ -58,6 +58,9 @@ class Prediction:
     objects: Sequence[PredObject]
     runtime_s: float | None = None
     notes: list[str] = field(default_factory=list)
+    stable: bool | None = None  # settled in every case of physics/settling.json
+    assets_valid: int | None = None
+    assets_total: int | None = None
 
 
 def _triple(value: Any) -> tuple[float, float, float] | None:

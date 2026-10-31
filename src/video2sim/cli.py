@@ -1,8 +1,9 @@
-"""Command line entry point: ``video2sim eval`` (P0.6). ``run`` arrives with P5.5."""
+"""Command line entry point: ``video2sim eval`` (P0.6) and ``video2sim run`` (P5.5)."""
 
 from __future__ import annotations
 
 import argparse
+import shutil
 import sys
 from collections.abc import Sequence
 from datetime import datetime, timezone
@@ -20,7 +21,7 @@ from video2sim.evaluation.metrics import SceneResult, evaluate_scene
 from video2sim.evaluation.report import build_report, write_html, write_json
 from video2sim.evaluation.scenes import GtScene, Prediction, discover_scenes
 from video2sim.evaluation.segmentation import load_instances, summarize_segmentation
-from video2sim.runner import OUTPUT_FILE, _code_version, sha256_file
+from video2sim.runner import MANIFEST_FILE, OUTPUT_FILE, StageFailed, _code_version, sha256_file
 from video2sim.schemas import WorldModel
 
 SPLIT_CHOICES = {"dev": ["dev"], "test": ["test"], "all": ["dev", "test"]}
@@ -110,6 +111,13 @@ def _build_parser() -> argparse.ArgumentParser:
     ev.add_argument("--position-sigma-m", type=float, default=0.0)
     ev.add_argument("--yaw-sigma-deg", type=float, default=0.0)
     ev.add_argument("--mass-sigma", type=float, default=0.0)
+    run = sub.add_parser("run", help="turn one video into a scene package")
+    run.add_argument("video", type=Path)
+    run.add_argument("--out", type=Path, required=True, help="folder for the scene package")
+    run.add_argument("--runs", type=Path, default=Path("runs"), help="run folders (default: runs)")
+    run.add_argument("--run-id", help="resume this run; default: a new id from time and video")
+    run.add_argument("--config", type=Path, default=Path("configs/default.yaml"))
+    run.add_argument("--targets", type=Path, default=Path("configs/targets.yaml"))
     return parser
 
 
@@ -168,10 +176,30 @@ def run_eval(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_pipeline(args: argparse.Namespace) -> int:
+    from video2sim.pipeline import build_runner  # heavy imports, not needed for eval
+
+    cfg: dict[str, Any] = yaml.safe_load(args.config.read_text(encoding="utf-8"))
+    targets: dict[str, Any] = yaml.safe_load(args.targets.read_text(encoding="utf-8"))
+    runner = build_runner(args.runs, cfg, targets, Path.cwd())
+    try:
+        manifest = runner.run(args.video, run_id=args.run_id)
+    except StageFailed as error:
+        print(str(error), file=sys.stderr)
+        return 1
+    run_dir = args.runs / manifest.run_id
+    shutil.copytree(run_dir / "export", args.out, dirs_exist_ok=True)
+    shutil.copy2(run_dir / MANIFEST_FILE, args.out / MANIFEST_FILE)
+    print(f"wrote the scene package to {args.out}; run folder {run_dir}")
+    return 0
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
     if args.command == "eval":
         return run_eval(args)
+    if args.command == "run":
+        return run_pipeline(args)
     return 2
 
 

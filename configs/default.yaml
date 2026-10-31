@@ -230,4 +230,24 @@ physics:
     decimation_aggression: 5        # fast_simplification agg, 3 to 10; below 3 it stops short of the budget
 
 export:
-  simulator: isaac_sim         # assumed, see PLAN.md decision D-001
+  simulator: mujoco            # validation and demo simulator in Phase 5 (D-027)
+  table_size_m: 2.0            # shown width of the table plane; its collision is infinite
+  qa_views: 3                  # camera views in the QA report, evenly spaced over the frames
+  check_tolerance: 1.0e-4      # share of the value allowed in USD and URDF read-back checks
+  check_tolerance_m: 1.0e-4    # same, for positions and mesh bounds
+
+demo:                          # P5.4, src/video2sim/pick_place.py
+  panda_model: data/third_party/mujoco_menagerie/franka_emika_panda/panda.xml  # scripts/fetch_panda.sh
+  base_distance_m: 0.45        # arm base from the object, well inside the Panda's 0.855 m reach
+  place_distance_m: 0.15       # goal from where the object starts
+  grasp_depth_m: 0.02          # pad center below the object's top
+  min_grasp_height_m: 0.02     # pad center above the table, so the fingertips clear it
+  grip_force_n: 70.0           # continuous grasp force of the Franka Hand, from reseller specification listings; Franka's own hand datasheet not found
+  lift_clearance_m: 0.03       # commanded above the required lift, for sag and slip
+  max_width_m: 0.07            # the gripper opens 0.08 m; leaves 5 mm a side
+  min_height_m: 0.03           # lower objects leave no room for the pads
+  min_clearance_m: 0.03        # free space around the object, footprint to footprint
+  base_angles: 16              # directions tried for the arm base
+  control_dt_s: 0.01
+  video_fps: 30
+  video_size_px: [640, 480]
