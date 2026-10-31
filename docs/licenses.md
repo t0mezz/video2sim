@@ -25,6 +25,7 @@ text or terms, and record who read it and when.
 | SciPy (convex hulls through trimesh, P3.4) | Added 2026-10-29 by human approval, for the proxy hull and stable-face choice. Its installed metadata gives a BSD-style text, "Copyright (c) 2001-2002 Enthought, Inc. 2003, SciPy Developers"; the wheel also bundles third-party libraries whose licenses were not read. | Installed package metadata, 2026-10-29 | Partly: bundled licenses not read |
 | Convex decomposition (CoACD or V-HACD) | Not checked. | | No |
 | MuJoCo (`mujoco` 3.17.0, settling, P4.7, D-021) | Added 2026-10-31 by human approval. The installed package metadata gives Apache-2.0. Runs on CPU, no network. It brings `glfw`, `pyopengl` and others, whose licenses were not read; none is distributed by us. | Installed package metadata, 2026-10-31 | Partly: SPDX id only, text not read |
+| OpenUSD (`usd-core` 26.8, USD export, P5.1, D-028) | Added 2026-10-31 by human approval. Tomorrow Open Source Technology License 1.0, which by its own note differs from Apache 2.0 only in section 6 (trademarks). The wheel bundles third-party code under BSD, MIT, JSON, Boost and Apache licenses; those terms were not read and none is distributed by us. | `LICENSE.txt` in the installed package: opening note and section list read, full text not, 2026-10-31 | Partly: full text and bundled licenses not read |
 | Isaac Sim and Isaac Lab | Not checked. | | No |
 
 ## Questions to answer for each row

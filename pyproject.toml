@@ -17,6 +17,7 @@ dependencies = [
     "pyyaml>=6.0",
     "scipy>=1.15.3",
     "trimesh>=5.2.0",
+    "usd-core>=26.8,<26.11",
 ]
 
 [project.scripts]

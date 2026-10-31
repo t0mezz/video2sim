@@ -17,7 +17,9 @@ from video2sim.schemas import (
     PhysicalProperties,
     Plane,
     RunManifest,
+    SceneExport,
     SimAsset,
+    SkippedAsset,
 )
 
 
@@ -165,6 +167,25 @@ def test_sim_asset_validity_requires_all_checks() -> None:
     assert asset({"watertight": True, "manifold": True}).is_valid
     assert not asset({"watertight": True, "manifold": False}).is_valid
     assert not asset({}).is_valid
+
+
+def test_scene_export_rejects_an_object_both_skipped_and_exported() -> None:
+    def export(skipped_id: str) -> SceneExport:
+        return SceneExport(
+            usd_path="export/scene.usda",
+            urdf_paths={"obj_000": "export/urdf/obj_000.urdf"},
+            qa_report_path="export/qa_report.html",
+            skipped=[SkippedAsset(object_id=skipped_id, reasons=["watertight"])],
+        )
+
+    assert export("obj_001").skipped[0].object_id == "obj_001"
+    with pytest.raises(ValidationError, match="skipped objects"):
+        export("obj_000")
+
+
+def test_scene_export_rejects_absolute_paths() -> None:
+    with pytest.raises(ValidationError):
+        SceneExport(usd_path="/tmp/scene.usda", urdf_paths={}, qa_report_path="export/qa.html")
 
 
 def test_run_manifest_starts_with_every_stage_pending() -> None:

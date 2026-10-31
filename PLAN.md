@@ -558,30 +558,34 @@ Evidence: gate run once on the test split, `benchmark/results/p4_gate_test.json`
 
 ## 9. Phase 5: Export, simulator validation, demo (weeks 11 to 12)
 
-Goal: one command takes a video to a USD scene that runs in Isaac Sim, with a QA report and a
-basic manipulation demo.
+Goal: one command takes a video to a USD and URDF scene package, validated in MuJoCo, with a QA
+report and a basic manipulation demo.
+
+Note (D-027): this phase validates in MuJoCo on the Mac. USD loading in Isaac Sim and PhysX
+behavior stay unverified until the verifier on the GPU workstation runs (section 12 item 8).
 
 Tasks
 
 - [ ] **P5.1** USD writer: Z-up, meters, kilograms; per object a transform with rigid body and
 
-      mass properties, visual mesh with textures, convex collision meshes, physics materials
+      mass properties, visual mesh with `displayColor` from its vertex colors, convex collision meshes, physics materials
       from the friction and restitution values; table and ground plane; physics scene.
+      Checked by reading the USD back against `SimAssets`. Settling stays in MuJoCo (D-027).
 
-- [ ] **P5.2** URDF writer per object (inertial, visual, collision), loaded in a second
+- [ ] **P5.2** URDF writer per object (inertial, visual, collision), loaded in MuJoCo to
 
-      simulator such as PyBullet or MuJoCo to cross-check units, axes and inertia.
+      cross-check units, axes and inertia.
 
 - [ ] **P5.3** QA report per scene: status, confidence and fallbacks per object, stability
 
       result, side-by-side renders of the real frame and the simulated scene from the same
       camera pose.
 
-- [ ] **P5.4** Isaac Lab check: scripted pick-and-place with a manipulator on one object from
+- [ ] **P5.4** MuJoCo check: scripted pick-and-place with a manipulator on one object from
 
       the twin, repeated across the stored friction and mass ranges. Stretch: a short RL run.
 
-- [ ] **P5.5** Command line (`video2sim run video.mp4 --out scene/`), container image, README
+- [ ] **P5.5** Command line (`video2sim run video.mp4 --out scene/`), README
 
       with the capture guide.
 
@@ -592,8 +596,8 @@ Tasks
 Exit criteria
 
 - [ ] Final benchmark run meets every target, or the misses are documented with causes
-- [ ] USD scenes open in Isaac Sim without edits; URDF loads in the second simulator
-- [ ] Scripted pick-and-place demo recorded on at least three scenes
+- [ ] USD scenes read back with the units, axes, mass and inertia of `SimAssets`; URDF loads in MuJoCo (D-027)
+- [ ] Scripted pick-and-place demo in MuJoCo recorded on at least three scenes
 - [ ] A new person can reproduce a scene from the README alone
 
 Evidence:
@@ -649,6 +653,8 @@ one that supersedes.
 | D-024 | Mass combines geometry with the vision-language model (human decision 2026-10-31), an exception to the rule that a model writes no number. One hosted request per object on 2 keyframe crops returns a low, nominal and high mass; the geometry mass stands when it falls inside that range, otherwise the model's mass and range are used, and inertia scales with the mass because the body is unchanged. Without a readable answer the geometry mass stands with `Flag.LOW_CONFIDENCE_MATERIAL`. On 56 weighed dev objects within 30%: geometry 36% held out, model alone 46%, the rule 52% held out (90% interval 38 to 66%, resampling objects). Measured size made the model worse (41%), so it is not sent. `physics.vlm_mass.enabled: false` turns it off to save calls: no request, no key, geometry mass only, no flag. The mass target is unchanged; only a human changes `configs/targets.yaml` | Decided | Week 9 | `src/video2sim/stages/vlm_mass.py`, `benchmark/run_vlm_mass.py`, `benchmark/results/p4_vlm_mass.json` |
 | D-025 | Phase 4 gate terms (human decisions 2026-10-31). The mass target is 50% within 30%, down from 70%, because no method on these inputs reached it (D-024). Round objects do not count towards settling: they really roll and fall over on the table (the s17 egg stands only through a dent made by hand). `Flag.IGNORED_ROUND` marks an object within `physics.settling.round_tolerance` of the ellipsoid in its bounding box, 0.04 from the dev gap between the egg (0.028) and the nearest other object (0.053); it stays in the scene and its drift is reported. The Phase 2 box fit now seats stacked objects: most of the footprint over another object and the lowest points near its top. This fixes s13 obj_001. The stack rule was scanned on all scenes' points without scores, and it also fires on s16 obj_002, a real stack in the test split | Decided | Week 9 | `configs/targets.yaml`, `src/video2sim/stages/settling.py`, `src/video2sim/stages/primitive_fit.py` |
 | D-026 | Phase 4 gate marked Passed by human decision (2026-10-31), with the mass miss waived. The gate run failed on mass at 45% on test against 50%. The target and the failed result stand as recorded, and the exit box stays unticked. Reason: mass carries low and high values, so the simulator work is not blocked, and no cheap fix remains on these inputs. Consequence: masses may be wrong by more than 30% on about half of objects, so the QA report of P5.3 must show the mass source and range, and a future mass method is built on dev only, because the test split has been seen | Decided | Week 10 | `benchmark/results/p4_gate_eval_test.json` |
+| D-027 | MuJoCo is the validation and demo simulator for Phase 5, because development is on a Mac (human decision 2026-10-31). Settling, the URDF checks and the scripted pick-and-place run in MuJoCo, and USD is still exported. After Phase 5, a parallel verifier that uses Isaac Sim is built on the human's NVIDIA GPU workstation. Supersedes for now: D-001 as the simulator Phase 5 validates in, and the repeat of the settling gate in Isaac Sim under D-021. Until the verifier runs, USD loading in Isaac Sim and all PhysX behavior are unverified | Decided | Week 11 | Phase 5 tasks and exit criteria reworded by human approval; section 12 item 8 |
+| D-028 | Phase 5 export contract (human decisions 2026-10-31). `schemas.py` gains `SceneExport` and `SkippedAsset`, the output of stage 6. `usd-core` is added below 26.11, because 26.11 drops Python 3.10, which the project and CI support; 26.8 is installed and imports on 3.10 and 3.14. USD visual meshes carry vertex colors as `displayColor` and no textures, so P5.1 is amended. The container image is removed from P5.5 and stays deferred with P0.8 | Decided | Week 11 | `src/video2sim/schemas.py`, `pyproject.toml`, `docs/licenses.md` |
 
 ## 12. After the MVP
 
@@ -706,6 +712,10 @@ In order:
    without breaking the reconstruction gates. Needs a GPU host, weights and a license check
    (`docs/licenses.md`); `benchmark/modal_vggt.py` is an untracked first attempt.
 
+8. **Isaac Sim verifier (D-027).** After Phase 5, on the NVIDIA GPU workstation, build a verifier
+   that runs alongside the MuJoCo checks: load the exported USD scenes in Isaac Sim and compare
+   their behavior under PhysX with the MuJoCo results.
+
 ## 13. Changelog
 
 | Date | Change |
@@ -753,3 +763,6 @@ In order:
 | 2026-10-31 | D-024: mass combines geometry with the vision-language model; 52% of dev objects within 30%, exit criterion not met, `AGENTS.md` rule amended by human decision |
 | 2026-10-31 | D-022: collision fit ignores surfaces inside the sealed body, primitive fallback and vertex thinning fixed; 61 of 61 dev objects pass the collision checks |
 | 2026-10-31 | D-020: tags-on-table layer on the plane fit; s05 rerun, all 4 objects now SAM 3D with fit 0.95 to 0.98 and `lift.max_extent_m` back at 1.5 |
+| 2026-10-31 | D-027: Phase 5 validates in MuJoCo on the Mac; a parallel Isaac Sim verifier follows on the GPU workstation (section 12 item 8) |
+| 2026-10-31 | Phase 5 goal, P5.1, P5.2, P5.4 and exit criteria reworded for MuJoCo under D-027 by human approval |
+| 2026-10-31 | D-028: `SceneExport` added to `schemas.py`, `usd-core` 26.8 added, P5.1 uses `displayColor`, container image removed from P5.5 |
