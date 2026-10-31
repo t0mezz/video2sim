@@ -47,7 +47,9 @@ from video2sim.stages.world_frame import (
     apply_scale,
     estimate_scale,
     fit_plane_ransac,
+    fit_table_on_tags,
     reference_tag_id,
+    tag_plane_distance_m,
     world_from_tag,
 )
 
@@ -282,6 +284,9 @@ class WorldFrameConfig:
     plane_inlier_threshold_m: float
     plane_ransac_iterations: int
     plane_radius_m: float
+    tags_on_table: bool
+    max_tag_plane_distance_m: float
+    tag_refit_band_m: float
     seed: int
 
     @classmethod
@@ -294,6 +299,9 @@ class WorldFrameConfig:
             plane_inlier_threshold_m=float(wf["plane_inlier_threshold_m"]),
             plane_ransac_iterations=int(wf["plane_ransac_iterations"]),
             plane_radius_m=float(wf["plane_radius_m"]),
+            tags_on_table=bool(wf["tags_on_table"]["enabled"]),
+            max_tag_plane_distance_m=float(wf["tags_on_table"]["max_distance_m"]),
+            tag_refit_band_m=float(wf["tags_on_table"]["refit_band_m"]),
             seed=int(cfg["seed"]),
         )
 
@@ -308,6 +316,7 @@ class WorldFrameResult:
     tag_centers_world_m: dict[int, F64]
     tag_views: dict[int, int]  # tag id -> number of frames used
     tag_reprojection_px: float
+    tag_plane_distance_m: float  # farthest tag corner from the final table plane
     flags: list[str]  # reasons for the QA report; empty when nothing is wrong
 
 
@@ -332,23 +341,51 @@ def solve_world_frame(
             f"only {len(near)} reconstructed points within {cfg.plane_radius_m} m of the marker"
         )
     cameras = np.array([v.T_world_from_camera[:3, 3] for v in views]) * est.scale
+    up_hint = cameras.mean(axis=0) - ref_center  # cameras look down on the table
     plane = fit_plane_ransac(
         near,
         inlier_threshold_m=cfg.plane_inlier_threshold_m,
         iterations=cfg.plane_ransac_iterations,
         seed=cfg.seed,
-        up_hint=cameras.mean(axis=0) - ref_center,  # cameras look down on the table
+        up_hint=up_hint,
     )
+    flags = []
+    tag_distance = tag_plane_distance_m(corners, plane.plane)
+    if cfg.tags_on_table and tag_distance > cfg.max_tag_plane_distance_m:
+        first = tag_distance
+        refit = fit_table_on_tags(
+            near,
+            corners,
+            band_m=cfg.tag_refit_band_m,
+            inlier_threshold_m=cfg.plane_inlier_threshold_m,
+            iterations=cfg.plane_ransac_iterations,
+            seed=cfg.seed,
+            up_hint=up_hint,
+        )
+        refit_distance = tag_plane_distance_m(corners, refit.plane)
+        if refit_distance <= cfg.max_tag_plane_distance_m:
+            plane, tag_distance = refit, refit_distance
+            flags.append(f"table_refit_from_tags: first plane was {first:.3f} m from a tag")
+        else:  # no plane holds all tags, so they are not all on the table (s24)
+            flags.append(f"tags_off_table: kept the first plane, {first:.3f} m from a tag")
     t = world_from_tag(corners[ref], plane.plane)
     centers = {i: t[:3, :3] @ c.mean(axis=0) + t[:3, 3] for i, c in corners.items()}
 
-    flags = []
     if est.disagree:
         flags.append(f"tag_scale_disagree: spread {100 * est.spread:.1f}% between tags")
     if len(tri.corners) == 1:
         flags.append("single_tag: scale has no cross-check")
     return WorldFrameResult(
-        est, ref, plane, t, tri.corners, centers, tri.n_views, tri.mean_reprojection_px, flags
+        est,
+        ref,
+        plane,
+        t,
+        tri.corners,
+        centers,
+        tri.n_views,
+        tri.mean_reprojection_px,
+        tag_distance,
+        flags,
     )
 
 

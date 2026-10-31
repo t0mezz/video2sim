@@ -38,6 +38,10 @@ reconstruction:
     plane_inlier_threshold_m: 0.004   # TODO(P1.6): tune on dev scenes; a guess, not yet measured
     plane_ransac_iterations: 500      # TODO(P1.6): tune on dev scenes
     plane_radius_m: 1.0               # TODO(P1.6): points this close to the reference tag fit the table; a guess
+    tags_on_table:                    # optional layer: the tags lie on the table, so a plane away from them is wrong (s05: plane through the object tops, 3 to 7 cm up). A refit that cannot hold all tags is dropped and flagged (s24). Disable for scenes whose markers are not on the table plane
+      enabled: true
+      max_distance_m: 0.015           # farthest tag corner from the plane before a refit; dev scenes: good ones up to 8.2 mm, s05 64 mm
+      refit_band_m: 0.02              # refit uses points this close to the plane through the tag corners; a guess
     max_tag_reprojection_px: 3.0      # TODO(P1.6): per-view limit when triangulating tag corners; a guess
     max_tag_scale_spread: 0.03        # TODO(P1.6): tag-to-tag scale disagreement that is flagged; a guess
     max_tag_fit_rms_m: 0.005          # TODO(P1.6): grid-board fit residual, benchmark check only
@@ -72,7 +76,7 @@ segmentation:
     voxel_m: 0.005             # grid resolution; a cluster point is a voxel centre
     max_height_m: 0.35         # grid top above the table plane; objects taller than this are cut off
     margin_m: 0.10             # grid extends this far beyond the track footprints
-    max_extent_m: 2.0          # refuse a grid wider than this (a stray track far from the others); s05 is 1.52 m with no stray
+    max_extent_m: 1.5          # refuse a grid wider than this (a stray track far from the others)
     max_views: 40              # frames used, spread evenly; cost is voxels x views x tracks
     mask_downscale: 2          # masks are shrunk by this factor before lookup
     min_views: 5               # a voxel needs this many views that see it
