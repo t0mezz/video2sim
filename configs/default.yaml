@@ -204,6 +204,13 @@ physics:
     samples_per_voxel_area: 8.0     # surface samples per voxel face area
     max_surface_samples: 3000000
     seed: 0
+  settling:                    # P4.7, stages/settling.py; window and drift limit are in targets.yaml
+    timestep_s: 0.001               # stable on the closed-form tests in tests/test_settling.py
+    gravity_m_s2: 9.80665           # standard gravity, CGPM 1901
+    penetration_tolerance_m: 0.0005 # overlaps deeper than this are separated before the drop
+    max_separation_iterations: 200
+    noslip_iterations: 5            # removes the creep of soft friction on a slope
+    drift_sample_s: 0.02            # how often drift is read during the window
   repair:                      # P4.1, stages/mesh_repair.py
     min_component_area_frac: 0.02   # a piece smaller than this share of the largest piece's area is a floater
     min_volume_m3: 1.0e-9           # below this the mesh is not a solid

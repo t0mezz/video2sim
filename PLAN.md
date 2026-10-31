@@ -444,11 +444,12 @@ Tasks
       per object. Use a box, cylinder or sphere primitive where the object is close to one.
       Evidence: `src/video2sim/stages/collision.py`, `tests/test_collision.py`; on the 5 raw SAM 3D
       meshes of `runs/s01_b` (thin-walled shells, walls 0.4 to 1.2% of the object size) 4 pass
-      `collision_loads` and `collision_fit` (1 box, 3 CoACD with 16 parts) and 1 fails fit
-      (8 parts, tightness 0.12 against a limit of 0.05), so export is blocked for it
-      (`benchmark/results/p4_2_collision.json`, `benchmark/run_collision.py`). CoACD takes 12 to
-      78 s per object. The fit check is surface-based because a volume ratio fails on shells.
-      Not yet run on registered, metric meshes (none on disk).
+      `collision_loads` and `collision_fit` (1 box, 3 CoACD with 16 parts) and 1 failed fit
+      (8 parts, tightness 0.12 against a limit of 0.05). Superseded by D-022: all 5 pass (2 boxes,
+      1 cylinder, 2 CoACD with 16 parts) (`benchmark/results/p4_2_collision.json`,
+      `benchmark/run_collision.py`). CoACD takes 12 to 99 s per object. The fit check is
+      surface-based because a volume ratio fails on shells. On the 61 registered, metric meshes
+      of the 13 rigid dev scenes all pass (`benchmark/results/p4_7_settling.json`).
 
 - [x] **P4.3** Build `configs/material_table.yaml`: density, friction and restitution ranges per
 
@@ -502,9 +503,22 @@ Tasks
       values, 20 (36%) per class; 26 (46%) in sample. The 70% exit criterion is not met. Friction
       and restitution stay as placeholders (D-019). No test split was run.
 
-- [ ] **P4.7** Scene settling: resolve interpenetrations, drop the scene under gravity in the
+- [x] **P4.7** Scene settling: resolve interpenetrations, drop the scene under gravity in the
 
       simulator, compare final poses with the observed ones.
+      Evidence: `src/video2sim/stages/settling.py`, `tests/test_settling.py` (rest, free fall,
+      slope, tipping and overlaps against closed forms), `benchmark/run_settling.py`,
+      `benchmark/results/p4_7_settling.json`. MuJoCo stands in for Isaac Sim (D-021), so the result
+      is provisional. All 61 objects of the 13 rigid dev scenes load and run, and all pass every
+      collision check after D-022. 10 of 13 scenes (77%) settle within 2 cm over 5 s against the
+      95% exit criterion, and the same 10 in all five cases (nominal, low and high friction, low
+      and high mass), so those ranges do not decide it. Each failing scene has one object: the
+      s03 basketball rolls (2.8 cm), because nothing resists rolling and no sourced value is
+      available to add; s13 obj_001 was placed on the table through the box beside it, and
+      separation moves it 4.4 cm (one of the 3 objects of that scene is also missing); s17
+      obj_004, a chocolate egg standing on end, falls over (5.7 cm, 110 degrees). The s04
+      basketball passes since it became a sphere primitive under D-022, which is not a fix for
+      rolling. No test split was run.
 
 - [ ] **P4.8** Emit `SimAssets`.
 
@@ -604,6 +618,8 @@ one that supersedes.
 | D-018 | Shape stage geometry path: SAM 3D Objects only (`shape.backend: sam3d`). TRELLIS.2 is dropped from the project (human decision 2026-10-30, after the P3.3 dev-split bake-off). Evidence: `benchmark/results/p3_3_bakeoff_dev.json`, 42 objects matched by all three arms: median size error 4.5% for SAM 3D, 8.7% for TRELLIS.2, 8.4% for TRELLIS.2 geometry on SAM 3D's pose; objects over 15%: 5, 15, 15; proxy hulls: 1, 20, 11. Removed: `models/trellis2.py`, `models/trellis2_modal.py`, `models/hybrid.py`, `shape.trellis2`, their tests. Kept: the results, `benchmark/compare_shape_arms.py`, `shape.parallel_samples`, `SampleFailed`. Consequences: `nvdiffrast` and `nvdiffrec` (research use only, D-005) are no longer in the pipeline; the DINOv3 and RMBG-2.0 licenses no longer apply; the SAM License terms remain. Not done: the test split and the Phase 4 stability measure were not run for the bake-off. `GeometrySource` in `schemas.py` still lists `trellis2` (schema change left for a human). The Modal app `video2sim-trellis2` and its weights volume are still deployed | Decided | Week 8 | Commands to remove them are in the 2026-10-30 changelog row |
 | D-019 | Unsourced friction and restitution are accepted as wide educated placeholders (human decision 2026-10-31). Every one of the 14 classes has at least one unsourced value, so flagging on any of them would flag every object and say nothing. `Flag.LOW_CONFIDENCE_MATERIAL` is raised only for an unsourced density or a low model confidence. The benchmark records mass only, so P4.6 cannot narrow friction or restitution | Decided | Week 9 | `configs/material_table.yaml`, `src/video2sim/stages/material_table.py` |
 | D-020 | Optional tags-on-table layer on the table plane fit (human decision 2026-10-31, `reconstruction.world_frame.tags_on_table`, on by default). On s05 RANSAC settled on the object tops, 3 to 7 cm above a bare white table, which cut the objects off in lifting and sent two of them to proxy hulls, with no flag. A plane more than 15 mm from a tag corner is refitted on the points near the plane through the tags; a refit that cannot hold all the tags is dropped and `tags_off_table` is raised (s24, 23 cm). Disable it for scenes whose markers are not on the table plane. Dev scenes: good ones up to 8.2 mm, s05 64 mm before and 1.1 mm after; the test split was not measured | Decided | Week 9 | `src/video2sim/stages/world_frame.py`, `src/video2sim/stages/reconstruction.py` |
+| D-021 | MuJoCo settles the scenes for P4.7, in place of Isaac Sim (human decision 2026-10-31). Isaac Sim does not run on the development Mac and P5.2 needs a second simulator anyway. Stability numbers from MuJoCo are provisional: the contact solver is not PhysX, and the gate is repeated in Isaac Sim in P5.1. Drift is the distance of the object-frame origin from the observed pose, the largest in the window, including separation; rotation is reported and does not gate. Restitution is not simulated, and the pair friction is the object's own or the larger of two objects' (MuJoCo's rule) | Decided | Week 9 | `configs/default.yaml` `physics.settling`, `src/video2sim/stages/settling.py` |
+| D-022 | `collision_fit` tightness ignores part surfaces inside the sealed body of `stages/mass.py` (human decision 2026-10-31). The old test, which side of the nearest visual surface a point is on, read cuts through the cavity of a shell as outside and failed 11 of 61 dev objects whose plain hulls were mostly tight. Plain hulls fail on 8 of 61 objects under both tests, and the hull of an open cup still fails (`tests/test_collision.py`). Known gap: mouths under about 8% of the longest side are sealed, so parts filling a narrow neck are not caught. With it: primitives compare against the sealed volume, a primitive that fails a check falls back to the decomposition, and hulls that edge collapse cannot thin use farthest point selection. Result: 47 to 61 of 61 objects pass, and 13 objects changed to primitives | Decided | Week 9 | `src/video2sim/stages/collision.py`, `benchmark/results/p4_7_settling.json` |
 
 ## 12. After the MVP
 
@@ -700,4 +716,6 @@ In order:
 | 2026-10-31 | P4.5: volume test written up in `docs/research/mesh_volume.md`; meshes are shells, the outer volume is right and density is the main mass error |
 | 2026-10-31 | P4.5 ticked: `stages/mass.py`, sealed voxel body, one dev-measured hollow fill fraction and the center of mass left to P4.8 (human decisions); 14 of 56 dev objects within 30%, exit criterion not met |
 | 2026-10-31 | P4.6 ticked: fill fractions per class and answer; 20 of 56 dev objects within 30% with objects held out (36%), exit criterion not met |
+| 2026-10-31 | P4.7 ticked under D-021: settling in MuJoCo, 10 of 13 rigid dev scenes pass (77%), exit criterion not met; `mujoco` added by human approval |
+| 2026-10-31 | D-022: collision fit ignores surfaces inside the sealed body, primitive fallback and vertex thinning fixed; 61 of 61 dev objects pass the collision checks |
 | 2026-10-31 | D-020: tags-on-table layer on the plane fit; s05 rerun, all 4 objects now SAM 3D with fit 0.95 to 0.98 and `lift.max_extent_m` back at 1.5 |

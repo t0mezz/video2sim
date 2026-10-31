@@ -9,6 +9,7 @@ dependencies = [
     "fast-simplification>=0.2.0",
     "meta-sam-parser>=0.1.0",
     "modal>=1.6.3",
+    "mujoco>=3.2",
     "numpy>=1.26",
     "opencv-python-headless>=5.0.0.93",
     "pycolmap>=4.2.1",
