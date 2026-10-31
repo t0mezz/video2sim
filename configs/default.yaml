@@ -134,7 +134,7 @@ segmentation:
     retries: 4                 # attempts on HTTP 429 and 5xx, with 2, 4, 8 s waits between them
     finishes: [matte, glossy, metallic, mirror, transparent, translucent]
     reflective_finishes: [metallic, mirror, transparent, translucent]   # flag the object when the model names one of these
-    classes:                   # PROVISIONAL keys from the materials seen on the dev scenes; P4.3 owns the final list and the numbers
+    classes:                   # final list (P4.3); the numbers are in configs/material_table.yaml
       - cardboard
       - paper
       - plastic_hard

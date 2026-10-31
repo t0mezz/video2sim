@@ -458,12 +458,19 @@ Tasks
       listed in `unsourced` as wide placeholders (density 6 of 14 classes, friction 13, restitution
       12), and only an unsourced density raises `Flag.LOW_CONFIDENCE_MATERIAL`.
 
-- [ ] **P4.4** Material inference. A vision-language model sees keyframe crops and returns
+- [x] **P4.4** Material inference. A vision-language model sees keyframe crops and returns
 
       structured fields only: category, material class, solid or hollow, confidence. Code
       maps the class to numbers through the table. The classification half already runs in
       Phase 2 (D-017, `stages/material_pass.py`, plus a surface-finish field); this task is
       done when the numbers half exists and the class list is final (P4.3).
+      Evidence: `object_material` in `src/video2sim/stages/physics.py`, `tests/test_physics.py`;
+      the 14 classes of P4.3 are the final list. On 56 matched dev objects (12 scenes, s05 has no
+      ground-truth origin) the class agrees with the inventory on 40 and hollow on 38
+      (`benchmark/results/p4_4_material_numbers.json`, `benchmark/run_material_numbers.py`), after
+      the four cardboard packages obj_002, 003, 014 and 029 were marked hollow in the inventory
+      by human decision (2026-10-31, ground truth regenerated, hollow fields only). Coffee can
+      obj_004 is open: inventory cardboard and not hollow, model steel and hollow.
 
 - [ ] **P4.5** Mass and inertia from the repaired mesh under uniform density, with a hollow
 
@@ -668,4 +675,6 @@ In order:
 | 2026-10-29 | Phase 2 cluster box criterion ticked by human decision (test split 6.0% median on s07 to s09, s10 unscored); Phase 2 gate passed; Phase 3 is the current focus |
 | 2026-10-29 | Cleanup before Phase 3: evidence narratives of Phases 0 to 2 and the section 12 reconstruction experiments moved verbatim to `docs/history/`; P2.1 discovery code removed (eef52b6) |
 | 2026-10-31 | P4.3 ticked under D-019: friction and restitution placeholders accepted, only an unsourced density flags an object; Phase 4 set to In progress |
+| 2026-10-31 | P4.4 ticked: class to numbers mapping in `stages/physics.py`, checked against the inventory on 56 dev objects |
+| 2026-10-31 | Inventory: obj_002, obj_003, obj_014 and obj_029 marked hollow by human decision; ground truth regenerated, only the 23 hollow fields changed |
 | 2026-10-31 | D-020: tags-on-table layer on the plane fit; s05 rerun, all 4 objects now SAM 3D with fit 0.95 to 0.98 and `lift.max_extent_m` back at 1.5 |
