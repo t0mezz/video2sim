@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 import trimesh
 import yaml
+from numpy.typing import NDArray
 
 from video2sim.stages.collision import (
     CollisionConfig,
@@ -27,7 +28,7 @@ def cfg() -> CollisionConfig:
     )
 
 
-def rotation(angle: float, axis: list[float]) -> np.ndarray:
+def rotation(angle: float, axis: list[float]) -> NDArray[np.float64]:
     return np.asarray(trimesh.transformations.rotation_matrix(angle, axis))  # type: ignore[no-untyped-call]
 
 
