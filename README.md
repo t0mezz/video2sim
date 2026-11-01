@@ -7,8 +7,8 @@ stage gives them a metric position in the world, and a physics stage adds collis
 mass, inertia and friction ranges. The result loads in Isaac Sim and is meant as a starting
 point for reinforcement learning and robot training.
 
-**Status:** pre-MVP. The repository holds the contracts between stages and the plan. The
-stages themselves are implemented phase by phase; see [PLAN.md](PLAN.md).
+**Status:** pre-MVP, in Phase 5. All six stages run. Scenes are validated in MuJoCo; loading the
+USD in Isaac Sim is not verified yet (D-027). See [PLAN.md](PLAN.md).
 
 ## Quick start
 
@@ -18,6 +18,24 @@ uv run pytest           # fast tests, no GPU or model weights needed
 uv run ruff check .     # lint
 uv run mypy             # type check
 ```
+
+## Make a scene
+
+Film the table as [docs/capture_protocol.md](docs/capture_protocol.md) says, with the printed
+marker board in view. The pipeline calls hosted models, so it needs a Meta Model API key and a
+Baseten key in `.env` (see `.env.example`), and a Modal account with the SAM 3D worker deployed
+(`AGENTS.md` has the commands). It sends video frames and object crops to those services.
+
+```bash
+uv run video2sim run my_table.mp4 --out scene/
+```
+
+`scene/` then holds `scene.usd`, one URDF per object in `urdf/`, and `qa_report.html`, which lists
+every object with its confidence, fallbacks, mass range and settling result. Run folders go to
+`runs/`, and running again with `--run-id` resumes from the last finished stage.
+
+The pick-and-place demo needs the Panda model: run `scripts/fetch_panda.sh`, then see
+`benchmark/run_pick_place.py`.
 
 ## Where to read next
 

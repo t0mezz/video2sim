@@ -33,8 +33,6 @@ from video2sim.evaluation.matching import gate_m, match
 from video2sim.evaluation.scenes import GtScene, Prediction
 
 NOT_MEASURED = {
-    "stability_pass_fraction": "needs the simulator (Phase 5)",
-    "asset_validity_fraction": "needs the export validators (Phase 5)",
     "manual_steps": "needs run logs of the full pipeline (Phase 5)",
 }
 
@@ -65,6 +63,9 @@ class SceneResult:
     n_false_positive: int
     runtime_s: float | None
     objects: tuple[ObjectResult, ...]
+    stable: bool | None = None
+    assets_valid: int | None = None
+    assets_total: int | None = None
 
 
 def yaw_difference_deg(a: float, b: float) -> float:
@@ -129,6 +130,9 @@ def evaluate_scene(
         n_false_positive=len(prediction.objects) - len(pairs),
         runtime_s=prediction.runtime_s,
         objects=tuple(results),
+        stable=prediction.stable,
+        assets_valid=prediction.assets_valid,
+        assets_total=prediction.assets_total,
     )
 
 
@@ -170,6 +174,9 @@ def summarize(scenes: Iterable[SceneResult], targets: Mapping[str, float]) -> li
     mass_flags = [o.mass_within_tolerance for o in matched if o.mass_within_tolerance is not None]
     mass_fraction = (sum(mass_flags) / len(mass_flags)) if mass_flags else None
     runtimes = present(s.runtime_s for s in scene_list)
+    settled = [s.stable for s in scene_list if s.stable is not None]
+    assets_total = sum(s.assets_total or 0 for s in scene_list)
+    assets_valid = sum(s.assets_valid or 0 for s in scene_list)
 
     t = targets
     rows = [
@@ -204,6 +211,20 @@ def summarize(scenes: Iterable[SceneResult], targets: Mapping[str, float]) -> li
             len(runtimes),
             t.get("runtime_max_minutes"),
             "max",
+        ),
+        _metric(
+            "stability_pass_fraction",
+            (sum(settled) / len(settled)) if settled else None,
+            len(settled),
+            t.get("stability_pass_fraction_min"),
+            "min",
+        ),
+        _metric(
+            "asset_validity_fraction",
+            (assets_valid / assets_total) if assets_total else None,
+            assets_total,
+            t.get("asset_validity_fraction_min"),
+            "min",
         ),
     ]
     rows += [

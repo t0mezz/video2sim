@@ -28,8 +28,10 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import logging
 import threading
 from collections.abc import Callable, Sequence
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
@@ -39,6 +41,8 @@ from numpy.typing import NDArray
 
 from video2sim.models.shape_model import F64, ShapeSample, ShapeView
 from video2sim.schemas import SE3
+
+LOG = logging.getLogger(__name__)
 
 MODEL_NAME = "sam3d"
 
@@ -57,6 +61,8 @@ class Sam3dConfig:
     stage1_inference_steps: int | None
     stage2_inference_steps: int | None
     use_pointmap: bool
+    warm_containers: int = 0
+    warm_hold_s: float = 0.0
 
     @classmethod
     def from_config(cls, cfg: dict[str, Any]) -> Sam3dConfig:
@@ -77,6 +83,8 @@ class Sam3dConfig:
             steps("stage1_inference_steps"),
             steps("stage2_inference_steps"),
             bool(c["use_pointmap"]),
+            int(c["warm_containers"]),
+            float(c["warm_hold_s"]),
         )
 
     def options(self) -> dict[str, Any]:
@@ -134,6 +142,32 @@ def _deployed_worker() -> Any:
     from video2sim.models.sam3d_modal import APP_NAME, WORKER_CLASS
 
     return modal.Cls.from_name(APP_NAME, WORKER_CLASS)()
+
+
+def warm_containers(
+    count: int, hold_s: float, lookup: Callable[[], Any] | None = None
+) -> list[dict[str, Any]]:
+    """Start ``count`` GPU containers, one throwaway draw each. A container takes one call at a
+    time, so calls that overlap land on different containers, which is what ``hold_s`` is for.
+    These are plain calls and set no minimum, so a crashed run leaves nothing billing: idle
+    containers just scale down."""
+    worker = (lookup or _deployed_worker)()
+    with ThreadPoolExecutor(max_workers=count) as pool:
+        return list(pool.map(lambda _: dict(worker.warm.remote(hold_s)), range(count)))
+
+
+def warm_in_background(count: int, hold_s: float, lookup: Callable[[], Any] | None = None) -> None:
+    """Warm containers without holding up the caller. Failure costs time only, so it is logged."""
+
+    def run() -> None:
+        try:
+            for row in warm_containers(count, hold_s, lookup):
+                LOG.info("warmed SAM 3D container: %s", row)
+        except Exception:
+            LOG.warning("SAM 3D warm-up failed; draws will start cold", exc_info=True)
+
+    if count > 0:
+        threading.Thread(target=run, name="sam3d-warm", daemon=True).start()
 
 
 def quaternion_wxyz_to_matrix(q: Sequence[float]) -> F64:

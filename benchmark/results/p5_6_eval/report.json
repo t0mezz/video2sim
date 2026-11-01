@@ -1,0 +1,831 @@
+{
+  "header": {
+    "created_utc": "2026-10-31T19:48:12+00:00",
+    "split": "test",
+    "source": "runs in runs_final/clean",
+    "code_version": "21d34de6153d5880b9d46fafee95aacc46e06953",
+    "config_sha256": "cff40402714937975da26444fd5f21fdfdeaf191785f235ea02a23ca36227f51",
+    "scenes_scored": 7,
+    "scenes_without_prediction": "s10",
+    "scenes_excluded_deformable": "s23",
+    "targets_status": "provisional",
+    "scenes_without_ground_truth": []
+  },
+  "summary": {
+    "pooled": [
+      {
+        "name": "object_recall",
+        "status": "measured",
+        "value": 0.9393939393939394,
+        "n": 33,
+        "target": 0.9,
+        "passed": true
+      },
+      {
+        "name": "size_error_median",
+        "status": "measured",
+        "value": 0.05696571518654365,
+        "n": 31,
+        "target": 0.05,
+        "passed": false
+      },
+      {
+        "name": "position_error_median_m",
+        "status": "measured",
+        "value": 0.0043357930422997975,
+        "n": 31,
+        "target": 0.015,
+        "passed": true
+      },
+      {
+        "name": "orientation_error_median_deg",
+        "status": "measured",
+        "value": 1.5257261651561294,
+        "n": 17,
+        "target": 10.0,
+        "passed": true
+      },
+      {
+        "name": "mass_within_tolerance_fraction",
+        "status": "measured",
+        "value": 0.2903225806451613,
+        "n": 31,
+        "target": 0.5,
+        "passed": false
+      },
+      {
+        "name": "runtime_max_minutes",
+        "status": "measured",
+        "value": 14.892372620133331,
+        "n": 7,
+        "target": 60,
+        "passed": true
+      },
+      {
+        "name": "stability_pass_fraction",
+        "status": "measured",
+        "value": 1.0,
+        "n": 7,
+        "target": 0.95,
+        "passed": true
+      },
+      {
+        "name": "asset_validity_fraction",
+        "status": "measured",
+        "value": 1.0,
+        "n": 33,
+        "target": 1.0,
+        "passed": true
+      },
+      {
+        "name": "manual_steps",
+        "status": "not_measured",
+        "value": null,
+        "n": 0,
+        "target": null,
+        "passed": null,
+        "reason": "needs run logs of the full pipeline (Phase 5)"
+      }
+    ],
+    "per_tier": {
+      "easy": [
+        {
+          "name": "object_recall",
+          "status": "measured",
+          "value": 1.0,
+          "n": 13,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "size_error_median",
+          "status": "measured",
+          "value": 0.033112385527996814,
+          "n": 13,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "position_error_median_m",
+          "status": "measured",
+          "value": 0.004795168321650875,
+          "n": 13,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "orientation_error_median_deg",
+          "status": "measured",
+          "value": 1.956365904939986,
+          "n": 7,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "mass_within_tolerance_fraction",
+          "status": "measured",
+          "value": 0.23076923076923078,
+          "n": 13,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "runtime_max_minutes",
+          "status": "measured",
+          "value": 11.569792550683333,
+          "n": 3,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "stability_pass_fraction",
+          "status": "measured",
+          "value": 1.0,
+          "n": 3,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "asset_validity_fraction",
+          "status": "measured",
+          "value": 1.0,
+          "n": 13,
+          "target": null,
+          "passed": null
+        }
+      ],
+      "medium": [
+        {
+          "name": "object_recall",
+          "status": "measured",
+          "value": 0.7777777777777778,
+          "n": 9,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "size_error_median",
+          "status": "measured",
+          "value": 0.07203234382963904,
+          "n": 7,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "position_error_median_m",
+          "status": "measured",
+          "value": 0.0037612096975551393,
+          "n": 7,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "orientation_error_median_deg",
+          "status": "measured",
+          "value": 1.5355202466697853,
+          "n": 3,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "mass_within_tolerance_fraction",
+          "status": "measured",
+          "value": 0.42857142857142855,
+          "n": 7,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "runtime_max_minutes",
+          "status": "measured",
+          "value": 14.892372620133331,
+          "n": 2,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "stability_pass_fraction",
+          "status": "measured",
+          "value": 1.0,
+          "n": 2,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "asset_validity_fraction",
+          "status": "measured",
+          "value": 1.0,
+          "n": 7,
+          "target": null,
+          "passed": null
+        }
+      ],
+      "hard": [
+        {
+          "name": "object_recall",
+          "status": "measured",
+          "value": 1.0,
+          "n": 11,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "size_error_median",
+          "status": "measured",
+          "value": 0.12241863286815234,
+          "n": 11,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "position_error_median_m",
+          "status": "measured",
+          "value": 0.0043357930422997975,
+          "n": 11,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "orientation_error_median_deg",
+          "status": "measured",
+          "value": 0.9720510363745802,
+          "n": 7,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "mass_within_tolerance_fraction",
+          "status": "measured",
+          "value": 0.2727272727272727,
+          "n": 11,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "runtime_max_minutes",
+          "status": "measured",
+          "value": 11.290403218416667,
+          "n": 2,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "stability_pass_fraction",
+          "status": "measured",
+          "value": 1.0,
+          "n": 2,
+          "target": null,
+          "passed": null
+        },
+        {
+          "name": "asset_validity_fraction",
+          "status": "measured",
+          "value": 1.0,
+          "n": 13,
+          "target": null,
+          "passed": null
+        }
+      ]
+    },
+    "n_scenes": 7,
+    "n_evaluable_objects": 33,
+    "n_excluded_objects": 0,
+    "n_false_positives": 2
+  },
+  "scenes": [
+    {
+      "scene_id": "s07",
+      "tier": "easy",
+      "split": "test",
+      "n_evaluable": 5,
+      "n_excluded": 0,
+      "n_matched": 5,
+      "n_false_positive": 0,
+      "runtime_s": 694.187553041,
+      "objects": [
+        {
+          "scene_id": "s07",
+          "tier": "easy",
+          "object_id": "obj_003",
+          "label": "packaging for in ear headphones",
+          "matched": true,
+          "pred_id": "obj_001",
+          "size_error": 0.017403104664712905,
+          "position_error_m": 0.00877629665255416,
+          "orientation_error_deg": 2.2360761230049917,
+          "mass_error": 0.4788680321548165,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s07",
+          "tier": "easy",
+          "object_id": "obj_021",
+          "label": "rubiks cube smaller",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.033112385527996814,
+          "position_error_m": 0.00043315299781392075,
+          "orientation_error_deg": null,
+          "mass_error": 0.46522962029558335,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s07",
+          "tier": "easy",
+          "object_id": "obj_004",
+          "label": "coffee powder can",
+          "matched": true,
+          "pred_id": "obj_002",
+          "size_error": 0.020794907469196593,
+          "position_error_m": 0.0040852289167820814,
+          "orientation_error_deg": null,
+          "mass_error": 0.056034482758620614,
+          "mass_within_tolerance": true
+        },
+        {
+          "scene_id": "s07",
+          "tier": "easy",
+          "object_id": "obj_007",
+          "label": "rubiks cube",
+          "matched": true,
+          "pred_id": "obj_004",
+          "size_error": 0.03279852789343824,
+          "position_error_m": 0.007344987870582401,
+          "orientation_error_deg": null,
+          "mass_error": 0.4786636870464329,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s07",
+          "tier": "easy",
+          "object_id": "obj_029",
+          "label": "empty phone packaging",
+          "matched": true,
+          "pred_id": "obj_003",
+          "size_error": 0.032926113020418694,
+          "position_error_m": 0.0020330230009854206,
+          "orientation_error_deg": 0.8973734133523692,
+          "mass_error": 1.3285156524988222,
+          "mass_within_tolerance": false
+        }
+      ],
+      "stable": true,
+      "assets_valid": 5,
+      "assets_total": 5
+    },
+    {
+      "scene_id": "s08",
+      "tier": "easy",
+      "split": "test",
+      "n_evaluable": 5,
+      "n_excluded": 0,
+      "n_matched": 5,
+      "n_false_positive": 0,
+      "runtime_s": 635.9268120829997,
+      "objects": [
+        {
+          "scene_id": "s08",
+          "tier": "easy",
+          "object_id": "obj_014",
+          "label": "packaging for electronics",
+          "matched": true,
+          "pred_id": "obj_003",
+          "size_error": 0.03127429719720619,
+          "position_error_m": 0.0064330206857001575,
+          "orientation_error_deg": 1.3357495467989082,
+          "mass_error": 0.2693221699000136,
+          "mass_within_tolerance": true
+        },
+        {
+          "scene_id": "s08",
+          "tier": "easy",
+          "object_id": "obj_046",
+          "label": "mug",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.05696571518654365,
+          "position_error_m": 0.017048357859809904,
+          "orientation_error_deg": 26.898458112686768,
+          "mass_error": 0.30125041933140306,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s08",
+          "tier": "easy",
+          "object_id": "obj_041",
+          "label": "mug",
+          "matched": true,
+          "pred_id": "obj_002",
+          "size_error": 0.019113595969276264,
+          "position_error_m": 0.026190112704353986,
+          "orientation_error_deg": 21.417831014623914,
+          "mass_error": 0.35173793808552195,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s08",
+          "tier": "easy",
+          "object_id": "obj_039",
+          "label": "action camera",
+          "matched": true,
+          "pred_id": "obj_004",
+          "size_error": 0.17331629709621296,
+          "position_error_m": 0.004795168321650875,
+          "orientation_error_deg": 1.956365904939986,
+          "mass_error": 0.5165240480353032,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s08",
+          "tier": "easy",
+          "object_id": "obj_060",
+          "label": "deodorant cap",
+          "matched": true,
+          "pred_id": "obj_001",
+          "size_error": 0.11536022413867877,
+          "position_error_m": 0.0028149911767770468,
+          "orientation_error_deg": null,
+          "mass_error": 0.6000000000000001,
+          "mass_within_tolerance": false
+        }
+      ],
+      "stable": true,
+      "assets_valid": 5,
+      "assets_total": 5
+    },
+    {
+      "scene_id": "s09",
+      "tier": "easy",
+      "split": "test",
+      "n_evaluable": 3,
+      "n_excluded": 0,
+      "n_matched": 3,
+      "n_false_positive": 0,
+      "runtime_s": 479.6574169579999,
+      "objects": [
+        {
+          "scene_id": "s09",
+          "tier": "easy",
+          "object_id": "obj_007",
+          "label": "rubiks cube",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.045235066570816135,
+          "position_error_m": 0.002167975009353965,
+          "orientation_error_deg": null,
+          "mass_error": 0.357429718875502,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s09",
+          "tier": "easy",
+          "object_id": "obj_005",
+          "label": "plastic plate",
+          "matched": true,
+          "pred_id": "obj_002",
+          "size_error": 0.060720154978587286,
+          "position_error_m": 0.0012693772086254116,
+          "orientation_error_deg": null,
+          "mass_error": 0.5833333333333334,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s09",
+          "tier": "easy",
+          "object_id": "obj_002",
+          "label": "packaging for breakfast bags",
+          "matched": true,
+          "pred_id": "obj_001",
+          "size_error": 0.12127108195820223,
+          "position_error_m": 0.009897348086701542,
+          "orientation_error_deg": 0.8134208530903209,
+          "mass_error": 0.1594394969373725,
+          "mass_within_tolerance": true
+        }
+      ],
+      "stable": true,
+      "assets_valid": 3,
+      "assets_total": 3
+    },
+    {
+      "scene_id": "s15",
+      "tier": "medium",
+      "split": "test",
+      "n_evaluable": 5,
+      "n_excluded": 0,
+      "n_matched": 4,
+      "n_false_positive": 0,
+      "runtime_s": 633.456013999999,
+      "objects": [
+        {
+          "scene_id": "s15",
+          "tier": "medium",
+          "object_id": "obj_014",
+          "label": "packaging for electronics",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.04866806831202989,
+          "position_error_m": 0.0021372590837142893,
+          "orientation_error_deg": 1.5355202466697853,
+          "mass_error": 0.30133130774894534,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s15",
+          "tier": "medium",
+          "object_id": "obj_040",
+          "label": "white 3d print cuboid",
+          "matched": true,
+          "pred_id": "obj_003",
+          "size_error": 0.3022154793832269,
+          "position_error_m": 0.00557004468834074,
+          "orientation_error_deg": null,
+          "mass_error": 0.7761160614337527,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s15",
+          "tier": "medium",
+          "object_id": "obj_038",
+          "label": "white round basket",
+          "matched": true,
+          "pred_id": "obj_001",
+          "size_error": 0.3270628800337991,
+          "position_error_m": 0.018618035855698722,
+          "orientation_error_deg": 47.912009183437476,
+          "mass_error": 0.5024875621890548,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s15",
+          "tier": "medium",
+          "object_id": "obj_004",
+          "label": "coffee powder can",
+          "matched": true,
+          "pred_id": "obj_002",
+          "size_error": 0.04659449874986887,
+          "position_error_m": 0.0026383560829016605,
+          "orientation_error_deg": null,
+          "mass_error": 0.12068965517241377,
+          "mass_within_tolerance": true
+        },
+        {
+          "scene_id": "s15",
+          "tier": "medium",
+          "object_id": "obj_021",
+          "label": "rubiks cube smaller",
+          "matched": false,
+          "pred_id": null,
+          "size_error": null,
+          "position_error_m": null,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": null
+        }
+      ],
+      "stable": true,
+      "assets_valid": 4,
+      "assets_total": 4
+    },
+    {
+      "scene_id": "s16",
+      "tier": "medium",
+      "split": "test",
+      "n_evaluable": 4,
+      "n_excluded": 0,
+      "n_matched": 3,
+      "n_false_positive": 0,
+      "runtime_s": 893.5423572079999,
+      "objects": [
+        {
+          "scene_id": "s16",
+          "tier": "medium",
+          "object_id": "obj_003",
+          "label": "packaging for in ear headphones",
+          "matched": false,
+          "pred_id": null,
+          "size_error": null,
+          "position_error_m": null,
+          "orientation_error_deg": null,
+          "mass_error": null,
+          "mass_within_tolerance": null
+        },
+        {
+          "scene_id": "s16",
+          "tier": "medium",
+          "object_id": "obj_004",
+          "label": "coffee powder can",
+          "matched": true,
+          "pred_id": "obj_003",
+          "size_error": 0.2706333452931725,
+          "position_error_m": 0.025092724433815942,
+          "orientation_error_deg": null,
+          "mass_error": 0.00862068965517242,
+          "mass_within_tolerance": true
+        },
+        {
+          "scene_id": "s16",
+          "tier": "medium",
+          "object_id": "obj_021",
+          "label": "rubiks cube smaller",
+          "matched": true,
+          "pred_id": "obj_002",
+          "size_error": 0.07203234382963904,
+          "position_error_m": 0.0037612096975551393,
+          "orientation_error_deg": null,
+          "mass_error": 0.1591072586997351,
+          "mass_within_tolerance": true
+        },
+        {
+          "scene_id": "s16",
+          "tier": "medium",
+          "object_id": "obj_029",
+          "label": "empty phone packaging",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.023445020529573996,
+          "position_error_m": 0.002478301447871335,
+          "orientation_error_deg": 0.8282840423986535,
+          "mass_error": 1.1660610720919278,
+          "mass_within_tolerance": false
+        }
+      ],
+      "stable": true,
+      "assets_valid": 3,
+      "assets_total": 3
+    },
+    {
+      "scene_id": "s19",
+      "tier": "hard",
+      "split": "test",
+      "n_evaluable": 5,
+      "n_excluded": 0,
+      "n_matched": 5,
+      "n_false_positive": 1,
+      "runtime_s": 619.7288868340011,
+      "objects": [
+        {
+          "scene_id": "s19",
+          "tier": "hard",
+          "object_id": "obj_006",
+          "label": "gamepad controller",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.17829368444683802,
+          "position_error_m": 0.006900104064949269,
+          "orientation_error_deg": 1.7016310701627049,
+          "mass_error": 0.027777777777777613,
+          "mass_within_tolerance": true
+        },
+        {
+          "scene_id": "s19",
+          "tier": "hard",
+          "object_id": "obj_023",
+          "label": "fabric tool bag",
+          "matched": true,
+          "pred_id": "obj_004",
+          "size_error": 0.21863465609816418,
+          "position_error_m": 0.0035592593378582916,
+          "orientation_error_deg": 0.07117049545716361,
+          "mass_error": 5.008893161879582,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s19",
+          "tier": "hard",
+          "object_id": "obj_036",
+          "label": "single breadboard module",
+          "matched": true,
+          "pred_id": "obj_002",
+          "size_error": 0.12241863286815234,
+          "position_error_m": 0.0038124876330179916,
+          "orientation_error_deg": 1.5257261651561294,
+          "mass_error": 0.2121212121212121,
+          "mass_within_tolerance": true
+        },
+        {
+          "scene_id": "s19",
+          "tier": "hard",
+          "object_id": "obj_034",
+          "label": "digital alarm",
+          "matched": true,
+          "pred_id": "obj_005",
+          "size_error": 0.05115970094137005,
+          "position_error_m": 0.008377120448113225,
+          "orientation_error_deg": 0.9720510363745802,
+          "mass_error": 0.3006812798195975,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s19",
+          "tier": "hard",
+          "object_id": "obj_010",
+          "label": "small wooden toy brick",
+          "matched": true,
+          "pred_id": "obj_003",
+          "size_error": 1.2193643758972685,
+          "position_error_m": 0.008592776253491485,
+          "orientation_error_deg": 0.7285836717134753,
+          "mass_error": 0.4118062295949882,
+          "mass_within_tolerance": false
+        }
+      ],
+      "stable": true,
+      "assets_valid": 6,
+      "assets_total": 6
+    },
+    {
+      "scene_id": "s20",
+      "tier": "hard",
+      "split": "test",
+      "n_evaluable": 6,
+      "n_excluded": 0,
+      "n_matched": 6,
+      "n_false_positive": 1,
+      "runtime_s": 677.4241931050001,
+      "objects": [
+        {
+          "scene_id": "s20",
+          "tier": "hard",
+          "object_id": "obj_034",
+          "label": "digital alarm",
+          "matched": true,
+          "pred_id": "obj_001",
+          "size_error": 0.18563229870689463,
+          "position_error_m": 0.006212206362403714,
+          "orientation_error_deg": 0.633287161818771,
+          "mass_error": 0.09962214505871453,
+          "mass_within_tolerance": true
+        },
+        {
+          "scene_id": "s20",
+          "tier": "hard",
+          "object_id": "obj_026",
+          "label": "glass water bottle",
+          "matched": true,
+          "pred_id": "obj_002",
+          "size_error": 0.02956893474903368,
+          "position_error_m": 0.00426832995679914,
+          "orientation_error_deg": null,
+          "mass_error": 0.31335187283276683,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s20",
+          "tier": "hard",
+          "object_id": "obj_013",
+          "label": "round deodorant",
+          "matched": true,
+          "pred_id": "obj_004",
+          "size_error": 0.02572405815054025,
+          "position_error_m": 0.0029966282319234547,
+          "orientation_error_deg": null,
+          "mass_error": 0.5855249523847118,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s20",
+          "tier": "hard",
+          "object_id": "obj_044",
+          "label": "scissors",
+          "matched": true,
+          "pred_id": "obj_003",
+          "size_error": 0.7458109902887555,
+          "position_error_m": 0.01523082769234665,
+          "orientation_error_deg": 11.22783520938907,
+          "mass_error": 1.9086597797490334,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s20",
+          "tier": "hard",
+          "object_id": "obj_035",
+          "label": "reflective puzzle toy",
+          "matched": true,
+          "pred_id": "obj_000",
+          "size_error": 0.049340134126963434,
+          "position_error_m": 0.002610906495312841,
+          "orientation_error_deg": null,
+          "mass_error": 1.7439359016573373,
+          "mass_within_tolerance": false
+        },
+        {
+          "scene_id": "s20",
+          "tier": "hard",
+          "object_id": "obj_042",
+          "label": "small, flat see through cylindric container",
+          "matched": true,
+          "pred_id": "obj_005",
+          "size_error": 0.06769527724421308,
+          "position_error_m": 0.0043357930422997975,
+          "orientation_error_deg": null,
+          "mass_error": 0.8121048604679256,
+          "mass_within_tolerance": false
+        }
+      ],
+      "stable": true,
+      "assets_valid": 7,
+      "assets_total": 7
+    }
+  ]
+}

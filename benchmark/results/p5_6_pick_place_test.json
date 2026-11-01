@@ -1,0 +1,130 @@
+{
+ "summary": {
+  "simulator": "mujoco (D-027)",
+  "scenes": 8,
+  "scenes_with_a_graspable_object": 2,
+  "success_every_case": [
+   "s20"
+  ]
+ },
+ "scenes": [
+  {
+   "run": "s07",
+   "object": null,
+   "clearance_m": null,
+   "success_every_case": false,
+   "cases": []
+  },
+  {
+   "run": "s08",
+   "object": "obj_004",
+   "clearance_m": 0.09514967887350412,
+   "success_every_case": false,
+   "cases": [
+    {
+     "case": "nominal",
+     "lifted_m": 0.1316611789614095,
+     "place_error_m": 0.0035218276907411335,
+     "success": true
+    },
+    {
+     "case": "friction_low",
+     "lifted_m": 0.1317840637368361,
+     "place_error_m": 0.0034969354128842273,
+     "success": true
+    },
+    {
+     "case": "friction_high",
+     "lifted_m": 0.13215508612513213,
+     "place_error_m": 0.1347557508042979,
+     "success": false
+    },
+    {
+     "case": "mass_low",
+     "lifted_m": 0.13205889529941414,
+     "place_error_m": 0.003327042826871571,
+     "success": true
+    },
+    {
+     "case": "mass_high",
+     "lifted_m": 11893.636471173308,
+     "place_error_m": 226.32331792596543,
+     "success": false
+    }
+   ]
+  },
+  {
+   "run": "s09",
+   "object": null,
+   "clearance_m": null,
+   "success_every_case": false,
+   "cases": []
+  },
+  {
+   "run": "s10",
+   "object": null,
+   "clearance_m": null,
+   "success_every_case": false,
+   "cases": []
+  },
+  {
+   "run": "s15",
+   "object": null,
+   "clearance_m": null,
+   "success_every_case": false,
+   "cases": []
+  },
+  {
+   "run": "s16",
+   "object": null,
+   "clearance_m": null,
+   "success_every_case": false,
+   "cases": []
+  },
+  {
+   "run": "s19",
+   "object": null,
+   "clearance_m": null,
+   "success_every_case": false,
+   "cases": []
+  },
+  {
+   "run": "s20",
+   "object": "obj_004",
+   "clearance_m": 0.010046667196816246,
+   "success_every_case": true,
+   "cases": [
+    {
+     "case": "nominal",
+     "lifted_m": 0.13171308483313682,
+     "place_error_m": 0.006357739286667089,
+     "success": true
+    },
+    {
+     "case": "friction_low",
+     "lifted_m": 0.13171768414095608,
+     "place_error_m": 0.005172235955349423,
+     "success": true
+    },
+    {
+     "case": "friction_high",
+     "lifted_m": 0.1317093526016812,
+     "place_error_m": 0.0063427063973206296,
+     "success": true
+    },
+    {
+     "case": "mass_low",
+     "lifted_m": 0.13179199978785322,
+     "place_error_m": 0.006481065407577415,
+     "success": true
+    },
+    {
+     "case": "mass_high",
+     "lifted_m": 0.13155149311769543,
+     "place_error_m": 0.006054520489629364,
+     "success": true
+    }
+   ]
+  }
+ ]
+}

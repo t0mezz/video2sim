@@ -157,7 +157,7 @@ segmentation:
 shape:
   backend: sam3d               # the only adapter; chosen in the P3.3 bake-off (D-018)
   keyframes_per_object: 2      # P3.4: best keyframes the model is run on
-  samples_per_keyframe: 3      # seeds per keyframe
+  samples_per_keyframe: 1      # seeds per keyframe; 2 draws per object, 5.7% size error against 5.0% with 6 (D-030)
   max_views: 12                # frames whose masks enter registration, spread over the video
   min_fit_score: 0.5           # below this the convex hull of the cluster stands in; a guess
   support_gap_m: 0.01          # a cluster this close to the table rests on it (P3.5)
@@ -168,7 +168,10 @@ shape:
     # Off until the P3.3 A/B: the paper reports shape barely depends on it, and P3.2 sets
     # pose and scale from the metric cloud (docs/research/sam3d.md, section 5)
     use_pointmap: false
+    warm_containers: 2         # started when segmentation starts; 0 is off (D-032)
+    warm_hold_s: 30            # each stays busy this long, or both calls land on one container
   parallel_samples: 6          # hosted draws in flight at once; the result does not depend on it
+  parallel_registrations: 3    # meshes registered at once; the result does not depend on it
   stretch_samples: 1           # best samples per object that get the per-axis refinement
   registration:                # P3.2, stages/registration.py; first guesses, tune in P3.3
     surface_samples: 3000      # mesh points for the point term
@@ -192,6 +195,8 @@ shape:
 physics:
   material_table: configs/material_table.yaml
   max_convex_parts: 16
+  parallel_mass_calls: 6       # hosted mass requests in flight at once
+  parallel_objects: 2          # objects repaired and decomposed at once; low because CoACD is CPU heavy and three COLMAP runs at once crashed the Mac
   collision:                   # P4.2, stages/collision.py
     primitive_tolerance: 0.04       # a primitive is used if its surface is within this share of the bbox diagonal (95th percentile)
     primitive_volume_ratio: [0.8, 1.25]   # and its volume is this close to the mesh's
@@ -230,4 +235,24 @@ physics:
     decimation_aggression: 5        # fast_simplification agg, 3 to 10; below 3 it stops short of the budget
 
 export:
-  simulator: isaac_sim         # assumed, see PLAN.md decision D-001
+  simulator: mujoco            # validation and demo simulator in Phase 5 (D-027)
+  table_size_m: 2.0            # shown width of the table plane; its collision is infinite
+  qa_views: 3                  # camera views in the QA report, evenly spaced over the frames
+  check_tolerance: 1.0e-4      # share of the value allowed in USD and URDF read-back checks
+  check_tolerance_m: 1.0e-4    # same, for positions and mesh bounds
+
+demo:                          # P5.4, src/video2sim/pick_place.py
+  panda_model: data/third_party/mujoco_menagerie/franka_emika_panda/panda.xml  # scripts/fetch_panda.sh
+  base_distance_m: 0.45        # arm base from the object, well inside the Panda's 0.855 m reach
+  place_distance_m: 0.15       # goal from where the object starts
+  grasp_depth_m: 0.02          # pad center below the object's top
+  min_grasp_height_m: 0.02     # pad center above the table, so the fingertips clear it
+  grip_force_n: 70.0           # continuous grasp force of the Franka Hand, from reseller specification listings; Franka's own hand datasheet not found
+  lift_clearance_m: 0.03       # commanded above the required lift, for sag and slip
+  max_width_m: 0.07            # the gripper opens 0.08 m; leaves 5 mm a side
+  min_height_m: 0.03           # lower objects leave no room for the pads
+  min_clearance_m: 0.03        # free space around the object, footprint to footprint
+  base_angles: 16              # directions tried for the arm base
+  control_dt_s: 0.01
+  video_fps: 30
+  video_size_px: [640, 480]

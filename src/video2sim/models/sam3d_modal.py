@@ -34,7 +34,9 @@ APP_NAME = "video2sim-sam3d"
 WORKER_CLASS = "Sam3dWorker"
 REPO_ID = "facebook/sam-3d-objects"
 SAM3D_COMMIT = "f91db411c50efee93d8db7aeb323885650f6f722"  # main on 2026-06-02
-GPU = "A100-80GB"  # doc/setup.md asks for at least 32 GB
+GPU = "A100-40GB"  # doc/setup.md asks for 32 GB; peak 27 GB reserved, on 80 GB (D-032)
+BUILD_GPU = "A100-80GB"  # kept apart from GPU so that changing the runtime GPU rebuilds nothing
+MAX_CONTAINERS = 2  # D-032
 WEIGHTS_DIR = "/weights"
 CHECKPOINT_DIR = f"{WEIGHTS_DIR}/checkpoints"
 REVISION_FILE = f"{WEIGHTS_DIR}/revision.txt"
@@ -59,7 +61,7 @@ image = (
         f"cd {SAM3D_DIR} && pip install -e '.[dev]'",
     )
     # "pytorch3d dependency on pytorch is broken, this 2-step approach solves it" (setup.md)
-    .run_commands(f"cd {SAM3D_DIR} && pip install -e '.[p3d]'", gpu=GPU)
+    .run_commands(f"cd {SAM3D_DIR} && pip install -e '.[p3d]'", gpu=BUILD_GPU)
     # no GPU in this step, so gsplat's CUDA build is told the architecture (A100: 8.0)
     .run_commands(
         f"cd {SAM3D_DIR} && TORCH_CUDA_ARCH_LIST=8.0 PIP_FIND_LINKS={_KAOLIN_LINKS} "
@@ -121,14 +123,17 @@ def download_weights() -> str:
     volumes={WEIGHTS_DIR: weights},
     timeout=900,
     scaledown_window=300,
+    max_containers=MAX_CONTAINERS,
 )
 class Sam3dWorker:
     @modal.enter()
     def load(self) -> None:
         import os
         import sys
+        import time
         from pathlib import Path
 
+        self.boot_started_utc = time.time()
         # the wrapper assumes conda and sets CUDA_HOME from CONDA_PREFIX; here CUDA is the base
         # image's. Set at load, not in the image, so the built layers stay cached.
         os.environ.setdefault("CONDA_PREFIX", "/usr/local/cuda")
@@ -138,6 +143,44 @@ class Sam3dWorker:
         self.inference: Any = Inference(f"{CHECKPOINT_DIR}/pipeline.yaml", compile=False)
         revision = Path(REVISION_FILE).read_text(encoding="utf-8").strip()
         self.checkpoint = f"{REPO_ID}@{revision}"
+        self.load_seconds = time.time() - self.boot_started_utc
+
+    @modal.method()
+    def warm(self, hold_s: float) -> dict[str, Any]:
+        """Load the weights and make one throwaway draw, because a container's first draw takes
+        2 to 3 times as long as the rest. A failed draw still leaves the weights loaded. Stays
+        busy for ``hold_s`` after that, or the other warm call lands on this container too."""
+        import os
+        import time
+
+        import numpy as np
+
+        started = time.time()
+        rgb = np.full((512, 512, 3), 128, dtype=np.uint8)
+        y, x = np.mgrid[:512, :512]
+        mask = (x - 256) ** 2 + (y - 256) ** 2 < 100**2
+        error = None
+        try:
+            self.inference._pipeline.run(
+                self.inference.merge_mask_to_rgba(rgb, mask),
+                None,
+                0,
+                stage1_only=False,
+                with_mesh_postprocess=False,
+                with_texture_baking=False,
+                with_layout_postprocess=False,
+                use_vertex_color=True,
+            )
+        except Exception as e:  # a blank image may decode to nothing, which is fine here
+            error = repr(e)
+        drawn = time.time() - started
+        time.sleep(hold_s)
+        return {
+            "container": os.environ.get("MODAL_TASK_ID", ""),
+            "load_s": self.load_seconds,
+            "warm_draw_s": drawn,
+            "error": error,
+        }
 
     @modal.method()
     def sample(
@@ -149,11 +192,15 @@ class Sam3dWorker:
         options: dict[str, Any],
     ) -> dict[str, Any]:
         import io
+        import os
+        import time
 
         import numpy as np
         import torch
         from PIL import Image
 
+        started = time.time()
+        torch.cuda.reset_peak_memory_stats()
         if options.get("checkpoint") != REPO_ID:
             raise ValueError(f"this worker serves {REPO_ID}, not {options.get('checkpoint')}")
         rgb = np.array(Image.open(io.BytesIO(image)).convert("RGB"))
@@ -177,7 +224,20 @@ class Sam3dWorker:
         )
         if output.get("glb") is None:
             raise RuntimeError("SAM 3D returned no mesh")
+        glb = output["glb"].export(file_type="glb")
         return {
-            "glb": output["glb"].export(file_type="glb"),
+            "glb": glb,
             "pose_json": pose_json(output, self.checkpoint),
+            # benchmark/probe_sam3d.py reads these; the client ignores them
+            "stats": {
+                "container": os.environ.get("MODAL_TASK_ID", ""),
+                "boot_started_utc": self.boot_started_utc,
+                "load_s": self.load_seconds,
+                "sample_started_utc": started,
+                "sample_s": time.time() - started,
+                "gpu_name": torch.cuda.get_device_name(0),
+                "vram_total_bytes": torch.cuda.get_device_properties(0).total_memory,
+                "vram_peak_allocated_bytes": torch.cuda.max_memory_allocated(),
+                "vram_peak_reserved_bytes": torch.cuda.max_memory_reserved(),
+            },
         }

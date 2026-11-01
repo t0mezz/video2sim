@@ -77,6 +77,19 @@ def sample_seed(base_seed: int, object_id: str, frame_index: int, draw: int) -> 
     return int(hashlib.sha256(key).hexdigest()[:8], 16)
 
 
+def draw_jobs(
+    object_id: str, views: Sequence[ShapeView], samples_per_keyframe: int, base_seed: int
+) -> list[tuple[ShapeView, int]]:
+    """Each draw of an object as a view and a seed, in view order (best keyframe first)."""
+    if samples_per_keyframe < 1:
+        raise ValueError("samples_per_keyframe must be at least 1")
+    return [
+        (view, sample_seed(base_seed, object_id, view.frame_index, draw))
+        for view in views
+        for draw in range(samples_per_keyframe)
+    ]
+
+
 def draw_samples(
     model: ShapeModel,
     object_id: str,
@@ -90,15 +103,9 @@ def draw_samples(
     A draw that raises ``SampleFailed`` is left out and, if ``failures`` is given, noted there.
     ``workers`` draws run at once, since a hosted model spends its time waiting; the order of
     the result does not depend on it."""
-    if samples_per_keyframe < 1:
-        raise ValueError("samples_per_keyframe must be at least 1")
     if workers < 1:
         raise ValueError("workers must be at least 1")
-    jobs = [
-        (view, sample_seed(base_seed, object_id, view.frame_index, draw))
-        for view in views
-        for draw in range(samples_per_keyframe)
-    ]
+    jobs = draw_jobs(object_id, views, samples_per_keyframe, base_seed)
 
     def run(job: tuple[ShapeView, int]) -> ShapeSample | str:
         view, seed = job

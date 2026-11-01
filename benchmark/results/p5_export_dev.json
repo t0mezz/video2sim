@@ -1,0 +1,392 @@
+{
+ "summary": {
+  "simulator": "mujoco (D-027)",
+  "runs": 13,
+  "failed": [],
+  "objects_exported": 61,
+  "objects_skipped": 0,
+  "urdf_settling_agrees": 13,
+  "urdf_differences": {},
+  "stable_every_case": 13
+ },
+ "scenes": [
+  {
+   "run": "s01_b",
+   "seconds": 1.309012709010858,
+   "run_id": "s01_b",
+   "status": "ok",
+   "objects_found": 5,
+   "objects_exported": 5,
+   "objects_skipped": 0,
+   "objects_without_asset": [],
+   "objects_to_review": [],
+   "scene_flags": [],
+   "stable_every_case": true,
+   "stability_cases": {
+    "nominal": true,
+    "friction_low": true,
+    "friction_high": true,
+    "mass_low": true,
+    "mass_high": true
+   },
+   "urdf_check": {
+    "agrees": true,
+    "problems": [],
+    "differences": [],
+    "largest_drift_m": 0.0007668399711920016
+   }
+  },
+  {
+   "run": "s02_b",
+   "seconds": 1.4557130000030156,
+   "run_id": "s02_b",
+   "status": "review",
+   "objects_found": 5,
+   "objects_exported": 5,
+   "objects_skipped": 0,
+   "objects_without_asset": [],
+   "objects_to_review": [
+    "obj_000",
+    "obj_001",
+    "obj_002",
+    "obj_004"
+   ],
+   "scene_flags": [],
+   "stable_every_case": true,
+   "stability_cases": {
+    "nominal": true,
+    "friction_low": true,
+    "friction_high": true,
+    "mass_low": true,
+    "mass_high": true
+   },
+   "urdf_check": {
+    "agrees": true,
+    "problems": [],
+    "differences": [],
+    "largest_drift_m": 0.0015180712491685766
+   }
+  },
+  {
+   "run": "s03_b",
+   "seconds": 0.7885674169810954,
+   "run_id": "s03_b",
+   "status": "review",
+   "objects_found": 1,
+   "objects_exported": 1,
+   "objects_skipped": 0,
+   "objects_without_asset": [],
+   "objects_to_review": [
+    "obj_000"
+   ],
+   "scene_flags": [],
+   "stable_every_case": true,
+   "stability_cases": {
+    "nominal": true,
+    "friction_low": true,
+    "friction_high": true,
+    "mass_low": true,
+    "mass_high": true
+   },
+   "urdf_check": {
+    "agrees": true,
+    "problems": [],
+    "differences": [],
+    "largest_drift_m": 0.027806651935666955
+   }
+  },
+  {
+   "run": "s04_b",
+   "seconds": 1.363603540987242,
+   "run_id": "s04_b",
+   "status": "review",
+   "objects_found": 5,
+   "objects_exported": 5,
+   "objects_skipped": 0,
+   "objects_without_asset": [],
+   "objects_to_review": [
+    "obj_000"
+   ],
+   "scene_flags": [],
+   "stable_every_case": true,
+   "stability_cases": {
+    "nominal": true,
+    "friction_low": true,
+    "friction_high": true,
+    "mass_low": true,
+    "mass_high": true
+   },
+   "urdf_check": {
+    "agrees": true,
+    "problems": [],
+    "differences": [],
+    "largest_drift_m": 0.017560227065337875
+   }
+  },
+  {
+   "run": "s05_b",
+   "seconds": 1.2345372090057936,
+   "run_id": "s05_b",
+   "status": "review",
+   "objects_found": 4,
+   "objects_exported": 4,
+   "objects_skipped": 0,
+   "objects_without_asset": [],
+   "objects_to_review": [
+    "obj_000"
+   ],
+   "scene_flags": [
+    "table_refit_from_tags: first plane was 0.062 m from a tag"
+   ],
+   "stable_every_case": true,
+   "stability_cases": {
+    "nominal": true,
+    "friction_low": true,
+    "friction_high": true,
+    "mass_low": true,
+    "mass_high": true
+   },
+   "urdf_check": {
+    "agrees": true,
+    "problems": [],
+    "differences": [],
+    "largest_drift_m": 0.0021329966362512815
+   }
+  },
+  {
+   "run": "s06_b",
+   "seconds": 1.236508625006536,
+   "run_id": "s06_b",
+   "status": "review",
+   "objects_found": 4,
+   "objects_exported": 4,
+   "objects_skipped": 0,
+   "objects_without_asset": [],
+   "objects_to_review": [
+    "obj_001",
+    "obj_003"
+   ],
+   "scene_flags": [],
+   "stable_every_case": true,
+   "stability_cases": {
+    "nominal": true,
+    "friction_low": true,
+    "friction_high": true,
+    "mass_low": true,
+    "mass_high": true
+   },
+   "urdf_check": {
+    "agrees": true,
+    "problems": [],
+    "differences": [],
+    "largest_drift_m": 0.0011313043133610282
+   }
+  },
+  {
+   "run": "s11_b",
+   "seconds": 1.3633380829996895,
+   "run_id": "s11_b",
+   "status": "review",
+   "objects_found": 7,
+   "objects_exported": 7,
+   "objects_skipped": 0,
+   "objects_without_asset": [],
+   "objects_to_review": [
+    "obj_000",
+    "obj_005"
+   ],
+   "scene_flags": [],
+   "stable_every_case": true,
+   "stability_cases": {
+    "nominal": true,
+    "friction_low": true,
+    "friction_high": true,
+    "mass_low": true,
+    "mass_high": true
+   },
+   "urdf_check": {
+    "agrees": true,
+    "problems": [],
+    "differences": [],
+    "largest_drift_m": 0.000764725163203927
+   }
+  },
+  {
+   "run": "s12_b",
+   "seconds": 1.7366714579984546,
+   "run_id": "s12_b",
+   "status": "ok",
+   "objects_found": 9,
+   "objects_exported": 9,
+   "objects_skipped": 0,
+   "objects_without_asset": [],
+   "objects_to_review": [],
+   "scene_flags": [
+    "sfm_fragmented",
+    "track 3 dropped: no voxel is inside the mask in enough views",
+    "possible missing object: 10 objects listed but 9 tracks"
+   ],
+   "stable_every_case": true,
+   "stability_cases": {
+    "nominal": true,
+    "friction_low": true,
+    "friction_high": true,
+    "mass_low": true,
+    "mass_high": true
+   },
+   "urdf_check": {
+    "agrees": true,
+    "problems": [],
+    "differences": [],
+    "largest_drift_m": 0.002361081232005421
+   }
+  },
+  {
+   "run": "s13_b",
+   "seconds": 0.277243249991443,
+   "run_id": "s13_b",
+   "status": "review",
+   "objects_found": 2,
+   "objects_exported": 2,
+   "objects_skipped": 0,
+   "objects_without_asset": [],
+   "objects_to_review": [
+    "obj_001"
+   ],
+   "scene_flags": [
+    "possible missing object: 3 objects listed but 2 tracks"
+   ],
+   "stable_every_case": true,
+   "stability_cases": {
+    "nominal": true,
+    "friction_low": true,
+    "friction_high": true,
+    "mass_low": true,
+    "mass_high": true
+   },
+   "urdf_check": {
+    "agrees": true,
+    "problems": [],
+    "differences": [],
+    "largest_drift_m": 0.004517307449906322
+   }
+  },
+  {
+   "run": "s14_b",
+   "seconds": 0.8436790829873644,
+   "run_id": "s14_b",
+   "status": "review",
+   "objects_found": 5,
+   "objects_exported": 5,
+   "objects_skipped": 0,
+   "objects_without_asset": [],
+   "objects_to_review": [
+    "obj_002"
+   ],
+   "scene_flags": [
+    "track 5 dropped: reaches the top of the grid (not a tabletop object)"
+   ],
+   "stable_every_case": true,
+   "stability_cases": {
+    "nominal": true,
+    "friction_low": true,
+    "friction_high": true,
+    "mass_low": true,
+    "mass_high": true
+   },
+   "urdf_check": {
+    "agrees": true,
+    "problems": [],
+    "differences": [],
+    "largest_drift_m": 0.004899404321490632
+   }
+  },
+  {
+   "run": "s17_b",
+   "seconds": 0.8073989579861518,
+   "run_id": "s17_b",
+   "status": "review",
+   "objects_found": 5,
+   "objects_exported": 5,
+   "objects_skipped": 0,
+   "objects_without_asset": [],
+   "objects_to_review": [
+    "obj_004"
+   ],
+   "scene_flags": [],
+   "stable_every_case": true,
+   "stability_cases": {
+    "nominal": true,
+    "friction_low": true,
+    "friction_high": true,
+    "mass_low": true,
+    "mass_high": true
+   },
+   "urdf_check": {
+    "agrees": true,
+    "problems": [],
+    "differences": [],
+    "largest_drift_m": 0.05723484591840856
+   }
+  },
+  {
+   "run": "s18_b",
+   "seconds": 1.2972137499891687,
+   "run_id": "s18_b",
+   "status": "review",
+   "objects_found": 8,
+   "objects_exported": 8,
+   "objects_skipped": 0,
+   "objects_without_asset": [],
+   "objects_to_review": [
+    "obj_002",
+    "obj_004",
+    "obj_005",
+    "obj_007"
+   ],
+   "scene_flags": [],
+   "stable_every_case": true,
+   "stability_cases": {
+    "nominal": true,
+    "friction_low": true,
+    "friction_high": true,
+    "mass_low": true,
+    "mass_high": true
+   },
+   "urdf_check": {
+    "agrees": true,
+    "problems": [],
+    "differences": [],
+    "largest_drift_m": 0.005412982361787965
+   }
+  },
+  {
+   "run": "s24_b",
+   "seconds": 0.2740107080026064,
+   "run_id": "s24_b",
+   "status": "review",
+   "objects_found": 1,
+   "objects_exported": 1,
+   "objects_skipped": 0,
+   "objects_without_asset": [],
+   "objects_to_review": [
+    "obj_000"
+   ],
+   "scene_flags": [],
+   "stable_every_case": true,
+   "stability_cases": {
+    "nominal": true,
+    "friction_low": true,
+    "friction_high": true,
+    "mass_low": true,
+    "mass_high": true
+   },
+   "urdf_check": {
+    "agrees": true,
+    "problems": [],
+    "differences": [],
+    "largest_drift_m": 0.00011923546306559697
+   }
+  }
+ ]
+}

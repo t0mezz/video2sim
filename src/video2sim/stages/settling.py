@@ -29,7 +29,7 @@ these objects fall a few millimeters. It stays in the export for P5.1.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 import numpy as np
@@ -107,6 +107,7 @@ class BodyResult:
 class SceneResult:
     bodies: list[BodyResult]
     residual_penetration_m: float  # the deepest overlap the separation left
+    final_poses: dict[str, F64] = field(default_factory=dict)  # T_world_from_object at the end
 
     @property
     def stable(self) -> bool:
@@ -229,13 +230,30 @@ def _rotation_deg(a: F64, b: F64) -> float:
     return float(np.degrees(2 * np.arccos(np.clip(abs(float(a @ b)), 0.0, 1.0))))
 
 
-def settle_scene(bodies: list[SettleBody], table: Plane, cfg: SettlingConfig) -> SceneResult:
-    """Separate the bodies, run ``cfg.window_s`` of gravity and measure drift from the poses."""
+def _matrix(mujoco: Any, pose: F64) -> F64:
+    """``T_world_from_object`` of one ``qpos`` entry (position, then w x y z)."""
+    t = np.eye(4)
+    rotation = np.zeros(9)
+    mujoco.mju_quat2Mat(rotation, pose[3:])
+    t[:3, :3] = rotation.reshape(3, 3)
+    t[:3, 3] = pose[:3]
+    return t
+
+
+def settle_scene(
+    bodies: list[SettleBody], table: Plane, cfg: SettlingConfig, model: Any = None
+) -> SceneResult:
+    """Separate the bodies, run ``cfg.window_s`` of gravity and measure drift from the poses.
+
+    ``model`` replaces the one built from ``scene_xml``. It must hold one free body per entry of
+    ``bodies``, in that order, and nothing else that moves (the URDF cross-check, P5.2).
+    """
     import mujoco  # type: ignore[import-untyped]  # heavy import
 
     if not bodies:
         return SceneResult([], 0.0)
-    model = mujoco.MjModel.from_xml_string(scene_xml(bodies, table, cfg))
+    if model is None:
+        model = mujoco.MjModel.from_xml_string(scene_xml(bodies, table, cfg))
     data = mujoco.MjData(model)
     count = len(bodies)
     observed = _place(mujoco, model, data, bodies)
@@ -264,7 +282,8 @@ def settle_scene(bodies: list[SettleBody], table: Plane, cfg: SettlingConfig) ->
         )
         for i, body in enumerate(bodies)
     ]
-    return SceneResult(results, residual)
+    poses = {b.object_id: _matrix(mujoco, final_pose[i]) for i, b in enumerate(bodies)}
+    return SceneResult(results, residual, poses)
 
 
 __all__ = [

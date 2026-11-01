@@ -111,7 +111,8 @@ def test_summary_rows_targets_and_not_measured() -> None:
     assert rows["size_error_median"]["passed"] is True
     assert rows["orientation_error_median_deg"]["n"] == 2  # the cube is skipped
     assert rows["runtime_max_minutes"]["status"] == "no_data"
-    assert rows["stability_pass_fraction"]["status"] == "not_measured"
+    assert rows["stability_pass_fraction"]["status"] == "no_data"
+    assert rows["manual_steps"]["status"] == "not_measured"
     floor = evaluate_scene(_scene(), constant_box())
     assert {r["name"]: r for r in summarize([floor], TARGETS)}["object_recall"]["passed"] is False
 
@@ -164,3 +165,19 @@ def test_scene_with_a_deformable_object_is_flagged() -> None:
     assert not rigid.has_deformable
     cloth = GtObject("c", "cloth", (0.2, 0.2, 0.01), (0.3, 0.3, 0.005), 0.0, 0.05, (), True)
     assert GtScene("s_def", "hard", "dev", "grid", (*rigid.objects, cloth)).has_deformable
+
+
+def test_stability_and_asset_validity_are_measured_from_scenes() -> None:
+    def scene(stable: bool, valid: int) -> SceneResult:
+        return SceneResult(
+            "s", "easy", "dev", 0, 0, 0, 0, None, (), stable, assets_valid=valid, assets_total=4
+        )
+
+    rows = {r["name"]: r for r in summarize([scene(True, 4), scene(False, 3)], {
+        "stability_pass_fraction_min": 0.95,
+        "asset_validity_fraction_min": 1.0,
+    })}  # fmt: skip
+    assert rows["stability_pass_fraction"]["value"] == pytest.approx(0.5)
+    assert rows["stability_pass_fraction"]["passed"] is False
+    assert rows["asset_validity_fraction"]["value"] == pytest.approx(7 / 8)
+    assert rows["asset_validity_fraction"]["n"] == 8

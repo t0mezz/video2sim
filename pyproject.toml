@@ -17,6 +17,7 @@ dependencies = [
     "pyyaml>=6.0",
     "scipy>=1.15.3",
     "trimesh>=5.2.0",
+    "usd-core>=26.8,<26.11",
 ]
 
 [project.scripts]
@@ -58,6 +59,11 @@ files = ["src", "tests"]
 # Installed only inside the SAM 3D worker image on Modal (models/sam3d_modal.py), never here.
 [[tool.mypy.overrides]]
 module = ["torch", "PIL", "PIL.*", "huggingface_hub", "inference"]
+ignore_missing_imports = true
+
+# usd-core ships neither stubs nor a py.typed marker.
+[[tool.mypy.overrides]]
+module = ["pxr", "pxr.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

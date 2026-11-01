@@ -35,6 +35,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Callable, Mapping, Sequence
+from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast, get_args
@@ -43,7 +44,14 @@ import cv2
 import numpy as np
 from numpy.typing import NDArray
 
-from video2sim.models.shape_model import ShapeModel, ShapeSample, ShapeView, draw_samples
+from video2sim.models.shape_model import (
+    SampleFailed,
+    ShapeModel,
+    ShapeSample,
+    ShapeView,
+    draw_jobs,
+    draw_samples,
+)
 from video2sim.runner import StageContext
 from video2sim.schemas import (
     SE3,
@@ -81,6 +89,7 @@ class ShapeStageConfig:
     support_gap_m: float
     stretch_samples: int
     parallel_samples: int
+    parallel_registrations: int
     registration: RegistrationConfig
 
     @classmethod
@@ -95,6 +104,7 @@ class ShapeStageConfig:
             float(c["support_gap_m"]),
             int(c["stretch_samples"]),
             int(c["parallel_samples"]),
+            int(c["parallel_registrations"]),
             RegistrationConfig.from_config(cfg),
         )
         counts = (
@@ -103,11 +113,12 @@ class ShapeStageConfig:
             out.max_views,
             out.stretch_samples,
             out.parallel_samples,
+            out.parallel_registrations,
         )
         if min(counts) < 1:
             raise ValueError(
-                "keyframes_per_object, samples_per_keyframe, max_views, stretch_samples and "
-                "parallel_samples must be at least 1"
+                "keyframes_per_object, samples_per_keyframe, max_views, stretch_samples, "
+                "parallel_samples and parallel_registrations must be at least 1"
             )
         if not 0 <= out.min_fit_score <= 1:
             raise ValueError("min_fit_score must be in [0, 1]")
@@ -252,6 +263,44 @@ def sample_record(c: Candidate) -> dict[str, Any]:
     }
 
 
+@dataclass(frozen=True)
+class ObjectPlan:
+    """What one object's draws and registrations need."""
+
+    obj: ObjectInstance
+    target: F64
+    views: list[MaskView]
+    view_frames: list[int]
+    support_z: float | None
+    shape_views: list[ShapeView]
+
+
+def plan_object(
+    obj: ObjectInstance,
+    world: WorldModel,
+    run_dir: Path,
+    masks: Mapping[str, Masks],
+    cfg: ShapeStageConfig,
+) -> ObjectPlan:
+    target = np.asarray(np.load(run_dir / obj.point_cluster_path), dtype=float).reshape(-1, 3)
+    own = masks[obj.object_id]
+    others = [m for k, m in masks.items() if k != obj.object_id]
+    posed = {f.frame_index for f in world.frames}
+    view_frames = spread([f for f in own if f in posed], cfg.max_views)
+    views = mask_views(world, own, others, view_frames)
+    images = {f.frame_index: run_dir / f.image_path for f in world.frames}
+    keyframes = [k for k in obj.keyframes if k in own and k in images][: cfg.keyframes_per_object]
+    shape_views = [ShapeView(k, images[k], own[k]) for k in keyframes]
+    return ObjectPlan(
+        obj,
+        target,
+        views,
+        view_frames,
+        support_height(world, target, cfg.support_gap_m),
+        shape_views if views and len(target) else [],
+    )
+
+
 def shape_object(
     obj: ObjectInstance,
     world: WorldModel,
@@ -262,35 +311,104 @@ def shape_object(
     cfg: ShapeStageConfig,
     seed: int,
 ) -> tuple[RegisteredObject, dict[str, Any], str | None]:
-    """One object's ``RegisteredObject``, its report entry and the checkpoint used, if any."""
-    target = np.asarray(np.load(run_dir / obj.point_cluster_path), dtype=float).reshape(-1, 3)
-    own = masks[obj.object_id]
-    others = [m for k, m in masks.items() if k != obj.object_id]
-    posed = {f.frame_index for f in world.frames}
-    view_frames = spread([f for f in own if f in posed], cfg.max_views)
-    views = mask_views(world, own, others, view_frames)
-    support_z = support_height(world, target, cfg.support_gap_m)
-    images = {f.frame_index: run_dir / f.image_path for f in world.frames}
-    keyframes = [k for k in obj.keyframes if k in own and k in images][: cfg.keyframes_per_object]
-
-    candidates: list[Candidate] = []
+    """One object from start to end, with nothing shared with the others: the sequential path."""
+    plan = plan_object(obj, world, run_dir, masks, cfg)
     failures: list[str] = []
-    checkpoint = None
-    if views and len(target):
-        shape_views = [ShapeView(k, images[k], own[k]) for k in keyframes]
-        samples = draw_samples(
-            model,
-            obj.object_id,
-            shape_views,
-            cfg.samples_per_keyframe,
-            seed,
-            failures,
-            cfg.parallel_samples,
+    samples = draw_samples(
+        model,
+        obj.object_id,
+        plan.shape_views,
+        cfg.samples_per_keyframe,
+        seed,
+        failures,
+        cfg.parallel_samples,
+    )
+    candidates = [
+        Candidate(
+            sample,
+            register_sample(
+                sample, world, plan.target, plan.views, cfg.registration, seed, plan.support_z
+            ),
         )
-        for sample in samples:
-            reg = register_sample(sample, world, target, views, cfg.registration, seed, support_z)
-            candidates.append(Candidate(sample, reg))
-            checkpoint = sample.checkpoint
+        for sample in samples
+    ]
+    return finish_object(plan, candidates, failures, out_dir, cfg, seed)
+
+
+def shape_scene(
+    objects: Sequence[ObjectInstance],
+    world: WorldModel,
+    run_dir: Path,
+    out_dir: Path,
+    masks: Mapping[str, Masks],
+    model: ShapeModel,
+    cfg: ShapeStageConfig,
+    seed: int,
+) -> list[tuple[RegisteredObject, dict[str, Any], str | None]]:
+    """All objects at once: the scene's draws share ``parallel_samples``, and each mesh goes to
+    registration as soon as it lands, so a slow draw holds up nothing else.
+
+    Seeds depend on the object and the draw, and results are read back in draw order, so the
+    outcome is that of ``shape_object`` whatever finishes first.
+    """
+    plans = [plan_object(obj, world, run_dir, masks, cfg) for obj in objects]
+    jobs = [
+        (index, view, draw_seed)
+        for index, plan in enumerate(plans)
+        for view, draw_seed in draw_jobs(
+            plan.obj.object_id, plan.shape_views, cfg.samples_per_keyframe, seed
+        )
+    ]
+
+    with (
+        ThreadPoolExecutor(max_workers=cfg.parallel_samples) as draws,
+        ThreadPoolExecutor(max_workers=cfg.parallel_registrations) as fits,
+    ):
+
+        def fit(index: int, sample: ShapeSample) -> Candidate:
+            p = plans[index]
+            reg = register_sample(
+                sample, world, p.target, p.views, cfg.registration, seed, p.support_z
+            )
+            return Candidate(sample, reg)
+
+        def draw(job: tuple[int, ShapeView, int]) -> Future[Candidate] | str:
+            index, view, draw_seed = job
+            try:
+                sample = model.sample(plans[index].obj.object_id, view, draw_seed)
+            except SampleFailed as e:
+                return f"frame {view.frame_index} seed {draw_seed}: {e}"
+            return fits.submit(fit, index, sample)
+
+        candidates: list[list[Candidate]] = [[] for _ in plans]
+        failures: list[list[str]] = [[] for _ in plans]
+        for job, result in zip(jobs, list(draws.map(draw, jobs)), strict=True):
+            if isinstance(result, str):
+                failures[job[0]].append(result)
+            else:
+                candidates[job[0]].append(result.result())
+
+        def finish(index: int) -> tuple[RegisteredObject, dict[str, Any], str | None]:
+            return finish_object(
+                plans[index], candidates[index], failures[index], out_dir, cfg, seed
+            )
+
+        return list(fits.map(finish, range(len(plans))))
+
+
+def finish_object(
+    plan: ObjectPlan,
+    candidates: list[Candidate],
+    failures: list[str],
+    out_dir: Path,
+    cfg: ShapeStageConfig,
+    seed: int,
+) -> tuple[RegisteredObject, dict[str, Any], str | None]:
+    """Keep the best draw and write the object's ``RegisteredObject``, report entry and checkpoint
+    used, if any."""
+    obj, target, views, support_z = plan.obj, plan.target, plan.views, plan.support_z
+    checkpoint = candidates[-1].sample.checkpoint if candidates else None
+    candidates = list(candidates)
     ranked = sorted(candidates, key=lambda c: -c.registration.fit_score)
     finalists = [
         Candidate(
@@ -306,7 +424,7 @@ def shape_object(
         candidates[candidates.index(old)] = new
     best = max(finalists, key=lambda c: c.registration.fit_score, default=None)
     report: dict[str, Any] = {
-        "views": view_frames,
+        "views": plan.view_frames,
         "support_z": support_z,
         "samples": [sample_record(c) for c in candidates],
         "failed_samples": failures,
@@ -385,10 +503,10 @@ class ShapeStage:
         masks = {o.object_id: load_masks(ctx.run_dir, o) for o in instances.objects}
 
         objects, report = [], {}
-        for obj in instances.objects:
-            registered, entry, checkpoint = shape_object(
-                obj, world, ctx.run_dir, ctx.out_dir, masks, model, stage_cfg, ctx.seed
-            )
+        results = shape_scene(
+            instances.objects, world, ctx.run_dir, ctx.out_dir, masks, model, stage_cfg, ctx.seed
+        )
+        for obj, (registered, entry, checkpoint) in zip(instances.objects, results, strict=True):
             if checkpoint is not None:
                 ctx.record_checkpoint(model.name, checkpoint)
             objects.append(registered)

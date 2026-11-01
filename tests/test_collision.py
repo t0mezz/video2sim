@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import cast
 
@@ -14,6 +15,7 @@ from video2sim.stages.collision import (
     CollisionConfig,
     check_parts,
     collision_geometry,
+    prepare_coacd,
     surface_fit,
     write_collision,
 )
@@ -201,3 +203,17 @@ def test_a_smooth_hull_edge_collapse_cannot_thin_still_meets_the_cap(
     assert len(out.vertices) <= cfg.max_part_vertices
     assert trimesh.convex.is_convex(out)  # type: ignore[no-untyped-call]
     assert out.volume == pytest.approx(can.volume, rel=0.02)
+
+
+def test_coacd_runs_in_two_threads_after_setup() -> None:
+    coacd = pytest.importorskip("coacd")
+    prepare_coacd()
+    mesh = trimesh.creation.annulus(0.05, 0.1, height=0.05)
+
+    def run(_: int) -> int:
+        solid = coacd.Mesh(np.asarray(mesh.vertices, float), np.asarray(mesh.faces, np.int64))
+        return len(coacd.run_coacd(solid, threshold=0.2, max_convex_hull=4, seed=0))
+
+    with ThreadPoolExecutor(2) as pool:
+        counts = list(pool.map(run, range(2)))
+    assert counts[0] == counts[1] >= 1

@@ -345,6 +345,34 @@ class SimAssets(Model):
 
 
 # ---------------------------------------------------------------------------
+# Stage 6: export
+# ---------------------------------------------------------------------------
+
+
+class SkippedAsset(Model):
+    """An asset left out of the scene, so the QA report can say why."""
+
+    object_id: str
+    reasons: list[str] = Field(min_length=1, description="The checks that failed")
+
+
+class SceneExport(Model):
+    """Output of stage 6: the scene package."""
+
+    usd_path: RelPath
+    urdf_paths: dict[str, RelPath] = Field(description="Object id to its URDF file")
+    qa_report_path: RelPath
+    skipped: list[SkippedAsset] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _skipped_not_exported(self) -> SceneExport:
+        both = {s.object_id for s in self.skipped} & set(self.urdf_paths)
+        if both:
+            raise ValueError(f"skipped objects cannot also be exported: {sorted(both)}")
+        return self
+
+
+# ---------------------------------------------------------------------------
 # Run bookkeeping
 # ---------------------------------------------------------------------------
 
