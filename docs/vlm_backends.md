@@ -36,20 +36,33 @@ model never reads another model's cached answer. Existing Baseten caches stay va
 
 ## A local llama.cpp instance (Muse Glimmer 30B, port 9931)
 
-On the development setup (reached at localhost:9931, e.g. through an SSH tunnel) `GET /v1/models` reports `muse-glimmer-30B`, llama.cpp, Q4_K_M, inputs text, image and video.
+The development instance is `llama-server` serving `muse-glimmer-30B` (Q4_K_M, inputs text, image
+and video), reached at `localhost:9931`, for example through an SSH tunnel. Its launch flags,
+without host and file paths:
 
-Limits to know about:
+| Flag | Meaning |
+| --- | --- |
+| `-a muse-glimmer-30B` | model name clients send as `model` |
+| `--mmproj <mmproj GGUF>` | vision projector, needed for image input |
+| `-ngl 30` | 30 layers on the GPU |
+| `-c 66560 -np 4` | 66560 tokens of context split over 4 slots: **16640 tokens per request** |
+| `-fa on -ctk q4_0 -ctv q4_0` | flash attention, KV cache quantized to 4 bit |
+| `-md <draft GGUF> -ngld 99` | draft model for speculative decoding, fully on the GPU |
+| `--jinja` | the model's own chat template |
+| `--temp 1.0 --top-p 0.95 --top-k 64` | server sampling defaults |
 
-- **Context is 8960 tokens** (`n_ctx`; the model trained on 131072). The router sends 3 full
-  frames in one request, which may not fit. If requests fail, lower `segmentation.router.n_frames`
-  or restart `llama-server` with a larger `-c`.
-- **Send small images.** A 3840x2160, 2 MB PNG made the server drop the connection and refuse
-  connections for about a minute on 2026-11-01. 512 px (62 KB) and 1024 px (166 KB) JPEGs
-  answered in 7 and 9 s. The pipeline's crops are small, but the router sends full-resolution
-  frames; check their size before a first run.
-- It is a local model with no retention terms to read, but unlike Baseten it has a single
-  slot: `segmentation.material_pass.max_workers` and `physics.parallel_mass_calls` above 1 just
-  queue at the server.
+What this means for the pipeline:
+
+- **Sampling:** the client sends `temperature: 0`, which overrides the server's `--temp 1.0`.
+  `top_p` and `top_k` stay at the server defaults.
+- **Context:** `GET /v1/models` shows `n_ctx` 16640, the per-slot share. On 2026-11-01 one
+  3840x2160 PNG (2.2 MB) was answered in 26 s, and the same image three times in one request, as
+  the router sends frames, in 47 s. Larger requests or more frames than that may not fit.
+- **Concurrency:** 4 slots, which matches `segmentation.material_pass.max_workers: 4` and
+  `physics.parallel_mass_calls`. A fifth request waits at the server.
+- **History:** an earlier instance had a 8960-token context. A 3840x2160 PNG made it drop the
+  connection and refuse connections for about a minute; 512 px and 1024 px JPEGs answered in 7
+  and 9 s.
 
 ## Smoke test
 
