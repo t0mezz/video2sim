@@ -1,41 +1,56 @@
-# Video2Sim
+<h1 align="center">Video2Sim</h1>
 
-Turn a smartphone video of a tabletop workspace into a physics-ready USD/URDF scene.
+<p align="center">
+  <b>Film a tabletop. Get a physics-ready USD/URDF scene.</b>
+</p>
 
-SAM 3.1 segments and tracks the objects, SAM 3D completes their shapes, a reconstruction
-stage gives them a metric position in the world, and a physics stage adds collision geometry,
-mass, inertia and friction ranges. The result loads in Isaac Sim and is meant as a starting
-point for reinforcement learning and robot training.
+<p align="center">
+  <img alt="python" src="https://img.shields.io/badge/python-3.10%2B-3776ab">
+  <img alt="sim" src="https://img.shields.io/badge/validated%20in-MuJoCo-4c8bf5">
+  <img alt="export" src="https://img.shields.io/badge/export-USD%20%2B%20URDF-76b900">
+</p>
 
-**Status:** pre-MVP, in Phase 5. All six stages run. Scenes are validated in MuJoCo; loading the
-USD in Isaac Sim is not verified yet (D-027). See [PLAN.md](PLAN.md).
+<p align="center">
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#make-a-scene">Make a scene</a> ·
+  <a href="#where-to-read-next">Docs</a>
+</p>
+
+---
+
+A smartphone video goes in. SAM 3.1 segments and tracks the objects, SAM 3D completes their
+shapes, a reconstruction stage gives them a metric position in the world, and a physics stage adds
+collision geometry, mass, inertia and friction ranges. The result loads in Isaac Sim and is meant
+as a starting point for reinforcement learning and robot training.
+
+```text
+capture -> reconstruction -> segmentation -> shape -> physics -> export
+```
 
 ## Quick start
 
 ```bash
-uv sync                 # install runtime and dev dependencies
-uv run pytest           # fast tests, no GPU or model weights needed
-uv run ruff check .     # lint
-uv run mypy             # type check
+uv sync                  # install runtime and dev dependencies
+cp .env.example .env     # then fill in META_MODEL_API_KEY and BASETEN_API_KEY
+uv run pytest -m "not gpu and not slow and not network"   # fast tests, no GPU or weights
+uv run video2sim run my_table.mp4 --out scene/            # film first, see below
 ```
+
+The VLM can also be a local OpenAI-compatible server instead of Baseten:
+[docs/vlm_backends.md](docs/vlm_backends.md).
 
 ## Make a scene
 
-Film the table as [docs/capture_protocol.md](docs/capture_protocol.md) says, with the printed
-marker board in view. The pipeline calls hosted models, so it needs a Meta Model API key and a
-Baseten key in `.env` (see `.env.example`), and a Modal account with the SAM 3D worker deployed
-(`AGENTS.md` has the commands). It sends video frames and object crops to those services.
+1. Film the table as [docs/capture_protocol.md](docs/capture_protocol.md) says, with the printed
+   marker board in view.
+2. Set up the hosted services: the keys in `.env`, and a Modal account with the SAM 3D worker
+   deployed (`AGENTS.md` has the commands). Video frames and object crops are sent to them.
+3. Run `uv run video2sim run my_table.mp4 --out scene/`.
 
-```bash
-uv run video2sim run my_table.mp4 --out scene/
-```
-
-`scene/` then holds `scene.usd`, one URDF per object in `urdf/`, and `qa_report.html`, which lists
-every object with its confidence, fallbacks, mass range and settling result. Run folders go to
-`runs/`, and running again with `--run-id` resumes from the last finished stage.
-
-The pick-and-place demo needs the Panda model: run `scripts/fetch_panda.sh`, then see
-`benchmark/run_pick_place.py`.
+`scene/` holds `scene.usd`, one URDF per object in `urdf/`, and `qa_report.html` with each
+object's confidence, fallbacks, mass range and settling result. Run again with `--run-id` to
+resume from the last finished stage. For the pick-and-place demo, run `scripts/fetch_panda.sh`
+and see `benchmark/run_pick_place.py`.
 
 ## Where to read next
 
@@ -45,5 +60,5 @@ The pick-and-place demo needs the Panda model: run `scripts/fetch_panda.sh`, the
 | [AGENTS.md](AGENTS.md) | Conventions and working rules, for people and coding agents. |
 | [benchmark/README.md](benchmark/README.md) | How benchmark scenes and ground truth are laid out. |
 | [docs/capture_protocol.md](docs/capture_protocol.md) | How to film a scene. |
-| [docs/licenses.md](docs/licenses.md) | License status of every model and tool we depend on. |
 | [docs/vlm_backends.md](docs/vlm_backends.md) | Pointing the VLM calls at Baseten or any OpenAI-compatible server. |
+| [docs/licenses.md](docs/licenses.md) | License status of every model and tool we depend on. |
