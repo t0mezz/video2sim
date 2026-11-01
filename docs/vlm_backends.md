@@ -15,7 +15,7 @@ vlm:
     base_url: http://localhost:9931/v1   # "/chat/completions" is appended
     model: muse-glimmer-30B
     api_key_env: null             # env var / .env entry holding a bearer token; null sends none
-    max_tokens: 1024              # null leaves it to the server
+    max_tokens: 4096              # thinking plus answer; null leaves it to the server
 ```
 
 - `baseten` is the hosted Muse Spark and needs `BASETEN_API_KEY`.
@@ -63,6 +63,31 @@ What this means for the pipeline:
 - **History:** an earlier instance had a 8960-token context. A 3840x2160 PNG made it drop the
   connection and refuse connections for about a minute; 512 px and 1024 px JPEGs answered in 7
   and 9 s.
+
+## Quality against Muse Spark Open
+
+`benchmark/compare_vlm.py` runs the pipeline's own prompts and parsers on the same dev inputs
+with both models (result: `benchmark/results/vlm_compare.json`, answers cached beside it). Muse
+Spark Open is `meta-models/muse-spark-open-1026` on Baseten; local is `muse-glimmer-30B` on the
+instance above, one run each on 2026-11-01, `max_tokens: 4096`.
+
+| Task (dev inputs) | Spark | Local |
+| --- | --- | --- |
+| Router, 24 scenes: object count equals ground truth | 19 | 19 |
+| Router: count within 1, surface chosen | 24, table | 24, table |
+| Mass, 56 objects: within 30% of weighed mass | 23 (41%) | 23 (41%) |
+| Mass: median ratio to truth, truth inside low-high | 1.02, 28 | 1.10, 30 |
+| Material, 56 objects: answer readable | 56 | 56 |
+| Material: `hollow` answered, correct among answered | 56, 38 | 38, 23 |
+| Same material class / same finish as the other model | 50 / 56, 47 / 56 | |
+| Mean seconds per request (136 each) | 13 | 86 (max 290) |
+
+Router misses are the same five scenes in both models. Hollow is compared with the ground-truth
+`hollow` flag only; material class and finish have no ground truth here, only the agreement
+between the models. The local model answers `unknown` for `hollow` on 18 objects where Spark
+commits. It is a reasoning model, so a request spends about 800 tokens thinking: that is why
+`max_tokens` is 4096 and why it takes about 6.6 times as long. With `max_tokens: 1024` some answers
+came back empty.
 
 ## Smoke test
 

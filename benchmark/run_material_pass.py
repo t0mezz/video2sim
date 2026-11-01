@@ -29,12 +29,12 @@ import numpy as np
 import yaml
 
 from video2sim.models.hosted import ResponseCache, read_secret
+from video2sim.models.vlm import BasetenMaterialClient
 from video2sim.runner import OUTPUT_FILE
 from video2sim.schemas import WorldModel
 from video2sim.stages.depth_flags import DepthConfig, depth_signals, judge
 from video2sim.stages.lift import LiftConfig
 from video2sim.stages.material_pass import (
-    BasetenMaterialClient,
     MaterialClient,
     MaterialConfig,
     crop_for_vlm,

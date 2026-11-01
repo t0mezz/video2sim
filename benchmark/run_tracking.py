@@ -25,9 +25,9 @@ from video2sim.evaluation.alignment import CLEAN_ALIGNED, align_clean, align_run
 from video2sim.evaluation.scenes import load_scene
 from video2sim.evaluation.segmentation import score_tracks
 from video2sim.models.hosted import ResponseCache, read_secret
+from video2sim.models.vlm import BasetenMaterialClient
 from video2sim.runner import OUTPUT_FILE
 from video2sim.schemas import WorldModel
-from video2sim.stages.material_pass import BasetenMaterialClient
 from video2sim.stages.scene_router import RouterConfig, route_scene, tracking_prompt
 from video2sim.stages.track_repair import RepairConfig, repair_tracks
 from video2sim.stages.tracking import (

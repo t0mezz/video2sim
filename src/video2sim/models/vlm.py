@@ -60,6 +60,14 @@ class ChatVlmClient:
         return str(reply["choices"][0]["message"]["content"])
 
 
+class BasetenMaterialClient(ChatVlmClient):
+    """The hosted Muse Spark regardless of ``vlm.backend``, for the benchmark experiments that
+    were run on it."""
+
+    def __init__(self, key: str, timeout_s: float, retries: int) -> None:
+        super().__init__(BASETEN_URL, BASETEN_MODEL, key, timeout_s, retries)
+
+
 @dataclass(frozen=True)
 class VlmConfig:
     """Values from ``vlm`` in ``configs/default.yaml``."""
@@ -112,4 +120,11 @@ def cache_model(client: object) -> str:
     return str(getattr(client, "model", BASETEN_MODEL))
 
 
-__all__ = ["BACKENDS", "ChatVlmClient", "VlmConfig", "cache_model", "make_vlm_client"]
+__all__ = [
+    "BACKENDS",
+    "BasetenMaterialClient",
+    "ChatVlmClient",
+    "VlmConfig",
+    "cache_model",
+    "make_vlm_client",
+]

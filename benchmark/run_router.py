@@ -22,9 +22,9 @@ import yaml
 
 from video2sim.evaluation.scenes import load_scene
 from video2sim.models.hosted import ResponseCache, read_secret
+from video2sim.models.vlm import BasetenMaterialClient
 from video2sim.runner import OUTPUT_FILE
 from video2sim.schemas import WorldModel
-from video2sim.stages.material_pass import BasetenMaterialClient
 from video2sim.stages.scene_router import RouterConfig, compare_counts, route_scene
 from video2sim.stages.tracking import load_tracks
 

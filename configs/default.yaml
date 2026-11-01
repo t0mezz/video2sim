@@ -52,7 +52,7 @@ vlm:                           # the model behind the router, the material pass 
     base_url: http://localhost:9931/v1   # /chat/completions is appended
     model: muse-glimmer-30B
     api_key_env: null          # name of an environment variable or .env entry; null sends no Authorization header
-    max_tokens: 1024           # caps the answer; null leaves it to the server
+    max_tokens: 4096           # caps thinking plus answer; a reasoning model needs ~1000 for thinking alone
 
 segmentation:
   sam_backend: null            # "api" or "self_hosted", see PLAN.md decision D-004
