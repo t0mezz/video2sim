@@ -36,13 +36,13 @@ import numpy as np
 from numpy.typing import NDArray
 
 from video2sim.models.hosted import ResponseCache, read_secret
+from video2sim.models.vlm import make_vlm_client
 from video2sim.runner import StageContext
 from video2sim.schemas import Flag, Instances, ObjectInstance, StageName, WorldModel
 from video2sim.stages.depth_flags import DepthConfig, depth_signals, judge
 from video2sim.stages.keyframes import KeyframeChoice, KeyframeConfig, keyframes_for_tracks
 from video2sim.stages.lift import LiftConfig, lift_points, lift_tracks, load_points
 from video2sim.stages.material_pass import (
-    BasetenMaterialClient,
     MaterialClient,
     MaterialConfig,
     MaterialDecision,
@@ -85,11 +85,10 @@ def default_clients(cfg: dict[str, Any]) -> SegmentationClients:
     """Clients for the hosted APIs. Keys come from the environment or ``.env``."""
     router, material = RouterConfig.from_config(cfg), MaterialConfig.from_config(cfg)
     tracking = TrackingConfig.from_config(cfg)
-    baseten = read_secret("BASETEN_API_KEY")
     return SegmentationClients(
-        BasetenMaterialClient(baseten, router.timeout_s, router.retries),
+        make_vlm_client(cfg, router.timeout_s, router.retries),
         MetaVideoSamClient(read_secret("META_MODEL_API_KEY"), tracking.timeout_s),
-        BasetenMaterialClient(baseten, material.timeout_s, material.retries),
+        make_vlm_client(cfg, material.timeout_s, material.retries),
     )
 
 

@@ -32,13 +32,8 @@ from typing import Any, Protocol
 
 import numpy as np
 
-from video2sim.models.hosted import (
-    BASETEN_MODEL,
-    BASETEN_URL,
-    ResponseCache,
-    image_data_url,
-    post_json,
-)
+from video2sim.models.hosted import ResponseCache, image_data_url
+from video2sim.models.vlm import cache_model
 from video2sim.schemas import Flag, WorldModel
 from video2sim.stages.depth_flags import DepthSignals, Verdict
 from video2sim.stages.tracking import Track
@@ -154,26 +149,6 @@ class MaterialClient(Protocol):
         ...
 
 
-class BasetenMaterialClient:
-    """Same hosted model and endpoint as discovery method A."""
-
-    def __init__(self, key: str, timeout_s: float, retries: int) -> None:
-        self._key, self._timeout_s, self._retries = key, timeout_s, retries
-
-    def ask(self, prompt: str, images: Sequence[Path]) -> str:
-        content: list[dict[str, Any]] = [{"type": "text", "text": prompt}]
-        content += [
-            {"type": "image_url", "image_url": {"url": image_data_url(path)}} for path in images
-        ]
-        body = {
-            "model": BASETEN_MODEL,
-            "temperature": 0,
-            "messages": [{"role": "user", "content": content}],
-        }
-        reply = json.loads(post_json(BASETEN_URL, self._key, body, self._timeout_s, self._retries))
-        return str(reply["choices"][0]["message"]["content"])
-
-
 def crop_for_vlm(
     run_dir: Path, world: WorldModel, track: Track, frame_index: int, pad_px: int, out: Path
 ) -> Path:
@@ -275,7 +250,7 @@ def ask_for_track(
         called = True
         return client.ask(prompt, images)
 
-    key = [prompt, BASETEN_MODEL, *(image_data_url(p) for p in images)]
+    key = [prompt, cache_model(client), *(image_data_url(p) for p in images)]
     return cache.get_or_call(key, call), not called
 
 

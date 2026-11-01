@@ -30,9 +30,9 @@ from video2sim.evaluation.loader import load_run
 from video2sim.evaluation.metrics import evaluate_scene
 from video2sim.evaluation.scenes import discover_scenes
 from video2sim.models.hosted import ResponseCache, read_secret
+from video2sim.models.vlm import BasetenMaterialClient
 from video2sim.runner import OUTPUT_FILE
 from video2sim.schemas import Instances, SimAssets, WorldModel
-from video2sim.stages.material_pass import BasetenMaterialClient
 from video2sim.stages.vlm_mass import PROMPT, parse_mass
 
 ROOT = Path(__file__).resolve().parent.parent

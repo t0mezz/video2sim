@@ -23,7 +23,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal
 
-from video2sim.models.hosted import ResponseCache
+from video2sim.models.hosted import BASETEN_MODEL, ResponseCache
+from video2sim.models.vlm import cache_model
 from video2sim.runner import sha256_file
 from video2sim.schemas import Estimate
 from video2sim.stages.material_pass import MaterialClient
@@ -87,6 +88,8 @@ def ask_mass(
     """One request for one object, cached by the prompt and the crops' bytes."""
     prompt = PROMPT.format(category=category, measured="")
     parts = [prompt, *[sha256_file(p) for p in crops]]
+    if (model := cache_model(client)) != BASETEN_MODEL:  # keeps the keys of earlier Baseten runs
+        parts.append(model)
     return parse_mass(cache.get_or_call(parts, lambda: client.ask(prompt, crops)))
 
 

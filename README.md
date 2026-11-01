@@ -46,3 +46,4 @@ The pick-and-place demo needs the Panda model: run `scripts/fetch_panda.sh`, the
 | [benchmark/README.md](benchmark/README.md) | How benchmark scenes and ground truth are laid out. |
 | [docs/capture_protocol.md](docs/capture_protocol.md) | How to film a scene. |
 | [docs/licenses.md](docs/licenses.md) | License status of every model and tool we depend on. |
+| [docs/vlm_backends.md](docs/vlm_backends.md) | Pointing the VLM calls at Baseten or any OpenAI-compatible server. |

@@ -25,7 +25,8 @@ from typing import Any, cast
 import numpy as np
 import trimesh
 
-from video2sim.models.hosted import ResponseCache, read_secret
+from video2sim.models.hosted import ResponseCache
+from video2sim.models.vlm import make_vlm_client
 from video2sim.runner import StageContext
 from video2sim.schemas import (
     SE3,
@@ -50,7 +51,6 @@ from video2sim.stages.collision import (
 )
 from video2sim.stages.mass import MassConfig, estimate_mass
 from video2sim.stages.material_pass import (
-    BasetenMaterialClient,
     MaterialClient,
     crop_for_vlm,
     pick_frames,
@@ -281,7 +281,7 @@ class PhysicsStage:
     dependencies: tuple[StageName, ...] = ("reconstruction", "segmentation", "shape")
 
     def __init__(self, material_table: Path, client: MaterialClient | None = None):
-        """``client`` is the hosted model; by default it reads ``BASETEN_API_KEY``."""
+        """``client`` is the hosted model; by default the one of ``vlm.backend``."""
         self._table = material_table
         self._client = client
         self.extra_inputs: tuple[Path, ...] = (material_table,)
@@ -294,9 +294,7 @@ class PhysicsStage:
         table = load_material_table(self._table)
         client = self._client
         if client is None and cfg.vlm_mass.enabled:
-            client = BasetenMaterialClient(
-                read_secret("BASETEN_API_KEY"), cfg.vlm_mass.timeout_s, cfg.vlm_mass.retries
-            )
+            client = make_vlm_client(ctx.config, cfg.vlm_mass.timeout_s, cfg.vlm_mass.retries)
         work = ctx.run_dir / "physics.work"
         work.mkdir(exist_ok=True)
 

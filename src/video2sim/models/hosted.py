@@ -71,13 +71,16 @@ _RETRIES = 4
 
 
 def post_json(
-    url: str, key: str, body: dict[str, Any], timeout_s: float = 120.0, retries: int = _RETRIES
+    url: str,
+    key: str | None,
+    body: dict[str, Any],
+    timeout_s: float = 120.0,
+    retries: int = _RETRIES,
 ) -> bytes:
-    request = urllib.request.Request(
-        url,
-        data=json.dumps(body).encode(),
-        headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-    )
+    headers = {"Content-Type": "application/json"}
+    if key:
+        headers["Authorization"] = f"Bearer {key}"
+    request = urllib.request.Request(url, data=json.dumps(body).encode(), headers=headers)
     for attempt in range(retries):
         try:
             with urllib.request.urlopen(request, timeout=timeout_s) as response:

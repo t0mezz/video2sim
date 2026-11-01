@@ -1,0 +1,4015 @@
+{
+ "models": {
+  "spark": "meta-models/muse-spark-open-1026",
+  "local": "muse-glimmer-30B"
+ },
+ "local_server": "muse-glimmer-30B",
+ "summary": {
+  "router": {
+   "spark": {
+    "scenes": 24,
+    "answered": 24,
+    "count_exact": 19,
+    "count_within_1": 24,
+    "mean_abs_count_error": 0.208
+   },
+   "local": {
+    "scenes": 24,
+    "answered": 24,
+    "count_exact": 19,
+    "count_within_1": 24,
+    "mean_abs_count_error": 0.208
+   }
+  },
+  "material": {
+   "spark": {
+    "objects": 56,
+    "readable": 56,
+    "hollow_answered": 56,
+    "hollow_correct": 38,
+    "classes": {
+     "plastic_hard": 19,
+     "cardboard": 13,
+     "metal_steel": 8,
+     "ceramic": 2,
+     "electronics_mixed": 4,
+     "foam": 2,
+     "rubber": 2,
+     "wood": 1,
+     "metal_aluminium": 1,
+     "glass": 1,
+     "foil_wrapped_food": 2,
+     "other": 1
+    }
+   },
+   "local": {
+    "objects": 56,
+    "readable": 56,
+    "hollow_answered": 38,
+    "hollow_correct": 23,
+    "classes": {
+     "plastic_hard": 21,
+     "cardboard": 13,
+     "metal_steel": 7,
+     "ceramic": 2,
+     "electronics_mixed": 4,
+     "rubber": 1,
+     "foam": 3,
+     "paper": 1,
+     "metal_aluminium": 1,
+     "glass": 1,
+     "foil_wrapped_food": 2
+    }
+   }
+  },
+  "material_agreement": {
+   "both_readable": 56,
+   "same_class": 50,
+   "same_finish": 47
+  },
+  "mass": {
+   "spark": {
+    "objects": 56,
+    "answered": 56,
+    "within_tolerance": 23,
+    "fraction": 0.4107142857142857,
+    "median_ratio": 1.0223135980117473,
+    "mean_mnre": 0.6423157299614307,
+    "truth_inside_low_high": 28
+   },
+   "local": {
+    "objects": 56,
+    "answered": 56,
+    "within_tolerance": 23,
+    "fraction": 0.4107142857142857,
+    "median_ratio": 1.1007262115439445,
+    "mean_mnre": 0.6260797870185143,
+    "truth_inside_low_high": 30
+   }
+  }
+ },
+ "timing": {
+  "spark": {
+   "requests": 136,
+   "mean_s": 12.97,
+   "max_s": 37.06
+  },
+  "local": {
+   "requests": 136,
+   "mean_s": 85.97,
+   "max_s": 290.04
+  }
+ },
+ "router": {
+  "spark": [
+   {
+    "scene": "s01_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "surface": "table",
+    "listed": 5,
+    "objects": [
+     "cube",
+     "cube",
+     "box",
+     "box",
+     "can"
+    ],
+    "gt_rigid": 5,
+    "gt_labels": [
+     "rubiks cube",
+     "rubiks cube smaller",
+     "empty phone packaging",
+     "coffee powder can",
+     "packaging for in ear headphones"
+    ]
+   },
+   {
+    "scene": "s02_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "surface": "table",
+    "listed": 5,
+    "objects": [
+     "mug",
+     "mug",
+     "box",
+     "camera",
+     "eraser"
+    ],
+    "gt_rigid": 5,
+    "gt_labels": [
+     "mug",
+     "mug",
+     "action camera",
+     "deodorant cap",
+     "packaging for electronics"
+    ]
+   },
+   {
+    "scene": "s03_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "surface": "table",
+    "listed": 1,
+    "objects": [
+     "ball"
+    ],
+    "gt_rigid": 1,
+    "gt_labels": [
+     "toy air basketball"
+    ]
+   },
+   {
+    "scene": "s04_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "surface": "table",
+    "listed": 5,
+    "objects": [
+     "box",
+     "ball",
+     "bottle",
+     "cube",
+     "box"
+    ],
+    "gt_rigid": 5,
+    "gt_labels": [
+     "toy air basketball",
+     "metal insulated water bottle",
+     "packaging for electronics",
+     "rubiks cube smaller",
+     "packaging for in ear headphones"
+    ]
+   },
+   {
+    "scene": "s05_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "surface": "table",
+    "listed": 4,
+    "objects": [
+     "cube",
+     "camera",
+     "box",
+     "can"
+    ],
+    "gt_rigid": 4,
+    "gt_labels": [
+     "rubiks cube",
+     "action camera",
+     "packaging for breakfast bags",
+     "coffee powder can"
+    ]
+   },
+   {
+    "scene": "s06_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.85)",
+    "surface": "table",
+    "listed": 4,
+    "objects": [
+     "can",
+     "box",
+     "car",
+     "cube"
+    ],
+    "gt_rigid": 4,
+    "gt_labels": [
+     "empty phone packaging",
+     "coffee powder can",
+     "white 3d print cuboid",
+     "3d printed car body"
+    ]
+   },
+   {
+    "scene": "s07_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "surface": "table",
+    "listed": 5,
+    "objects": [
+     "box",
+     "box",
+     "can",
+     "cube",
+     "cube"
+    ],
+    "gt_rigid": 5,
+    "gt_labels": [
+     "packaging for in ear headphones",
+     "rubiks cube smaller",
+     "coffee powder can",
+     "rubiks cube",
+     "empty phone packaging"
+    ]
+   },
+   {
+    "scene": "s08_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "surface": "table",
+    "listed": 5,
+    "objects": [
+     "mug",
+     "mug",
+     "box",
+     "camera",
+     "cylinder"
+    ],
+    "gt_rigid": 5,
+    "gt_labels": [
+     "packaging for electronics",
+     "mug",
+     "mug",
+     "action camera",
+     "deodorant cap"
+    ]
+   },
+   {
+    "scene": "s09_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "surface": "table",
+    "listed": 3,
+    "objects": [
+     "cube",
+     "box",
+     "plate"
+    ],
+    "gt_rigid": 3,
+    "gt_labels": [
+     "rubiks cube",
+     "plastic plate",
+     "packaging for breakfast bags"
+    ]
+   },
+   {
+    "scene": "s10_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "surface": "table",
+    "listed": 4,
+    "objects": [
+     "cube",
+     "box",
+     "box",
+     "runner"
+    ],
+    "gt_rigid": 3,
+    "gt_labels": [
+     "packaging for breakfast bags",
+     "rubiks cube",
+     "empty phone packaging"
+    ]
+   },
+   {
+    "scene": "s11_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "surface": "table",
+    "listed": 7,
+    "objects": [
+     "cube",
+     "cube",
+     "cube",
+     "pyramid",
+     "prism",
+     "cylinder",
+     "prism"
+    ],
+    "gt_rigid": 7,
+    "gt_labels": [
+     "cube",
+     "white 3d print cuboid",
+     "square pyramid",
+     "triangular prism",
+     "hexagonal prism",
+     "cuboid",
+     "cylinder"
+    ]
+   },
+   {
+    "scene": "s12_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.98)",
+    "surface": "table",
+    "listed": 10,
+    "objects": [
+     "can",
+     "can",
+     "box",
+     "box",
+     "box",
+     "box",
+     "camera",
+     "cube",
+     "cube",
+     "eraser"
+    ],
+    "gt_rigid": 10,
+    "gt_labels": [
+     "coffee powder can",
+     "empty phone packaging",
+     "spray can",
+     "packaging for electronics",
+     "packaging for breakfast bags",
+     "deodorant cap",
+     "action camera",
+     "packaging for in ear headphones",
+     "rubiks cube smaller",
+     "rubiks cube"
+    ]
+   },
+   {
+    "scene": "s13_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "surface": "table",
+    "listed": 3,
+    "objects": [
+     "box",
+     "box",
+     "cube"
+    ],
+    "gt_rigid": 3,
+    "gt_labels": [
+     "packaging for breakfast bags",
+     "packaging for electronics",
+     "white 3d print cuboid"
+    ]
+   },
+   {
+    "scene": "s14_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.71)",
+    "surface": "table",
+    "listed": 5,
+    "objects": [
+     "can",
+     "box",
+     "controller",
+     "block",
+     "breadboard"
+    ],
+    "gt_rigid": 5,
+    "gt_labels": [
+     "coffee powder can",
+     "single breadboard module",
+     "white 3d print cuboid",
+     "gamepad controller",
+     "packaging for breakfast bags"
+    ]
+   },
+   {
+    "scene": "s15_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "surface": "table",
+    "listed": 5,
+    "objects": [
+     "basket",
+     "can",
+     "box",
+     "block",
+     "cube"
+    ],
+    "gt_rigid": 5,
+    "gt_labels": [
+     "packaging for electronics",
+     "white 3d print cuboid",
+     "white round basket",
+     "coffee powder can",
+     "rubiks cube smaller"
+    ]
+   },
+   {
+    "scene": "s16_a",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "surface": "table",
+    "listed": 4,
+    "objects": [
+     "box",
+     "box",
+     "can",
+     "cube"
+    ],
+    "gt_rigid": 4,
+    "gt_labels": [
+     "packaging for in ear headphones",
+     "coffee powder can",
+     "rubiks cube smaller",
+     "empty phone packaging"
+    ]
+   },
+   {
+    "scene": "s17_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "surface": "table",
+    "listed": 5,
+    "objects": [
+     "bottle",
+     "bottle",
+     "can",
+     "cube",
+     "egg"
+    ],
+    "gt_rigid": 5,
+    "gt_labels": [
+     "glass water bottle",
+     "small paint can",
+     "deodorant spray, no cap",
+     "reflective puzzle toy",
+     "chocolate egg"
+    ]
+   },
+   {
+    "scene": "s18_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "surface": "table",
+    "listed": 8,
+    "objects": [
+     "hairbrush",
+     "car body",
+     "controller",
+     "figurine",
+     "hole punch",
+     "jar",
+     "pliers",
+     "toy car"
+    ],
+    "gt_rigid": 8,
+    "gt_labels": [
+     "gamepad controller",
+     "round hair brush",
+     "round tube, packaging for cold medicine rub",
+     "lego toy car",
+     "3d printed car body",
+     "hole punch",
+     "chocolate santa blue",
+     "plier"
+    ]
+   },
+   {
+    "scene": "s19_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.98)",
+    "surface": "table",
+    "listed": 6,
+    "objects": [
+     "controller",
+     "pouch",
+     "block",
+     "tape",
+     "breadboard",
+     "clock"
+    ],
+    "gt_rigid": 5,
+    "gt_labels": [
+     "gamepad controller",
+     "fabric tool bag",
+     "single breadboard module",
+     "digital alarm",
+     "small wooden toy brick"
+    ]
+   },
+   {
+    "scene": "s20_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "surface": "table",
+    "listed": 6,
+    "objects": [
+     "bottle",
+     "cube",
+     "clock",
+     "deodorant",
+     "scissors",
+     "dish"
+    ],
+    "gt_rigid": 6,
+    "gt_labels": [
+     "digital alarm",
+     "glass water bottle",
+     "round deodorant",
+     "scissors",
+     "reflective puzzle toy",
+     "small, flat see through cylindric container"
+    ]
+   },
+   {
+    "scene": "s21_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "surface": "table",
+    "listed": 2,
+    "objects": [
+     "ball",
+     "towel"
+    ],
+    "gt_rigid": 1,
+    "gt_labels": [
+     "toy air basketball"
+    ]
+   },
+   {
+    "scene": "s22_a",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "surface": "table",
+    "listed": 1,
+    "objects": [
+     "pouch"
+    ],
+    "gt_rigid": 0,
+    "gt_labels": []
+   },
+   {
+    "scene": "s23_a",
+    "fell_back": false,
+    "reason": "VLM surface table (0.99)",
+    "surface": "table",
+    "listed": 1,
+    "objects": [
+     "sponge"
+    ],
+    "gt_rigid": 0,
+    "gt_labels": []
+   },
+   {
+    "scene": "s24_b",
+    "fell_back": false,
+    "reason": "VLM surface surface (0.99)",
+    "surface": "surface",
+    "listed": 1,
+    "objects": [
+     "cube"
+    ],
+    "gt_rigid": 1,
+    "gt_labels": [
+     "white 3d print cuboid"
+    ]
+   }
+  ],
+  "local": [
+   {
+    "scene": "s01_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.95)",
+    "surface": "table",
+    "listed": 5,
+    "objects": [
+     "cube",
+     "cube",
+     "box",
+     "box",
+     "can"
+    ],
+    "gt_rigid": 5,
+    "gt_labels": [
+     "rubiks cube",
+     "rubiks cube smaller",
+     "empty phone packaging",
+     "coffee powder can",
+     "packaging for in ear headphones"
+    ]
+   },
+   {
+    "scene": "s02_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.95)",
+    "surface": "table",
+    "listed": 5,
+    "objects": [
+     "mug",
+     "mug",
+     "box",
+     "camera",
+     "cap"
+    ],
+    "gt_rigid": 5,
+    "gt_labels": [
+     "mug",
+     "mug",
+     "action camera",
+     "deodorant cap",
+     "packaging for electronics"
+    ]
+   },
+   {
+    "scene": "s03_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.98)",
+    "surface": "table",
+    "listed": 1,
+    "objects": [
+     "ball"
+    ],
+    "gt_rigid": 1,
+    "gt_labels": [
+     "toy air basketball"
+    ]
+   },
+   {
+    "scene": "s04_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.98)",
+    "surface": "table",
+    "listed": 5,
+    "objects": [
+     "cube",
+     "basketball",
+     "box",
+     "bottle",
+     "box"
+    ],
+    "gt_rigid": 5,
+    "gt_labels": [
+     "toy air basketball",
+     "metal insulated water bottle",
+     "packaging for electronics",
+     "rubiks cube smaller",
+     "packaging for in ear headphones"
+    ]
+   },
+   {
+    "scene": "s05_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.98)",
+    "surface": "table",
+    "listed": 4,
+    "objects": [
+     "cube",
+     "camera",
+     "box",
+     "can"
+    ],
+    "gt_rigid": 4,
+    "gt_labels": [
+     "rubiks cube",
+     "action camera",
+     "packaging for breakfast bags",
+     "coffee powder can"
+    ]
+   },
+   {
+    "scene": "s06_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.70)",
+    "surface": "table",
+    "listed": 4,
+    "objects": [
+     "car",
+     "can",
+     "box",
+     "cube"
+    ],
+    "gt_rigid": 4,
+    "gt_labels": [
+     "empty phone packaging",
+     "coffee powder can",
+     "white 3d print cuboid",
+     "3d printed car body"
+    ]
+   },
+   {
+    "scene": "s07_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.98)",
+    "surface": "table",
+    "listed": 5,
+    "objects": [
+     "box",
+     "box",
+     "can",
+     "cube",
+     "cube"
+    ],
+    "gt_rigid": 5,
+    "gt_labels": [
+     "packaging for in ear headphones",
+     "rubiks cube smaller",
+     "coffee powder can",
+     "rubiks cube",
+     "empty phone packaging"
+    ]
+   },
+   {
+    "scene": "s08_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.95)",
+    "surface": "table",
+    "listed": 5,
+    "objects": [
+     "box",
+     "mug",
+     "mug",
+     "camera",
+     "cylinder"
+    ],
+    "gt_rigid": 5,
+    "gt_labels": [
+     "packaging for electronics",
+     "mug",
+     "mug",
+     "action camera",
+     "deodorant cap"
+    ]
+   },
+   {
+    "scene": "s09_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.98)",
+    "surface": "table",
+    "listed": 3,
+    "objects": [
+     "cube",
+     "box",
+     "plate"
+    ],
+    "gt_rigid": 3,
+    "gt_labels": [
+     "rubiks cube",
+     "plastic plate",
+     "packaging for breakfast bags"
+    ]
+   },
+   {
+    "scene": "s10_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.98)",
+    "surface": "table",
+    "listed": 4,
+    "objects": [
+     "cube",
+     "box",
+     "box",
+     "runner"
+    ],
+    "gt_rigid": 3,
+    "gt_labels": [
+     "packaging for breakfast bags",
+     "rubiks cube",
+     "empty phone packaging"
+    ]
+   },
+   {
+    "scene": "s11_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.97)",
+    "surface": "table",
+    "listed": 7,
+    "objects": [
+     "cube",
+     "cube",
+     "cube",
+     "pyramid",
+     "prism",
+     "cylinder",
+     "prism"
+    ],
+    "gt_rigid": 7,
+    "gt_labels": [
+     "cube",
+     "white 3d print cuboid",
+     "square pyramid",
+     "triangular prism",
+     "hexagonal prism",
+     "cuboid",
+     "cylinder"
+    ]
+   },
+   {
+    "scene": "s12_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.95)",
+    "surface": "table",
+    "listed": 10,
+    "objects": [
+     "tin",
+     "spray can",
+     "box",
+     "box",
+     "box",
+     "box",
+     "camera",
+     "cap",
+     "cube",
+     "cube"
+    ],
+    "gt_rigid": 10,
+    "gt_labels": [
+     "coffee powder can",
+     "empty phone packaging",
+     "spray can",
+     "packaging for electronics",
+     "packaging for breakfast bags",
+     "deodorant cap",
+     "action camera",
+     "packaging for in ear headphones",
+     "rubiks cube smaller",
+     "rubiks cube"
+    ]
+   },
+   {
+    "scene": "s13_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.98)",
+    "surface": "table",
+    "listed": 3,
+    "objects": [
+     "box",
+     "box",
+     "cube"
+    ],
+    "gt_rigid": 3,
+    "gt_labels": [
+     "packaging for breakfast bags",
+     "packaging for electronics",
+     "white 3d print cuboid"
+    ]
+   },
+   {
+    "scene": "s14_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.60)",
+    "surface": "table",
+    "listed": 5,
+    "objects": [
+     "cube",
+     "controller",
+     "can",
+     "box",
+     "breadboard"
+    ],
+    "gt_rigid": 5,
+    "gt_labels": [
+     "coffee powder can",
+     "single breadboard module",
+     "white 3d print cuboid",
+     "gamepad controller",
+     "packaging for breakfast bags"
+    ]
+   },
+   {
+    "scene": "s15_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.95)",
+    "surface": "table",
+    "listed": 5,
+    "objects": [
+     "basket",
+     "can",
+     "box",
+     "cube",
+     "cube"
+    ],
+    "gt_rigid": 5,
+    "gt_labels": [
+     "packaging for electronics",
+     "white 3d print cuboid",
+     "white round basket",
+     "coffee powder can",
+     "rubiks cube smaller"
+    ]
+   },
+   {
+    "scene": "s16_a",
+    "fell_back": false,
+    "reason": "VLM surface table (0.98)",
+    "surface": "table",
+    "listed": 4,
+    "objects": [
+     "cube",
+     "can",
+     "box",
+     "box"
+    ],
+    "gt_rigid": 4,
+    "gt_labels": [
+     "packaging for in ear headphones",
+     "coffee powder can",
+     "rubiks cube smaller",
+     "empty phone packaging"
+    ]
+   },
+   {
+    "scene": "s17_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.95)",
+    "surface": "table",
+    "listed": 5,
+    "objects": [
+     "bottle",
+     "cube",
+     "can",
+     "spray bottle",
+     "egg"
+    ],
+    "gt_rigid": 5,
+    "gt_labels": [
+     "glass water bottle",
+     "small paint can",
+     "deodorant spray, no cap",
+     "reflective puzzle toy",
+     "chocolate egg"
+    ]
+   },
+   {
+    "scene": "s18_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.95)",
+    "surface": "table",
+    "listed": 8,
+    "objects": [
+     "punch",
+     "controller",
+     "car",
+     "car",
+     "figurine",
+     "jar",
+     "brush",
+     "pliers"
+    ],
+    "gt_rigid": 8,
+    "gt_labels": [
+     "gamepad controller",
+     "round hair brush",
+     "round tube, packaging for cold medicine rub",
+     "lego toy car",
+     "3d printed car body",
+     "hole punch",
+     "chocolate santa blue",
+     "plier"
+    ]
+   },
+   {
+    "scene": "s19_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.95)",
+    "surface": "table",
+    "listed": 6,
+    "objects": [
+     "controller",
+     "pouch",
+     "device",
+     "breadboard",
+     "block",
+     "tape"
+    ],
+    "gt_rigid": 5,
+    "gt_labels": [
+     "gamepad controller",
+     "fabric tool bag",
+     "single breadboard module",
+     "digital alarm",
+     "small wooden toy brick"
+    ]
+   },
+   {
+    "scene": "s20_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.98)",
+    "surface": "table",
+    "listed": 6,
+    "objects": [
+     "bottle",
+     "cube",
+     "clock",
+     "can",
+     "scissors",
+     "dish"
+    ],
+    "gt_rigid": 6,
+    "gt_labels": [
+     "digital alarm",
+     "glass water bottle",
+     "round deodorant",
+     "scissors",
+     "reflective puzzle toy",
+     "small, flat see through cylindric container"
+    ]
+   },
+   {
+    "scene": "s21_b",
+    "fell_back": false,
+    "reason": "VLM surface table (0.95)",
+    "surface": "table",
+    "listed": 2,
+    "objects": [
+     "ball",
+     "towel"
+    ],
+    "gt_rigid": 1,
+    "gt_labels": [
+     "toy air basketball"
+    ]
+   },
+   {
+    "scene": "s22_a",
+    "fell_back": false,
+    "reason": "VLM surface table (0.97)",
+    "surface": "table",
+    "listed": 1,
+    "objects": [
+     "pouch"
+    ],
+    "gt_rigid": 0,
+    "gt_labels": []
+   },
+   {
+    "scene": "s23_a",
+    "fell_back": false,
+    "reason": "VLM surface table (0.97)",
+    "surface": "table",
+    "listed": 1,
+    "objects": [
+     "loofah"
+    ],
+    "gt_rigid": 0,
+    "gt_labels": []
+   },
+   {
+    "scene": "s24_b",
+    "fell_back": false,
+    "reason": "VLM surface surface (0.95)",
+    "surface": "surface",
+    "listed": 1,
+    "objects": [
+     "cube"
+    ],
+    "gt_rigid": 1,
+    "gt_labels": [
+     "white 3d print cuboid"
+    ]
+   }
+  ]
+ },
+ "material": {
+  "spark": [
+   {
+    "scene": "s01",
+    "object": "obj_007",
+    "label": "rubiks cube",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "rubik's cube",
+     "material_class": "plastic_hard",
+     "finish": "glossy",
+     "hollow": "hollow",
+     "confidence": 0.97,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s01",
+    "object": "obj_021",
+    "label": "rubiks cube smaller",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "Rubik's cube",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.94,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s01",
+    "object": "obj_029",
+    "label": "empty phone packaging",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.98,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s01",
+    "object": "obj_004",
+    "label": "coffee powder can",
+    "gt_hollow": false,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "can",
+     "material_class": "metal_steel",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.88,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s01",
+    "object": "obj_003",
+    "label": "packaging for in ear headphones",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.97,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s02",
+    "object": "obj_041",
+    "label": "mug",
+    "gt_hollow": true,
+    "gt_material": "ceramic",
+    "error": null,
+    "answer": {
+     "category": "mug",
+     "material_class": "ceramic",
+     "finish": "glossy",
+     "hollow": "hollow",
+     "confidence": 0.98,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s02",
+    "object": "obj_046",
+    "label": "mug",
+    "gt_hollow": true,
+    "gt_material": "ceramic",
+    "error": null,
+    "answer": {
+     "category": "mug",
+     "material_class": "ceramic",
+     "finish": "glossy",
+     "hollow": "hollow",
+     "confidence": 0.97,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s02",
+    "object": "obj_039",
+    "label": "action camera",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "camera",
+     "material_class": "electronics_mixed",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.97,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s02",
+    "object": "obj_060",
+    "label": "deodorant cap",
+    "gt_hollow": true,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "earplug",
+     "material_class": "foam",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.75,
+     "rigidity": "deformable"
+    }
+   },
+   {
+    "scene": "s02",
+    "object": "obj_014",
+    "label": "packaging for electronics",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.98,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s03",
+    "object": "obj_027",
+    "label": "toy air basketball",
+    "gt_hollow": true,
+    "gt_material": "plastic",
+    "error": null,
+    "answer": {
+     "category": "basketball",
+     "material_class": "rubber",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.82,
+     "rigidity": "semi_rigid"
+    }
+   },
+   {
+    "scene": "s04",
+    "object": "obj_027",
+    "label": "toy air basketball",
+    "gt_hollow": true,
+    "gt_material": "plastic",
+    "error": null,
+    "answer": {
+     "category": "basketball",
+     "material_class": "rubber",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.88,
+     "rigidity": "semi_rigid"
+    }
+   },
+   {
+    "scene": "s04",
+    "object": "obj_022",
+    "label": "metal insulated water bottle",
+    "gt_hollow": true,
+    "gt_material": "metal",
+    "error": null,
+    "answer": {
+     "category": "bottle",
+     "material_class": "metal_steel",
+     "finish": "metallic",
+     "hollow": "hollow",
+     "confidence": 0.94,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s04",
+    "object": "obj_014",
+    "label": "packaging for electronics",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.98,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s04",
+    "object": "obj_021",
+    "label": "rubiks cube smaller",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "Rubik's cube",
+     "material_class": "plastic_hard",
+     "finish": "glossy",
+     "hollow": "solid",
+     "confidence": 0.97,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s04",
+    "object": "obj_003",
+    "label": "packaging for in ear headphones",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.97,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s06",
+    "object": "obj_029",
+    "label": "empty phone packaging",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.98,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s06",
+    "object": "obj_004",
+    "label": "coffee powder can",
+    "gt_hollow": false,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "can",
+     "material_class": "metal_steel",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.96,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s06",
+    "object": "obj_018",
+    "label": "3d printed car body",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "toy car",
+     "material_class": "wood",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.58,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s11",
+    "object": "obj_047",
+    "label": "cube",
+    "gt_hollow": false,
+    "gt_material": "PLA",
+    "error": null,
+    "answer": {
+     "category": "cube",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.58,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s11",
+    "object": "obj_040",
+    "label": "white 3d print cuboid",
+    "gt_hollow": true,
+    "gt_material": "PLA",
+    "error": null,
+    "answer": {
+     "category": "cube",
+     "material_class": "foam",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.72,
+     "rigidity": "deformable"
+    }
+   },
+   {
+    "scene": "s11",
+    "object": "obj_048",
+    "label": "square pyramid",
+    "gt_hollow": false,
+    "gt_material": "PLA",
+    "error": null,
+    "answer": {
+     "category": "pyramid",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.62,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s11",
+    "object": "obj_049",
+    "label": "triangular prism",
+    "gt_hollow": false,
+    "gt_material": "PLA",
+    "error": null,
+    "answer": {
+     "category": "prism",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.62,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s11",
+    "object": "obj_056",
+    "label": "hexagonal prism",
+    "gt_hollow": false,
+    "gt_material": "PLA",
+    "error": null,
+    "answer": {
+     "category": "token",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.62,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s11",
+    "object": "obj_050",
+    "label": "cuboid",
+    "gt_hollow": false,
+    "gt_material": "PLA",
+    "error": null,
+    "answer": {
+     "category": "cube",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.62,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s11",
+    "object": "obj_052",
+    "label": "cylinder",
+    "gt_hollow": false,
+    "gt_material": "PLA",
+    "error": null,
+    "answer": {
+     "category": "knob",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.88,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s12",
+    "object": "obj_004",
+    "label": "coffee powder can",
+    "gt_hollow": false,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "can",
+     "material_class": "metal_steel",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.96,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s12",
+    "object": "obj_029",
+    "label": "empty phone packaging",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.93,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s12",
+    "object": "obj_001",
+    "label": "spray can",
+    "gt_hollow": true,
+    "gt_material": "metal",
+    "error": null,
+    "answer": {
+     "category": "aerosol can",
+     "material_class": "metal_aluminium",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.96,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s12",
+    "object": "obj_014",
+    "label": "packaging for electronics",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.98,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s12",
+    "object": "obj_002",
+    "label": "packaging for breakfast bags",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.97,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s12",
+    "object": "obj_060",
+    "label": "deodorant cap",
+    "gt_hollow": true,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "pawn",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.82,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s12",
+    "object": "obj_003",
+    "label": "packaging for in ear headphones",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.96,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s12",
+    "object": "obj_021",
+    "label": "rubiks cube smaller",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "Rubik's cube",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.94,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s12",
+    "object": "obj_007",
+    "label": "rubiks cube",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "Rubik's cube",
+     "material_class": "plastic_hard",
+     "finish": "glossy",
+     "hollow": "hollow",
+     "confidence": 0.96,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s13",
+    "object": "obj_002",
+    "label": "packaging for breakfast bags",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.98,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s13",
+    "object": "obj_014",
+    "label": "packaging for electronics",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.96,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s14",
+    "object": "obj_004",
+    "label": "coffee powder can",
+    "gt_hollow": false,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "can",
+     "material_class": "metal_steel",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.96,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s14",
+    "object": "obj_036",
+    "label": "single breadboard module",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "breadboard",
+     "material_class": "electronics_mixed",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.97,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s14",
+    "object": "obj_040",
+    "label": "white 3d print cuboid",
+    "gt_hollow": true,
+    "gt_material": "PLA",
+    "error": null,
+    "answer": {
+     "category": "cube",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.64,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s14",
+    "object": "obj_006",
+    "label": "gamepad controller",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "controller",
+     "material_class": "electronics_mixed",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.99,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s14",
+    "object": "obj_002",
+    "label": "packaging for breakfast bags",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.98,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s17",
+    "object": "obj_026",
+    "label": "glass water bottle",
+    "gt_hollow": true,
+    "gt_material": "glass",
+    "error": null,
+    "answer": {
+     "category": "bottle",
+     "material_class": "glass",
+     "finish": "transparent",
+     "hollow": "hollow",
+     "confidence": 0.98,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s17",
+    "object": "obj_019",
+    "label": "small paint can",
+    "gt_hollow": false,
+    "gt_material": "metal",
+    "error": null,
+    "answer": {
+     "category": "can",
+     "material_class": "metal_steel",
+     "finish": "metallic",
+     "hollow": "hollow",
+     "confidence": 0.96,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s17",
+    "object": "obj_059",
+    "label": "deodorant spray, no cap",
+    "gt_hollow": false,
+    "gt_material": "glass",
+    "error": null,
+    "answer": {
+     "category": "bottle",
+     "material_class": "plastic_hard",
+     "finish": "transparent",
+     "hollow": "hollow",
+     "confidence": 0.94,
+     "rigidity": "semi_rigid"
+    }
+   },
+   {
+    "scene": "s17",
+    "object": "obj_035",
+    "label": "reflective puzzle toy",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "cube",
+     "material_class": "plastic_hard",
+     "finish": "glossy",
+     "hollow": "hollow",
+     "confidence": 0.84,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s17",
+    "object": "obj_015",
+    "label": "chocolate egg",
+    "gt_hollow": true,
+    "gt_material": "aluminium foil",
+    "error": null,
+    "answer": {
+     "category": "chocolate egg",
+     "material_class": "foil_wrapped_food",
+     "finish": "metallic",
+     "hollow": "hollow",
+     "confidence": 0.97,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s18",
+    "object": "obj_006",
+    "label": "gamepad controller",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "controller",
+     "material_class": "electronics_mixed",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.98,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s18",
+    "object": "obj_032",
+    "label": "round hair brush",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "brush",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.96,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s18",
+    "object": "obj_008",
+    "label": "round tube, packaging for cold medicine rub",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "jar",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.97,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s18",
+    "object": "obj_000",
+    "label": "lego toy car",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "toy car",
+     "material_class": "plastic_hard",
+     "finish": "glossy",
+     "hollow": "solid",
+     "confidence": 0.96,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s18",
+    "object": "obj_018",
+    "label": "3d printed car body",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "model car",
+     "material_class": "other",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.62,
+     "rigidity": "deformable"
+    }
+   },
+   {
+    "scene": "s18",
+    "object": "obj_024",
+    "label": "hole punch",
+    "gt_hollow": false,
+    "gt_material": "metal",
+    "error": null,
+    "answer": {
+     "category": "hole punch",
+     "material_class": "metal_steel",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.93,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s18",
+    "object": "obj_012",
+    "label": "chocolate santa blue",
+    "gt_hollow": true,
+    "gt_material": "aluminium foil",
+    "error": null,
+    "answer": {
+     "category": "chocolate figurine",
+     "material_class": "foil_wrapped_food",
+     "finish": "metallic",
+     "hollow": "hollow",
+     "confidence": 0.96,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s18",
+    "object": "obj_045",
+    "label": "plier",
+    "gt_hollow": false,
+    "gt_material": "rubber",
+    "error": null,
+    "answer": {
+     "category": "pliers",
+     "material_class": "metal_steel",
+     "finish": "metallic",
+     "hollow": "solid",
+     "confidence": 0.98,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s24",
+    "object": "obj_040",
+    "label": "white 3d print cuboid",
+    "gt_hollow": true,
+    "gt_material": "PLA",
+    "error": null,
+    "answer": {
+     "category": "cube",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.58,
+     "rigidity": "rigid"
+    }
+   }
+  ],
+  "local": [
+   {
+    "scene": "s01",
+    "object": "obj_007",
+    "label": "rubiks cube",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "rubik_cube",
+     "material_class": "plastic_hard",
+     "finish": "glossy",
+     "hollow": "unknown",
+     "confidence": 0.9,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s01",
+    "object": "obj_021",
+    "label": "rubiks cube smaller",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "rubiks_cube",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "unknown",
+     "confidence": 0.85,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s01",
+    "object": "obj_029",
+    "label": "empty phone packaging",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.9,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s01",
+    "object": "obj_004",
+    "label": "coffee powder can",
+    "gt_hollow": false,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "coffee_can",
+     "material_class": "metal_steel",
+     "finish": "glossy",
+     "hollow": "hollow",
+     "confidence": 0.85,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s01",
+    "object": "obj_003",
+    "label": "packaging for in ear headphones",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.85,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s02",
+    "object": "obj_041",
+    "label": "mug",
+    "gt_hollow": true,
+    "gt_material": "ceramic",
+    "error": null,
+    "answer": {
+     "category": "mug",
+     "material_class": "ceramic",
+     "finish": "glossy",
+     "hollow": "hollow",
+     "confidence": 0.95,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s02",
+    "object": "obj_046",
+    "label": "mug",
+    "gt_hollow": true,
+    "gt_material": "ceramic",
+    "error": null,
+    "answer": {
+     "category": "mug",
+     "material_class": "ceramic",
+     "finish": "glossy",
+     "hollow": "hollow",
+     "confidence": 0.95,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s02",
+    "object": "obj_039",
+    "label": "action camera",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "camera",
+     "material_class": "electronics_mixed",
+     "finish": "matte",
+     "hollow": "unknown",
+     "confidence": 0.85,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s02",
+    "object": "obj_060",
+    "label": "deodorant cap",
+    "gt_hollow": true,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "cap",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "unknown",
+     "confidence": 0.55,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s02",
+    "object": "obj_014",
+    "label": "packaging for electronics",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.9,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s03",
+    "object": "obj_027",
+    "label": "toy air basketball",
+    "gt_hollow": true,
+    "gt_material": "plastic",
+    "error": null,
+    "answer": {
+     "category": "basketball",
+     "material_class": "rubber",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.75,
+     "rigidity": "semi_rigid"
+    }
+   },
+   {
+    "scene": "s04",
+    "object": "obj_027",
+    "label": "toy air basketball",
+    "gt_hollow": true,
+    "gt_material": "plastic",
+    "error": null,
+    "answer": {
+     "category": "basketball",
+     "material_class": "foam",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.6,
+     "rigidity": "semi_rigid"
+    }
+   },
+   {
+    "scene": "s04",
+    "object": "obj_022",
+    "label": "metal insulated water bottle",
+    "gt_hollow": true,
+    "gt_material": "metal",
+    "error": null,
+    "answer": {
+     "category": "bottle",
+     "material_class": "metal_steel",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.85,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s04",
+    "object": "obj_014",
+    "label": "packaging for electronics",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.95,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s04",
+    "object": "obj_021",
+    "label": "rubiks cube smaller",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "rubiks_cube",
+     "material_class": "plastic_hard",
+     "finish": "glossy",
+     "hollow": "hollow",
+     "confidence": 0.9,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s04",
+    "object": "obj_003",
+    "label": "packaging for in ear headphones",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.9,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s06",
+    "object": "obj_029",
+    "label": "empty phone packaging",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.92,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s06",
+    "object": "obj_004",
+    "label": "coffee powder can",
+    "gt_hollow": false,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "can",
+     "material_class": "metal_steel",
+     "finish": "glossy",
+     "hollow": "hollow",
+     "confidence": 0.85,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s06",
+    "object": "obj_018",
+    "label": "3d printed car body",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "model_car",
+     "material_class": "foam",
+     "finish": "matte",
+     "hollow": "unknown",
+     "confidence": 0.55,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s11",
+    "object": "obj_047",
+    "label": "cube",
+    "gt_hollow": false,
+    "gt_material": "PLA",
+    "error": null,
+    "answer": {
+     "category": "cube",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "unknown",
+     "confidence": 0.4,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s11",
+    "object": "obj_040",
+    "label": "white 3d print cuboid",
+    "gt_hollow": true,
+    "gt_material": "PLA",
+    "error": null,
+    "answer": {
+     "category": "cube",
+     "material_class": "foam",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.55,
+     "rigidity": "semi_rigid"
+    }
+   },
+   {
+    "scene": "s11",
+    "object": "obj_048",
+    "label": "square pyramid",
+    "gt_hollow": false,
+    "gt_material": "PLA",
+    "error": null,
+    "answer": {
+     "category": "pyramid",
+     "material_class": "paper",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.45,
+     "rigidity": "semi_rigid"
+    }
+   },
+   {
+    "scene": "s11",
+    "object": "obj_049",
+    "label": "triangular prism",
+    "gt_hollow": false,
+    "gt_material": "PLA",
+    "error": null,
+    "answer": {
+     "category": "prism",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "unknown",
+     "confidence": 0.45,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s11",
+    "object": "obj_056",
+    "label": "hexagonal prism",
+    "gt_hollow": false,
+    "gt_material": "PLA",
+    "error": null,
+    "answer": {
+     "category": "block",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "unknown",
+     "confidence": 0.55,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s11",
+    "object": "obj_050",
+    "label": "cuboid",
+    "gt_hollow": false,
+    "gt_material": "PLA",
+    "error": null,
+    "answer": {
+     "category": "cube",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "unknown",
+     "confidence": 0.35,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s11",
+    "object": "obj_052",
+    "label": "cylinder",
+    "gt_hollow": false,
+    "gt_material": "PLA",
+    "error": null,
+    "answer": {
+     "category": "knob",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "unknown",
+     "confidence": 0.65,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s12",
+    "object": "obj_004",
+    "label": "coffee powder can",
+    "gt_hollow": false,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "coffee_can",
+     "material_class": "metal_steel",
+     "finish": "glossy",
+     "hollow": "hollow",
+     "confidence": 0.85,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s12",
+    "object": "obj_029",
+    "label": "empty phone packaging",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.85,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s12",
+    "object": "obj_001",
+    "label": "spray can",
+    "gt_hollow": true,
+    "gt_material": "metal",
+    "error": null,
+    "answer": {
+     "category": "spray_can",
+     "material_class": "metal_aluminium",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.9,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s12",
+    "object": "obj_014",
+    "label": "packaging for electronics",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.92,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s12",
+    "object": "obj_002",
+    "label": "packaging for breakfast bags",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.95,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s12",
+    "object": "obj_060",
+    "label": "deodorant cap",
+    "gt_hollow": true,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "token",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "unknown",
+     "confidence": 0.65,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s12",
+    "object": "obj_003",
+    "label": "packaging for in ear headphones",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.95,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s12",
+    "object": "obj_021",
+    "label": "rubiks cube smaller",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "cube",
+     "material_class": "plastic_hard",
+     "finish": "glossy",
+     "hollow": "unknown",
+     "confidence": 0.9,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s12",
+    "object": "obj_007",
+    "label": "rubiks cube",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "rubiks_cube",
+     "material_class": "plastic_hard",
+     "finish": "glossy",
+     "hollow": "unknown",
+     "confidence": 0.9,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s13",
+    "object": "obj_002",
+    "label": "packaging for breakfast bags",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.85,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s13",
+    "object": "obj_014",
+    "label": "packaging for electronics",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.75,
+     "rigidity": "semi_rigid"
+    }
+   },
+   {
+    "scene": "s14",
+    "object": "obj_004",
+    "label": "coffee powder can",
+    "gt_hollow": false,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "coffee_can",
+     "material_class": "metal_steel",
+     "finish": "glossy",
+     "hollow": "hollow",
+     "confidence": 0.9,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s14",
+    "object": "obj_036",
+    "label": "single breadboard module",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "breadboard",
+     "material_class": "electronics_mixed",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.85,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s14",
+    "object": "obj_040",
+    "label": "white 3d print cuboid",
+    "gt_hollow": true,
+    "gt_material": "PLA",
+    "error": null,
+    "answer": {
+     "category": "cube",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.7,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s14",
+    "object": "obj_006",
+    "label": "gamepad controller",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "controller",
+     "material_class": "electronics_mixed",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.9,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s14",
+    "object": "obj_002",
+    "label": "packaging for breakfast bags",
+    "gt_hollow": true,
+    "gt_material": "cardboard",
+    "error": null,
+    "answer": {
+     "category": "box",
+     "material_class": "cardboard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.95,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s17",
+    "object": "obj_026",
+    "label": "glass water bottle",
+    "gt_hollow": true,
+    "gt_material": "glass",
+    "error": null,
+    "answer": {
+     "category": "bottle",
+     "material_class": "glass",
+     "finish": "transparent",
+     "hollow": "hollow",
+     "confidence": 0.97,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s17",
+    "object": "obj_019",
+    "label": "small paint can",
+    "gt_hollow": false,
+    "gt_material": "metal",
+    "error": null,
+    "answer": {
+     "category": "paint_can",
+     "material_class": "metal_steel",
+     "finish": "metallic",
+     "hollow": "hollow",
+     "confidence": 0.9,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s17",
+    "object": "obj_059",
+    "label": "deodorant spray, no cap",
+    "gt_hollow": false,
+    "gt_material": "glass",
+    "error": null,
+    "answer": {
+     "category": "bottle",
+     "material_class": "plastic_hard",
+     "finish": "transparent",
+     "hollow": "hollow",
+     "confidence": 0.85,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s17",
+    "object": "obj_035",
+    "label": "reflective puzzle toy",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "cube",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "unknown",
+     "confidence": 0.75,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s17",
+    "object": "obj_015",
+    "label": "chocolate egg",
+    "gt_hollow": true,
+    "gt_material": "aluminium foil",
+    "error": null,
+    "answer": {
+     "category": "Kinder egg",
+     "material_class": "foil_wrapped_food",
+     "finish": "metallic",
+     "hollow": "hollow",
+     "confidence": 0.78,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s18",
+    "object": "obj_006",
+    "label": "gamepad controller",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "game_controller",
+     "material_class": "electronics_mixed",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.9,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s18",
+    "object": "obj_032",
+    "label": "round hair brush",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "hairbrush",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "unknown",
+     "confidence": 0.75,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s18",
+    "object": "obj_008",
+    "label": "round tube, packaging for cold medicine rub",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "jar",
+     "material_class": "plastic_hard",
+     "finish": "glossy",
+     "hollow": "unknown",
+     "confidence": 0.8,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s18",
+    "object": "obj_000",
+    "label": "lego toy car",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "toy car",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "hollow",
+     "confidence": 0.85,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s18",
+    "object": "obj_018",
+    "label": "3d printed car body",
+    "gt_hollow": false,
+    "gt_material": "hard plastic",
+    "error": null,
+    "answer": {
+     "category": "car model",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "unknown",
+     "confidence": 0.65,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s18",
+    "object": "obj_024",
+    "label": "hole punch",
+    "gt_hollow": false,
+    "gt_material": "metal",
+    "error": null,
+    "answer": {
+     "category": "hole_puncher",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.85,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s18",
+    "object": "obj_012",
+    "label": "chocolate santa blue",
+    "gt_hollow": true,
+    "gt_material": "aluminium foil",
+    "error": null,
+    "answer": {
+     "category": "figurine",
+     "material_class": "foil_wrapped_food",
+     "finish": "metallic",
+     "hollow": "unknown",
+     "confidence": 0.65,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s18",
+    "object": "obj_045",
+    "label": "plier",
+    "gt_hollow": false,
+    "gt_material": "rubber",
+    "error": null,
+    "answer": {
+     "category": "pliers",
+     "material_class": "metal_steel",
+     "finish": "metallic",
+     "hollow": "solid",
+     "confidence": 0.85,
+     "rigidity": "rigid"
+    }
+   },
+   {
+    "scene": "s24",
+    "object": "obj_040",
+    "label": "white 3d print cuboid",
+    "gt_hollow": true,
+    "gt_material": "PLA",
+    "error": null,
+    "answer": {
+     "category": "cube",
+     "material_class": "plastic_hard",
+     "finish": "matte",
+     "hollow": "solid",
+     "confidence": 0.65,
+     "rigidity": "rigid"
+    }
+   }
+  ]
+ },
+ "mass": {
+  "spark": [
+   {
+    "scene": "s01",
+    "object": "obj_007",
+    "label": "rubiks cube",
+    "mass_true_kg": 0.249,
+    "nominal_kg": 0.155,
+    "low_kg": 0.125,
+    "high_kg": 0.185,
+    "error": null
+   },
+   {
+    "scene": "s01",
+    "object": "obj_021",
+    "label": "rubiks cube smaller",
+    "mass_true_kg": 0.081333,
+    "nominal_kg": 0.095,
+    "low_kg": 0.075,
+    "high_kg": 0.12,
+    "error": null
+   },
+   {
+    "scene": "s01",
+    "object": "obj_029",
+    "label": "empty phone packaging",
+    "mass_true_kg": 0.184667,
+    "nominal_kg": 0.43,
+    "low_kg": 0.32,
+    "high_kg": 0.54,
+    "error": null
+   },
+   {
+    "scene": "s01",
+    "object": "obj_004",
+    "label": "coffee powder can",
+    "mass_true_kg": 0.232,
+    "nominal_kg": 0.235,
+    "low_kg": 0.21,
+    "high_kg": 0.26,
+    "error": null
+   },
+   {
+    "scene": "s01",
+    "object": "obj_003",
+    "label": "packaging for in ear headphones",
+    "mass_true_kg": 0.094667,
+    "nominal_kg": 0.135,
+    "low_kg": 0.095,
+    "high_kg": 0.185,
+    "error": null
+   },
+   {
+    "scene": "s02",
+    "object": "obj_041",
+    "label": "mug",
+    "mass_true_kg": 0.22,
+    "nominal_kg": 0.35,
+    "low_kg": 0.26,
+    "high_kg": 0.44,
+    "error": null
+   },
+   {
+    "scene": "s02",
+    "object": "obj_046",
+    "label": "mug",
+    "mass_true_kg": 0.250667,
+    "nominal_kg": 0.4,
+    "low_kg": 0.3,
+    "high_kg": 0.52,
+    "error": null
+   },
+   {
+    "scene": "s02",
+    "object": "obj_039",
+    "label": "action camera",
+    "mass_true_kg": 0.159,
+    "nominal_kg": 0.159,
+    "low_kg": 0.15,
+    "high_kg": 0.168,
+    "error": null
+   },
+   {
+    "scene": "s02",
+    "object": "obj_060",
+    "label": "deodorant cap",
+    "mass_true_kg": 0.003,
+    "nominal_kg": 0.0003,
+    "low_kg": 0.00011999999999999999,
+    "high_kg": 0.0006,
+    "error": null
+   },
+   {
+    "scene": "s02",
+    "object": "obj_014",
+    "label": "packaging for electronics",
+    "mass_true_kg": 0.234667,
+    "nominal_kg": 0.18,
+    "low_kg": 0.09,
+    "high_kg": 0.35,
+    "error": null
+   },
+   {
+    "scene": "s03",
+    "object": "obj_027",
+    "label": "toy air basketball",
+    "mass_true_kg": 0.079333,
+    "nominal_kg": 0.035,
+    "low_kg": 0.015,
+    "high_kg": 0.07,
+    "error": null
+   },
+   {
+    "scene": "s04",
+    "object": "obj_027",
+    "label": "toy air basketball",
+    "mass_true_kg": 0.079333,
+    "nominal_kg": 0.055,
+    "low_kg": 0.028,
+    "high_kg": 0.095,
+    "error": null
+   },
+   {
+    "scene": "s04",
+    "object": "obj_022",
+    "label": "metal insulated water bottle",
+    "mass_true_kg": 0.414,
+    "nominal_kg": 0.35,
+    "low_kg": 0.24,
+    "high_kg": 0.8,
+    "error": null
+   },
+   {
+    "scene": "s04",
+    "object": "obj_014",
+    "label": "packaging for electronics",
+    "mass_true_kg": 0.234667,
+    "nominal_kg": 0.035,
+    "low_kg": 0.015,
+    "high_kg": 0.075,
+    "error": null
+   },
+   {
+    "scene": "s04",
+    "object": "obj_021",
+    "label": "rubiks cube smaller",
+    "mass_true_kg": 0.081333,
+    "nominal_kg": 0.09,
+    "low_kg": 0.07,
+    "high_kg": 0.115,
+    "error": null
+   },
+   {
+    "scene": "s04",
+    "object": "obj_003",
+    "label": "packaging for in ear headphones",
+    "mass_true_kg": 0.094667,
+    "nominal_kg": 0.16,
+    "low_kg": 0.115,
+    "high_kg": 0.21,
+    "error": null
+   },
+   {
+    "scene": "s06",
+    "object": "obj_029",
+    "label": "empty phone packaging",
+    "mass_true_kg": 0.184667,
+    "nominal_kg": 0.41,
+    "low_kg": 0.33,
+    "high_kg": 0.5,
+    "error": null
+   },
+   {
+    "scene": "s06",
+    "object": "obj_004",
+    "label": "coffee powder can",
+    "mass_true_kg": 0.232,
+    "nominal_kg": 0.24,
+    "low_kg": 0.21,
+    "high_kg": 0.265,
+    "error": null
+   },
+   {
+    "scene": "s06",
+    "object": "obj_018",
+    "label": "3d printed car body",
+    "mass_true_kg": 0.157667,
+    "nominal_kg": 0.04,
+    "low_kg": 0.015,
+    "high_kg": 0.09,
+    "error": null
+   },
+   {
+    "scene": "s11",
+    "object": "obj_047",
+    "label": "cube",
+    "mass_true_kg": 0.009333,
+    "nominal_kg": 0.008,
+    "low_kg": 0.002,
+    "high_kg": 0.025,
+    "error": null
+   },
+   {
+    "scene": "s11",
+    "object": "obj_040",
+    "label": "white 3d print cuboid",
+    "mass_true_kg": 0.022333,
+    "nominal_kg": 0.015,
+    "low_kg": 0.007,
+    "high_kg": 0.03,
+    "error": null
+   },
+   {
+    "scene": "s11",
+    "object": "obj_048",
+    "label": "square pyramid",
+    "mass_true_kg": 0.003667,
+    "nominal_kg": 0.01,
+    "low_kg": 0.004,
+    "high_kg": 0.022,
+    "error": null
+   },
+   {
+    "scene": "s11",
+    "object": "obj_049",
+    "label": "triangular prism",
+    "mass_true_kg": 0.004,
+    "nominal_kg": 0.03,
+    "low_kg": 0.01,
+    "high_kg": 0.075,
+    "error": null
+   },
+   {
+    "scene": "s11",
+    "object": "obj_056",
+    "label": "hexagonal prism",
+    "mass_true_kg": 0.006667,
+    "nominal_kg": 0.003,
+    "low_kg": 0.001,
+    "high_kg": 0.006,
+    "error": null
+   },
+   {
+    "scene": "s11",
+    "object": "obj_050",
+    "label": "cuboid",
+    "mass_true_kg": 0.007,
+    "nominal_kg": 0.46,
+    "low_kg": 0.28,
+    "high_kg": 1.1,
+    "error": null
+   },
+   {
+    "scene": "s11",
+    "object": "obj_052",
+    "label": "cylinder",
+    "mass_true_kg": 0.004,
+    "nominal_kg": 0.014,
+    "low_kg": 0.006,
+    "high_kg": 0.03,
+    "error": null
+   },
+   {
+    "scene": "s12",
+    "object": "obj_004",
+    "label": "coffee powder can",
+    "mass_true_kg": 0.232,
+    "nominal_kg": 0.25,
+    "low_kg": 0.21,
+    "high_kg": 0.285,
+    "error": null
+   },
+   {
+    "scene": "s12",
+    "object": "obj_029",
+    "label": "empty phone packaging",
+    "mass_true_kg": 0.184667,
+    "nominal_kg": 0.41,
+    "low_kg": 0.28,
+    "high_kg": 0.54,
+    "error": null
+   },
+   {
+    "scene": "s12",
+    "object": "obj_001",
+    "label": "spray can",
+    "mass_true_kg": 0.473333,
+    "nominal_kg": 0.485,
+    "low_kg": 0.38,
+    "high_kg": 0.59,
+    "error": null
+   },
+   {
+    "scene": "s12",
+    "object": "obj_014",
+    "label": "packaging for electronics",
+    "mass_true_kg": 0.234667,
+    "nominal_kg": 0.085,
+    "low_kg": 0.035,
+    "high_kg": 0.16,
+    "error": null
+   },
+   {
+    "scene": "s12",
+    "object": "obj_002",
+    "label": "packaging for breakfast bags",
+    "mass_true_kg": 0.274,
+    "nominal_kg": 0.34,
+    "low_kg": 0.21,
+    "high_kg": 0.52,
+    "error": null
+   },
+   {
+    "scene": "s12",
+    "object": "obj_060",
+    "label": "deodorant cap",
+    "mass_true_kg": 0.003,
+    "nominal_kg": 0.0035,
+    "low_kg": 0.0015,
+    "high_kg": 0.007,
+    "error": null
+   },
+   {
+    "scene": "s12",
+    "object": "obj_003",
+    "label": "packaging for in ear headphones",
+    "mass_true_kg": 0.094667,
+    "nominal_kg": 0.13,
+    "low_kg": 0.08,
+    "high_kg": 0.18,
+    "error": null
+   },
+   {
+    "scene": "s12",
+    "object": "obj_021",
+    "label": "rubiks cube smaller",
+    "mass_true_kg": 0.081333,
+    "nominal_kg": 0.095,
+    "low_kg": 0.07,
+    "high_kg": 0.12,
+    "error": null
+   },
+   {
+    "scene": "s12",
+    "object": "obj_007",
+    "label": "rubiks cube",
+    "mass_true_kg": 0.249,
+    "nominal_kg": 0.145,
+    "low_kg": 0.115,
+    "high_kg": 0.18,
+    "error": null
+   },
+   {
+    "scene": "s13",
+    "object": "obj_002",
+    "label": "packaging for breakfast bags",
+    "mass_true_kg": 0.274,
+    "nominal_kg": 0.38,
+    "low_kg": 0.2,
+    "high_kg": 0.6,
+    "error": null
+   },
+   {
+    "scene": "s13",
+    "object": "obj_014",
+    "label": "packaging for electronics",
+    "mass_true_kg": 0.234667,
+    "nominal_kg": 0.14,
+    "low_kg": 0.07,
+    "high_kg": 0.23,
+    "error": null
+   },
+   {
+    "scene": "s14",
+    "object": "obj_004",
+    "label": "coffee powder can",
+    "mass_true_kg": 0.232,
+    "nominal_kg": 0.18,
+    "low_kg": 0.06,
+    "high_kg": 0.26,
+    "error": null
+   },
+   {
+    "scene": "s14",
+    "object": "obj_036",
+    "label": "single breadboard module",
+    "mass_true_kg": 0.033,
+    "nominal_kg": 0.042,
+    "low_kg": 0.028,
+    "high_kg": 0.06,
+    "error": null
+   },
+   {
+    "scene": "s14",
+    "object": "obj_040",
+    "label": "white 3d print cuboid",
+    "mass_true_kg": 0.022333,
+    "nominal_kg": 0.008,
+    "low_kg": 0.003,
+    "high_kg": 0.018,
+    "error": null
+   },
+   {
+    "scene": "s14",
+    "object": "obj_006",
+    "label": "gamepad controller",
+    "mass_true_kg": 0.288,
+    "nominal_kg": 0.285,
+    "low_kg": 0.26,
+    "high_kg": 0.31,
+    "error": null
+   },
+   {
+    "scene": "s14",
+    "object": "obj_002",
+    "label": "packaging for breakfast bags",
+    "mass_true_kg": 0.274,
+    "nominal_kg": 0.28,
+    "low_kg": 0.18,
+    "high_kg": 0.4,
+    "error": null
+   },
+   {
+    "scene": "s17",
+    "object": "obj_026",
+    "label": "glass water bottle",
+    "mass_true_kg": 0.611667,
+    "nominal_kg": 0.185,
+    "low_kg": 0.12,
+    "high_kg": 0.26,
+    "error": null
+   },
+   {
+    "scene": "s17",
+    "object": "obj_019",
+    "label": "small paint can",
+    "mass_true_kg": 0.161333,
+    "nominal_kg": 0.165,
+    "low_kg": 0.095,
+    "high_kg": 0.215,
+    "error": null
+   },
+   {
+    "scene": "s17",
+    "object": "obj_059",
+    "label": "deodorant spray, no cap",
+    "mass_true_kg": 0.072667,
+    "nominal_kg": 0.075,
+    "low_kg": 0.035,
+    "high_kg": 0.125,
+    "error": null
+   },
+   {
+    "scene": "s17",
+    "object": "obj_035",
+    "label": "reflective puzzle toy",
+    "mass_true_kg": 0.027333,
+    "nominal_kg": 0.07,
+    "low_kg": 0.055,
+    "high_kg": 0.09,
+    "error": null
+   },
+   {
+    "scene": "s17",
+    "object": "obj_015",
+    "label": "chocolate egg",
+    "mass_true_kg": 0.033333,
+    "nominal_kg": 0.02,
+    "low_kg": 0.018,
+    "high_kg": 0.022,
+    "error": null
+   },
+   {
+    "scene": "s18",
+    "object": "obj_006",
+    "label": "gamepad controller",
+    "mass_true_kg": 0.288,
+    "nominal_kg": 0.28,
+    "low_kg": 0.24,
+    "high_kg": 0.31,
+    "error": null
+   },
+   {
+    "scene": "s18",
+    "object": "obj_032",
+    "label": "round hair brush",
+    "mass_true_kg": 0.056,
+    "nominal_kg": 0.05,
+    "low_kg": 0.03,
+    "high_kg": 0.08,
+    "error": null
+   },
+   {
+    "scene": "s18",
+    "object": "obj_008",
+    "label": "round tube, packaging for cold medicine rub",
+    "mass_true_kg": 0.039333,
+    "nominal_kg": 0.075,
+    "low_kg": 0.04,
+    "high_kg": 0.115,
+    "error": null
+   },
+   {
+    "scene": "s18",
+    "object": "obj_000",
+    "label": "lego toy car",
+    "mass_true_kg": 0.162333,
+    "nominal_kg": 0.095,
+    "low_kg": 0.05,
+    "high_kg": 0.15,
+    "error": null
+   },
+   {
+    "scene": "s18",
+    "object": "obj_018",
+    "label": "3d printed car body",
+    "mass_true_kg": 0.157667,
+    "nominal_kg": 0.16,
+    "low_kg": 0.075,
+    "high_kg": 0.34,
+    "error": null
+   },
+   {
+    "scene": "s18",
+    "object": "obj_024",
+    "label": "hole punch",
+    "mass_true_kg": 0.242,
+    "nominal_kg": 0.28,
+    "low_kg": 0.17,
+    "high_kg": 0.42,
+    "error": null
+   },
+   {
+    "scene": "s18",
+    "object": "obj_012",
+    "label": "chocolate santa blue",
+    "mass_true_kg": 0.129333,
+    "nominal_kg": 0.05,
+    "low_kg": 0.03,
+    "high_kg": 0.075,
+    "error": null
+   },
+   {
+    "scene": "s18",
+    "object": "obj_045",
+    "label": "plier",
+    "mass_true_kg": 0.074,
+    "nominal_kg": 0.105,
+    "low_kg": 0.07,
+    "high_kg": 0.145,
+    "error": null
+   },
+   {
+    "scene": "s24",
+    "object": "obj_040",
+    "label": "white 3d print cuboid",
+    "mass_true_kg": 0.022333,
+    "nominal_kg": 0.006,
+    "low_kg": 0.003,
+    "high_kg": 0.012,
+    "error": null
+   }
+  ],
+  "local": [
+   {
+    "scene": "s01",
+    "object": "obj_007",
+    "label": "rubiks cube",
+    "mass_true_kg": 0.249,
+    "nominal_kg": 0.15,
+    "low_kg": 0.12,
+    "high_kg": 0.19,
+    "error": null
+   },
+   {
+    "scene": "s01",
+    "object": "obj_021",
+    "label": "rubiks cube smaller",
+    "mass_true_kg": 0.081333,
+    "nominal_kg": 0.09,
+    "low_kg": 0.07,
+    "high_kg": 0.12,
+    "error": null
+   },
+   {
+    "scene": "s01",
+    "object": "obj_029",
+    "label": "empty phone packaging",
+    "mass_true_kg": 0.184667,
+    "nominal_kg": 0.34,
+    "low_kg": 0.23,
+    "high_kg": 0.48,
+    "error": null
+   },
+   {
+    "scene": "s01",
+    "object": "obj_004",
+    "label": "coffee powder can",
+    "mass_true_kg": 0.232,
+    "nominal_kg": 0.25,
+    "low_kg": 0.22,
+    "high_kg": 0.28,
+    "error": null
+   },
+   {
+    "scene": "s01",
+    "object": "obj_003",
+    "label": "packaging for in ear headphones",
+    "mass_true_kg": 0.094667,
+    "nominal_kg": 0.2,
+    "low_kg": 0.12,
+    "high_kg": 0.3,
+    "error": null
+   },
+   {
+    "scene": "s02",
+    "object": "obj_041",
+    "label": "mug",
+    "mass_true_kg": 0.22,
+    "nominal_kg": 0.34,
+    "low_kg": 0.22,
+    "high_kg": 0.46,
+    "error": null
+   },
+   {
+    "scene": "s02",
+    "object": "obj_046",
+    "label": "mug",
+    "mass_true_kg": 0.250667,
+    "nominal_kg": 0.34,
+    "low_kg": 0.26,
+    "high_kg": 0.44,
+    "error": null
+   },
+   {
+    "scene": "s02",
+    "object": "obj_039",
+    "label": "action camera",
+    "mass_true_kg": 0.159,
+    "nominal_kg": 0.154,
+    "low_kg": 0.135,
+    "high_kg": 0.175,
+    "error": null
+   },
+   {
+    "scene": "s02",
+    "object": "obj_060",
+    "label": "deodorant cap",
+    "mass_true_kg": 0.003,
+    "nominal_kg": 0.0005,
+    "low_kg": 0.0002,
+    "high_kg": 0.001,
+    "error": null
+   },
+   {
+    "scene": "s02",
+    "object": "obj_014",
+    "label": "packaging for electronics",
+    "mass_true_kg": 0.234667,
+    "nominal_kg": 0.18,
+    "low_kg": 0.08,
+    "high_kg": 0.35,
+    "error": null
+   },
+   {
+    "scene": "s03",
+    "object": "obj_027",
+    "label": "toy air basketball",
+    "mass_true_kg": 0.079333,
+    "nominal_kg": 0.075,
+    "low_kg": 0.04,
+    "high_kg": 0.13,
+    "error": null
+   },
+   {
+    "scene": "s04",
+    "object": "obj_027",
+    "label": "toy air basketball",
+    "mass_true_kg": 0.079333,
+    "nominal_kg": 0.07,
+    "low_kg": 0.04,
+    "high_kg": 0.12,
+    "error": null
+   },
+   {
+    "scene": "s04",
+    "object": "obj_022",
+    "label": "metal insulated water bottle",
+    "mass_true_kg": 0.414,
+    "nominal_kg": 0.34,
+    "low_kg": 0.25,
+    "high_kg": 0.45,
+    "error": null
+   },
+   {
+    "scene": "s04",
+    "object": "obj_014",
+    "label": "packaging for electronics",
+    "mass_true_kg": 0.234667,
+    "nominal_kg": 0.05,
+    "low_kg": 0.02,
+    "high_kg": 0.12,
+    "error": null
+   },
+   {
+    "scene": "s04",
+    "object": "obj_021",
+    "label": "rubiks cube smaller",
+    "mass_true_kg": 0.081333,
+    "nominal_kg": 0.09,
+    "low_kg": 0.07,
+    "high_kg": 0.11,
+    "error": null
+   },
+   {
+    "scene": "s04",
+    "object": "obj_003",
+    "label": "packaging for in ear headphones",
+    "mass_true_kg": 0.094667,
+    "nominal_kg": 0.115,
+    "low_kg": 0.08,
+    "high_kg": 0.16,
+    "error": null
+   },
+   {
+    "scene": "s06",
+    "object": "obj_029",
+    "label": "empty phone packaging",
+    "mass_true_kg": 0.184667,
+    "nominal_kg": 0.35,
+    "low_kg": 0.25,
+    "high_kg": 0.5,
+    "error": null
+   },
+   {
+    "scene": "s06",
+    "object": "obj_004",
+    "label": "coffee powder can",
+    "mass_true_kg": 0.232,
+    "nominal_kg": 0.25,
+    "low_kg": 0.22,
+    "high_kg": 0.28,
+    "error": null
+   },
+   {
+    "scene": "s06",
+    "object": "obj_018",
+    "label": "3d printed car body",
+    "mass_true_kg": 0.157667,
+    "nominal_kg": 0.05,
+    "low_kg": 0.02,
+    "high_kg": 0.1,
+    "error": null
+   },
+   {
+    "scene": "s11",
+    "object": "obj_047",
+    "label": "cube",
+    "mass_true_kg": 0.009333,
+    "nominal_kg": 0.1,
+    "low_kg": 0.07,
+    "high_kg": 0.13,
+    "error": null
+   },
+   {
+    "scene": "s11",
+    "object": "obj_040",
+    "label": "white 3d print cuboid",
+    "mass_true_kg": 0.022333,
+    "nominal_kg": 0.02,
+    "low_kg": 0.005,
+    "high_kg": 0.06,
+    "error": null
+   },
+   {
+    "scene": "s11",
+    "object": "obj_048",
+    "label": "square pyramid",
+    "mass_true_kg": 0.003667,
+    "nominal_kg": 0.05,
+    "low_kg": 0.02,
+    "high_kg": 0.15,
+    "error": null
+   },
+   {
+    "scene": "s11",
+    "object": "obj_049",
+    "label": "triangular prism",
+    "mass_true_kg": 0.004,
+    "nominal_kg": 0.045,
+    "low_kg": 0.015,
+    "high_kg": 0.1,
+    "error": null
+   },
+   {
+    "scene": "s11",
+    "object": "obj_056",
+    "label": "hexagonal prism",
+    "mass_true_kg": 0.006667,
+    "nominal_kg": 0.015,
+    "low_kg": 0.005,
+    "high_kg": 0.03,
+    "error": null
+   },
+   {
+    "scene": "s11",
+    "object": "obj_050",
+    "label": "cuboid",
+    "mass_true_kg": 0.007,
+    "nominal_kg": 0.03,
+    "low_kg": 0.01,
+    "high_kg": 0.08,
+    "error": null
+   },
+   {
+    "scene": "s11",
+    "object": "obj_052",
+    "label": "cylinder",
+    "mass_true_kg": 0.004,
+    "nominal_kg": 0.02,
+    "low_kg": 0.01,
+    "high_kg": 0.04,
+    "error": null
+   },
+   {
+    "scene": "s12",
+    "object": "obj_004",
+    "label": "coffee powder can",
+    "mass_true_kg": 0.232,
+    "nominal_kg": 0.26,
+    "low_kg": 0.22,
+    "high_kg": 0.3,
+    "error": null
+   },
+   {
+    "scene": "s12",
+    "object": "obj_029",
+    "label": "empty phone packaging",
+    "mass_true_kg": 0.184667,
+    "nominal_kg": 0.34,
+    "low_kg": 0.22,
+    "high_kg": 0.5,
+    "error": null
+   },
+   {
+    "scene": "s12",
+    "object": "obj_001",
+    "label": "spray can",
+    "mass_true_kg": 0.473333,
+    "nominal_kg": 0.62,
+    "low_kg": 0.5,
+    "high_kg": 0.75,
+    "error": null
+   },
+   {
+    "scene": "s12",
+    "object": "obj_014",
+    "label": "packaging for electronics",
+    "mass_true_kg": 0.234667,
+    "nominal_kg": 0.09,
+    "low_kg": 0.04,
+    "high_kg": 0.2,
+    "error": null
+   },
+   {
+    "scene": "s12",
+    "object": "obj_002",
+    "label": "packaging for breakfast bags",
+    "mass_true_kg": 0.274,
+    "nominal_kg": 0.3,
+    "low_kg": 0.18,
+    "high_kg": 0.45,
+    "error": null
+   },
+   {
+    "scene": "s12",
+    "object": "obj_060",
+    "label": "deodorant cap",
+    "mass_true_kg": 0.003,
+    "nominal_kg": 0.003,
+    "low_kg": 0.0015,
+    "high_kg": 0.006,
+    "error": null
+   },
+   {
+    "scene": "s12",
+    "object": "obj_003",
+    "label": "packaging for in ear headphones",
+    "mass_true_kg": 0.094667,
+    "nominal_kg": 0.13,
+    "low_kg": 0.08,
+    "high_kg": 0.2,
+    "error": null
+   },
+   {
+    "scene": "s12",
+    "object": "obj_021",
+    "label": "rubiks cube smaller",
+    "mass_true_kg": 0.081333,
+    "nominal_kg": 0.095,
+    "low_kg": 0.07,
+    "high_kg": 0.13,
+    "error": null
+   },
+   {
+    "scene": "s12",
+    "object": "obj_007",
+    "label": "rubiks cube",
+    "mass_true_kg": 0.249,
+    "nominal_kg": 0.095,
+    "low_kg": 0.07,
+    "high_kg": 0.12,
+    "error": null
+   },
+   {
+    "scene": "s13",
+    "object": "obj_002",
+    "label": "packaging for breakfast bags",
+    "mass_true_kg": 0.274,
+    "nominal_kg": 0.08,
+    "low_kg": 0.04,
+    "high_kg": 0.15,
+    "error": null
+   },
+   {
+    "scene": "s13",
+    "object": "obj_014",
+    "label": "packaging for electronics",
+    "mass_true_kg": 0.234667,
+    "nominal_kg": 0.08,
+    "low_kg": 0.04,
+    "high_kg": 0.15,
+    "error": null
+   },
+   {
+    "scene": "s14",
+    "object": "obj_004",
+    "label": "coffee powder can",
+    "mass_true_kg": 0.232,
+    "nominal_kg": 0.27,
+    "low_kg": 0.22,
+    "high_kg": 0.32,
+    "error": null
+   },
+   {
+    "scene": "s14",
+    "object": "obj_036",
+    "label": "single breadboard module",
+    "mass_true_kg": 0.033,
+    "nominal_kg": 0.05,
+    "low_kg": 0.03,
+    "high_kg": 0.08,
+    "error": null
+   },
+   {
+    "scene": "s14",
+    "object": "obj_040",
+    "label": "white 3d print cuboid",
+    "mass_true_kg": 0.022333,
+    "nominal_kg": 0.022,
+    "low_kg": 0.012,
+    "high_kg": 0.038,
+    "error": null
+   },
+   {
+    "scene": "s14",
+    "object": "obj_006",
+    "label": "gamepad controller",
+    "mass_true_kg": 0.288,
+    "nominal_kg": 0.285,
+    "low_kg": 0.24,
+    "high_kg": 0.34,
+    "error": null
+   },
+   {
+    "scene": "s14",
+    "object": "obj_002",
+    "label": "packaging for breakfast bags",
+    "mass_true_kg": 0.274,
+    "nominal_kg": 0.22,
+    "low_kg": 0.15,
+    "high_kg": 0.32,
+    "error": null
+   },
+   {
+    "scene": "s17",
+    "object": "obj_026",
+    "label": "glass water bottle",
+    "mass_true_kg": 0.611667,
+    "nominal_kg": 0.2,
+    "low_kg": 0.12,
+    "high_kg": 0.3,
+    "error": null
+   },
+   {
+    "scene": "s17",
+    "object": "obj_019",
+    "label": "small paint can",
+    "mass_true_kg": 0.161333,
+    "nominal_kg": 0.24,
+    "low_kg": 0.16,
+    "high_kg": 0.34,
+    "error": null
+   },
+   {
+    "scene": "s17",
+    "object": "obj_059",
+    "label": "deodorant spray, no cap",
+    "mass_true_kg": 0.072667,
+    "nominal_kg": 0.13,
+    "low_kg": 0.07,
+    "high_kg": 0.22,
+    "error": null
+   },
+   {
+    "scene": "s17",
+    "object": "obj_035",
+    "label": "reflective puzzle toy",
+    "mass_true_kg": 0.027333,
+    "nominal_kg": 0.095,
+    "low_kg": 0.07,
+    "high_kg": 0.13,
+    "error": null
+   },
+   {
+    "scene": "s17",
+    "object": "obj_015",
+    "label": "chocolate egg",
+    "mass_true_kg": 0.033333,
+    "nominal_kg": 0.02,
+    "low_kg": 0.015,
+    "high_kg": 0.028,
+    "error": null
+   },
+   {
+    "scene": "s18",
+    "object": "obj_006",
+    "label": "gamepad controller",
+    "mass_true_kg": 0.288,
+    "nominal_kg": 0.285,
+    "low_kg": 0.24,
+    "high_kg": 0.33,
+    "error": null
+   },
+   {
+    "scene": "s18",
+    "object": "obj_032",
+    "label": "round hair brush",
+    "mass_true_kg": 0.056,
+    "nominal_kg": 0.075,
+    "low_kg": 0.045,
+    "high_kg": 0.12,
+    "error": null
+   },
+   {
+    "scene": "s18",
+    "object": "obj_008",
+    "label": "round tube, packaging for cold medicine rub",
+    "mass_true_kg": 0.039333,
+    "nominal_kg": 0.095,
+    "low_kg": 0.07,
+    "high_kg": 0.13,
+    "error": null
+   },
+   {
+    "scene": "s18",
+    "object": "obj_000",
+    "label": "lego toy car",
+    "mass_true_kg": 0.162333,
+    "nominal_kg": 0.15,
+    "low_kg": 0.08,
+    "high_kg": 0.25,
+    "error": null
+   },
+   {
+    "scene": "s18",
+    "object": "obj_018",
+    "label": "3d printed car body",
+    "mass_true_kg": 0.157667,
+    "nominal_kg": 0.035,
+    "low_kg": 0.015,
+    "high_kg": 0.07,
+    "error": null
+   },
+   {
+    "scene": "s18",
+    "object": "obj_024",
+    "label": "hole punch",
+    "mass_true_kg": 0.242,
+    "nominal_kg": 0.35,
+    "low_kg": 0.25,
+    "high_kg": 0.5,
+    "error": null
+   },
+   {
+    "scene": "s18",
+    "object": "obj_012",
+    "label": "chocolate santa blue",
+    "mass_true_kg": 0.129333,
+    "nominal_kg": 0.1,
+    "low_kg": 0.05,
+    "high_kg": 0.15,
+    "error": null
+   },
+   {
+    "scene": "s18",
+    "object": "obj_045",
+    "label": "plier",
+    "mass_true_kg": 0.074,
+    "nominal_kg": 0.14,
+    "low_kg": 0.08,
+    "high_kg": 0.22,
+    "error": null
+   },
+   {
+    "scene": "s24",
+    "object": "obj_040",
+    "label": "white 3d print cuboid",
+    "mass_true_kg": 0.022333,
+    "nominal_kg": 0.018,
+    "low_kg": 0.008,
+    "high_kg": 0.035,
+    "error": null
+   }
+  ]
+ }
+}
