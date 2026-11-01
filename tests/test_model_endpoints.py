@@ -158,7 +158,12 @@ def test_vlm_section_reaches_the_stages_that_share_it_and_enters_their_cache_key
     assert runner._shared(ShapeStage()) == {}
 
 
-def test_doctor_offline_passes_on_the_default_config_and_reports_failures() -> None:
+def test_doctor_offline_passes_on_the_default_config_and_reports_failures(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # The default config names keys that live in .env locally and are absent in CI.
+    for name in ("BASETEN_API_KEY", "META_MODEL_API_KEY"):
+        monkeypatch.setenv(name, "test-key")
     assert all(c.ok for c in run_doctor(_cfg(), offline=True))
     cfg = _cfg()
     cfg["vlm"]["protocol"] = "nope"
