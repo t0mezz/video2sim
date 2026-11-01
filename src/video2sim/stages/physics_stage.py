@@ -138,7 +138,9 @@ def prepare_object(
         trimesh.Trimesh, trimesh.load(run_dir / registered.mesh_path, force="mesh", process=False)
     )
     repaired = repair_mesh(mesh, cfg.repair)
-    collision = collision_geometry(repaired.mesh, cfg.collision)
+    collision = collision_geometry(
+        repaired.mesh, cfg.collision, cache_dir=run_dir / "physics.work" / "decomp_cache"
+    )
     material = object_material(instance, table, cfg.min_confidence)
     mass = estimate_mass(repaired.mesh, material, cfg.mass)
     final_mass, mass_source = combine(mass.mass_kg, model_mass, cfg.vlm_mass.enabled)

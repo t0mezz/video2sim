@@ -11,8 +11,17 @@ of convex parts in the same frame, the way a simulator wants them.
   surfaces, not inside-outside points, because that needs ``rtree``. A primitive that then fails
   a check is dropped for the decomposition, with ``steps["primitive_rejected"]``.
 * Otherwise the mesh is split into at most ``physics.max_convex_parts`` convex parts by CoACD.
-  Without ``coacd`` the single convex hull stands in and ``steps["coacd_unavailable"]`` says so;
+  CoACD sees a decimated copy (``decomp_decimate``, on by default) because its cost grows with
+  the triangle count while the returned parts are checked against the full mesh below. Without
+  ``coacd`` the single convex hull stands in and ``steps["coacd_unavailable"]`` says so;
   the ``collision_fit`` check then decides whether the hull is too fat to use.
+* With ``adaptive_escalation`` the decomposition climbs a ladder: the convex hull, then a cheap
+  CoACD run (``cheap_threshold``, ``cheap_max_parts``), then the full one. The first rung whose
+  parts pass the checks wins, so near-convex objects skip the expensive search.
+* Decomposition results are cached by a hash of the input mesh and the decomposition settings
+  (``decomp_cache``, under ``physics.work/decomp_cache``), because CoACD is deterministic for a
+  given seed and benchmark reruns otherwise pay for the same search twice. A corrupt cache entry
+  is ignored and recomputed; every rung, cached or fresh, still goes through the checks.
 * The checks go into ``SimAsset.checks``: ``collision_loads`` (every part is finite, closed,
   convex, has positive volume and at most ``max_part_vertices`` vertices, and there are no more
   than ``max_convex_parts`` of them), and ``collision_fit`` (the parts follow the visual surface,
@@ -40,8 +49,10 @@ point selection then takes over.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from hashlib import sha256
 from pathlib import Path
 from typing import Any, Literal, cast
+from zipfile import BadZipFile
 
 import numpy as np
 import trimesh
@@ -70,6 +81,15 @@ class CollisionConfig:
     coacd_threshold: float
     seed: int
     sealing: MassConfig
+    decomp_decimate: bool = True
+    decomp_max_faces: int = 4000
+    decomp_volume_change_frac: float = 0.05
+    coacd_resolution: int = 2000
+    coacd_mcts_iterations: int = 150
+    adaptive_escalation: bool = True
+    cheap_threshold: float = 0.25
+    cheap_max_parts: int = 4
+    decomp_cache: bool = True
 
     @classmethod
     def from_config(cls, cfg: dict[str, Any]) -> CollisionConfig:
@@ -89,6 +109,15 @@ class CollisionConfig:
             coacd_threshold=float(c["coacd_threshold"]),
             seed=int(c["seed"]),
             sealing=MassConfig.from_config(cfg),
+            decomp_decimate=bool(c.get("decomp_decimate", True)),
+            decomp_max_faces=int(c.get("decomp_max_faces", 4000)),
+            decomp_volume_change_frac=float(c.get("decomp_volume_change_frac", 0.05)),
+            coacd_resolution=int(c.get("coacd_resolution", 2000)),
+            coacd_mcts_iterations=int(c.get("coacd_mcts_iterations", 150)),
+            adaptive_escalation=bool(c.get("adaptive_escalation", True)),
+            cheap_threshold=float(c.get("cheap_threshold", 0.25)),
+            cheap_max_parts=int(c.get("cheap_max_parts", 4)),
+            decomp_cache=bool(c.get("decomp_cache", True)),
         )
         if out.max_convex_parts < 1:
             raise ValueError("physics.max_convex_parts must be at least 1")
@@ -105,6 +134,18 @@ class CollisionConfig:
             raise ValueError("physics.collision.fit_min_coverage must be in (0, 1]")
         if out.max_part_vertices < 4:
             raise ValueError("physics.collision.max_part_vertices must be at least 4")
+        if out.decomp_max_faces < 4:
+            raise ValueError("physics.collision.decomp_max_faces must be at least 4")
+        if not 0 < out.decomp_volume_change_frac < 1:
+            raise ValueError("physics.collision.decomp_volume_change_frac must be in (0, 1)")
+        if out.coacd_resolution < 1:
+            raise ValueError("physics.collision.coacd_resolution must be positive")
+        if out.coacd_mcts_iterations < 1:
+            raise ValueError("physics.collision.coacd_mcts_iterations must be positive")
+        if out.cheap_threshold <= 0:
+            raise ValueError("physics.collision.cheap_threshold must be positive")
+        if out.cheap_max_parts < 1:
+            raise ValueError("physics.collision.cheap_max_parts must be at least 1")
         return out
 
 
@@ -294,25 +335,177 @@ def prepare_coacd() -> None:
     coacd.set_log_level("info" if native_logs_wanted() else "error")
 
 
-def _decompose(
+CACHE_VERSION = 1
+
+
+def _decimate_input(
     mesh: trimesh.Trimesh, cfg: CollisionConfig, steps: dict[str, int]
-) -> list[trimesh.Trimesh]:
+) -> trimesh.Trimesh:
+    """A copy of ``mesh`` with at most ``decomp_max_faces`` faces, for CoACD's eyes only.
+
+    Falls back to ``mesh`` when decimation is off, unneeded, unavailable, or unsafe, because a
+    bad copy only costs time while a distorted one could cost the fit.
+    """
+    steps["decomp_input_faces"] = len(mesh.faces)
+    if not cfg.decomp_decimate or len(mesh.faces) <= cfg.decomp_max_faces:
+        return mesh
     try:
-        import coacd  # type: ignore[import-untyped,import-not-found,unused-ignore]  # heavy import
+        import fast_simplification  # type: ignore[import-untyped,unused-ignore]  # heavy import
     except ImportError:
-        steps["coacd_unavailable"] = 1
-        return [_limit_vertices(cast(trimesh.Trimesh, mesh.convex_hull), cfg.max_part_vertices)]
+        steps["decomp_decimate_skipped"] = 1
+        return mesh
+    before = float(mesh.volume) if mesh.is_watertight else 0.0
+    v, f = fast_simplification.simplify(
+        np.asarray(mesh.vertices, dtype=np.float64),
+        np.asarray(mesh.faces, dtype=np.int32),
+        target_count=cfg.decomp_max_faces,
+        agg=7,
+    )
+    small = trimesh.Trimesh(v, f, process=False)
+    small.merge_vertices()
+    small.update_faces(small.nondegenerate_faces())
+    small.remove_unreferenced_vertices()
+    if not small.is_watertight or (
+        before > 0 and abs(float(small.volume) - before) > cfg.decomp_volume_change_frac * before
+    ):
+        steps["decomp_decimate_skipped"] = 1
+        return mesh
+    steps["decomp_decimated"] = 1
+    steps["decomp_input_faces"] = len(small.faces)
+    return small
+
+
+def _run_coacd(
+    mesh: trimesh.Trimesh, threshold: float, max_hull: int, cfg: CollisionConfig
+) -> list[trimesh.Trimesh]:
+    """CoACD with the configured search knobs. Raises ``ImportError`` without ``coacd``."""
+    import coacd  # type: ignore[import-untyped,import-not-found,unused-ignore]  # heavy import
+
     result = coacd.run_coacd(
         coacd.Mesh(np.asarray(mesh.vertices, float), np.asarray(mesh.faces, np.int64)),
-        threshold=cfg.coacd_threshold,
-        max_convex_hull=cfg.max_convex_parts,
+        threshold=threshold,
+        max_convex_hull=max_hull,
+        resolution=cfg.coacd_resolution,
+        mcts_iterations=cfg.coacd_mcts_iterations,
         seed=cfg.seed,
     )
     parts = [trimesh.Trimesh(np.asarray(v), np.asarray(f), process=True) for v, f in result]
     return [_limit_vertices(p, cfg.max_part_vertices) for p in parts]
 
 
-def collision_geometry(mesh: trimesh.Trimesh, cfg: CollisionConfig) -> CollisionResult:
+def _cache_key(mesh: trimesh.Trimesh, cfg: CollisionConfig) -> str:
+    """The decomposition settings and input that decide the cached parts."""
+    h = sha256()
+    h.update(np.ascontiguousarray(mesh.vertices, dtype=np.float64).tobytes())
+    h.update(np.ascontiguousarray(mesh.faces, dtype=np.int64).tobytes())
+    h.update(
+        repr(
+            (
+                CACHE_VERSION,
+                cfg.seed,
+                cfg.max_convex_parts,
+                cfg.max_part_vertices,
+                cfg.decomp_decimate,
+                cfg.decomp_max_faces,
+                cfg.decomp_volume_change_frac,
+                cfg.coacd_resolution,
+                cfg.coacd_mcts_iterations,
+                cfg.adaptive_escalation,
+                cfg.cheap_threshold,
+                cfg.cheap_max_parts,
+                cfg.coacd_threshold,
+            )
+        ).encode()
+    )
+    return h.hexdigest()
+
+
+def _read_cache(cache_dir: Path, key: str) -> list[trimesh.Trimesh] | None:
+    """Cached parts for ``key``, or None on a miss or a corrupt entry."""
+    try:
+        with np.load(cache_dir / f"{key}.npz") as data:
+            return [
+                trimesh.Trimesh(np.asarray(data[f"v{i}"]), np.asarray(data[f"f{i}"]), process=True)
+                for i in range(int(data["n"]))
+            ]
+    except (OSError, ValueError, KeyError, BadZipFile):
+        return None
+
+
+def _write_cache(cache_dir: Path, key: str, parts: list[trimesh.Trimesh]) -> None:
+    """Store ``parts`` under ``key``; a failed write is silently skipped."""
+    try:
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        tmp = cache_dir / f"{key}.tmp"  # savez adds .npz to an extensionless name
+        final = cache_dir / f"{key}.npz"
+        arrays: dict[str, Any] = {"n": np.int64(len(parts))}
+        for i, part in enumerate(parts):
+            arrays[f"v{i}"] = np.asarray(part.vertices, dtype=np.float64)
+            arrays[f"f{i}"] = np.asarray(part.faces, dtype=np.int64)
+        np.savez(tmp, **arrays)
+        Path(str(tmp) + ".npz").replace(final)  # atomic, so no reader sees half a file
+    except OSError:
+        pass
+
+
+def _decompose(
+    mesh: trimesh.Trimesh,
+    cfg: CollisionConfig,
+    steps: dict[str, int],
+    body: SealedBody,
+    cache_dir: Path | None = None,
+) -> list[trimesh.Trimesh]:
+    """Convex parts for ``mesh`` via the hull-cheap-full ladder, each rung checked.
+
+    Every rung is judged by the same checks against the full ``mesh``, so a cheap rung can only
+    win when it fits as well as the full search would have to. Without ``adaptive_escalation``
+    only the full rung runs, on the same (possibly decimated) input as the ladder would use.
+    """
+    try:
+        import coacd  # noqa: F401  # type: ignore[import-untyped,import-not-found,unused-ignore]  # heavy import
+    except ImportError:
+        steps["coacd_unavailable"] = 1
+        return [_limit_vertices(cast(trimesh.Trimesh, mesh.convex_hull), cfg.max_part_vertices)]
+    cache = cache_dir if cfg.decomp_cache and cache_dir is not None else None
+    key = _cache_key(mesh, cfg) if cache is not None else None
+    if cache is not None and key is not None:
+        cached = _read_cache(cache, key)
+        if cached is not None:
+            steps["decomp_cache_hit"] = 1
+            return cached
+    entry = _decimate_input(mesh, cfg, steps)
+    if cfg.adaptive_escalation:
+        rungs: list[tuple[str, float, int] | None] = [
+            None,
+            ("cheap", cfg.cheap_threshold, cfg.cheap_max_parts),
+            ("full", cfg.coacd_threshold, cfg.max_convex_parts),
+        ]
+    else:
+        rungs = [("full", cfg.coacd_threshold, cfg.max_convex_parts)]
+    parts: list[trimesh.Trimesh] = []
+    for rung in rungs:
+        if rung is None:
+            parts = [
+                _limit_vertices(cast(trimesh.Trimesh, entry.convex_hull), cfg.max_part_vertices)
+            ]
+            name = "hull"
+        else:
+            name, threshold, max_hull = rung
+            parts = _run_coacd(entry, threshold, max_hull, cfg)
+        if all(check_parts(parts, mesh, cfg, body=body).values()):
+            steps[f"decomp_rung_{name}"] = 1
+            break
+        steps[f"decomp_rung_{name}_failed"] = 1
+    else:  # every rung failed the checks: keep the full search's answer, checks and all
+        steps["decomp_all_rungs_failed"] = 1
+    if cache is not None and key is not None:
+        _write_cache(cache, key, parts)
+    return parts
+
+
+def collision_geometry(
+    mesh: trimesh.Trimesh, cfg: CollisionConfig, cache_dir: Path | None = None
+) -> CollisionResult:
     """Convex collision parts for the repaired ``mesh``, with their checks."""
     steps: dict[str, int] = {}
     body = sealed_body(mesh, cfg.sealing)
@@ -323,7 +516,7 @@ def collision_geometry(mesh: trimesh.Trimesh, cfg: CollisionConfig) -> Collision
         if all(checks.values()):
             return CollisionResult([part], kind, checks, score, steps)
         steps["primitive_rejected"] = 1
-    parts = _decompose(mesh, cfg, steps)
+    parts = _decompose(mesh, cfg, steps, body, cache_dir)
     kind = (
         "convex_hull"
         if steps.get("coacd_unavailable") or len(parts) == 1

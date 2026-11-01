@@ -237,6 +237,15 @@ physics:
     fit_cover_tolerance: 0.01       # near, as a share of the bbox diagonal
     max_part_vertices: 255          # per convex part; assumed PhysX limit, verify in P5.1
     coacd_threshold: 0.05           # CoACD concavity threshold
+    coacd_resolution: 2000          # CoACD search resolution; 500 barely moves wall time on s02 obj_001, so this stays
+    coacd_mcts_iterations: 30       # CoACD search iterations per cut; 30 keeps the s02/s12 part counts with all fit checks passing, ~2x faster than 150
+    decomp_decimate: true           # decompose a decimated copy; the checks still run against the full mesh
+    decomp_max_faces: 4000          # a decomposition input above this many faces is decimated to it
+    decomp_volume_change_frac: 0.05 # a decimated copy that moves the volume more than this is dropped
+    adaptive_escalation: true       # try hull, then a cheap decomposition, then the full one; each rung must pass the checks
+    cheap_threshold: 0.25           # concavity threshold of the cheap rung; coarser than coacd_threshold
+    cheap_max_parts: 4              # part cap of the cheap rung
+    decomp_cache: true              # reuse decompositions by input hash under physics.work/decomp_cache
     seed: 0
   mass:                        # P4.5, stages/mass.py; values from docs/research/mesh_volume.md
     seal_radius: 0.04               # gaps up to this share of the longest side are closed; 2% misses cracks, 8% closes a bottle neck
