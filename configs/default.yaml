@@ -74,6 +74,9 @@ segmentation:
       surface:
         description: a glossy or reflective surface that mirrors its surroundings, such as a glass stove top, polished counter or mirror; a matte counter, floor or shelf is not this
         prompt: object on a surface
+      stack:
+        description: objects stacked directly on top of each other in a pile or tower; choose this whenever one object rests on another, even on a table
+        prompt: object on a table
   tracking:                    # P2.2: one SAM 3.1 video request per scene
     endpoint:                  # where the request goes; see docs/model_interfaces.md
       protocol: meta_responses # meta_responses (the Meta Model API, or a server imitating it) or python:package.module:factory
