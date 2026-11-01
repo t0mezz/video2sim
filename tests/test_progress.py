@@ -3,7 +3,7 @@ from __future__ import annotations
 import io
 import time
 
-from video2sim.progress import ProgressReporter, format_clock, format_seconds
+from video2sim.progress import ProgressReporter, banner, format_clock, format_seconds
 from video2sim.runner import StageEvent
 
 
@@ -86,3 +86,30 @@ def test_without_verbose_the_details_are_left_out() -> None:
     out = io.StringIO()
     ProgressReporter(out)(StageEvent("cached", "capture", 1, 6, run_id="r1", detail="key 3fa9c1d2"))
     assert out.getvalue() == "[1/6] capture  cached\n"
+
+
+class _Utf8(Tty):
+    encoding = "utf-8"
+
+
+class _Ascii(Tty):
+    encoding = "ascii"
+
+
+def test_banner_is_only_for_terminals() -> None:
+    assert banner(io.StringIO()) == ""
+    assert "\033[48;2;" in banner(_Utf8(), {"COLORTERM": "truecolor"})
+    assert "\033[48;5;" in banner(_Utf8(), {})
+    assert "\033" not in banner(_Utf8(), {"NO_COLOR": "1"})
+    assert banner(_Ascii(), {}) == "video2sim\n\n"
+
+
+def test_dry_run_reports_every_stage_without_waiting() -> None:
+    from video2sim.dry_run import simulate
+    from video2sim.schemas import STAGE_ORDER
+
+    out = io.StringIO()
+    simulate(ProgressReporter(out, interactive=False), stage_s=0.0, sleep=lambda _: None)
+    lines = out.getvalue().splitlines()
+    assert len(lines) == 2 * len(STAGE_ORDER) - 1 and "cached" in lines[0]
+    assert sum("done" in line for line in lines) == len(STAGE_ORDER) - 1

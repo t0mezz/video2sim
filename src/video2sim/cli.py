@@ -121,8 +121,15 @@ def _build_parser() -> argparse.ArgumentParser:
     ev.add_argument("--yaw-sigma-deg", type=float, default=0.0)
     ev.add_argument("--mass-sigma", type=float, default=0.0)
     run = sub.add_parser("run", help="turn one video into a scene package")
-    run.add_argument("video", type=Path)
-    run.add_argument("--out", type=Path, required=True, help="folder for the scene package")
+    run.add_argument("video", type=Path, nargs="?", help="the video (not needed with --dry-run)")
+    run.add_argument(
+        "--out", type=Path, help="folder for the scene package (not needed with --dry-run)"
+    )
+    run.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="show fake stage progress; read no video, call nothing, write nothing",
+    )
     run.add_argument("--runs", type=Path, default=Path("runs"), help="run folders (default: runs)")
     run.add_argument("--run-id", help="resume this run; default: a new id from time and video")
     run.add_argument("--config", type=Path, default=Path("configs/default.yaml"))
@@ -208,6 +215,19 @@ def run_eval(args: argparse.Namespace) -> int:
 
 
 def run_pipeline(args: argparse.Namespace) -> int:
+    if args.dry_run:
+        from video2sim.dry_run import simulate
+
+        fake = ProgressReporter(sys.stderr, verbose=args.verbose)
+        try:
+            simulate(lambda event: None if args.quiet else fake(event))
+        finally:
+            fake.close()
+        print("dry run: nothing was run or written", file=sys.stderr)
+        return 0
+    if args.video is None or args.out is None:
+        print("run needs a VIDEO and --out FOLDER (or --dry-run)", file=sys.stderr)
+        return 2
     from video2sim.pipeline import build_runner  # heavy imports, not needed for eval
 
     cfg: dict[str, Any] = yaml.safe_load(args.config.read_text(encoding="utf-8"))

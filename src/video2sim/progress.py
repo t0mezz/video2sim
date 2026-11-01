@@ -12,10 +12,13 @@ do not tangle with a spinner, and adds the run id and the cache keys. Standard l
 
 from __future__ import annotations
 
+import os
 import threading
 import time
+from collections.abc import Mapping
 from typing import TextIO
 
+from video2sim.logo import render
 from video2sim.runner import StageEvent
 
 _BRAILLE = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
@@ -23,6 +26,24 @@ _ASCII = "|/-\\"
 _ERASE = "\r\033[2K"
 _INDENT = "  "  # one spinner frame and a space
 _TICK_S = 0.1
+
+
+def banner(stream: TextIO, env: Mapping[str, str] | None = None) -> str:
+    """The logo for the top of a run, or "" when the stream is not a terminal.
+
+    A pipe or log file gets nothing, so logs keep one plain line per event. A terminal that
+    cannot show block characters gets the name in plain text; ``NO_COLOR`` and ``TERM=dumb``
+    give a one-color logo, and a terminal without ``COLORTERM=truecolor`` gets 256 colors.
+    """
+    if not stream.isatty():
+        return ""
+    env = os.environ if env is None else env
+    encoding = (getattr(stream, "encoding", None) or "").lower()
+    if not encoding.startswith("utf"):
+        return "video2sim\n\n"
+    color = "NO_COLOR" not in env and env.get("TERM") != "dumb"
+    truecolor = env.get("COLORTERM", "").lower() in ("truecolor", "24bit")
+    return render(color, truecolor) + "\n\n"
 
 
 def format_seconds(seconds: float) -> str:
