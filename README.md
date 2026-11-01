@@ -47,8 +47,9 @@ The VLM can also be a local OpenAI-compatible server instead of Baseten:
    deployed (`AGENTS.md` has the commands). Video frames and object crops are sent to them.
 3. Run `uv run video2sim run my_table.mp4 --out scene/`.
 
-Progress goes to stderr, one line per stage (a spinner on a terminal); `--quiet` turns it off and
-stdout keeps only the final line.
+Progress goes to stderr, one line per stage (a spinner on a terminal); `--quiet` turns it off, and
+`--verbose` adds the run id, cache keys and the COLMAP and CoACD logs. Stdout keeps only the final
+line.
 
 `scene/` holds `scene.usd`, one URDF per object in `urdf/`, and `qa_report.html` with each
 object's confidence, fallbacks, mass range and settling result. Run again with `--run-id` to

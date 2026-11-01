@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -79,3 +80,30 @@ def test_progress_goes_to_a_handler_unless_quiet(
     (tmp_path / "runs" / "r1").rename(tmp_path / "runs" / "r0")
     assert cli.main([*base, "--out", str(tmp_path / "b"), "--quiet"]) == 0
     assert callable(seen[0]) and seen[1] is None
+
+
+def test_verbose_sets_the_native_log_switch_and_conflicts_with_quiet(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.delenv("VIDEO2SIM_VERBOSE", raising=False)
+    monkeypatch.setattr(
+        "video2sim.pipeline.build_runner",
+        lambda *a, **k: FakeRunner(
+            RunManifest(
+                run_id="r1",
+                created_utc="2026-10-31T00:00:00Z",
+                input_video_sha256="a",
+                config_sha256="b",
+                code_version=None,
+                seed=0,
+            ),
+            tmp_path / "runs",
+            False,
+        ),
+    )
+    args = ["run", "v.mp4", "--out", str(tmp_path / "s"), "--runs", str(tmp_path / "runs")]
+    assert cli.main([*args, "--verbose"]) == 0
+    assert os.environ["VIDEO2SIM_VERBOSE"] == "1"
+    monkeypatch.delenv("VIDEO2SIM_VERBOSE")
+    with pytest.raises(SystemExit):
+        cli.main([*args, "--verbose", "--quiet"])

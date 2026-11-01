@@ -32,6 +32,7 @@ from pydantic import BaseModel
 
 from video2sim.schemas import STAGE_ORDER, RunManifest, StageName, StageRecord
 
+VERBOSE_ENV = "VIDEO2SIM_VERBOSE"
 OUTPUT_FILE = "output.json"
 MANIFEST_FILE = "manifest.json"
 
@@ -61,7 +62,8 @@ class StageEvent:
     """What the runner tells a listener: a stage is cached, starts, finishes or fails.
 
     ``index`` counts from 1 over the stages this runner has. ``seconds`` is set on ``done`` and
-    ``failed``, ``message`` on ``failed``.
+    ``failed``, ``message`` on ``failed``. ``run_id`` and ``detail`` are for verbose output:
+    ``detail`` is the short cache key, and on ``done`` the short hash of the stage's output.
     """
 
     kind: Literal["cached", "started", "done", "failed"]
@@ -70,6 +72,8 @@ class StageEvent:
     total: int
     seconds: float | None = None
     message: str | None = None
+    run_id: str | None = None
+    detail: str | None = None
 
 
 EventHandler = Callable[[StageEvent], None]
@@ -105,6 +109,12 @@ def sha256_dir(path: Path) -> str:
                 digest.update(chunk)
         digest.update(b"\0")
     return digest.hexdigest()
+
+
+def native_logs_wanted() -> bool:
+    """True under ``video2sim run --verbose``: stages then leave the logs of native libraries
+    (COLMAP, CoACD) on instead of silencing them."""
+    return bool(os.environ.get(VERBOSE_ENV))
 
 
 def seed_for(base_seed: int, stage: StageName) -> int:
@@ -214,6 +224,7 @@ class Runner:
         self.config = config
         self.base_dir = base_dir or Path.cwd()
         self._on_event = on_event
+        self._run_id: str | None = None
         self._output_types: dict[StageName, type[BaseModel]] = {
             stage.name: stage.output_type for stage in stages
         }
@@ -238,6 +249,7 @@ class Runner:
         if not run_id or Path(run_id).name != run_id or run_id in {".", ".."}:
             raise RunnerError(f"run_id must be a plain folder name, got {run_id!r}")
         run_dir = self.runs_root / run_id
+        self._run_id = run_id
         manifest = self._open(run_dir, run_id, video_sha)
         force_index = STAGE_ORDER.index(force_from) if force_from else None
 
@@ -254,7 +266,7 @@ class Runner:
                 and record.input_sha256 == key
                 and (run_dir / stage.name).is_dir()
             ):
-                self._emit("cached", stage.name)
+                self._emit("cached", stage.name, detail=f"key {key[:8]}")
                 continue
             manifest = self._execute(stage, run_dir, video, manifest, key)
         return manifest
@@ -267,12 +279,22 @@ class Runner:
         stage: StageName,
         seconds: float | None = None,
         message: str | None = None,
+        detail: str | None = None,
     ) -> None:
         if self._on_event is None:
             return
         names = [s.name for s in self.stages]
         self._on_event(
-            StageEvent(kind, stage, names.index(stage) + 1, len(names), seconds, message)
+            StageEvent(
+                kind,
+                stage,
+                names.index(stage) + 1,
+                len(names),
+                seconds,
+                message,
+                self._run_id,
+                detail,
+            )
         )
 
     @staticmethod
@@ -344,7 +366,7 @@ class Runner:
             output_types=self._output_types,
         )
         start = time.perf_counter()
-        self._emit("started", stage.name)
+        self._emit("started", stage.name, detail=f"key {key[:8]}")
         try:
             output = stage.run(ctx)
             if not isinstance(output, stage.output_type):
@@ -378,7 +400,7 @@ class Runner:
         )
         manifest = self._with_record(manifest, stage.name, done, ctx.checkpoints)
         self._write_manifest(run_dir, manifest)
-        self._emit("done", stage.name, done.seconds)
+        self._emit("done", stage.name, done.seconds, detail=f"output {output_sha[:8]}")
         return manifest
 
     @staticmethod

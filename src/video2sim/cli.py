@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import shutil
 import sys
 from collections.abc import Sequence
@@ -22,7 +23,14 @@ from video2sim.evaluation.report import build_report, write_html, write_json
 from video2sim.evaluation.scenes import GtScene, Prediction, discover_scenes
 from video2sim.evaluation.segmentation import load_instances, summarize_segmentation
 from video2sim.progress import ProgressReporter
-from video2sim.runner import MANIFEST_FILE, OUTPUT_FILE, StageFailed, _code_version, sha256_file
+from video2sim.runner import (
+    MANIFEST_FILE,
+    OUTPUT_FILE,
+    VERBOSE_ENV,
+    StageFailed,
+    _code_version,
+    sha256_file,
+)
 from video2sim.schemas import WorldModel
 
 SPLIT_CHOICES = {"dev": ["dev"], "test": ["test"], "all": ["dev", "test"]}
@@ -119,7 +127,13 @@ def _build_parser() -> argparse.ArgumentParser:
     run.add_argument("--run-id", help="resume this run; default: a new id from time and video")
     run.add_argument("--config", type=Path, default=Path("configs/default.yaml"))
     run.add_argument("--targets", type=Path, default=Path("configs/targets.yaml"))
-    run.add_argument("--quiet", action="store_true", help="no progress on stderr")
+    noise = run.add_mutually_exclusive_group()
+    noise.add_argument("--quiet", action="store_true", help="no progress on stderr")
+    noise.add_argument(
+        "--verbose",
+        action="store_true",
+        help="plain progress with run id and cache keys, and the logs of COLMAP and CoACD",
+    )
     return parser
 
 
@@ -183,7 +197,9 @@ def run_pipeline(args: argparse.Namespace) -> int:
 
     cfg: dict[str, Any] = yaml.safe_load(args.config.read_text(encoding="utf-8"))
     targets: dict[str, Any] = yaml.safe_load(args.targets.read_text(encoding="utf-8"))
-    reporter = None if args.quiet else ProgressReporter(sys.stderr)
+    if args.verbose:
+        os.environ[VERBOSE_ENV] = "1"
+    reporter = None if args.quiet else ProgressReporter(sys.stderr, verbose=args.verbose)
     runner = build_runner(args.runs, cfg, targets, Path.cwd(), on_event=reporter)
     try:
         manifest = runner.run(args.video, run_id=args.run_id)

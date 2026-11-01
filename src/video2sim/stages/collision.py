@@ -47,6 +47,7 @@ import numpy as np
 import trimesh
 from numpy.typing import NDArray
 
+from video2sim.runner import native_logs_wanted
 from video2sim.stages.mass import MassConfig, SealedBody, sealed_body
 
 F64 = NDArray[np.float64]
@@ -290,7 +291,7 @@ def prepare_coacd() -> None:
         import coacd  # type: ignore[import-untyped,import-not-found,unused-ignore]  # heavy import
     except ImportError:
         return
-    coacd.set_log_level("error")
+    coacd.set_log_level("info" if native_logs_wanted() else "error")
 
 
 def _decompose(

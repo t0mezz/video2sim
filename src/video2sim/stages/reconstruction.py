@@ -26,7 +26,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from video2sim.runner import StageContext
+from video2sim.runner import StageContext, native_logs_wanted
 from video2sim.schemas import (
     SE3,
     CameraFrame,
@@ -172,8 +172,10 @@ def run_sfm(
     import pycolmap
 
     # COLMAP logs its feature, matching and mapper progress to stderr, thousands of lines a run.
-    pycolmap.logging.minloglevel = pycolmap.logging.Level.ERROR.value
-    pycolmap.logging.alsologtostderr = False
+    # ``video2sim run --verbose`` keeps them.
+    if not native_logs_wanted():
+        pycolmap.logging.minloglevel = pycolmap.logging.Level.ERROR.value
+        pycolmap.logging.alsologtostderr = False
     opt = options or SfmOptions()
     frames = sorted(frames_dir.glob("*.png"))
     n_input = len(frames)

@@ -311,9 +311,13 @@ def test_events_report_each_stage_and_then_a_cache_hit(
         ("done", "segmentation", 3, 3),
     ]
     assert all(e.seconds is not None and e.seconds >= 0 for e in events if e.kind == "done")
+    assert {e.run_id for e in events} == {"r1"}
+    assert all(e.detail and e.detail.startswith("key ") for e in events if e.kind == "started")
+    assert all(e.detail and e.detail.startswith("output ") for e in events if e.kind == "done")
     events.clear()
     runner.run(video, run_id="r1")
     assert [e.kind for e in events] == ["cached", "cached", "cached"]
+    assert all(e.detail and e.detail.startswith("key ") for e in events)
 
 
 def test_a_failing_stage_reports_failed_with_its_message(
