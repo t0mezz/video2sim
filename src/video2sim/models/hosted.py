@@ -18,7 +18,7 @@ import re
 import time
 import urllib.error
 import urllib.request
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -76,10 +76,12 @@ def post_json(
     body: dict[str, Any],
     timeout_s: float = 120.0,
     retries: int = _RETRIES,
+    extra_headers: Mapping[str, str] | None = None,
 ) -> bytes:
     headers = {"Content-Type": "application/json"}
     if key:
         headers["Authorization"] = f"Bearer {key}"
+    headers.update(extra_headers or {})
     request = urllib.request.Request(url, data=json.dumps(body).encode(), headers=headers)
     for attempt in range(retries):
         try:

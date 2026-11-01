@@ -1,4 +1,4 @@
-"""Command line entry point: ``video2sim eval`` (P0.6) and ``video2sim run`` (P5.5)."""
+"""Command line entry point: ``eval`` (P0.6), ``run`` (P5.5) and ``doctor``."""
 
 from __future__ import annotations
 
@@ -134,7 +134,22 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="plain progress with run id and cache keys, and the logs of COLMAP and CoACD",
     )
+    doctor = sub.add_parser("doctor", help="check that the configured model endpoints work")
+    doctor.add_argument("--config", type=Path, default=Path("configs/default.yaml"))
+    doctor.add_argument(
+        "--offline", action="store_true", help="check the config and keys only; call nothing"
+    )
     return parser
+
+
+def run_doctor_command(args: argparse.Namespace) -> int:
+    from video2sim.doctor import run_doctor
+
+    cfg: dict[str, Any] = yaml.safe_load(args.config.read_text(encoding="utf-8"))
+    checks = run_doctor(cfg, offline=args.offline)
+    for check in checks:
+        print(f"{'ok  ' if check.ok else 'FAIL'} {check.name}: {check.detail}")
+    return 0 if all(c.ok for c in checks) else 1
 
 
 def run_eval(args: argparse.Namespace) -> int:
@@ -222,6 +237,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return run_eval(args)
     if args.command == "run":
         return run_pipeline(args)
+    if args.command == "doctor":
+        return run_doctor_command(args)
     return 2
 
 

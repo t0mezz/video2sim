@@ -35,7 +35,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from video2sim.models.hosted import ResponseCache, read_secret
+from video2sim.models.hosted import ResponseCache
 from video2sim.models.vlm import make_vlm_client
 from video2sim.runner import StageContext
 from video2sim.schemas import Flag, Instances, ObjectInstance, StageName, WorldModel
@@ -61,10 +61,10 @@ from video2sim.stages.scene_router import (
 from video2sim.stages.shape_flags import ShapeConfig, judge_all, shape_signals
 from video2sim.stages.track_repair import RepairConfig, RepairReport, repair_tracks
 from video2sim.stages.tracking import (
-    MetaVideoSamClient,
     Track,
     TrackingConfig,
     VideoSamClient,
+    make_tracking_client,
     track_objects,
 )
 
@@ -84,11 +84,10 @@ class SegmentationClients:
 def default_clients(cfg: dict[str, Any]) -> SegmentationClients:
     """Clients for the hosted APIs. Keys come from the environment or ``.env``."""
     router, material = RouterConfig.from_config(cfg), MaterialConfig.from_config(cfg)
-    tracking = TrackingConfig.from_config(cfg)
     return SegmentationClients(
-        make_vlm_client(cfg, router.timeout_s, router.retries),
-        MetaVideoSamClient(read_secret("META_MODEL_API_KEY"), tracking.timeout_s),
-        make_vlm_client(cfg, material.timeout_s, material.retries),
+        make_vlm_client(cfg, router.timeout_s, router.retries, "router"),
+        make_tracking_client(cfg),
+        make_vlm_client(cfg, material.timeout_s, material.retries, "material"),
     )
 
 
@@ -204,6 +203,8 @@ class SegmentationStage:
     dependencies: tuple[StageName, ...] = ("reconstruction",)
     extra_inputs: tuple[Path, ...] = ()
 
+    shared_config = ("vlm",)  # the endpoints behind the router and the material pass
+
     def __init__(
         self,
         clients: Callable[[dict[str, Any]], SegmentationClients] = default_clients,
@@ -217,7 +218,7 @@ class SegmentationStage:
         if self._on_start is not None:
             self._on_start()
         world = ctx.load("reconstruction", WorldModel)
-        cfg: dict[str, Any] = {"segmentation": dict(ctx.config)}
+        cfg: dict[str, Any] = {"segmentation": dict(ctx.config), **ctx.shared}
         work = ctx.run_dir / "segmentation.work"
         work.mkdir(exist_ok=True)
         clients = self._clients(cfg)

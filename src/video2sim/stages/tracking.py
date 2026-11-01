@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import importlib
 import json
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
@@ -28,6 +29,7 @@ from video2sim.models.hosted import (
     file_digest,
     parse_sam_text,
     post_json,
+    read_secret,
     sse_deltas,
 )
 from video2sim.schemas import WorldModel
@@ -77,15 +79,65 @@ class VideoSamClient(Protocol):
         ...
 
 
+@dataclass(frozen=True)
+class TrackingEndpoint:
+    """Where the SAM 3.1 video request goes: ``segmentation.tracking.endpoint``. ``meta_responses``
+    is the Meta Model API's Responses protocol, which a self-hosted server can imitate;
+    ``python:package.module:factory`` loads a factory ``(endpoint, timeout_s) -> VideoSamClient``
+    for a server with another protocol, as long as the client answers in SAM 3.1 text."""
+
+    protocol: str = "meta_responses"
+    url: str = META_URL
+    model: str = SAM_MODEL
+    api_key_env: str | None = "META_MODEL_API_KEY"
+
+    @classmethod
+    def from_config(cls, cfg: Mapping[str, Any]) -> TrackingEndpoint:
+        e = cfg["segmentation"]["tracking"].get("endpoint") or {}
+        protocol = str(e.get("protocol", "meta_responses"))
+        if protocol != "meta_responses" and not protocol.startswith("python:"):
+            raise ValueError(
+                "tracking endpoint protocol must be meta_responses or python:module:factory, "
+                f"got {protocol!r}"
+            )
+        env = e.get("api_key_env", "META_MODEL_API_KEY")
+        return cls(
+            protocol,
+            str(e.get("url", META_URL)),
+            str(e.get("model", SAM_MODEL)),
+            str(env) if env else None,
+        )
+
+
+def make_tracking_client(cfg: Mapping[str, Any]) -> VideoSamClient:
+    """The client of ``segmentation.tracking.endpoint``."""
+    endpoint = TrackingEndpoint.from_config(cfg)
+    timeout_s = TrackingConfig.from_config(dict(cfg)).timeout_s
+    if endpoint.protocol.startswith("python:"):
+        module, _, name = endpoint.protocol.removeprefix("python:").partition(":")
+        if not (module and name):
+            raise ValueError("tracking protocol python: needs python:package.module:factory")
+        client: VideoSamClient = getattr(importlib.import_module(module), name)(endpoint, timeout_s)
+        return client
+    key = read_secret(endpoint.api_key_env) if endpoint.api_key_env else None
+    return MetaVideoSamClient(key, timeout_s, endpoint.url, endpoint.model)
+
+
 class MetaVideoSamClient:
-    def __init__(self, key: str, timeout_s: float = 600.0) -> None:
-        self._key, self._timeout_s = key, timeout_s
+    def __init__(
+        self,
+        key: str | None,
+        timeout_s: float = 600.0,
+        url: str = META_URL,
+        model: str = SAM_MODEL,
+    ) -> None:
+        self._key, self._timeout_s, self._url, self._model = key, timeout_s, url, model
 
     def track(self, video: Path, prompt: str, direction: Direction) -> str:
         # The data URL form is not shown in the docs; it was checked on s01 (2026-10-28).
         url = "data:video/mp4;base64," + base64.b64encode(video.read_bytes()).decode()
         body = {
-            "model": SAM_MODEL,
+            "model": self._model,
             "stream": True,
             "metadata": {"propagation_direction": direction},
             "input": [
@@ -99,7 +151,7 @@ class MetaVideoSamClient:
                 }
             ],
         }
-        raw = post_json(META_URL, self._key, body, self._timeout_s).decode()
+        raw = post_json(self._url, self._key, body, self._timeout_s).decode()
         return "\n".join(sse_deltas(raw))
 
 

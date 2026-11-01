@@ -33,6 +33,7 @@ A failed hosted call fails the stage rather than leaving an object out quietly (
 
 from __future__ import annotations
 
+import importlib
 import json
 from collections.abc import Callable, Mapping, Sequence
 from concurrent.futures import Future, ThreadPoolExecutor
@@ -130,14 +131,32 @@ class ShapeStageConfig:
 ModelFactory = Callable[[dict[str, Any], Path], ShapeModel]
 
 
-def default_model(cfg: dict[str, Any], work: Path) -> ShapeModel:
-    """The hosted model named by ``shape.backend``."""
-    backend = cfg["shape"]["backend"]
-    if backend != "sam3d":
-        raise ValueError(f"shape.backend {backend!r} has no adapter (only sam3d)")
-    from video2sim.models.sam3d import ModalTransport, Sam3d, Sam3dConfig
+def _sam3d_model(cfg: dict[str, Any], work: Path) -> ShapeModel:
+    from video2sim.models.sam3d import Sam3d, Sam3dConfig, make_transport
 
-    return Sam3d(Sam3dConfig.from_config(cfg), ModalTransport(), work / "sam3d_cache")
+    return Sam3d(Sam3dConfig.from_config(cfg), make_transport(cfg), work / "sam3d_cache")
+
+
+# name -> factory. A model that satisfies ``ShapeModel`` plugs in here, or through
+# ``shape.backend: python:package.module:factory`` with a factory of the same signature.
+SHAPE_BACKENDS: dict[str, ModelFactory] = {"sam3d": _sam3d_model}
+
+
+def default_model(cfg: dict[str, Any], work: Path) -> ShapeModel:
+    """The model named by ``shape.backend``."""
+    backend = str(cfg["shape"]["backend"])
+    if backend.startswith("python:"):
+        module, _, name = backend.removeprefix("python:").partition(":")
+        if not (module and name):
+            raise ValueError("shape.backend python: needs the form python:package.module:factory")
+        factory: ModelFactory = getattr(importlib.import_module(module), name)
+        return factory(cfg, work)
+    if backend not in SHAPE_BACKENDS:
+        raise ValueError(
+            f"shape.backend {backend!r} has no adapter (known: {sorted(SHAPE_BACKENDS)} "
+            "or python:package.module:factory)"
+        )
+    return SHAPE_BACKENDS[backend](cfg, work)
 
 
 def load_masks(run_dir: Path, obj: ObjectInstance) -> Masks:

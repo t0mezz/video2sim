@@ -176,6 +176,8 @@ class StageContext:
     dependencies: tuple[StageName, ...]
     output_types: Mapping[StageName, type[BaseModel]]
     checkpoints: dict[str, str] = field(default_factory=dict)
+    # Top-level config sections the stage declared in ``shared_config``, such as ``vlm``
+    shared: Mapping[str, Any] = field(default_factory=dict)
 
     def load(self, stage: StageName, model: type[_T]) -> _T:
         """Typed output of a declared dependency. Its files are under ``run_dir / stage``."""
@@ -330,6 +332,10 @@ class Runner:
         tmp.write_text(manifest.model_dump_json(indent=2))
         os.replace(tmp, run_dir / MANIFEST_FILE)
 
+    def _shared(self, stage: Stage) -> dict[str, Any]:
+        """The top-level sections a stage lists in an optional ``shared_config`` attribute."""
+        return {k: self.config.get(k, {}) for k in getattr(stage, "shared_config", ())}
+
     def _cache_key(self, stage: Stage, manifest: RunManifest, video_sha: str) -> str:
         deps = {dep: manifest.stages[dep].output_sha256 for dep in stage.dependencies}
         extra: dict[str, str] = {}
@@ -346,6 +352,8 @@ class Runner:
             "video": None if stage.dependencies else video_sha,
             "extra": extra,
         }
+        if shared := self._shared(stage):  # absent when empty, so earlier keys stay valid
+            payload["shared"] = shared
         return canonical_sha256(payload)
 
     def _execute(
@@ -361,6 +369,7 @@ class Runner:
             video=video,
             out_dir=tmp,
             config=self.config.get(stage.name, {}),
+            shared=self._shared(stage),
             seed=seed_for(manifest.seed, stage.name),
             dependencies=stage.dependencies,
             output_types=self._output_types,

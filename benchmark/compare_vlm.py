@@ -4,7 +4,7 @@
         --local-url http://localhost:9931/v1
 
 ``spark`` is the hosted Muse Spark Open (``BASETEN_API_KEY``), ``local`` is the OpenAI-compatible
-server of ``vlm.openai_compatible`` (``--local-url`` overrides its ``base_url``). Both get the
+local server (``--local-url`` overrides its ``base_url``). Both get the
 pipeline's own prompts, parsers and images. Inputs are the finished runs in ``runs/`` (router: the
 frames of each scene) and ``runs_instances/`` (material and mass: the crops of each dev object),
 as in ``run_router.py`` and ``run_vlm_mass.py``. Scoring against ground truth:
@@ -221,7 +221,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--runs", type=Path, default=ROOT / "runs")
-    parser.add_argument("--local-url", help="overrides vlm.openai_compatible.base_url")
+    parser.add_argument("--local-url", help="base_url of the local server")
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--tasks", default="router,material,mass")
     parser.add_argument("--limit", type=int, help="only the first N dev objects, for a trial")
@@ -229,9 +229,14 @@ def main() -> None:
     cfg: dict[str, Any] = yaml.safe_load(
         (ROOT / "configs/default.yaml").read_text(encoding="utf-8")
     )
-    cfg["vlm"]["backend"] = "openai_compatible"
-    if args.local_url:
-        cfg["vlm"]["openai_compatible"]["base_url"] = args.local_url
+    # the default config names the hosted model; the local server of docs/model_interfaces.md
+    cfg["vlm"].update(
+        protocol="openai_chat",
+        base_url=args.local_url or "http://localhost:9931/v1",
+        model="muse-glimmer-30B",
+        api_key_env=None,
+        max_tokens=4096,
+    )
     tolerance = float(
         yaml.safe_load((ROOT / "configs/targets.yaml").read_text(encoding="utf-8"))["targets"][
             "mass_tolerance"

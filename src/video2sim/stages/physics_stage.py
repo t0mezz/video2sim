@@ -280,8 +280,10 @@ class PhysicsStage:
     output_type = SimAssets
     dependencies: tuple[StageName, ...] = ("reconstruction", "segmentation", "shape")
 
+    shared_config = ("vlm",)  # the endpoint behind the mass request
+
     def __init__(self, material_table: Path, client: MaterialClient | None = None):
-        """``client`` is the hosted model; by default the one of ``vlm.backend``."""
+        """``client`` is the hosted model; by default the one of the ``vlm`` section."""
         self._table = material_table
         self._client = client
         self.extra_inputs: tuple[Path, ...] = (material_table,)
@@ -294,7 +296,9 @@ class PhysicsStage:
         table = load_material_table(self._table)
         client = self._client
         if client is None and cfg.vlm_mass.enabled:
-            client = make_vlm_client(ctx.config, cfg.vlm_mass.timeout_s, cfg.vlm_mass.retries)
+            client = make_vlm_client(
+                ctx.shared, cfg.vlm_mass.timeout_s, cfg.vlm_mass.retries, "mass"
+            )
         work = ctx.run_dir / "physics.work"
         work.mkdir(exist_ok=True)
 

@@ -26,11 +26,12 @@ Conventions decoded here, read from the SAM 3D source on 2026-10-29
 from __future__ import annotations
 
 import hashlib
+import importlib
 import io
 import json
 import logging
 import threading
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
@@ -119,10 +120,16 @@ class Sam3dTransport(Protocol):
 
 class ModalTransport:
     """Calls the worker deployed from ``models/sam3d_modal.py``. Each call uploads one image
-    and mask to Modal and starts a GPU container if none is warm."""
+    and mask to Modal and starts a GPU container if none is warm. ``app`` and ``cls`` name the
+    deployment (``shape.modal``), so a copy deployed under another name works too."""
 
-    def __init__(self, lookup: Callable[[], Any] | None = None) -> None:
-        self._lookup = lookup or _deployed_worker
+    def __init__(
+        self,
+        lookup: Callable[[], Any] | None = None,
+        app: str | None = None,
+        cls: str | None = None,
+    ) -> None:
+        self._lookup = lookup or (lambda: _deployed_worker(app, cls))
         self._worker: Any = None
         self._lock = threading.Lock()
 
@@ -135,13 +142,46 @@ class ModalTransport:
         )
         return Sam3dAnswer(glb=bytes(out["glb"]), pose_json=str(out["pose_json"]))
 
+    def warm(self, count: int, hold_s: float) -> None:
+        """Optional capability: see ``start_warm_up``."""
+        warm_in_background(count, hold_s, self._lookup)
 
-def _deployed_worker() -> Any:
+
+def _deployed_worker(app: str | None = None, cls: str | None = None) -> Any:
     import modal
 
     from video2sim.models.sam3d_modal import APP_NAME, WORKER_CLASS
 
-    return modal.Cls.from_name(APP_NAME, WORKER_CLASS)()
+    return modal.Cls.from_name(app or APP_NAME, cls or WORKER_CLASS)()
+
+
+def make_transport(cfg: Mapping[str, Any]) -> Sam3dTransport:
+    """The transport named by ``shape.transport``: ``modal`` (the default), ``http`` or
+    ``python:package.module:factory``, a factory ``(cfg) -> Sam3dTransport``."""
+    shape = cfg["shape"]
+    name = str(shape.get("transport", "modal"))
+    if name == "modal":
+        m = shape.get("modal") or {}
+        return ModalTransport(app=m.get("app"), cls=m.get("cls"))
+    if name == "http":
+        from video2sim.models.sam3d_http import HttpConfig, HttpTransport
+
+        return HttpTransport(HttpConfig.from_config(cfg))
+    if name.startswith("python:"):
+        module, _, attr = name.removeprefix("python:").partition(":")
+        if not (module and attr):
+            raise ValueError("shape.transport python: needs the form python:package.module:factory")
+        transport: Sam3dTransport = getattr(importlib.import_module(module), attr)(cfg)
+        return transport
+    raise ValueError(f"shape.transport must be modal, http or python:module:factory, got {name!r}")
+
+
+def start_warm_up(transport: object, count: int, hold_s: float) -> None:
+    """Warm the transport's GPU workers in the background, if it can and ``count`` asks for it.
+    Transports without a ``warm`` method (HTTP servers, which are already running) do nothing."""
+    warm = getattr(transport, "warm", None)
+    if count > 0 and callable(warm):
+        warm(count, hold_s)
 
 
 def warm_containers(

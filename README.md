@@ -36,8 +36,9 @@ uv run pytest -m "not gpu and not slow and not network"   # fast tests, no GPU o
 uv run video2sim run my_table.mp4 --out scene/            # film first, see below
 ```
 
-The VLM can also be a local OpenAI-compatible server instead of Baseten:
-[docs/vlm_backends.md](docs/vlm_backends.md).
+Every model endpoint (VLM, SAM 3D, SAM 3.1) is configurable, so you can point the pipeline at your
+own instance or swap in an equivalent model: [docs/model_interfaces.md](docs/model_interfaces.md).
+`uv run video2sim doctor` checks the endpoints before a run.
 
 ## Make a scene
 
@@ -64,5 +65,5 @@ and see `benchmark/run_pick_place.py`.
 | [AGENTS.md](AGENTS.md) | Conventions and working rules, for people and coding agents. |
 | [benchmark/README.md](benchmark/README.md) | How benchmark scenes and ground truth are laid out. |
 | [docs/capture_protocol.md](docs/capture_protocol.md) | How to film a scene. |
-| [docs/vlm_backends.md](docs/vlm_backends.md) | Pointing the VLM calls at Baseten or any OpenAI-compatible server. |
+| [docs/model_interfaces.md](docs/model_interfaces.md) | Hooking up your own VLM, SAM 3D and SAM 3.1 instances, or swapping the models. |
 | [docs/licenses.md](docs/licenses.md) | License status of every model and tool we depend on. |
