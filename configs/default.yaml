@@ -46,6 +46,14 @@ reconstruction:
     max_tag_scale_spread: 0.03        # TODO(P1.6): tag-to-tag scale disagreement that is flagged; a guess
     max_tag_fit_rms_m: 0.005          # TODO(P1.6): grid-board fit residual, benchmark check only
 
+vlm:                           # the model behind the router, the material pass and vlm_mass; see docs/vlm_backends.md
+  backend: baseten             # "baseten" (key BASETEN_API_KEY) or "openai_compatible"
+  openai_compatible:           # any OpenAI chat-completions server with image input (llama.cpp, vLLM, Ollama)
+    base_url: http://localhost:9931/v1   # /chat/completions is appended
+    model: muse-glimmer-30B
+    api_key_env: null          # name of an environment variable or .env entry; null sends no Authorization header
+    max_tokens: 1024           # caps the answer; null leaves it to the server
+
 segmentation:
   sam_backend: null            # "api" or "self_hosted", see PLAN.md decision D-004
   router:                      # P2.1/P2.2: one VLM request per scene picks the SAM prompt and lists the objects

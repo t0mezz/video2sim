@@ -21,7 +21,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
 
-from video2sim.models.hosted import BASETEN_MODEL, ResponseCache, image_data_url
+from video2sim.models.hosted import ResponseCache, image_data_url
+from video2sim.models.vlm import cache_model
 from video2sim.schemas import WorldModel
 from video2sim.stages.segmentation import sample_frame_indices
 
@@ -162,7 +163,7 @@ def route_scene(
     picks = [world.frames[i] for i in sample_frame_indices(len(world.frames), cfg.n_frames)]
     images = [run_dir / f.image_path for f in picks]
     prompt = build_prompt(cfg)
-    key = [prompt, BASETEN_MODEL, *(image_data_url(p) for p in images)]
+    key = [prompt, cache_model(client), *(image_data_url(p) for p in images)]
     try:
         raw = cache.get_or_call(key, lambda: client.ask(prompt, images))
     except Exception as e:  # a failed call must not stop the scene
