@@ -153,7 +153,7 @@ def test_vlm_section_reaches_the_stages_that_share_it_and_enters_their_cache_key
     from video2sim.stages.shape import ShapeStage
 
     runner = Runner(tmp_path, [], {"vlm": {"model": "a"}}, tmp_path)
-    assert runner._shared(SegmentationStage()) == {"vlm": {"model": "a"}}
+    assert runner._shared(SegmentationStage()) == {"vlm": {"model": "a"}, "capture": {}}
     assert runner._shared(PhysicsStage(tmp_path / "t.yaml")) == {"vlm": {"model": "a"}}
     assert runner._shared(ShapeStage()) == {}
 

@@ -84,6 +84,13 @@ segmentation:
     fps: 5                     # frame rate of the clip sent; billed per frame, at least 50 (dev.meta.ai pricing)
     direction: both            # propagation_direction: "both", "forward" or "backward"
     timeout_s: 600             # a long clip can take minutes to answer
+    marker_filter:             # drops tracks that sit on an ArUco tag OpenCV decoded in that frame (a covered tag would not decode), stages/marker_filter.py
+      enabled: true
+      erode_px: 2              # detected tag quads shrink by this much, so mask bleed at the edge does not count
+      min_mask_share: 0.2      # a frame is a hit when this share of the mask lies in the tags ...
+      min_tag_share: 0.2       # ... or this share of the tags lies in the mask
+      min_hit_frames: 2        # a track is dropped with at least this many hit frames ...
+      min_hit_fraction: 0.2    # ... and this share of its frames where a tag was detected
     repair:                    # 3D identity repair; thresholds are guesses until tuned on dev scenes
       merge_radius_m: 0.05     # tracks with no shared frame whose table footprints are this close are one object
       split_gap_m: 0.10        # a track whose footprints fall into groups this far apart is two objects

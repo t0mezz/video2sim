@@ -42,6 +42,7 @@ from video2sim.schemas import Flag, Instances, ObjectInstance, StageName, WorldM
 from video2sim.stages.depth_flags import DepthConfig, depth_signals, judge
 from video2sim.stages.keyframes import KeyframeChoice, KeyframeConfig, keyframes_for_tracks
 from video2sim.stages.lift import LiftConfig, lift_points, lift_tracks, load_points
+from video2sim.stages.marker_filter import MarkerFilterConfig, filter_marker_tracks
 from video2sim.stages.material_pass import (
     MaterialClient,
     MaterialConfig,
@@ -203,7 +204,7 @@ class SegmentationStage:
     dependencies: tuple[StageName, ...] = ("reconstruction",)
     extra_inputs: tuple[Path, ...] = ()
 
-    shared_config = ("vlm",)  # the endpoints behind the router and the material pass
+    shared_config = ("vlm", "capture")  # the model endpoints; the tag family of the marker filter
 
     def __init__(
         self,
@@ -241,6 +242,11 @@ class SegmentationStage:
             tcfg,
             work / "tracking_work",
         )
+        raw, marker_report = filter_marker_tracks(
+            raw, world, ctx.run_dir, MarkerFilterConfig.from_config(cfg)
+        )
+        for track_id, reason in marker_report.dropped.items():
+            scene_flags.append(f"track {track_id} dropped as a marker: {reason}")
         poses = {f.frame_index: f.T_world_from_camera for f in world.frames}
         repaired, report = repair_tracks(
             raw, poses, world.intrinsics, world.table_plane, RepairConfig.from_config(cfg)
