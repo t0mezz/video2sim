@@ -10,6 +10,7 @@ from video2sim.runner import (
     Runner,
     RunnerError,
     StageContext,
+    StageEvent,
     StageFailed,
     seed_for,
 )
@@ -291,3 +292,40 @@ def test_seeds_differ_per_stage_and_are_stable() -> None:
     assert seed_for(0, "capture") != seed_for(0, "shape")
     assert seed_for(0, "capture") == seed_for(0, "capture")
     assert seed_for(0, "capture") != seed_for(1, "capture")
+
+
+def test_events_report_each_stage_and_then_a_cache_hit(
+    tmp_path: Path, video: Path, stages: tuple[FakeStage, ...]
+) -> None:
+    events: list[StageEvent] = []
+    runner = Runner(
+        tmp_path / "runs", stages, {"seed": 0}, base_dir=tmp_path, on_event=events.append
+    )
+    runner.run(video, run_id="r1")
+    assert [(e.kind, e.stage, e.index, e.total) for e in events] == [
+        ("started", "capture", 1, 3),
+        ("done", "capture", 1, 3),
+        ("started", "reconstruction", 2, 3),
+        ("done", "reconstruction", 2, 3),
+        ("started", "segmentation", 3, 3),
+        ("done", "segmentation", 3, 3),
+    ]
+    assert all(e.seconds is not None and e.seconds >= 0 for e in events if e.kind == "done")
+    events.clear()
+    runner.run(video, run_id="r1")
+    assert [e.kind for e in events] == ["cached", "cached", "cached"]
+
+
+def test_a_failing_stage_reports_failed_with_its_message(
+    tmp_path: Path, video: Path, stages: tuple[FakeStage, ...]
+) -> None:
+    stages[1].fail = True
+    events: list[StageEvent] = []
+    runner = Runner(
+        tmp_path / "runs", stages, {"seed": 0}, base_dir=tmp_path, on_event=events.append
+    )
+    with pytest.raises(StageFailed):
+        runner.run(video, run_id="r1")
+    last = events[-1]
+    assert (last.kind, last.stage) == ("failed", "reconstruction")
+    assert last.message and last.seconds is not None

@@ -22,11 +22,11 @@ import os
 import shutil
 import subprocess
 import time
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Protocol, TypeVar
+from typing import Any, Literal, Protocol, TypeVar
 
 from pydantic import BaseModel
 
@@ -54,6 +54,25 @@ class StageFailed(Exception):
         super().__init__(f"stage {stage!r} failed: {record.message}")
         self.stage = stage
         self.manifest = manifest
+
+
+@dataclass(frozen=True)
+class StageEvent:
+    """What the runner tells a listener: a stage is cached, starts, finishes or fails.
+
+    ``index`` counts from 1 over the stages this runner has. ``seconds`` is set on ``done`` and
+    ``failed``, ``message`` on ``failed``.
+    """
+
+    kind: Literal["cached", "started", "done", "failed"]
+    stage: StageName
+    index: int
+    total: int
+    seconds: float | None = None
+    message: str | None = None
+
+
+EventHandler = Callable[[StageEvent], None]
 
 
 # ---------------------------------------------------------------------------
@@ -176,8 +195,10 @@ class Runner:
         stages: Sequence[Stage],
         config: Mapping[str, Any],
         base_dir: Path | None = None,
+        on_event: EventHandler | None = None,
     ) -> None:
-        """``base_dir`` is where relative ``extra_inputs`` are resolved (default: cwd)."""
+        """``base_dir`` is where relative ``extra_inputs`` are resolved (default: cwd).
+        ``on_event`` hears about every stage; it is how a command line shows progress."""
         names = [stage.name for stage in stages]
         order = [name for name in STAGE_ORDER if name in names]
         if names != order or len(set(names)) != len(names):
@@ -192,6 +213,7 @@ class Runner:
         self.stages = list(stages)
         self.config = config
         self.base_dir = base_dir or Path.cwd()
+        self._on_event = on_event
         self._output_types: dict[StageName, type[BaseModel]] = {
             stage.name: stage.output_type for stage in stages
         }
@@ -232,11 +254,26 @@ class Runner:
                 and record.input_sha256 == key
                 and (run_dir / stage.name).is_dir()
             ):
+                self._emit("cached", stage.name)
                 continue
             manifest = self._execute(stage, run_dir, video, manifest, key)
         return manifest
 
     # -- internals -----------------------------------------------------------------------
+
+    def _emit(
+        self,
+        kind: Literal["cached", "started", "done", "failed"],
+        stage: StageName,
+        seconds: float | None = None,
+        message: str | None = None,
+    ) -> None:
+        if self._on_event is None:
+            return
+        names = [s.name for s in self.stages]
+        self._on_event(
+            StageEvent(kind, stage, names.index(stage) + 1, len(names), seconds, message)
+        )
 
     @staticmethod
     def _new_run_id(video_sha: str) -> str:
@@ -307,6 +344,7 @@ class Runner:
             output_types=self._output_types,
         )
         start = time.perf_counter()
+        self._emit("started", stage.name)
         try:
             output = stage.run(ctx)
             if not isinstance(output, stage.output_type):
@@ -327,6 +365,7 @@ class Runner:
             )
             manifest = self._with_record(manifest, stage.name, failed)
             self._write_manifest(run_dir, manifest)
+            self._emit("failed", stage.name, failed.seconds, failed.message)
             raise StageFailed(stage.name, manifest) from error
 
         shutil.rmtree(final, ignore_errors=True)
@@ -339,6 +378,7 @@ class Runner:
         )
         manifest = self._with_record(manifest, stage.name, done, ctx.checkpoints)
         self._write_manifest(run_dir, manifest)
+        self._emit("done", stage.name, done.seconds)
         return manifest
 
     @staticmethod

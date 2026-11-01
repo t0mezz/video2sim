@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from video2sim.models.sam3d import Sam3dConfig, warm_in_background
-from video2sim.runner import Runner
+from video2sim.runner import EventHandler, Runner
 from video2sim.stages.capture import CaptureStage
 from video2sim.stages.export import ExportStage, export_stage_config
 from video2sim.stages.physics_stage import PhysicsStage, physics_stage_config
@@ -16,7 +16,11 @@ from video2sim.stages.shape import ShapeStage
 
 
 def build_runner(
-    runs_root: Path, cfg: dict[str, Any], targets: dict[str, Any], base_dir: Path
+    runs_root: Path,
+    cfg: dict[str, Any],
+    targets: dict[str, Any],
+    base_dir: Path,
+    on_event: EventHandler | None = None,
 ) -> Runner:
     """``cfg`` is ``configs/default.yaml`` and ``targets`` is ``configs/targets.yaml``."""
     sam3d = Sam3dConfig.from_config(cfg)
@@ -45,6 +49,7 @@ def build_runner(
             "export": export_stage_config(cfg, targets),
         },
         base_dir,
+        on_event,
     )
 
 

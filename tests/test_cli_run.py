@@ -38,7 +38,7 @@ def run_cli(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fail: bool) -> int:
     )
     runs = tmp_path / "runs"
     monkeypatch.setattr(
-        "video2sim.pipeline.build_runner", lambda *a: FakeRunner(manifest, runs, fail)
+        "video2sim.pipeline.build_runner", lambda *a, **k: FakeRunner(manifest, runs, fail)
     )
     return cli.main(["run", "v.mp4", "--out", str(tmp_path / "scene"), "--runs", str(runs)])
 
@@ -54,3 +54,28 @@ def test_a_failed_stage_exits_1_and_writes_no_package(
 ) -> None:
     assert run_cli(tmp_path, monkeypatch, fail=True) == 1
     assert not (tmp_path / "scene").exists()
+
+
+def test_progress_goes_to_a_handler_unless_quiet(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    seen: list[Any] = []
+
+    def build(*a: Any, on_event: Any = None) -> FakeRunner:
+        seen.append(on_event)
+        return FakeRunner(manifest, tmp_path / "runs", False)
+
+    manifest = RunManifest(
+        run_id="r1",
+        created_utc="2026-10-31T00:00:00Z",
+        input_video_sha256="a",
+        config_sha256="b",
+        code_version=None,
+        seed=0,
+    )
+    monkeypatch.setattr("video2sim.pipeline.build_runner", build)
+    base = ["run", "v.mp4", "--runs", str(tmp_path / "runs")]
+    assert cli.main([*base, "--out", str(tmp_path / "a")]) == 0
+    (tmp_path / "runs" / "r1").rename(tmp_path / "runs" / "r0")
+    assert cli.main([*base, "--out", str(tmp_path / "b"), "--quiet"]) == 0
+    assert callable(seen[0]) and seen[1] is None

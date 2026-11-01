@@ -171,6 +171,9 @@ def run_sfm(
 
     import pycolmap
 
+    # COLMAP logs its feature, matching and mapper progress to stderr, thousands of lines a run.
+    pycolmap.logging.minloglevel = pycolmap.logging.Level.ERROR.value
+    pycolmap.logging.alsologtostderr = False
     opt = options or SfmOptions()
     frames = sorted(frames_dir.glob("*.png"))
     n_input = len(frames)

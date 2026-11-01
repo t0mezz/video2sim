@@ -21,6 +21,7 @@ from video2sim.evaluation.metrics import SceneResult, evaluate_scene
 from video2sim.evaluation.report import build_report, write_html, write_json
 from video2sim.evaluation.scenes import GtScene, Prediction, discover_scenes
 from video2sim.evaluation.segmentation import load_instances, summarize_segmentation
+from video2sim.progress import ProgressReporter
 from video2sim.runner import MANIFEST_FILE, OUTPUT_FILE, StageFailed, _code_version, sha256_file
 from video2sim.schemas import WorldModel
 
@@ -118,6 +119,7 @@ def _build_parser() -> argparse.ArgumentParser:
     run.add_argument("--run-id", help="resume this run; default: a new id from time and video")
     run.add_argument("--config", type=Path, default=Path("configs/default.yaml"))
     run.add_argument("--targets", type=Path, default=Path("configs/targets.yaml"))
+    run.add_argument("--quiet", action="store_true", help="no progress on stderr")
     return parser
 
 
@@ -181,12 +183,16 @@ def run_pipeline(args: argparse.Namespace) -> int:
 
     cfg: dict[str, Any] = yaml.safe_load(args.config.read_text(encoding="utf-8"))
     targets: dict[str, Any] = yaml.safe_load(args.targets.read_text(encoding="utf-8"))
-    runner = build_runner(args.runs, cfg, targets, Path.cwd())
+    reporter = None if args.quiet else ProgressReporter(sys.stderr)
+    runner = build_runner(args.runs, cfg, targets, Path.cwd(), on_event=reporter)
     try:
         manifest = runner.run(args.video, run_id=args.run_id)
     except StageFailed as error:
         print(str(error), file=sys.stderr)
         return 1
+    finally:
+        if reporter is not None:
+            reporter.close()
     run_dir = args.runs / manifest.run_id
     shutil.copytree(run_dir / "export", args.out, dirs_exist_ok=True)
     shutil.copy2(run_dir / MANIFEST_FILE, args.out / MANIFEST_FILE)
