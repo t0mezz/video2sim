@@ -19,6 +19,8 @@ The pieces are the ones built in P2.1 to P2.5, in this order:
 
 A track with no hull is dropped and named in ``Instances.flags``, so the objects in the
 output all have geometry; an object the router listed but no track covers is named there too.
+``route.json`` records the router's path (surface, prompt, listed objects, reason) and the raw
+and repaired track counts with splits and merges.
 Hosted answers are cached in ``segmentation.work/`` (outside the hashed stage folder, like
 ``reconstruction.work/``), so a rerun with the same inputs makes no call. Hosted clients are
 built by ``clients`` and can be replaced in tests.
@@ -53,6 +55,7 @@ from video2sim.stages.material_pass import (
 )
 from video2sim.stages.primitive_fit import FitResult, PrimitiveConfig, fit_clusters
 from video2sim.stages.scene_router import (
+    Route,
     RouterClient,
     RouterConfig,
     compare_counts,
@@ -90,6 +93,24 @@ def default_clients(cfg: dict[str, Any]) -> SegmentationClients:
         make_tracking_client(cfg),
         make_vlm_client(cfg, material.timeout_s, material.retries, "material"),
     )
+
+
+def route_report(
+    route: Route, raw: list[Track], repaired: list[Track], report: RepairReport
+) -> dict[str, Any]:
+    """JSON-serializable tracking summary for ``route.json``: the router's path and what
+    tracking and 3D repair made of it. Counts and names only, so it is deterministic."""
+    return {
+        "surface": route.surface,
+        "prompt": route.prompt,
+        "objects": list(route.objects),
+        "reason": route.reason,
+        "fell_back": route.fell_back,
+        "tracks_raw": len(raw),
+        "tracks_repaired": len(repaired),
+        "splits": [[a, list(b)] for a, b in report.splits],
+        "merges": [list(m) for m in report.merges],
+    }
 
 
 def repaired_ids(report: RepairReport) -> set[int]:
@@ -250,6 +271,10 @@ class SegmentationStage:
         poses = {f.frame_index: f.T_world_from_camera for f in world.frames}
         repaired, report = repair_tracks(
             raw, poses, world.intrinsics, world.table_plane, RepairConfig.from_config(cfg)
+        )
+        (ctx.out_dir / "route.json").write_text(
+            json.dumps(route_report(route, raw, repaired, report), indent=2) + "\n",
+            encoding="utf-8",
         )
 
         hulls, hull_report = lift_tracks(repaired, world, lift_cfg)
