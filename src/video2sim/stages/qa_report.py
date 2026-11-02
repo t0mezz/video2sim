@@ -2,8 +2,9 @@
 
 It shows every object, exported or not, with what could be wrong with it. The mass source and
 range are always shown, since masses may be off by more than 30% on about half of the objects
-(D-026). Stability comes from the physics stage and the URDF check in MuJoCo only: Isaac Sim is
-not run (D-027), and the report says so.
+(D-026). Each row also carries the visual mesh polygon count, which tells a light proxy hull
+from a dense generative mesh at a glance. Stability comes from the physics stage and the URDF
+check in MuJoCo only: Isaac Sim is not run (D-027), and the report says so.
 """
 
 from __future__ import annotations
@@ -11,7 +12,7 @@ from __future__ import annotations
 import html
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from video2sim.schemas import (
     Instances,
@@ -24,6 +25,21 @@ from video2sim.schemas import (
 VALIDATED_IN = "MuJoCo (D-027); Isaac Sim and PhysX not verified"
 
 
+def _mesh_counts(run_dir: Path, relpath: str) -> tuple[int | None, int | None]:
+    """(vertices, faces) of the visual mesh, or Nones when it cannot be read.
+
+    Export reads every visual mesh before the report is built, so a failure here means
+    the file changed under us; the row shows a dash instead of failing the stage.
+    """
+    import trimesh  # heavy import, kept out of module import time
+
+    try:
+        mesh = cast("trimesh.Trimesh", trimesh.load(run_dir / relpath, force="mesh", process=False))
+        return len(mesh.vertices), len(mesh.faces)
+    except Exception:
+        return None, None
+
+
 def _object_row(
     asset: Any,
     instance: Any,
@@ -31,9 +47,11 @@ def _object_row(
     physics: dict[str, Any],
     settling: dict[str, dict[str, Any]],
     skipped: dict[str, list[str]],
+    mesh_counts: dict[str, tuple[int | None, int | None]],
 ) -> dict[str, Any]:
     name = asset.object_id
     p = asset.properties
+    vertices, faces = mesh_counts.get(name, (None, None))
     drifts: dict[str, float] = {}
     stable = True
     for case, result in settling.items():
@@ -50,6 +68,8 @@ def _object_row(
         "skip_reasons": skipped.get(name, []),
         "geometry_source": registered.geometry_source,
         "fit_score": registered.fit_score,
+        "vertices": vertices,
+        "faces": faces,
         "collision_kind": physics["collision_kind"],
         "collision_parts": physics["collision_parts"],
         "material_class": p.material_class,
@@ -68,6 +88,7 @@ def _object_row(
 
 def build_report(
     run_id: str,
+    run_dir: Path,
     world: WorldModel,
     instances: Instances,
     registered: RegisteredObjects,
@@ -81,6 +102,7 @@ def build_report(
     by_instance = {o.object_id: o for o in instances.objects}
     by_shape = {o.object_id: o for o in registered.objects}
     reasons = {s.object_id: s.reasons for s in skipped}
+    mesh_counts = {a.object_id: _mesh_counts(run_dir, a.visual_mesh_path) for a in assets.assets}
     rows = [
         _object_row(
             a,
@@ -89,6 +111,7 @@ def build_report(
             physics[a.object_id],
             settling,
             reasons,
+            mesh_counts,
         )
         for a in assets.assets
     ]
@@ -128,9 +151,9 @@ def _cell(value: object) -> str:
 
 def _html(report: dict[str, Any]) -> str:
     columns = (
-        "object", "label", "status", "geometry", "fit", "collision", "material", "confidence",
-        "mass source", "mass kg (low / nominal / high)", "friction", "restitution", "drift cm",
-        "stable", "flags and notes",
+        "object", "label", "status", "geometry", "fit", "polygons", "collision", "material",
+        "confidence", "mass source", "mass kg (low / nominal / high)", "friction", "restitution",
+        "drift cm", "stable", "flags and notes",
     )  # fmt: skip
     rows = []
     for o in report["objects"]:
@@ -141,6 +164,7 @@ def _html(report: dict[str, Any]) -> str:
             o["status"],
             o["geometry_source"],
             "-" if o["fit_score"] is None else f"{o['fit_score']:.2f}",
+            "-" if o["faces"] is None else str(o["faces"]),
             f"{o['collision_kind']} ({o['collision_parts']})",
             o["material_class"] + (" hollow" if o["is_hollow"] else ""),
             f"{o['confidence']:.2f}",

@@ -177,6 +177,7 @@ class ExportStage:
         )
         report = build_report(
             ctx.run_dir.name,
+            ctx.run_dir,
             world,
             instances,
             registered,
