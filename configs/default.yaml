@@ -67,6 +67,16 @@ segmentation:
     default_surface: table     # used when the call fails or the answer cannot be read
     timeout_s: 300
     retries: 3
+    views:                       # S12.9: router view selection; mode even keeps n_frames above
+      mode: even                 # even or coverage (set cover over the workspace, 9.3)
+      count: 6                   # views picked in coverage mode
+      cell_m: 0.02               # workspace grid step; guesses until tuned on dev (S12.9)
+      probe_heights_m: [0.03, 0.10]  # a cell must be seen at both heights above the plane
+      min_views_per_cell: 2      # views that must see a cell unoccluded
+      workspace_margin_m: 0.10   # grid extends this far past the cloud footprint
+      max_image_px: 1024         # router images are downscaled to this long side (9.4)
+      table_margin_m: 0.003      # points below this above the plane are the table (as in lift)
+      max_height_m: 0.35         # points above this are not workspace (as in lift)
     pool:                      # surface key -> description shown to the model, SAM concept prompt
       table:
         description: a table, desk or board
