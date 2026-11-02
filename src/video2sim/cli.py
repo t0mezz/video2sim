@@ -11,17 +11,20 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-import numpy as np
 import yaml
-from numpy.typing import NDArray
 
 from video2sim.evaluation import baselines
-from video2sim.evaluation.alignment import align_scene
+from video2sim.evaluation.alignment import BoardAlignment, align_scene
 from video2sim.evaluation.loader import load_run
 from video2sim.evaluation.metrics import SceneResult, evaluate_scene
 from video2sim.evaluation.report import build_report, write_html, write_json
 from video2sim.evaluation.scenes import GtScene, Prediction, discover_scenes
-from video2sim.evaluation.segmentation import load_instances, summarize_segmentation
+from video2sim.evaluation.segmentation import (
+    load_instances,
+    load_tracks,
+    score_tracks,
+    summarize_segmentation,
+)
 from video2sim.progress import ProgressReporter
 from video2sim.runner import (
     MANIFEST_FILE,
@@ -31,13 +34,16 @@ from video2sim.runner import (
     _code_version,
     sha256_file,
 )
-from video2sim.schemas import WorldModel
+from video2sim.schemas import SE3, WorldModel
 
 SPLIT_CHOICES = {"dev": ["dev"], "test": ["test"], "all": ["dev", "test"]}
 
 
 def _predict(
-    args: argparse.Namespace, scene: GtScene, segmentation_flags: dict[str, dict[str, Any]]
+    args: argparse.Namespace,
+    scene: GtScene,
+    segmentation_flags: dict[str, dict[str, Any]],
+    track_switches: dict[str, int] | None = None,
 ) -> Prediction:
     if args.baseline == "oracle":
         return baselines.oracle(
@@ -52,17 +58,45 @@ def _predict(
         return baselines.constant_box()
     if args.stage == "segmentation":
         run_dir = args.runs / scene.scene_id
-        run = load_instances(run_dir, _board_from_world(args, scene, run_dir))
+        alignment = _board_from_world(args, scene, run_dir)
+        run = load_instances(run_dir, alignment.T_board_from_world)
         segmentation_flags[scene.scene_id] = dict(run.flags)
+        if track_switches is not None:
+            try:
+                track_switches[scene.scene_id] = _count_switches(scene, run_dir, alignment)
+            except (OSError, ValueError) as error:
+                print(f"{scene.scene_id}: no track data ({error})", file=sys.stderr)
         return run.prediction
     run_dir = args.runs / scene.scene_id
-    return load_run(run_dir, _board_from_world(args, scene, run_dir))
+    return load_run(run_dir, _board_from_world(args, scene, run_dir).T_board_from_world)
 
 
-def _board_from_world(
-    args: argparse.Namespace, scene: GtScene, run_dir: Path
-) -> NDArray[np.float64]:
-    """``T_board_from_world`` of a run, so its clusters meet the board-frame ground truth.
+def _count_switches(scene: GtScene, run_dir: Path, alignment: BoardAlignment) -> int:
+    """Identity switches of the repaired tracks against the scene ground truth.
+
+    Raises OSError when files are missing and ValueError when the data does not fit.
+    """
+    world = WorldModel.model_validate_json(
+        (run_dir / "reconstruction" / OUTPUT_FILE).read_text(encoding="utf-8")
+    )
+    tracks = load_tracks(run_dir)
+    if not tracks:
+        raise ValueError("no track masks")
+    sample = next(iter(next(iter(tracks.values())).values()))
+    if sample.shape != (world.intrinsics.height_px, world.intrinsics.width_px):
+        raise ValueError("track masks do not match the reconstruction resolution")
+    frames = {f.frame_index: f for f in world.frames}
+    poses: dict[int, SE3] = {}
+    for masks in tracks.values():
+        for frame in masks:
+            if frame not in frames:
+                raise ValueError(f"track frame {frame} has no camera pose")
+            poses.setdefault(frame, alignment.pose_in_board(frames[frame].T_world_from_camera))
+    return score_tracks(scene.objects, world.intrinsics, poses, tracks).switches
+
+
+def _board_from_world(args: argparse.Namespace, scene: GtScene, run_dir: Path) -> BoardAlignment:
+    """Board alignment of a run, so its clusters meet the board-frame ground truth.
 
     Raises ``ValueError`` for a clean-board scene whose origin is not established, which the
     caller reports as a scene without a usable prediction."""
@@ -75,7 +109,7 @@ def _board_from_world(
     )
     if alignment is None:
         raise ValueError("clean board: origin of the ground truth is not established")
-    return alignment.T_board_from_world
+    return alignment
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -166,13 +200,14 @@ def run_eval(args: argparse.Namespace) -> int:
 
     results: list[SceneResult] = []
     segmentation_flags: dict[str, dict[str, Any]] = {}
+    track_switches: dict[str, int] = {}
     unpredicted: list[str] = []
     deformable = [s.scene_id for s in scenes if s.has_deformable and args.scene is None]
     for scene in scenes:
         if scene.scene_id in deformable:
             continue
         try:
-            prediction = _predict(args, scene, segmentation_flags)
+            prediction = _predict(args, scene, segmentation_flags, track_switches)
         except (OSError, ValueError) as error:
             print(f"{scene.scene_id}: no usable prediction ({error})", file=sys.stderr)
             unpredicted.append(scene.scene_id)
@@ -191,11 +226,11 @@ def run_eval(args: argparse.Namespace) -> int:
     }
     report = build_report(results, targets, header, missing)
     if args.stage == "segmentation" or (args.baseline and args.baseline != "constant"):
-        # Identity switches need track masks, which no loader reads yet (P2.2): no_data.
+        # Baselines have no tracks, so their switches row stays no_data.
         report["segmentation"] = summarize_segmentation(
             results,
             {k: {o: tuple(f) for o, f in v.items()} for k, v in segmentation_flags.items()},
-            {},
+            track_switches,
             targets.get("gates", {}).get("segmentation", {}),
             targets["targets"].get("object_recall_min"),
         )

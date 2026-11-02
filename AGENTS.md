@@ -63,8 +63,8 @@ It defaults to the dev split; `--split test` is for phase gates only, and `--sce
 scores one scene. `--stage segmentation` scores the point clusters in `segmentation/output.json`
 (moved into the ground-truth board frame by `evaluation/alignment.py:align_scene`; a clean-board
 scene outside `CLEAN_ALIGNED` has no usable prediction) instead of the shape meshes and adds a Phase 2 section (cluster box error on easy scenes,
-identity switches, flags on s17 to s20; switches stay `no_data` in the report until the
-`--stage segmentation` path reads `segmentation/tracks/`, see `benchmark/run_tracking.py`). Scenes with a deformable object are left out (D-014) unless named with `--scene`. It writes `report.json` and `report.html` and exits 0 unless
+identity switches, flags on s17 to s20; switches stay `no_data` for baselines and for runs
+without repaired track masks in `segmentation/masks/`, see `benchmark/run_tracking.py`). Scenes with a deformable object are left out (D-014) unless named with `--scene`. It writes `report.json` and `report.html` and exits 0 unless
 `--fail-on-target` is given. The metric definitions are decision D-012 in `PLAN.md`.
 
 CI (`.github/workflows/ci.yml`) runs ruff check, `ruff format --check`, mypy and the fast

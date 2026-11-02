@@ -58,6 +58,42 @@ def _load_points(path: Path) -> NDArray[np.float64]:
     return np.asarray(cloud.vertices, dtype=np.float64)
 
 
+def load_tracks(run_dir: Path) -> dict[int, dict[int, BoolMask]]:
+    """Track masks by track id then frame, read from ``segmentation/masks/obj_*/``.
+
+    These are the repaired, kept tracks: object ids mirror track ids (``obj_{id:03d}``).
+    Directories that do not parse as tracks, frames that do not parse, and unreadable
+    masks are skipped; an empty result means the run has no usable track data.
+    """
+    import cv2  # heavy import, kept out of module import time
+
+    tracks: dict[int, dict[int, BoolMask]] = {}
+    masks_dir = run_dir / "segmentation" / "masks"
+    if not masks_dir.is_dir():
+        return tracks
+    for obj_dir in sorted(masks_dir.iterdir()):
+        parts = obj_dir.name.split("_")
+        if len(parts) != 2 or parts[0] != "obj" or not obj_dir.is_dir():
+            continue
+        try:
+            track_id = int(parts[1])
+        except ValueError:
+            continue
+        frames: dict[int, BoolMask] = {}
+        for png in sorted(obj_dir.glob("*.png")):
+            try:
+                frame = int(png.stem)
+            except ValueError:
+                continue
+            mask = cv2.imread(str(png), cv2.IMREAD_GRAYSCALE)
+            if mask is None:
+                continue
+            frames[frame] = mask > 0
+        if frames:
+            tracks[track_id] = frames
+    return tracks
+
+
 def load_instances(
     run_dir: Path, T_board_from_world: NDArray[np.float64] | None = None
 ) -> SegmentationRun:

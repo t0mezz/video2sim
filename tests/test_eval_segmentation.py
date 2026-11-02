@@ -13,15 +13,18 @@ from video2sim.evaluation.baselines import oracle
 from video2sim.evaluation.metrics import evaluate_scene
 from video2sim.evaluation.scenes import GtObject, GtScene
 from video2sim.evaluation.segmentation import (
+    BoolMask,
     assign_mask,
     count_id_switches,
     load_instances,
+    load_tracks,
     mask_recall,
     project_box_mask,
+    score_tracks,
     summarize_segmentation,
 )
 from video2sim.runner import OUTPUT_FILE
-from video2sim.schemas import SE3, Intrinsics, Plane, WorldModel
+from video2sim.schemas import SE3, CameraFrame, Intrinsics, Plane, WorldModel
 
 GATES = {"id_switches_per_scene_max": 1.0, "cluster_bbox_error_max": 0.10}
 
@@ -161,6 +164,46 @@ def test_load_instances_reads_clusters_and_flags(tmp_path: Path) -> None:
     assert run.flags == {"obj_0": ("thin",)}
 
 
+def _write_masks(run: Path, masks: dict[int, dict[int, BoolMask]]) -> None:
+    import cv2
+
+    for track_id, frames in masks.items():
+        track_dir = run / "segmentation" / "masks" / f"obj_{track_id:03d}"
+        track_dir.mkdir(parents=True, exist_ok=True)
+        for frame, mask in frames.items():
+            cv2.imwrite(str(track_dir / f"{frame:05d}.png"), mask.astype(np.uint8) * 255)
+
+
+def test_load_tracks_reads_masks_by_track_and_frame(tmp_path: Path) -> None:
+    run = tmp_path / "s01"
+    a = np.zeros((8, 8), dtype=bool)
+    a[1:3, 1:3] = True
+    b = np.zeros((8, 8), dtype=bool)
+    b[4:6, 4:6] = True
+    _write_masks(run, {0: {0: a, 1: b}, 1: {1: b}})
+    masks = run / "segmentation" / "masks"
+    (masks / "notes").mkdir()  # junk without an id is skipped
+    (masks / "obj_002.png").write_bytes(b"not a directory")  # files are skipped
+    (masks / "obj_000" / "xx.png").write_bytes(b"not a frame")  # bad names are skipped
+    tracks = load_tracks(run)
+    assert sorted(tracks) == [0, 1]
+    assert sorted(tracks[0]) == [0, 1] and sorted(tracks[1]) == [1]
+    assert tracks[0][0].dtype == bool and tracks[0][0].sum() == 4
+    assert load_tracks(tmp_path / "missing") == {}
+
+
+def test_score_tracks_counts_a_switch_between_objects() -> None:
+    k, pose = _camera()
+    objs = _scene("s01").objects
+    gt = {o.object_id: project_box_mask(o, k, pose) for o in objs}
+    tracks = {0: {0: gt["a"], 1: gt["a"], 2: gt["b"]}, 1: {0: gt["b"], 1: gt["b"]}}
+    poses = {0: pose, 1: pose, 2: pose}
+    result = score_tracks(objs, k, poses, tracks)
+    assert result.switches == 1
+    assert result.tracks_per_object == {"a": 1, "b": 1}
+    assert result.unassigned_tracks == 0
+
+
 def test_cli_reports_phase_2_section_for_the_oracle(tmp_path: Path) -> None:
     root = tmp_path / "scenes"
     (root / "s01").mkdir(parents=True)
@@ -275,3 +318,98 @@ def test_cli_scores_segmentation_clusters_in_the_board_frame(
     assert recall["value"] == 1.0 and recall["n"] == 1  # s05 cannot be aligned: not scored
     assert bbox["value"] < 1e-9
     assert "s05" in report["header"]["scenes_without_prediction"]
+
+
+def test_cli_scores_track_switches_from_masks(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root, runs = tmp_path / "scenes", tmp_path / "runs"
+    (root / "s01").mkdir(parents=True)
+    (root / "s01" / "ground_truth.json").write_text(
+        json.dumps(
+            {
+                "scene_id": "s01",
+                "tier": "easy",
+                "split": "dev",
+                "board": "grid",
+                "objects": [
+                    {
+                        "object_id": "o1",
+                        "label": "cube",
+                        "size_m": [0.1, 0.1, 0.1],
+                        "position_m": [0.2, 0.25, 0.05],
+                        "yaw_deg": 0.0,
+                        "mass_kg": 0.1,
+                        "incomplete": [],
+                    },
+                    {
+                        "object_id": "o2",
+                        "label": "cube",
+                        "size_m": [0.1, 0.1, 0.1],
+                        "position_m": [0.5, 0.25, 0.05],
+                        "yaw_deg": 0.0,
+                        "mass_kg": 0.1,
+                        "incomplete": [],
+                    },
+                ],
+            }
+        )
+    )
+    run = _write_run(runs)  # prediction cluster and flags; track masks below are separate
+    k = Intrinsics(fx=800, fy=800, cx=320, cy=240, width_px=640, height_px=480)
+    pose = SE3.from_numpy(
+        np.array(
+            [[1.0, 0.0, 0.0, 0.35], [0.0, -1.0, 0.0, 0.25], [0.0, 0.0, -1.0, 0.6], [0, 0, 0, 1.0]]
+        )
+    )
+    gt = json.loads((root / "s01" / "ground_truth.json").read_text())["objects"]
+    boxes = {
+        o["object_id"]: project_box_mask(
+            GtObject(
+                o["object_id"],
+                o["label"],
+                tuple(o["size_m"]),
+                tuple(o["position_m"]),
+                o["yaw_deg"],
+                o["mass_kg"],
+            ),
+            k,
+            pose,
+        )
+        for o in gt
+    }
+    assert all(m.any() for m in boxes.values())
+    _write_masks(run, {0: {0: boxes["o1"], 1: boxes["o2"]}})  # one track jumping cubes
+    world = WorldModel(
+        intrinsics=k,
+        frames=[
+            CameraFrame(frame_index=f, image_path=f"frames/{f:05d}.png", T_world_from_camera=pose)
+            for f in (0, 1)
+        ],
+        scale_factor=1.0,
+        scale_source="marker",
+        table_plane=Plane(normal=(0.0, 0.0, 1.0), offset_m=0.0),
+        point_cloud_path="reconstruction/points.ply",
+        mean_reprojection_error_px=0.5,
+        registered_fraction=1.0,
+    )
+    (run / "reconstruction").mkdir(parents=True)
+    (run / "reconstruction" / OUTPUT_FILE).write_text(world.model_dump_json())
+
+    def fake_align(
+        world: WorldModel, run_dir: Path, scene_id: str, board: str, edge: float, family: str
+    ) -> BoardAlignment | None:
+        return BoardAlignment(np.eye(4), 1.0, 0.0, (0,))
+
+    monkeypatch.setattr(cli, "align_scene", fake_align)
+    out = tmp_path / "out"
+    code = main(
+        ["eval", "--benchmark", str(root), "--runs", str(runs), "--stage", "segmentation",
+         "--out", str(out)]
+    )  # fmt: skip
+    report = json.loads((out / "report.json").read_text())
+    assert code == 0
+    rows = report["segmentation"]["rows"]
+    (switches,) = [r for r in rows if r["name"] == "id_switches_per_scene"]
+    assert switches["status"] == "measured"
+    assert switches["value"] == 1.0 and switches["n"] == 1
