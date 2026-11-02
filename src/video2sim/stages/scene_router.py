@@ -22,6 +22,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
 
+import numpy as np
+from numpy.typing import NDArray
+
 from video2sim.models.hosted import ResponseCache, image_data_url
 from video2sim.models.vlm import cache_model
 from video2sim.schemas import WorldModel
@@ -420,27 +423,31 @@ def route_scene(
     client: RouterClient | None,
     cache: ResponseCache,
     cfg: RouterConfig,
+    cloud: NDArray[np.float64] | None = None,
 ) -> Route:
     """One hosted request (cached) on ``cfg.n_frames`` frames spread over the registered frames.
     Without a ``client`` no call is made and the default surface is used. In coverage mode one
     cached call runs per selected view (``views.count`` at most) plus one synonym call, in
-    parallel; a failing view is skipped, and when all fail the scene falls back as today."""
+    parallel; a failing view is skipped, and when all fail the scene falls back as today.
+    ``cloud`` is the already-loaded sparse cloud; coverage loads it when omitted."""
     if client is None:
         return decide_route(None, cfg, failure="no client")
+    router = client
     if cfg.views.mode == "even":
         picks = [world.frames[i] for i in sample_frame_indices(len(world.frames), cfg.n_frames)]
         images = [run_dir / f.image_path for f in picks]
         prompt = build_prompt(cfg)
-        key = [prompt, cache_model(client), *(image_data_url(p) for p in images)]
+        key = [prompt, cache_model(router), *(image_data_url(p) for p in images)]
         try:
-            raw = cache.get_or_call(key, lambda: client.ask(prompt, images))
+            raw = cache.get_or_call(key, lambda: router.ask(prompt, images))
         except Exception as e:  # a failed call must not stop the scene
             return decide_route(None, cfg, failure=type(e).__name__)
         return decide_route(raw, cfg)
     from video2sim.stages.lift import load_points
     from video2sim.stages.view_select import select_views
 
-    cloud = load_points(run_dir / world.point_cloud_path)
+    if cloud is None:
+        cloud = load_points(run_dir / world.point_cloud_path)
     selection = select_views(world, cloud, cfg.views, run_dir)
     positions = [order for order, f in enumerate(world.frames) if f.frame_index in selection.frames]
     view_dir = run_dir / "segmentation.work" / "router_views"
@@ -454,7 +461,7 @@ def route_scene(
         for p in positions
     ]
     with ThreadPoolExecutor(max_workers=cfg.max_workers) as pool:
-        raws = list(pool.map(lambda image: _ask_view(client, cache, prompt, image), images))
+        raws = list(pool.map(lambda image: _ask_view(router, cache, prompt, image), images))
     answers: list[ViewAnswer] = []
     failed = 0
     for maybe_raw in raws:
@@ -472,7 +479,7 @@ def route_scene(
     groups: Sequence[Sequence[str]] = [[n] for n in nouns]
     synonym_note = "synonym merge off"
     if cfg.merge_synonyms and len(nouns) > 1:
-        merged = synonym_groups(client, cache, nouns)
+        merged = synonym_groups(router, cache, nouns)
         if merged is None:
             synonym_note = "synonym merge failed, exact strings kept"
         else:
