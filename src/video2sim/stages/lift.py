@@ -277,7 +277,8 @@ def lift_tracks(
         if cfg.occlusion_aware:
             present = [s for s in smalls if s is not None]
             if present:
-                combined = np.stack(present).any(axis=0)
+                # asarray pins the dtype: .any() stubs disagree across numpy versions.
+                combined = np.asarray(np.stack(present).any(axis=0), dtype=bool)
         for row, small in enumerate(smalls):
             if small is None:
                 continue
