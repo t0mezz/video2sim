@@ -67,9 +67,12 @@ segmentation:
     default_surface: table     # used when the call fails or the answer cannot be read
     timeout_s: 300
     retries: 3
+    merge_synonyms: true         # one text-only call merges noun synonyms across views (9.4)
+    noun_denylist: [table, board, marker, sheet, shadow, hand, arm]  # never SAM prompts (9.4)
     views:                       # S12.9: router view selection; mode even keeps n_frames above
       mode: even                 # even or coverage (set cover over the workspace, 9.3)
       count: 6                   # views picked in coverage mode
+      max_workers: 4             # parallel per-view calls, same pattern as material_pass
       cell_m: 0.02               # workspace grid step; guesses until tuned on dev (S12.9)
       probe_heights_m: [0.03, 0.10]  # a cell must be seen at both heights above the plane
       min_views_per_cell: 2      # views that must see a cell unoccluded
