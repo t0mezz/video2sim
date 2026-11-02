@@ -17,10 +17,12 @@ from video2sim.schemas import (
     SE3,
     CameraFrame,
     Flag,
+    GeometrySource,
     Instances,
     Intrinsics,
     ObjectInstance,
     Plane,
+    RegisteredObject,
     RegisteredObjects,
     WorldModel,
 )
@@ -29,6 +31,7 @@ from video2sim.stages.shape import (
     ShapeStage,
     ShapeStageConfig,
     load_masks,
+    shape_live_line,
     shape_object,
     shape_scene,
     spread,
@@ -235,6 +238,26 @@ def test_spread_keeps_the_ends_and_at_most_count_frames() -> None:
     assert spread([5, 1, 3], 10) == [1, 3, 5]
     picks = spread(list(range(100)), 12)
     assert len(picks) == 12 and picks[0] == 0 and picks[-1] == 99
+
+
+def _registered(
+    object_id: str, source: GeometrySource, fit_score: float | None
+) -> RegisteredObject:
+    return RegisteredObject(
+        object_id=object_id,
+        mesh_path=f"shape/meshes/{object_id}.ply",
+        T_world_from_object=SE3.identity(),
+        geometry_source=source,
+        fit_score=fit_score,
+        flags=[],
+    )
+
+
+def test_live_line_names_the_fit_or_the_proxy_fallback() -> None:
+    assert shape_live_line(_registered("obj_000", "sam3d", 0.904)) == "obj_000: fit 0.90"
+    assert shape_live_line(_registered("obj_001", "proxy_hull", None)) == (
+        "obj_001: proxy proxy_hull"
+    )
 
 
 def test_config_rejects_a_fit_threshold_above_one() -> None:

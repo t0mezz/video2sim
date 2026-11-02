@@ -62,11 +62,13 @@ class StageEvent:
     """What the runner tells a listener: a stage is cached, starts, finishes or fails.
 
     ``index`` counts from 1 over the stages this runner has. ``seconds`` is set on ``done`` and
-    ``failed``, ``message`` on ``failed``. ``run_id`` and ``detail`` are for verbose output:
-    ``detail`` is the short cache key, and on ``done`` the short hash of the stage's output.
+    ``failed``, ``message`` on ``failed`` and ``info``. ``info`` is a live line a stage reports
+    while it runs; it carries no timing and never affects the cache. ``run_id`` and ``detail``
+    are for verbose output: ``detail`` is the short cache key, and on ``done`` the short hash
+    of the stage's output.
     """
 
-    kind: Literal["cached", "started", "done", "failed"]
+    kind: Literal["cached", "started", "done", "failed", "info"]
     stage: StageName
     index: int
     total: int
@@ -178,6 +180,18 @@ class StageContext:
     checkpoints: dict[str, str] = field(default_factory=dict)
     # Top-level config sections the stage declared in ``shared_config``, such as ``vlm``
     shared: Mapping[str, Any] = field(default_factory=dict)
+    # Listener for live lines, set by the runner. None in tests and dry runs that pass no
+    # handler: ``report`` then drops the line. May be called from worker threads; the
+    # runner's handler must tolerate that (``ProgressReporter`` serializes with a lock).
+    on_info: Callable[[str], None] | None = None
+
+    def report(self, text: str) -> None:
+        """One live progress line for the run log, at most one per object per milestone.
+
+        Display only: reported lines never enter the cache key or the stage output.
+        """
+        if self.on_info is not None:
+            self.on_info(text)
 
     def load(self, stage: StageName, model: type[_T]) -> _T:
         """Typed output of a declared dependency. Its files are under ``run_dir / stage``."""
@@ -277,7 +291,7 @@ class Runner:
 
     def _emit(
         self,
-        kind: Literal["cached", "started", "done", "failed"],
+        kind: Literal["cached", "started", "done", "failed", "info"],
         stage: StageName,
         seconds: float | None = None,
         message: str | None = None,
@@ -373,6 +387,7 @@ class Runner:
             seed=seed_for(manifest.seed, stage.name),
             dependencies=stage.dependencies,
             output_types=self._output_types,
+            on_info=lambda text: self._emit("info", stage.name, message=text),
         )
         start = time.perf_counter()
         self._emit("started", stage.name, detail=f"key {key[:8]}")

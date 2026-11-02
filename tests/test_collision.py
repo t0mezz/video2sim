@@ -3,7 +3,7 @@ from __future__ import annotations
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 import numpy as np
 import pytest
@@ -203,6 +203,178 @@ def test_a_smooth_hull_edge_collapse_cannot_thin_still_meets_the_cap(
     assert len(out.vertices) <= cfg.max_part_vertices
     assert trimesh.convex.is_convex(out)  # type: ignore[no-untyped-call]
     assert out.volume == pytest.approx(can.volume, rel=0.02)
+
+
+class _StubMesh:
+    def __init__(self, vertices: Any, faces: Any) -> None:
+        self.vertices = vertices
+        self.faces = faces
+
+
+class _StubCoacd:
+    """A fake ``coacd`` module that returns canned boxes and records its inputs."""
+
+    Mesh = _StubMesh
+
+    def __init__(self, mode: str = "halves") -> None:
+        self.mode = mode
+        self.calls: list[tuple[int, float, int, int, int]] = []
+
+    def run_coacd(self, mesh: Any, **kw: Any) -> list[tuple[Any, Any]]:
+        self.calls.append(
+            (
+                len(np.asarray(mesh.vertices)),
+                float(kw["threshold"]),
+                int(kw["max_convex_hull"]),
+                int(kw["resolution"]),
+                int(kw["mcts_iterations"]),
+            )
+        )
+        u = 0.05
+        if self.mode == "halves" and int(kw["max_convex_hull"]) > 4:
+            bottom = trimesh.creation.box(extents=(2 * u, u, u))
+            bottom.apply_translation([u, u / 2, u / 2])
+            left = trimesh.creation.box(extents=(u, u, u))
+            left.apply_translation([u / 2, 3 * u / 2, u / 2])
+            return [
+                (np.asarray(bottom.vertices), np.asarray(bottom.faces)),
+                (np.asarray(left.vertices), np.asarray(left.faces)),
+            ]
+        strip = trimesh.creation.box(extents=(2 * u, u, u))
+        strip.apply_translation([u, u / 2, u / 2])
+        return [(np.asarray(strip.vertices), np.asarray(strip.faces))]
+
+
+def _stubbed(
+    cfg: CollisionConfig, monkeypatch: pytest.MonkeyPatch, **kw: Any
+) -> tuple[_StubCoacd, CollisionConfig]:
+    import dataclasses
+
+    stub = _StubCoacd(str(kw.pop("mode", "halves")))
+    monkeypatch.setitem(sys.modules, "coacd", stub)
+    return stub, dataclasses.replace(cfg, **kw)
+
+
+def test_decomposition_shortcuts_are_on_by_default(cfg: CollisionConfig) -> None:
+    assert cfg.decomp_decimate and cfg.adaptive_escalation and cfg.decomp_cache
+
+
+def test_cheap_rung_wins_and_full_rung_backs_it_up(
+    cfg: CollisionConfig, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    stub, cfg = _stubbed(cfg, monkeypatch)
+    res = collision_geometry(lshape(), cfg)
+    assert [c[1:3] for c in stub.calls] == [
+        (cfg.cheap_threshold, cfg.cheap_max_parts),
+        (cfg.coacd_threshold, cfg.max_convex_parts),
+    ]
+    assert res.ok and len(res.parts) == 2
+    assert res.steps["decomp_rung_cheap_failed"] == 1
+    assert res.steps["decomp_rung_full"] == 1
+
+
+def test_search_knobs_reach_coacd(cfg: CollisionConfig, monkeypatch: pytest.MonkeyPatch) -> None:
+    stub, cfg = _stubbed(
+        cfg, monkeypatch, coacd_resolution=500, coacd_mcts_iterations=20, adaptive_escalation=False
+    )
+    collision_geometry(lshape(), cfg)
+    assert [(c[3], c[4]) for c in stub.calls] == [(500, 20)]
+
+
+def test_hull_rung_wins_for_a_near_convex_mesh_without_calling_coacd(
+    cfg: CollisionConfig, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    stub, cfg = _stubbed(cfg, monkeypatch, primitive_tolerance=1e-6)
+    m = trimesh.creation.box(extents=(0.1, 0.1, 0.1))
+    v = np.asarray(m.vertices)
+    v[0] -= [0.002, 0.002, 0.002]  # a dent no primitive may claim and no hull hides badly
+    m.vertices = v
+    res = collision_geometry(m, cfg)
+    assert stub.calls == []
+    assert res.kind == "convex_hull" and res.ok and len(res.parts) == 1
+    assert res.steps["decomp_rung_hull"] == 1
+
+
+def test_decimated_copy_feeds_coacd_and_the_toggle_restores_the_full_mesh(
+    cfg: CollisionConfig, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    pytest.importorskip("fast_simplification")
+    stub, cfg = _stubbed(cfg, monkeypatch)
+    big = lshape()
+    for _ in range(5):  # midpoint splits: more faces, the same surface
+        big = big.subdivide()
+    assert big.is_watertight and len(big.faces) > cfg.decomp_max_faces
+    res = collision_geometry(big, cfg)
+    assert res.steps["decomp_decimated"] == 1
+    assert res.steps["decomp_input_faces"] <= cfg.decomp_max_faces
+    assert all(c[0] <= 2100 for c in stub.calls)  # decimated vertices, not the full mesh
+    assert res.ok and res.steps["decomp_rung_full"] == 1
+    full_stub, full_cfg = _stubbed(cfg, monkeypatch, decomp_decimate=False)
+    collision_geometry(big, full_cfg)
+    assert full_stub.calls and all(c[0] > 5000 for c in full_stub.calls)
+
+
+def test_cache_reuses_parts_and_ignores_corruption(
+    cfg: CollisionConfig, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    stub, cfg = _stubbed(cfg, monkeypatch)
+    first = collision_geometry(lshape(), cfg, cache_dir=tmp_path)
+    assert len(stub.calls) == 2 and first.ok  # cheap rung fails, full rung wins
+    assert first.steps["decomp_rung_hull_failed"] == 1
+    second = collision_geometry(lshape(), cfg, cache_dir=tmp_path)
+    assert len(stub.calls) == 2  # no new CoACD call
+    assert second.steps["decomp_cache_hit"] == 1 and second.ok
+    assert [p.volume for p in second.parts] == pytest.approx([p.volume for p in first.parts])
+    for p in tmp_path.glob("*.npz"):
+        p.write_bytes(b"not a zip file")
+    third = collision_geometry(lshape(), cfg, cache_dir=tmp_path)
+    assert len(stub.calls) == 4  # corrupt entry recomputed
+    assert third.ok
+
+
+def test_no_cache_without_a_cache_dir(
+    cfg: CollisionConfig, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    stub, cfg = _stubbed(cfg, monkeypatch)
+    collision_geometry(lshape(), cfg)
+    collision_geometry(lshape(), cfg, cache_dir=tmp_path)
+    collision_geometry(lshape(), cfg)
+    assert len(stub.calls) == 6  # two rungs each, nothing cached without a dir
+
+
+def test_without_escalation_only_the_full_rung_runs(
+    cfg: CollisionConfig, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    stub, cfg = _stubbed(cfg, monkeypatch, adaptive_escalation=False)
+    res = collision_geometry(lshape(), cfg)
+    assert [c[1:3] for c in stub.calls] == [(cfg.coacd_threshold, cfg.max_convex_parts)]
+    assert res.ok and res.steps["decomp_rung_full"] == 1
+
+
+def test_a_thin_walled_cup_survives_the_decimated_path(cfg: CollisionConfig) -> None:
+    pytest.importorskip("coacd")
+    pytest.importorskip("fast_simplification")
+    profile = [[0, -0.05], [0.04, -0.05], [0.04, 0.05], [0.035, 0.05], [0.035, -0.04], [0, -0.04]]
+    cup = trimesh.creation.revolve(np.array(profile), sections=600)
+    assert cup.is_watertight and len(cup.faces) > cfg.decomp_max_faces
+    res = collision_geometry(cup, cfg)
+    assert res.steps["decomp_decimated"] == 1
+    assert res.kind == "convex_decomposition" and res.ok
+
+
+def test_decomposition_ranges_are_validated() -> None:
+    for key, bad in [
+        ("decomp_max_faces", 3),
+        ("decomp_volume_change_frac", 1.5),
+        ("coacd_resolution", 0),
+        ("coacd_mcts_iterations", 0),
+        ("cheap_threshold", 0.0),
+        ("cheap_max_parts", 0),
+    ]:
+        bad_cfg = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
+        bad_cfg["physics"]["collision"][key] = bad
+        with pytest.raises(ValueError):
+            CollisionConfig.from_config(bad_cfg)
 
 
 def test_coacd_runs_in_two_threads_after_setup() -> None:

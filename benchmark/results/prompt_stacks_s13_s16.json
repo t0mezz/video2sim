@@ -1,0 +1,258 @@
+{
+  "prompts": {
+    "objects-on-a-table": null,
+    "object-on-a-table": "object on a table",
+    "stacked-objects-on-a-table": "stacked objects on a table"
+  },
+  "trials": [
+    {
+      "run": "s13_b",
+      "scene": "s13",
+      "prompt_slug": "objects-on-a-table",
+      "prompt": "objects on a table",
+      "tracks_raw": 2,
+      "tracks_repaired": 2,
+      "raw": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_002": 1,
+          "obj_014": 1
+        },
+        "unassigned_tracks": 0
+      },
+      "repaired": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_002": 1,
+          "obj_014": 1
+        },
+        "unassigned_tracks": 0
+      },
+      "fitted": {
+        "gt_objects": 3,
+        "matched": 2,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_002": 0.205,
+          "obj_014": 0.327,
+          "obj_040": null
+        },
+        "position_errors_mm": {
+          "obj_002": 13,
+          "obj_014": 18
+        }
+      },
+      "fitted_track_ids": [
+        0,
+        1
+      ]
+    },
+    {
+      "run": "s13_b",
+      "scene": "s13",
+      "prompt_slug": "object-on-a-table",
+      "prompt": "object on a table",
+      "tracks_raw": 3,
+      "tracks_repaired": 3,
+      "raw": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_002": 1,
+          "obj_014": 1,
+          "obj_040": 1
+        },
+        "unassigned_tracks": 0
+      },
+      "repaired": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_002": 1,
+          "obj_014": 1,
+          "obj_040": 1
+        },
+        "unassigned_tracks": 0
+      },
+      "fitted": {
+        "gt_objects": 3,
+        "matched": 3,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_002": 0.545,
+          "obj_014": 0.652,
+          "obj_040": 0.188
+        },
+        "position_errors_mm": {
+          "obj_002": 35,
+          "obj_014": 23,
+          "obj_040": 10
+        }
+      },
+      "fitted_track_ids": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "run": "s13_b",
+      "scene": "s13",
+      "prompt_slug": "stacked-objects-on-a-table",
+      "prompt": "stacked objects on a table",
+      "tracks_raw": 1,
+      "tracks_repaired": 1,
+      "raw": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_002": 1
+        },
+        "unassigned_tracks": 0
+      },
+      "repaired": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_002": 1
+        },
+        "unassigned_tracks": 0
+      },
+      "fitted": {
+        "gt_objects": 3,
+        "matched": 1,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_002": null,
+          "obj_014": 1.25,
+          "obj_040": null
+        },
+        "position_errors_mm": {
+          "obj_014": 10
+        }
+      },
+      "fitted_track_ids": [
+        0
+      ]
+    },
+    {
+      "run": "s16_a",
+      "scene": "s16",
+      "prompt_slug": "objects-on-a-table",
+      "prompt": "objects on a table",
+      "tracks_raw": 5,
+      "tracks_repaired": 5,
+      "raw": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_029": 1,
+          "obj_003": 1,
+          "obj_021": 1,
+          "obj_004": 1
+        },
+        "unassigned_tracks": 1
+      },
+      "repaired": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_029": 1,
+          "obj_003": 1,
+          "obj_021": 1,
+          "obj_004": 1
+        },
+        "unassigned_tracks": 1
+      },
+      "fitted": {
+        "gt_objects": 4,
+        "matched": 3,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_003": null,
+          "obj_004": 0.267,
+          "obj_021": 0.141,
+          "obj_029": 0.086
+        },
+        "position_errors_mm": {
+          "obj_004": 25,
+          "obj_021": 3,
+          "obj_029": 5
+        }
+      },
+      "fitted_track_ids": [
+        0,
+        2,
+        3
+      ]
+    },
+    {
+      "run": "s16_a",
+      "scene": "s16",
+      "prompt_slug": "object-on-a-table",
+      "prompt": "object on a table",
+      "tracks_raw": 16,
+      "tracks_repaired": 16,
+      "raw": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_004": 1,
+          "obj_003": 1,
+          "obj_029": 1,
+          "obj_021": 1
+        },
+        "unassigned_tracks": 12
+      },
+      "repaired": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {
+          "obj_004": 1,
+          "obj_003": 1,
+          "obj_029": 1,
+          "obj_021": 1
+        },
+        "unassigned_tracks": 12
+      },
+      "lift_error": "ValueError: tracks span 1.97 m, more than max_extent_m; one track is probably far from the objects",
+      "fitted": null,
+      "fitted_track_ids": []
+    },
+    {
+      "run": "s16_a",
+      "scene": "s16",
+      "prompt_slug": "stacked-objects-on-a-table",
+      "prompt": "stacked objects on a table",
+      "tracks_raw": 0,
+      "tracks_repaired": 0,
+      "raw": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {},
+        "unassigned_tracks": 0
+      },
+      "repaired": {
+        "switches": 0,
+        "fragmented": 0,
+        "tracks_per_object": {},
+        "unassigned_tracks": 0
+      },
+      "fitted": {
+        "gt_objects": 4,
+        "matched": 0,
+        "false_positives": 0,
+        "size_errors": {
+          "obj_003": null,
+          "obj_004": null,
+          "obj_021": null,
+          "obj_029": null
+        },
+        "position_errors_mm": {}
+      },
+      "fitted_track_ids": []
+    }
+  ]
+}

@@ -9,12 +9,16 @@ from video2sim.stages.depth_flags import Verdict
 from video2sim.stages.keyframes import KeyframeChoice
 from video2sim.stages.material_pass import MaterialAnswer, MaterialDecision
 from video2sim.stages.primitive_fit import FitResult, Primitive
+from video2sim.stages.scene_router import Route
 from video2sim.stages.segmentation_stage import (
     build_object,
     choose_cluster,
     fit_report,
+    flag_live_line,
     object_flags,
     repaired_ids,
+    route_report,
+    tracking_live_line,
     write_object_files,
 )
 from video2sim.stages.track_repair import RepairReport
@@ -30,9 +34,49 @@ def decision(
     return MaterialDecision(3, flag, "reason", verdict, "ok", answer, None, non_rigid)
 
 
+def test_live_lines_name_the_route_and_each_flagged_object() -> None:
+    summary = {
+        "surface": "table",
+        "prompt": "objects on a table",
+        "objects": ["box", "box", "cube"],
+        "reason": "VLM surface table (0.99)",
+        "fell_back": False,
+        "tracks_raw": 2,
+        "tracks_repaired": 2,
+        "splits": [],
+        "merges": [[0, 1]],
+    }
+    assert tracking_live_line(summary) == (
+        "route VLM surface table (0.99): 3 listed, 2 tracks (1 merges, 0 splits)"
+    )
+    assert flag_live_line("obj_001", "box", ["occluded", "small"]) == (
+        "obj_001 (box): occluded, small"
+    )
+
+
 def test_repaired_ids_cover_split_parts_and_the_kept_id_of_a_merge() -> None:
     report = RepairReport(splits=((2, (2, 7)),), merges=((4, 5, 6),))
     assert repaired_ids(report) == {2, 7, 4}
+
+
+def test_route_report_records_the_router_path_and_track_counts() -> None:
+    route = Route(
+        "table", "objects on a table", ("box", "cube"), "VLM surface table (0.99)", False, None
+    )
+    report = RepairReport(splits=((3, (3, 4)),), merges=((0, 1),))
+    raw = [Track(0, {}), Track(1, {}), Track(3, {})]
+    repaired = [Track(0, {}), Track(3, {}), Track(4, {})]
+    assert route_report(route, raw, repaired, report) == {
+        "surface": "table",
+        "prompt": "objects on a table",
+        "objects": ["box", "cube"],
+        "reason": "VLM surface table (0.99)",
+        "fell_back": False,
+        "tracks_raw": 3,
+        "tracks_repaired": 3,
+        "splits": [[3, [3, 4]]],
+        "merges": [[0, 1]],
+    }
 
 
 def test_flags_are_combined_once_in_a_fixed_order() -> None:

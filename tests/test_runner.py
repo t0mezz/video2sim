@@ -32,10 +32,12 @@ class FakeStage:
         name: StageName,
         dependencies: tuple[StageName, ...] = (),
         extra_inputs: tuple[Path, ...] = (),
+        live: tuple[str, ...] = (),
     ) -> None:
         self.name = name
         self.dependencies = dependencies
         self.extra_inputs = extra_inputs
+        self.live = live
         self.calls = 0
         self.fail = False
         self.crash = False
@@ -43,6 +45,8 @@ class FakeStage:
 
     def run(self, ctx: StageContext) -> Out:
         self.calls += 1
+        for line in self.live:
+            ctx.report(line)
         parts = [str(ctx.config.get("value", "")), str(ctx.seed)]
         parts += [ctx.load(dep, Out).value for dep in self.dependencies]
         parts += [path.read_text() for path in self.extra_inputs]
@@ -318,6 +322,41 @@ def test_events_report_each_stage_and_then_a_cache_hit(
     runner.run(video, run_id="r1")
     assert [e.kind for e in events] == ["cached", "cached", "cached"]
     assert all(e.detail and e.detail.startswith("key ") for e in events)
+
+
+def test_live_lines_arrive_as_info_events_between_start_and_done(
+    tmp_path: Path, video: Path
+) -> None:
+    events: list[StageEvent] = []
+    runner = Runner(
+        tmp_path / "runs",
+        [FakeStage("capture", live=("obj_000: fit 0.90", "obj_001: proxy"))],
+        {"seed": 0},
+        base_dir=tmp_path,
+        on_event=events.append,
+    )
+    runner.run(video, run_id="r1")
+    assert [(e.kind, e.message) for e in events] == [
+        ("started", None),
+        ("info", "obj_000: fit 0.90"),
+        ("info", "obj_001: proxy"),
+        ("done", None),
+    ]
+    assert all((e.stage, e.index, e.total, e.run_id) == ("capture", 1, 1, "r1") for e in events)
+
+
+def test_report_without_a_handler_drops_the_line() -> None:
+    ctx = StageContext(
+        stage="capture",
+        run_dir=Path("."),
+        video=Path("video.mp4"),
+        out_dir=Path("out"),
+        config={},
+        seed=0,
+        dependencies=(),
+        output_types={},
+    )
+    ctx.report("obj_000: fit 0.90")  # must not raise
 
 
 def test_a_failing_stage_reports_failed_with_its_message(

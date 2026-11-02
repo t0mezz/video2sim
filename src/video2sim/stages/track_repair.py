@@ -8,6 +8,9 @@ plane, in world XY. Objects on the table do not move, so the footprints of one o
 together over all views, whatever the camera does.
 
 * Split: a track whose footprints fall into two or more groups far apart covered two objects.
+  Feet from occlusion slivers (masks far below the track's median size, ``sliver_frac``)
+  are left out of the grouping: a nearly hidden object must not found a new group. Those
+  frames rejoin the temporally nearest group afterwards.
 * Merge: two tracks that never appear in the same frame and share a footprint are one object.
   A shared frame means two objects were visible at once, so such tracks are never merged;
   this also keeps a stack apart, because the upper object's base projects to a different spot.
@@ -42,13 +45,21 @@ class RepairConfig:
     merge_radius_m: float
     split_gap_m: float
     min_frames: int
+    sliver_frac: float
 
     @classmethod
     def from_config(cls, cfg: dict[str, Any]) -> RepairConfig:
         r = cfg["segmentation"]["tracking"]["repair"]
-        out = cls(float(r["merge_radius_m"]), float(r["split_gap_m"]), int(r["min_frames"]))
+        out = cls(
+            float(r["merge_radius_m"]),
+            float(r["split_gap_m"]),
+            int(r["min_frames"]),
+            float(r["sliver_frac"]),
+        )
         if out.merge_radius_m <= 0 or out.split_gap_m <= 0 or out.min_frames < 1:
             raise ValueError("repair thresholds must be positive")
+        if not 0.0 <= out.sliver_frac < 1.0:
+            raise ValueError("sliver_frac must be in [0, 1)")
         return out
 
 
@@ -118,6 +129,11 @@ def _groups(points: NDArray[np.float64], link_m: float) -> list[list[int]]:
 
 def _split(track: Track, feet: Mapping[int, F64], cfg: RepairConfig, next_id: int) -> list[Track]:
     """The track itself, or one track per far-apart group of footprints."""
+    if cfg.sliver_frac > 0.0 and track.masks:
+        typical = float(np.median([m.sum() for m in track.masks.values()]))
+        feet = {
+            f: p for f, p in feet.items() if int(track.masks[f].sum()) >= cfg.sliver_frac * typical
+        }
     frames = sorted(feet)
     if len(frames) < 2 * cfg.min_frames:
         return [track]

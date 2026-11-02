@@ -352,8 +352,10 @@ def test_stage_writes_the_package_and_a_clean_report(
     assert report["objects"][0]["mass_kg"]["high"] == pytest.approx(0.4)
     assert report["scene_flags"] == ["a scene warning"]
     assert "not verified" in report["validated_in"]
+    assert [(o["vertices"], o["faces"]) for o in report["objects"]] == [(8, 12), (8, 12)]
     html = (run_dir / out.qa_report_path).read_text()
     assert "qa/view_00000.jpg" in html
+    assert "polygons" in html and ">12<" in html
     assert (run_dir / "export" / "qa" / "view_00000.jpg").exists()
 
 

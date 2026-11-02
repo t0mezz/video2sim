@@ -74,6 +74,9 @@ segmentation:
       surface:
         description: a glossy or reflective surface that mirrors its surroundings, such as a glass stove top, polished counter or mirror; a matte counter, floor or shelf is not this
         prompt: object on a surface
+      stack:
+        description: objects stacked directly on top of each other in a pile or tower; choose this whenever one object rests on another, even on a table
+        prompt: object on a table
   tracking:                    # P2.2: one SAM 3.1 video request per scene
     endpoint:                  # where the request goes; see docs/model_interfaces.md
       protocol: meta_responses # meta_responses (the Meta Model API, or a server imitating it) or python:package.module:factory
@@ -95,6 +98,7 @@ segmentation:
       merge_radius_m: 0.05     # tracks with no shared frame whose table footprints are this close are one object
       split_gap_m: 0.10        # a track whose footprints fall into groups this far apart is two objects
       min_frames: 3            # smallest group that counts as an object when splitting
+      sliver_frac: 0.2         # feet from masks below this share of the track median are occlusion slivers, not new objects
   lift:                        # P2.3: masks to point clusters by voting over views (visual hull)
     voxel_m: 0.005             # grid resolution; a cluster point is a voxel centre
     max_height_m: 0.35         # grid top above the table plane; objects taller than this are cut off
@@ -105,6 +109,11 @@ segmentation:
     min_views: 5               # a voxel needs this many views that see it
     min_agreement: 0.9         # share of those views whose mask must contain it; the slack is occlusion
     min_voxels: 20             # smaller clusters are dropped and listed in the lift report
+    occlusion_aware: true      # excuse views where a voxel lands on another track's mask only
+    small_mask_px: 15000       # tracks below this median mask size vote with the small thresholds
+    small_min_agreement: 0.9   # agreement for small tracks
+    small_min_voxels: 20       # minimum voxels for small tracks
+    dup_dist_m: 0.02           # clusters closer than this are one object; the smaller is dropped as a duplicate
     min_points: 8              # the sparse-point variant: fewer voted SfM points drop the track
     table_margin_m: 0.003      # sparse points this close to the table plane are the table, not the object
     trim_points_per_side: 2    # outermost sparse points dropped per side of the resting box (strays); easy-tier median 18.7% -> 8.9%, docs/research/cluster_box_accuracy.md
@@ -188,7 +197,7 @@ shape:
     api_key_env: null          # name of an environment variable or .env entry; null sends no Authorization header
     timeout_s: 600
     retries: 3
-  keyframes_per_object: 2      # P3.4: best keyframes the model is run on
+  keyframes_per_object: 6      # P3.4: best keyframes the model is run on
   samples_per_keyframe: 1      # seeds per keyframe; 2 draws per object, 5.7% size error against 5.0% with 6 (D-030)
   max_views: 12                # frames whose masks enter registration, spread over the video
   min_fit_score: 0.5           # below this the convex hull of the cluster stands in; a guess
@@ -215,7 +224,10 @@ shape:
     sigma_mask_px: 3.0
     mask_weight: 1.0           # lambda in the PLAN.md cost
     huber_m: 0.005             # above this a point counts linearly, for SfM strays
-    inlier_m: 0.005            # fit score: observed points this close to the mesh
+    inlier_m: 0.010            # fit score: observed points this close to the mesh; 5 mm is
+                         # tighter than generative accuracy (D-030: 5 to 6% size error), which sent
+                         # the good s15 video_b basket (best fit 0.17) to a proxy hull; 10 mm takes
+                         # it to 0.75. A guess: validate proxy rate and size error on dev.
     yaw_hypotheses: 4          # starts at quarter turns about world up
     yaw_screen_iterations: 4   # rounds each start gets before the best one is refined
     outer_iterations: 50       # nearest-neighbour rounds; about 20 on the synthetic box
@@ -237,6 +249,15 @@ physics:
     fit_cover_tolerance: 0.01       # near, as a share of the bbox diagonal
     max_part_vertices: 255          # per convex part; assumed PhysX limit, verify in P5.1
     coacd_threshold: 0.05           # CoACD concavity threshold
+    coacd_resolution: 2000          # CoACD search resolution; 500 barely moves wall time on s02 obj_001, so this stays
+    coacd_mcts_iterations: 30       # CoACD search iterations per cut; 30 keeps the s02/s12 part counts with all fit checks passing, ~2x faster than 150
+    decomp_decimate: true           # decompose a decimated copy; the checks still run against the full mesh
+    decomp_max_faces: 2000          # a decomposition input above this many faces is decimated to it
+    decomp_volume_change_frac: 0.05 # a decimated copy that moves the volume more than this is dropped
+    adaptive_escalation: true       # try hull, then a cheap decomposition, then the full one; each rung must pass the checks
+    cheap_threshold: 0.25           # concavity threshold of the cheap rung; coarser than coacd_threshold
+    cheap_max_parts: 4              # part cap of the cheap rung
+    decomp_cache: true              # reuse decompositions by input hash under physics.work/decomp_cache
     seed: 0
   mass:                        # P4.5, stages/mass.py; values from docs/research/mesh_volume.md
     seal_radius: 0.04               # gaps up to this share of the longest side are closed; 2% misses cracks, 8% closes a bottle neck
@@ -262,7 +283,7 @@ physics:
   repair:                      # P4.1, stages/mesh_repair.py
     min_component_area_frac: 0.02   # a piece smaller than this share of the largest piece's area is a floater
     min_volume_m3: 1.0e-9           # below this the mesh is not a solid
-    max_triangles: 20000            # triangle budget per visual mesh; above it the mesh is decimated
+    max_triangles: 2000             # triangle budget per visual mesh; above it the mesh is decimated
     max_volume_change_frac: 0.02    # decimation that moves the volume more than this is rejected
     decimation_aggression: 5        # fast_simplification agg, 3 to 10; below 3 it stops short of the budget
 

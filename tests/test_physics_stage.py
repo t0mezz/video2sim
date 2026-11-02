@@ -27,7 +27,13 @@ from video2sim.schemas import (
     SimAssets,
     WorldModel,
 )
-from video2sim.stages.physics_stage import CASES, PhysicsStage, physics_stage_config
+from video2sim.stages.physics_stage import (
+    CASES,
+    PhysicsStage,
+    drift_live_line,
+    mass_live_line,
+    physics_stage_config,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 K = Intrinsics(fx=500.0, fy=500.0, cx=320.0, cy=240.0, width_px=640, height_px=480)
@@ -258,6 +264,17 @@ def test_an_unreadable_answer_keeps_the_geometry_mass_and_flags_it(tmp_path: Pat
     report = json.loads((run_dir / "physics" / "report.json").read_text())
     assert report["obj_000"]["mass_source"] == "geometry_no_answer"
     assert report["obj_000"]["reasons"]
+
+
+def test_live_lines_name_the_mass_source_and_the_drift() -> None:
+    assert mass_live_line("obj_000", {"mass_source": "geometry"}) == "obj_000: mass from geometry"
+    assert mass_live_line("obj_001", {"mass_source": "model"}) == "obj_001: mass from model"
+    assert mass_live_line("obj_002", {"mass_source": "geometry_no_answer"}) == (
+        "obj_002: mass from geometry (no model answer)"
+    )
+    assert mass_live_line("obj_003", {}) == "obj_003: mass from unknown"
+    assert drift_live_line("obj_000", 0.0044, True) == "obj_000: drift 4.4 mm (stable)"
+    assert drift_live_line("obj_001", 0.057, False) == "obj_001: drift 57.0 mm (unstable)"
 
 
 def test_disabled_vlm_mass_needs_no_client_or_key_and_raises_no_flag(

@@ -234,7 +234,11 @@ def run_pipeline(args: argparse.Namespace) -> int:
     targets: dict[str, Any] = yaml.safe_load(args.targets.read_text(encoding="utf-8"))
     if args.verbose:
         os.environ[VERBOSE_ENV] = "1"
-    reporter = None if args.quiet else ProgressReporter(sys.stderr, verbose=args.verbose)
+    reporter = (
+        None
+        if args.quiet
+        else ProgressReporter(sys.stderr, verbose=args.verbose, runs_root=args.runs)
+    )
     runner = build_runner(args.runs, cfg, targets, Path.cwd(), on_event=reporter)
     try:
         manifest = runner.run(args.video, run_id=args.run_id)

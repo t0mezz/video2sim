@@ -138,7 +138,9 @@ def prepare_object(
         trimesh.Trimesh, trimesh.load(run_dir / registered.mesh_path, force="mesh", process=False)
     )
     repaired = repair_mesh(mesh, cfg.repair)
-    collision = collision_geometry(repaired.mesh, cfg.collision)
+    collision = collision_geometry(
+        repaired.mesh, cfg.collision, cache_dir=run_dir / "physics.work" / "decomp_cache"
+    )
     material = object_material(instance, table, cfg.min_confidence)
     mass = estimate_mass(repaired.mesh, material, cfg.mass)
     final_mass, mass_source = combine(mass.mass_kg, model_mass, cfg.vlm_mass.enabled)
@@ -203,6 +205,26 @@ def prepare_object(
         ],
     }
     return PreparedObject(asset, parts), entry
+
+
+_MASS_SOURCE_LABELS = {
+    "geometry": "geometry",
+    "geometry_only": "geometry (model disabled)",
+    "geometry_no_answer": "geometry (no model answer)",
+    "model": "model",
+}
+
+
+def mass_live_line(object_id: str, entry: Mapping[str, Any]) -> str:
+    """One prepared object for the live log: where its mass came from."""
+    source = _MASS_SOURCE_LABELS.get(str(entry.get("mass_source")), "unknown")
+    return f"{object_id}: mass from {source}"
+
+
+def drift_live_line(object_id: str, drift_m: float, stable: bool) -> str:
+    """One settled object for the live log."""
+    verdict = "stable" if stable else "unstable"
+    return f"{object_id}: drift {drift_m * 1000:.1f} mm ({verdict})"
 
 
 def model_mass(
@@ -309,11 +331,15 @@ class PhysicsStage:
                 instances[obj.object_id], world, client, ctx.run_dir, work, cfg.vlm_mass
             )
 
-        def prepare(job: tuple[RegisteredObject, Estimate | None]) -> tuple[PreparedObject, Any]:
+        def prepare(
+            job: tuple[RegisteredObject, Estimate | None],
+        ) -> tuple[PreparedObject, Any]:
             obj, answer = job
-            return prepare_object(
+            prepared, entry = prepare_object(
                 obj, instances[obj.object_id], table, answer, ctx.run_dir, ctx.out_dir, cfg
             )
+            ctx.report(mass_live_line(obj.object_id, entry))
+            return prepared, entry
 
         with ThreadPoolExecutor(max_workers=cfg.parallel_mass_calls) as calls:
             answers = list(calls.map(ask, registered.objects))
@@ -328,10 +354,17 @@ class PhysicsStage:
         (ctx.out_dir / "report.json").write_text(
             json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
         )
+        settled = settling_report(items, world.table_plane, cfg.settling)
         (ctx.out_dir / "settling.json").write_text(
-            json.dumps(settling_report(items, world.table_plane, cfg.settling), indent=1) + "\n",
+            json.dumps(settled, indent=1) + "\n",
             encoding="utf-8",
         )
+        for body in settled.get("nominal", {}).get("bodies", []):
+            ctx.report(
+                drift_live_line(
+                    str(body["object_id"]), float(body["max_drift_m"]), bool(body["stable"])
+                )
+            )
         return SimAssets(assets=[i.asset for i in items])
 
 

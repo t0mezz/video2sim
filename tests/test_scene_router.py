@@ -79,6 +79,17 @@ def test_route_scene_without_client_makes_no_call(cfg: RouterConfig, tmp_path: P
     assert route.fell_back
 
 
+def test_stack_surface_routes_multi_object_scene_to_the_singular_prompt(
+    cfg: RouterConfig,
+) -> None:
+    from video2sim.stages.scene_router import tracking_prompt
+
+    route = decide_route(answer("stack", ["box", "box", "cube"]), cfg)
+    assert not route.fell_back
+    assert route.prompt == "object on a table"
+    assert tracking_prompt(route, cfg) == "object on a table"
+
+
 def test_tracking_prompt_uses_the_noun_only_off_the_default_surface(cfg: RouterConfig) -> None:
     from video2sim.stages.scene_router import tracking_prompt
 

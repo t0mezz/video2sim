@@ -354,6 +354,13 @@ def shape_object(
     return finish_object(plan, candidates, failures, out_dir, cfg, seed)
 
 
+def shape_live_line(registered: RegisteredObject) -> str:
+    """One finished object for the live log: its fit score, or the proxy it fell back to."""
+    if registered.geometry_source != "sam3d" or registered.fit_score is None:
+        return f"{registered.object_id}: proxy {registered.geometry_source}"
+    return f"{registered.object_id}: fit {registered.fit_score:.2f}"
+
+
 def shape_scene(
     objects: Sequence[ObjectInstance],
     world: WorldModel,
@@ -363,6 +370,7 @@ def shape_scene(
     model: ShapeModel,
     cfg: ShapeStageConfig,
     seed: int,
+    on_object: Callable[[RegisteredObject, dict[str, Any]], None] | None = None,
 ) -> list[tuple[RegisteredObject, dict[str, Any], str | None]]:
     """All objects at once: the scene's draws share ``parallel_samples``, and each mesh goes to
     registration as soon as it lands, so a slow draw holds up nothing else.
@@ -408,9 +416,12 @@ def shape_scene(
                 candidates[job[0]].append(result.result())
 
         def finish(index: int) -> tuple[RegisteredObject, dict[str, Any], str | None]:
-            return finish_object(
+            result = finish_object(
                 plans[index], candidates[index], failures[index], out_dir, cfg, seed
             )
+            if on_object is not None:
+                on_object(result[0], result[1])
+            return result
 
         return list(fits.map(finish, range(len(plans))))
 
@@ -523,7 +534,15 @@ class ShapeStage:
 
         objects, report = [], {}
         results = shape_scene(
-            instances.objects, world, ctx.run_dir, ctx.out_dir, masks, model, stage_cfg, ctx.seed
+            instances.objects,
+            world,
+            ctx.run_dir,
+            ctx.out_dir,
+            masks,
+            model,
+            stage_cfg,
+            ctx.seed,
+            on_object=lambda reg, _entry: ctx.report(shape_live_line(reg)),
         )
         for obj, (registered, entry, checkpoint) in zip(instances.objects, results, strict=True):
             if checkpoint is not None:

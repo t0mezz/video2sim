@@ -19,7 +19,7 @@ POSE = SE3.from_numpy(
     np.array([[1.0, 0, 0, 0], [0, -1.0, 0, 0], [0, 0, -1.0, 1.0], [0, 0, 0, 1.0]])
 )
 TABLE = Plane(normal=(0.0, 0.0, 1.0), offset_m=0.0)
-CFG = RepairConfig(merge_radius_m=0.05, split_gap_m=0.10, min_frames=3)
+CFG = RepairConfig(merge_radius_m=0.05, split_gap_m=0.10, min_frames=3, sliver_frac=0.2)
 
 
 def _blob(u: int, v: int) -> BoolMask:
@@ -74,6 +74,33 @@ def test_a_short_stray_group_joins_the_nearest_object_instead_of_splitting() -> 
     masks[10] = _blob(70, 60)
     tracks, report = _repair([Track(0, masks)])
     assert len(tracks) == 1 and report.splits == ()
+
+
+def _sliver() -> BoolMask:
+    sliver = np.zeros((100, 100), dtype=bool)
+    sliver[58:60, 69:71] = True  # 4 px far away, like a nearly hidden object
+    return sliver
+
+
+def test_an_occlusion_sliver_window_splits_without_the_guard() -> None:
+    from dataclasses import replace
+
+    masks = {f: _blob(30, 60) for f in range(12)}
+    for f in range(5, 9):
+        masks[f] = _sliver()
+    tracks, report = repair_tracks(
+        [Track(0, masks)], {f: POSE for f in range(12)}, K, TABLE, replace(CFG, sliver_frac=0.0)
+    )
+    assert len(tracks) == 2 and report.splits == ((0, (0, 1)),)
+
+
+def test_an_occlusion_sliver_does_not_found_a_new_group() -> None:
+    masks = {f: _blob(30, 60) for f in range(12)}
+    for f in range(5, 9):
+        masks[f] = _sliver()
+    tracks, report = _repair([Track(0, masks)])
+    assert len(tracks) == 1 and report.splits == ()
+    assert sorted(tracks[0].masks) == list(range(12))
 
 
 def test_config_rejects_bad_values() -> None:
