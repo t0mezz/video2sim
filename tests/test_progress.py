@@ -2,8 +2,12 @@ from __future__ import annotations
 
 import io
 import json
+import sys
+import threading
 import time
 from pathlib import Path
+
+import pytest
 
 from video2sim.progress import (
     ProgressReporter,
@@ -59,6 +63,109 @@ def test_terminal_shows_a_spinner_that_the_result_line_replaces() -> None:
     frame = text.split("\033[2K")[1]
     assert frame[1:].startswith(" [2/6]")  # a spinner frame, a space, then the label
     assert "\033[2K  [2/6] reconstruction  done in 2 s\n" in text  # label in the same column
+
+
+def test_info_event_prints_a_live_line_in_plain_mode() -> None:
+    out = io.StringIO()
+    reporter = ProgressReporter(out)
+    reporter(StageEvent("started", "shape", 4, 6))
+    reporter(StageEvent("info", "shape", 4, 6, None, "obj_000: fit 0.90"))
+    reporter(StageEvent("done", "shape", 4, 6, 1.0))
+    reporter.close()
+    assert out.getvalue().splitlines() == [
+        "[4/6] shape  running",
+        "  obj_000: fit 0.90",
+        "[4/6] shape  done in 1 s",
+    ]
+    assert "\033" not in out.getvalue()
+
+
+def test_info_event_pauses_and_resumes_the_spinner() -> None:
+    out = Tty()
+    reporter = ProgressReporter(out)
+    reporter(event("started"))
+    time.sleep(0.25)
+    reporter(StageEvent("info", "reconstruction", 2, 6, None, "route table: 3 listed, 2 tracks"))
+    reporter(event("done", 2.0))
+    reporter.close()
+    text = out.getvalue()
+    assert "route table: 3 listed, 2 tracks\n" in text
+    assert text.count("done in 2 s") == 1
+    info_at = text.index("route table")
+    assert "[2/6] reconstruction" in text[info_at:]  # a spinner frame follows the live line
+    assert text.count("\n") == 2  # the live line and the result line only
+
+
+def test_done_line_shows_a_green_check_on_a_utf8_terminal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("TERM", "xterm")
+    monkeypatch.delenv("NO_COLOR", raising=False)
+    out = _Utf8()
+    reporter = ProgressReporter(out)
+    reporter(StageEvent("done", "shape", 4, 6, 1.0))
+    reporter.close()
+    assert out.getvalue() == "\r\033[2K\033[32m✓\033[0m [4/6] shape  done in 1 s\n\r\033[2K"
+
+
+def test_info_lines_are_gray_and_indented_on_a_terminal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("TERM", "xterm")
+    monkeypatch.delenv("NO_COLOR", raising=False)
+    out = _Utf8()
+    reporter = ProgressReporter(out)
+    reporter(StageEvent("info", "shape", 4, 6, None, "obj_000: fit 0.90"))
+    reporter.close()
+    assert "  \033[90mobj_000: fit 0.90\033[0m\n" in out.getvalue()
+
+
+def test_no_color_falls_back_to_the_plain_indent(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("NO_COLOR", "1")
+    out = _Utf8()
+    reporter = ProgressReporter(out)
+    reporter(StageEvent("done", "shape", 4, 6, 1.0))
+    reporter.close()
+    assert out.getvalue() == "\r\033[2K  [4/6] shape  done in 1 s\n\r\033[2K"
+
+
+def test_concurrent_live_lines_and_results_never_fail_or_lose_a_line() -> None:
+    # A thread race, so the test narrows the switch interval to force thread
+    # switches inside the reporter's halt/resume window; restored afterwards.
+    old_interval = sys.getswitchinterval()
+    sys.setswitchinterval(0.000001)
+    try:
+        out = Tty()
+        reporter = ProgressReporter(out)
+        errors: list[Exception] = []
+        reporter(StageEvent("started", "shape", 4, 6))
+
+        def hammer(n: int) -> None:
+            try:
+                for i in range(n):
+                    reporter(StageEvent("info", "shape", 4, 6, None, f"obj_{i:03d}: fit 0.90"))
+            except Exception as e:
+                errors.append(e)
+
+        threads = [threading.Thread(target=hammer, args=(100,)) for _ in range(8)]
+        for thread in threads:
+            thread.start()
+        try:
+            for _ in range(100):
+                reporter(StageEvent("done", "shape", 4, 6, 0.01))
+                reporter(StageEvent("started", "shape", 4, 6))
+        except Exception as e:
+            errors.append(e)
+        for thread in threads:
+            thread.join()
+        reporter.close()
+        assert not errors
+        text = out.getvalue()
+        assert text.count("done in") == 100
+        for i in range(100):
+            assert text.count(f"obj_{i:03d}: fit 0.90\n") == 8
+    finally:
+        sys.setswitchinterval(old_interval)
 
 
 def test_a_second_started_event_stops_the_first_spinner() -> None:
@@ -135,8 +242,24 @@ def test_done_event_reports_stage_summary_by_default(tmp_path: Path) -> None:
     reporter.close()
     assert out.getvalue().splitlines() == [
         "[1/6] capture  done in 2 s",
-        "3 frames at 5.0 fps",
+        "-> 3 frames at 5.0 fps",
     ]
+
+
+def test_summary_lines_carry_an_arrow_on_utf8_terminals(tmp_path: Path) -> None:
+    _write_stage(
+        tmp_path,
+        "r1",
+        "capture",
+        {"accepted": True, "frame_paths": ["a", "b", "c"], "fps": 5.0},
+    )
+    out = _Utf8()
+    reporter = ProgressReporter(out, runs_root=tmp_path)
+    reporter(StageEvent("done", "capture", 1, 6, 2.0, run_id="r1"))
+    reporter.close()
+    text = out.getvalue()
+    # The arrow sits in the spinner/checkmark column, right after the line erase.
+    assert "\r\033[2K⇾ 3 frames at 5.0 fps\n" in text
 
 
 def test_cached_event_reports_summary_and_missing_output_stays_quiet(tmp_path: Path) -> None:
@@ -159,7 +282,7 @@ def test_cached_event_reports_summary_and_missing_output_stays_quiet(tmp_path: P
     reporter.close()
     assert out.getvalue().splitlines() == [
         "[2/6] reconstruction  cached",
-        "2 frames, 100% registered, reprojection 0.50 px, scale from marker",
+        "-> 2 frames, 100% registered, reprojection 0.50 px, scale from marker",
         "[4/6] shape  done in 3 s",
     ]
 

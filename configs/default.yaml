@@ -98,6 +98,7 @@ segmentation:
       merge_radius_m: 0.05     # tracks with no shared frame whose table footprints are this close are one object
       split_gap_m: 0.10        # a track whose footprints fall into groups this far apart is two objects
       min_frames: 3            # smallest group that counts as an object when splitting
+      sliver_frac: 0.2         # feet from masks below this share of the track median are occlusion slivers, not new objects
   lift:                        # P2.3: masks to point clusters by voting over views (visual hull)
     voxel_m: 0.005             # grid resolution; a cluster point is a voxel centre
     max_height_m: 0.35         # grid top above the table plane; objects taller than this are cut off
@@ -108,6 +109,11 @@ segmentation:
     min_views: 5               # a voxel needs this many views that see it
     min_agreement: 0.9         # share of those views whose mask must contain it; the slack is occlusion
     min_voxels: 20             # smaller clusters are dropped and listed in the lift report
+    occlusion_aware: true      # excuse views where a voxel lands on another track's mask only
+    small_mask_px: 15000       # tracks below this median mask size vote with the small thresholds
+    small_min_agreement: 0.9   # agreement for small tracks
+    small_min_voxels: 20       # minimum voxels for small tracks
+    dup_dist_m: 0.02           # clusters closer than this are one object; the smaller is dropped as a duplicate
     min_points: 8              # the sparse-point variant: fewer voted SfM points drop the track
     table_margin_m: 0.003      # sparse points this close to the table plane are the table, not the object
     trim_points_per_side: 2    # outermost sparse points dropped per side of the resting box (strays); easy-tier median 18.7% -> 8.9%, docs/research/cluster_box_accuracy.md
@@ -191,7 +197,7 @@ shape:
     api_key_env: null          # name of an environment variable or .env entry; null sends no Authorization header
     timeout_s: 600
     retries: 3
-  keyframes_per_object: 2      # P3.4: best keyframes the model is run on
+  keyframes_per_object: 6      # P3.4: best keyframes the model is run on
   samples_per_keyframe: 1      # seeds per keyframe; 2 draws per object, 5.7% size error against 5.0% with 6 (D-030)
   max_views: 12                # frames whose masks enter registration, spread over the video
   min_fit_score: 0.5           # below this the convex hull of the cluster stands in; a guess

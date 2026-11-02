@@ -14,9 +14,11 @@ from video2sim.stages.segmentation_stage import (
     build_object,
     choose_cluster,
     fit_report,
+    flag_live_line,
     object_flags,
     repaired_ids,
     route_report,
+    tracking_live_line,
     write_object_files,
 )
 from video2sim.stages.track_repair import RepairReport
@@ -30,6 +32,26 @@ def decision(
 ) -> MaterialDecision:
     verdict: Verdict = "clear"
     return MaterialDecision(3, flag, "reason", verdict, "ok", answer, None, non_rigid)
+
+
+def test_live_lines_name_the_route_and_each_flagged_object() -> None:
+    summary = {
+        "surface": "table",
+        "prompt": "objects on a table",
+        "objects": ["box", "box", "cube"],
+        "reason": "VLM surface table (0.99)",
+        "fell_back": False,
+        "tracks_raw": 2,
+        "tracks_repaired": 2,
+        "splits": [],
+        "merges": [[0, 1]],
+    }
+    assert tracking_live_line(summary) == (
+        "route VLM surface table (0.99): 3 listed, 2 tracks (1 merges, 0 splits)"
+    )
+    assert flag_live_line("obj_001", "box", ["occluded", "small"]) == (
+        "obj_001 (box): occluded, small"
+    )
 
 
 def test_repaired_ids_cover_split_parts_and_the_kept_id_of_a_merge() -> None:

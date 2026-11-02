@@ -36,6 +36,11 @@ LIFT = LiftConfig(
     min_points=8,
     table_margin_m=0.003,
     trim_points_per_side=0,
+    occlusion_aware=False,
+    small_mask_px=15000,
+    small_min_agreement=0.9,
+    small_min_voxels=20,
+    dup_dist_m=0.02,
 )
 CFG = PrimitiveConfig(
     mask_downscale=2,

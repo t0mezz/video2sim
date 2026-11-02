@@ -2,17 +2,24 @@
 
 ``ProgressReporter`` is a runner ``on_event`` handler. On a terminal it draws a spinner with the
 running stage and its elapsed time on one line and replaces it with a result line when the stage
-ends. Result lines are indented by the width of the spinner and its space, so the stage labels
-of past and running stages line up in one column. Anywhere else (a pipe, a log file, CI) it
-writes one plain line per event and never uses carriage returns.
+ends. A finished stage gets a green check in the spinner's column; other result lines keep the
+indented column, so the stage labels of past and running stages line up. Anywhere else (a pipe,
+a log file, CI) it writes one plain line per event and never uses carriage returns.
 
 With ``verbose`` it always writes plain lines, so the logs of native libraries that are left on
 do not tangle with a spinner, and adds the run id and the cache keys. Standard library only.
 
 With ``runs_root`` a finished stage (``done`` or ``cached``) gains up to two summary lines read
 from that stage's own ``output.json`` and its sidecars: frame counts, the router's path, proxy
-fallbacks, mass sources. A missing or unreadable file means no summary lines, never an error,
+fallbacks, mass sources. Each summary line starts with an arrow (``⇾`` on UTF-8 streams,
+``->`` elsewhere) in the spinner/checkmark column. A missing or unreadable file means
+no summary lines, never an error,
 so dry runs and foreign folders stay quiet.
+
+An ``info`` event is a live line a stage reports while it runs (``StageContext.report``): one
+line per object per milestone, indented two spaces past the stage label, gray on color
+terminals and plain but still indented anywhere else. On a terminal the spinner pauses
+for the line and resumes with its elapsed time kept.
 """
 
 from __future__ import annotations
@@ -35,7 +42,25 @@ _BRAILLE = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
 _ASCII = "|/-\\"
 _ERASE = "\r\033[2K"
 _INDENT = "  "  # one spinner frame and a space
+_GREEN = "\033[32m"
+_GRAY = "\033[90m"
+_RESET = "\033[0m"
 _TICK_S = 0.1
+
+
+def _done_mark(interactive: bool, encoding: str) -> str:
+    """Green check for finished stages, in the spinner's column.
+
+    Terminals only: pipes, log files and CI keep the plain indented line, and
+    ``NO_COLOR``/dumb terminals and non-UTF streams fall back to the indent.
+    """
+    if not interactive:
+        return ""
+    if "NO_COLOR" in os.environ or os.environ.get("TERM") == "dumb":
+        return ""
+    if not encoding.startswith("utf"):
+        return ""
+    return f"{_GREEN}✓{_RESET} "
 
 
 def banner(stream: TextIO, env: Mapping[str, str] | None = None) -> str:
@@ -273,8 +298,17 @@ class ProgressReporter:
         tty = stream.isatty() if interactive is None else interactive
         self._interactive = tty and not verbose
         encoding = (getattr(stream, "encoding", None) or "").lower()
+        self._mark = _done_mark(self._interactive, encoding)
+        # The mark is non-empty exactly on color-capable terminals, so it doubles
+        # as the gray switch for live lines below.
+        self._color = bool(self._mark)
         self._frames = _BRAILLE if encoding.startswith("utf") else _ASCII
+        self._arrow = "⇾ " if encoding.startswith("utf") else "-> "
         self._lock = threading.Lock()
+        # Serializes spinner transitions (halt/resume) across the runner thread and
+        # stage worker threads reporting live lines. Reentrant: _halt/_resume below
+        # assume the caller holds it. Always taken before _lock, never the reverse.
+        self._transition = threading.RLock()
         self._label = ""
         self._started = 0.0
         self._stop: threading.Event | None = None
@@ -287,11 +321,16 @@ class ProgressReporter:
         tail = f"  ({event.detail})" if self._verbose and event.detail else ""
         if event.kind == "started":
             self._begin(label, tail)
+        elif event.kind == "info":
+            self._info(event.message or "")
         elif event.kind == "cached":
             self._line(f"{label}  cached{tail}")
             self._report_summaries(event)
         elif event.kind == "done":
-            self._end(f"{label}  done in {format_seconds(event.seconds or 0.0)}{tail}")
+            self._end(
+                f"{label}  done in {format_seconds(event.seconds or 0.0)}{tail}",
+                ok=True,
+            )
             self._report_summaries(event)
         else:
             reason = f": {event.message}" if event.message else ""
@@ -299,7 +338,12 @@ class ProgressReporter:
             self._end(f"{label}  failed after {seconds}{reason}{tail}")
 
     def _report_summaries(self, event: StageEvent) -> None:
-        """Summary lines for a finished stage, read from its own outputs when known."""
+        """Summary lines for a finished stage, read from its own outputs when known.
+
+        Each line gets an arrow marker (``⇾`` on UTF-8 streams, ``->`` elsewhere)
+        in the spinner/checkmark column, so summaries stand out from live lines
+        and result lines.
+        """
         if self._runs_root is None or not event.run_id:
             return
         try:
@@ -307,7 +351,7 @@ class ProgressReporter:
         except Exception:
             return
         for line in lines:
-            self._line(line)
+            self._summary(line)
 
     def _announce(self, event: StageEvent) -> None:
         if not self._announced and event.run_id:
@@ -316,31 +360,83 @@ class ProgressReporter:
 
     def close(self) -> None:
         """Stop the spinner and clear its line, for example after Ctrl-C."""
-        self._halt()
-        if self._interactive:
-            with self._lock:
-                self._stream.write(_ERASE)
-                self._stream.flush()
+        with self._transition:
+            self._halt()
+            if self._interactive:
+                with self._lock:
+                    self._stream.write(_ERASE)
+                    self._stream.flush()
+
+    def _info(self, text: str) -> None:
+        """A live line from a running stage. Never blank, never longer than a summary.
+
+        Gray and indented two spaces past the stage label on color terminals; plain
+        but still indented anywhere else, so pipes and logs stay free of escapes.
+        """
+        line = _clip(text)
+        if not line:
+            return
+        if self._color:
+            line = f"{_GRAY}{line}{_RESET}"
+        line = f"  {line}"
+        with self._transition:
+            if self._interactive and self._thread is not None:
+                label, started = self._label, self._started
+                self._halt()
+                self._line(line)
+                self._label, self._started = label, started
+                self._resume()
+            else:
+                self._line(line)
 
     def _begin(self, label: str, tail: str) -> None:
-        self._halt()
-        self._label, self._started = label, time.monotonic()
-        if not self._interactive:
-            self._line(f"{label}  running{tail}")
-            return
-        self._stop = threading.Event()
-        self._thread = threading.Thread(target=self._spin, args=(self._stop,), daemon=True)
-        self._thread.start()
+        with self._transition:
+            self._halt()
+            self._label, self._started = label, time.monotonic()
+            if not self._interactive:
+                self._line(f"{label}  running{tail}")
+                return
+            self._resume()
 
-    def _end(self, text: str) -> None:
-        self._halt()
-        self._line(text)
+    def _resume(self) -> None:
+        # Call with _transition held. The thread starts before it is published: a
+        # concurrent _halt may then only ever see started threads, so join() cannot
+        # hit a thread that was created but not started. That race crashed long
+        # stages reporting live lines from worker threads (RuntimeError: cannot
+        # join thread before it is started).
+        stop = threading.Event()
+        thread = threading.Thread(target=self._spin, args=(stop,), daemon=True)
+        thread.start()
+        self._stop = stop
+        self._thread = thread
+
+    def _end(self, text: str, ok: bool = False) -> None:
+        with self._transition:
+            self._halt()
+            if ok and self._mark:
+                with self._lock:
+                    self._stream.write(f"{_ERASE}{self._mark}{text}\n")
+                    self._stream.flush()
+            else:
+                self._line(text)
 
     def _halt(self) -> None:
-        if self._stop is not None and self._thread is not None:
-            self._stop.set()
-            self._thread.join()
+        # Call with _transition held. The grabbed thread was started before it was
+        # published (see _resume), so join() below always sees a started thread.
+        stop, thread = self._stop, self._thread
         self._stop = self._thread = None
+        if stop is not None and thread is not None:
+            stop.set()
+            thread.join()
+
+    def _summary(self, text: str) -> None:
+        """A stage summary line, with the arrow in the spinner/checkmark column."""
+        with self._lock:
+            if self._interactive:
+                self._stream.write(f"{_ERASE}{self._arrow}{text}\n")
+            else:
+                self._stream.write(f"{self._arrow}{text}\n")
+            self._stream.flush()
 
     def _line(self, text: str) -> None:
         with self._lock:

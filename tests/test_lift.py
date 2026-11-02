@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import Any
 
 import numpy as np
@@ -9,6 +10,7 @@ from video2sim.evaluation.geometry import box_vertices
 from video2sim.schemas import SE3, CameraFrame, Intrinsics, Plane, WorldModel
 from video2sim.stages.lift import (
     LiftConfig,
+    _duplicate_tracks,
     _largest_component,
     footprint_axes,
     lift_points,
@@ -90,6 +92,11 @@ CFG = LiftConfig(
     min_points=8,
     table_margin_m=0.003,
     trim_points_per_side=0,
+    occlusion_aware=False,
+    small_mask_px=15000,
+    small_min_agreement=0.9,
+    small_min_voxels=20,
+    dup_dist_m=0.02,
 )
 
 
@@ -127,6 +134,45 @@ def test_a_mask_seen_in_one_view_adds_nothing() -> None:
     assert "no voxel" in report.dropped[1] or "voxels agree" in report.dropped[1]
 
 
+def test_occluded_views_are_excused_with_occlusion_aware() -> None:
+    world = _world()
+    back = _box_masks(world, (0.04, 0.04, 0.04), (0.0, 0.0))
+    front = _box_masks(world, (0.08, 0.08, 0.16), (0.09, 0.0))
+    # SAM sees only the visible part: the back box minus the blocker's silhouette.
+    visible = {i: m & ~front[i] for i, m in back.items()}
+    tracks = [Track(0, visible), Track(1, front)]
+    clusters, report = lift_tracks(tracks, world, CFG)
+    assert 0 not in clusters and 1 in clusters
+    assert report.dropped[0] == "no voxel is inside the mask in enough views"
+    aware = replace(CFG, occlusion_aware=True)
+    clusters, report = lift_tracks(tracks, world, aware)
+    assert sorted(clusters) == [0, 1] and report.dropped == {}
+
+
+def test_coinciding_clusters_drop_the_smaller_as_a_duplicate() -> None:
+    rng = np.random.default_rng(0)
+    cloud = rng.random((50, 3)) * 0.05
+    shifted = cloud + np.array([0.005, 0.0, 0.0])  # 5 mm over: the same object twice
+    far = cloud + np.array([0.16, 0.0, 0.0])  # a genuinely separate object
+    assert _duplicate_tracks({0: cloud, 1: shifted}, 0.02) == {1: "duplicate of track 0"}
+    assert _duplicate_tracks({0: cloud, 2: far}, 0.02) == {}
+    assert _duplicate_tracks({0: cloud, 1: shifted}, 0.0) == {}
+
+
+def test_small_track_uses_the_relaxed_agreement() -> None:
+    world = _world()
+    masks = _box_masks(world, (0.04, 0.04, 0.04), (0.0, 0.0))
+    assert float(np.median([m.sum() for m in masks.values()])) < CFG.small_mask_px
+    jittered = dict(masks)
+    for i in (3, 7):
+        jittered[i] = np.roll(masks[i], 30, axis=(0, 1))  # 10 of 12 views agree: 0.83
+    clusters, report = lift_tracks([Track(0, jittered)], world, CFG)
+    assert 0 not in clusters
+    relaxed = replace(CFG, small_min_agreement=0.75)
+    clusters, report = lift_tracks([Track(0, jittered)], world, relaxed)
+    assert 0 in clusters and report.dropped == {}
+
+
 def test_largest_component_drops_a_detached_voxel() -> None:
     cells = np.array([[0, 0, 0], [1, 0, 0], [1, 1, 1], [9, 9, 9]], dtype=np.int64)
     assert _largest_component(cells).tolist() == [True, True, True, False]
@@ -137,12 +183,18 @@ def test_config_rejects_bad_values() -> None:
         "voxel_m": 0.005, "max_height_m": 0.3, "margin_m": 0.1, "max_extent_m": 1.5,
         "max_views": 10, "mask_downscale": 4, "min_views": 5, "min_agreement": 0.85,
         "min_voxels": 20, "min_points": 8, "table_margin_m": 0.003, "trim_points_per_side": 2,
+        "occlusion_aware": False, "small_mask_px": 15000, "small_min_agreement": 0.85,
+        "small_min_voxels": 20, "dup_dist_m": 0.02,
     }  # fmt: skip
     assert LiftConfig.from_config({"segmentation": {"lift": base}}).max_views == 10
     for key, value in (
         ("voxel_m", 0.0),
         ("min_views", 0),
         ("min_agreement", 1.5),
+        ("small_min_agreement", 0.0),
+        ("small_min_voxels", 0),
+        ("small_mask_px", 0.0),
+        ("dup_dist_m", -0.01),
         ("trim_points_per_side", -1),
     ):
         with pytest.raises(ValueError):

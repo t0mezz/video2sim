@@ -9,9 +9,19 @@ on another object is dropped.
 
 * A view where a track has no mask is skipped for that track: SAM found nothing there, and a
   lost object must not veto its own voxels (s03's ball is missing from the first 17 frames).
-* The slack in ``min_agreement`` is for occlusion. A voxel hidden behind another object
+* Without ``occlusion_aware``, the slack in ``min_agreement`` is the only occlusion
+  budget. A voxel hidden behind another object
   projects onto the occluder's mask in those views and still counts as in view.
 * A voxel claimed by two tracks goes to the one with the higher agreement.
+* With ``occlusion_aware`` a voxel that lands on another track's mask but not its own
+  excuses that view (like a missing mask), instead of counting seen-but-not-hit.
+  Without it, an object hidden in more than ``1 - min_agreement`` of views can never pass.
+* Tracks below ``small_mask_px`` median mask pixels vote with ``small_min_agreement``
+  and ``small_min_voxels``: fist-sized thresholds kill small objects, whose few voxels
+  die first to mask jitter at the edges.
+* Coinciding clusters are duplicates: when two cluster centers are closer than
+  ``dup_dist_m`` the smaller cluster is dropped as a duplicate of the larger, so a
+  fractured track can never export the same object twice.
 * Only the largest connected group of each track is kept, which removes outlier voxels.
 * A track with too few voxels, or one that reaches the top of the grid, is dropped and listed
   in the report. Hands and arms are not detected as such: they move between views, so their
@@ -68,6 +78,11 @@ class LiftConfig:
     min_points: int
     table_margin_m: float
     trim_points_per_side: int
+    occlusion_aware: bool
+    small_mask_px: float
+    small_min_agreement: float
+    small_min_voxels: int
+    dup_dist_m: float
 
     @classmethod
     def from_config(cls, cfg: dict[str, Any]) -> LiftConfig:
@@ -85,6 +100,11 @@ class LiftConfig:
             int(c["min_points"]),
             float(c["table_margin_m"]),
             int(c["trim_points_per_side"]),
+            bool(c["occlusion_aware"]),
+            float(c["small_mask_px"]),
+            float(c["small_min_agreement"]),
+            int(c["small_min_voxels"]),
+            float(c["dup_dist_m"]),
         )
         if (
             min(out.voxel_m, out.max_height_m, out.margin_m, out.max_extent_m) <= 0
@@ -92,7 +112,14 @@ class LiftConfig:
         ):
             raise ValueError("lift lengths must be positive")
         if (
-            min(out.max_views, out.mask_downscale, out.min_views, out.min_voxels, out.min_points)
+            min(
+                out.max_views,
+                out.mask_downscale,
+                out.min_views,
+                out.min_voxels,
+                out.min_points,
+                out.small_min_voxels,
+            )
             < 1
         ):
             raise ValueError("lift counts must be at least 1")
@@ -100,6 +127,12 @@ class LiftConfig:
             raise ValueError("trim_points_per_side must not be negative")
         if not 0.0 < out.min_agreement <= 1.0:
             raise ValueError("min_agreement must be in (0, 1]")
+        if not 0.0 < out.small_min_agreement <= 1.0:
+            raise ValueError("small_min_agreement must be in (0, 1]")
+        if out.small_mask_px <= 0:
+            raise ValueError("small_mask_px must be positive")
+        if out.dup_dist_m < 0:
+            raise ValueError("dup_dist_m must not be negative")
         return out
 
 
@@ -205,6 +238,12 @@ def lift_tracks(
     views = _views(world, cfg)
     k = world.intrinsics
     scale = 1.0 / cfg.mask_downscale
+    areas = np.array(
+        [float(np.median([m.sum() for m in t.masks.values()])) if t.masks else 0.0 for t in tracks]
+    )
+    small_track = areas < cfg.small_mask_px
+    agree = np.where(small_track, cfg.small_min_agreement, cfg.min_agreement)
+    minvox = np.where(small_track, cfg.small_min_voxels, cfg.min_voxels)
     seen = np.zeros((len(tracks), len(centers)), dtype=np.int32)
     hits = np.zeros((len(tracks), len(centers)), dtype=np.int32)
     for position in views:
@@ -219,47 +258,90 @@ def lift_tracks(
         ok &= (u >= 0) & (u < k.width_px) & (v >= 0) & (v < k.height_px)
         ui = np.clip((u * scale).astype(np.int64), 0, None)
         vi = np.clip((v * scale).astype(np.int64), 0, None)
-        for row, track in enumerate(tracks):
+        smalls: list[NDArray[np.bool_] | None] = []
+        for track in tracks:
             mask = track.masks.get(frame.frame_index)
             if mask is None:
+                smalls.append(None)
                 continue  # SAM found nothing here: no evidence either way for this track
-            small = cv2.resize(
-                mask.astype(np.uint8),
-                None,
-                fx=scale,
-                fy=scale,
-                interpolation=cv2.INTER_AREA,
-            ).astype(bool)
-            inside = (
-                ok & small[np.minimum(vi, small.shape[0] - 1), np.minimum(ui, small.shape[1] - 1)]
+            smalls.append(
+                cv2.resize(
+                    mask.astype(np.uint8),
+                    None,
+                    fx=scale,
+                    fy=scale,
+                    interpolation=cv2.INTER_AREA,
+                ).astype(bool)
             )
-            seen[row] += ok
-            hits[row] += inside
+        combined: NDArray[np.bool_] | None = None
+        if cfg.occlusion_aware:
+            present = [s for s in smalls if s is not None]
+            if present:
+                combined = np.stack(present).any(axis=0)
+        for row, small in enumerate(smalls):
+            if small is None:
+                continue
+            own = small[np.minimum(vi, small.shape[0] - 1), np.minimum(ui, small.shape[1] - 1)]
+            use = ok
+            if combined is not None:
+                occluded = (
+                    combined[
+                        np.minimum(vi, combined.shape[0] - 1), np.minimum(ui, combined.shape[1] - 1)
+                    ]
+                    & ~own
+                )
+                # On another track's mask only: hidden, not evidence against this track.
+                use = ok & ~occluded
+            seen[row] += use
+            hits[row] += use & own
 
     ratio = np.where(seen >= cfg.min_views, hits / np.maximum(seen, 1), 0.0)
     best = ratio.argmax(axis=0)
-    claimed = ratio.max(axis=0) >= cfg.min_agreement
 
     clusters: dict[int, F64] = {}
     dropped: dict[int, str] = {}
     voxels: dict[int, int] = {}
     top_layer = shape[2] - 1
     for row, track in enumerate(tracks):
-        member = np.nonzero(claimed & (best == row))[0]
+        member = np.nonzero((ratio[row] >= agree[row]) & (best == row))[0]
         if member.size == 0:
             dropped[track.track_id] = "no voxel is inside the mask in enough views"
             continue
         cells = np.stack(np.unravel_index(member, shape), axis=1).astype(np.int64)
         keep = _largest_component(cells)
         member, cells = member[keep], cells[keep]
-        if len(member) < cfg.min_voxels:
+        if len(member) < minvox[row]:
             dropped[track.track_id] = f"only {len(member)} voxels agree"
         elif int(np.max(cells[:, 2])) >= top_layer:
             dropped[track.track_id] = "reaches the top of the grid (not a tabletop object)"
         else:
             clusters[track.track_id] = centers[member]
             voxels[track.track_id] = len(member)
+    if cfg.dup_dist_m > 0.0:
+        dups = _duplicate_tracks(clusters, cfg.dup_dist_m)
+        for i, reason in dups.items():
+            del clusters[i]
+            voxels.pop(i, None)
+            dropped[i] = reason
     return clusters, LiftReport(len(views), voxels, dropped)
+
+
+def _duplicate_tracks(clusters: Mapping[int, F64], dup_dist_m: float) -> dict[int, str]:
+    """Ids to drop: clusters coinciding within ``dup_dist_m`` keep the larger one.
+
+    A fractured track lifts twice to the same object; the pieces agree voxel for voxel,
+    so their centers coincide far below any distance two real objects can have.
+    """
+    means = {i: np.asarray(c).mean(axis=0) for i, c in clusters.items()}
+    dups: dict[int, str] = {}
+    for a in sorted(clusters):
+        for b in sorted(clusters):
+            if b <= a or a in dups or b in dups:
+                continue
+            if float(np.linalg.norm(means[a] - means[b])) < dup_dist_m:
+                keep, drop = (a, b) if len(clusters[a]) >= len(clusters[b]) else (b, a)
+                dups[drop] = f"duplicate of track {keep}"
+    return dups
 
 
 def footprint_axes(points: F64) -> tuple[F64, F64]:

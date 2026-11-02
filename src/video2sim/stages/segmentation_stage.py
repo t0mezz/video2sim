@@ -113,6 +113,21 @@ def route_report(
     }
 
 
+def tracking_live_line(summary: dict[str, Any]) -> str:
+    """The route line for the live log, from a ``route_report`` dict."""
+    listed = len(summary["objects"]) if isinstance(summary["objects"], list) else 0
+    splits = len(summary["splits"]) if isinstance(summary["splits"], list) else 0
+    merges = len(summary["merges"]) if isinstance(summary["merges"], list) else 0
+    reason = str(summary["reason"] or summary["surface"])
+    repaired = int(summary["tracks_repaired"])
+    return f"route {reason}: {listed} listed, {repaired} tracks ({merges} merges, {splits} splits)"
+
+
+def flag_live_line(object_id: str, label: str, flags: list[str]) -> str:
+    """One flagged object for the live log."""
+    return f"{object_id} ({label}): {', '.join(flags)}"
+
+
 def repaired_ids(report: RepairReport) -> set[int]:
     """Ids of tracks that were produced by a split or a merge."""
     ids = {i for _, parts in report.splits for i in parts}
@@ -268,14 +283,17 @@ class SegmentationStage:
         )
         for track_id, reason in marker_report.dropped.items():
             scene_flags.append(f"track {track_id} dropped as a marker: {reason}")
+            ctx.report(f"dropped track {track_id}: marker ({reason})")
         poses = {f.frame_index: f.T_world_from_camera for f in world.frames}
         repaired, report = repair_tracks(
             raw, poses, world.intrinsics, world.table_plane, RepairConfig.from_config(cfg)
         )
+        summary = route_report(route, raw, repaired, report)
         (ctx.out_dir / "route.json").write_text(
-            json.dumps(route_report(route, raw, repaired, report), indent=2) + "\n",
+            json.dumps(summary, indent=2) + "\n",
             encoding="utf-8",
         )
+        ctx.report(tracking_live_line(summary))
 
         hulls, hull_report = lift_tracks(repaired, world, lift_cfg)
         kept = [t for t in repaired if t.track_id in hulls]
@@ -283,6 +301,7 @@ class SegmentationStage:
             if t.track_id not in hulls:
                 reason = hull_report.dropped.get(t.track_id, "no point cluster")
                 scene_flags.append(f"track {t.track_id} dropped: {reason}")
+                ctx.report(f"dropped track {t.track_id}: {reason}")
         check = compare_counts(route, len(kept))
         if check.missing_suspected:
             scene_flags.append(f"possible missing object: {check.reason}")
@@ -369,4 +388,7 @@ class SegmentationStage:
                     decision,
                 )
             )
+            if flags:
+                label = decision.answer.category if decision.answer is not None else "object"
+                ctx.report(flag_live_line(object_id, label, [f.value for f in flags]))
         return Instances(objects=objects, flags=scene_flags)
