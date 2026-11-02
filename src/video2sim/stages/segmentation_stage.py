@@ -53,7 +53,12 @@ from video2sim.stages.material_pass import (
     decide_all,
     pick_frames,
 )
-from video2sim.stages.primitive_fit import FitResult, PrimitiveConfig, fit_clusters
+from video2sim.stages.primitive_fit import (
+    FitResult,
+    PrimitiveConfig,
+    drop_duplicate_fits,
+    fit_clusters,
+)
 from video2sim.stages.scene_router import (
     Route,
     RouterClient,
@@ -311,7 +316,14 @@ class SegmentationStage:
 
         cloud = load_points(ctx.run_dir / world.point_cloud_path)
         sparse, _ = lift_points(kept, world, cloud, lift_cfg)
-        fits = fit_clusters(kept, sparse, world, lift_cfg, PrimitiveConfig.from_config(cfg))
+        prim_cfg = PrimitiveConfig.from_config(cfg)
+        fits = fit_clusters(kept, sparse, world, lift_cfg, prim_cfg)
+        dups = drop_duplicate_fits(fits, {t.track_id: t for t in kept}, prim_cfg)
+        for i, reason in dups.items():
+            fits.pop(i, None)
+            scene_flags.append(f"track {i} dropped as a {reason}")
+            ctx.report(f"dropped track {i}: {reason}")
+        kept = [t for t in kept if t.track_id not in dups]
         ctx.out_dir.mkdir(parents=True, exist_ok=True)
         (ctx.out_dir / "fit.json").write_text(
             json.dumps(fit_report(fits), indent=2) + "\n", encoding="utf-8"

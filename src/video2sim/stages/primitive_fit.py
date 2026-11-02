@@ -74,6 +74,8 @@ class PrimitiveConfig:
     stack_gap_m: float
     stack_min_points: int
     stack_percentile: float
+    duplicate_dist_m: float
+    duplicate_size_frac: float
 
     @classmethod
     def from_config(cls, cfg: dict[str, Any]) -> PrimitiveConfig:
@@ -94,6 +96,8 @@ class PrimitiveConfig:
             float(c["stack_gap_m"]),
             int(c["stack_min_points"]),
             float(c["stack_percentile"]),
+            float(c["duplicate_dist_m"]),
+            float(c["duplicate_size_frac"]),
         )
         if min(out.mask_downscale, out.min_views, out.iterations, out.shrink_every) < 1:
             raise ValueError("primitive_fit counts must be at least 1")
@@ -101,6 +105,8 @@ class PrimitiveConfig:
             raise ValueError("shrink must be in (0, 1)")
         if min(out.step_m, out.step_deg, out.min_size_m, out.max_cost) <= 0:
             raise ValueError("primitive_fit steps, sizes and max_cost must be positive")
+        if out.duplicate_dist_m <= 0 or not 0.0 < out.duplicate_size_frac < 1.0:
+            raise ValueError("duplicate_dist_m must be positive and duplicate_size_frac in (0, 1)")
         return out
 
 
@@ -376,3 +382,45 @@ def fit_clusters(
                 "union with the points",
             )
     return seat_stacked(out, points, table_z, cfg)
+
+
+def drop_duplicate_fits(
+    fits: Mapping[int, FitResult],
+    tracks: Mapping[int, Track],
+    cfg: PrimitiveConfig,
+) -> dict[int, str]:
+    """Ids to drop: two fitted primitives of one object tracked twice.
+
+    A fragmented track gives frame-disjoint pieces whose voted points and table
+    footprints depend on the covered views, so neither the lift duplicate check nor the
+    repair merge fires on them. The fitted primitive does not depend on the views that
+    way: two tracks of one box fit the same box. Both s12 video_b breakfast tracks
+    agreed to 5 mm and 1% with no shared frame, while the closest distinct pair anywhere
+    (s13 stacked boxes) differs by 48% in size. Shared frames veto the drop: stacked
+    identical boxes co-occur, and only a mask-IoU check could tell those apart from
+    concurrent double tracks (not implemented).
+    """
+    prims = {i: f.primitive for i, f in fits.items() if f.primitive is not None}
+    dropped: dict[int, str] = {}
+    ids = sorted(prims)
+    for x in range(len(ids)):
+        for y in range(x + 1, len(ids)):
+            a, b = ids[x], ids[y]
+            if a in dropped or b in dropped:
+                continue
+            pa, pb = prims[a], prims[b]
+            if pa.kind != pb.kind:
+                continue
+            center = np.linalg.norm(np.array(pa.center_xy_m) - np.array(pb.center_xy_m))
+            if float(center) >= cfg.duplicate_dist_m:
+                continue
+            sizes = (np.array(pa.size_m), np.array(pb.size_m))
+            rel = np.abs(sizes[0] - sizes[1]).max() / max(sizes[0].max(), sizes[1].max())
+            if float(rel) >= cfg.duplicate_size_frac:
+                continue
+            if set(tracks[a].masks) & set(tracks[b].masks):
+                continue
+            better = (pa.views, -pa.cost) >= (pb.views, -pb.cost)
+            keep, drop = (a, b) if better else (b, a)
+            dropped[drop] = f"duplicate of track {keep}"
+    return dropped

@@ -128,6 +128,10 @@ segmentation:
     step_deg: 5.0              # starting step of the yaw
     min_size_m: 0.005          # a primitive side below this is rejected
     stack_min_overlap: 0.8     # stacked: this share of the footprint lies over another object ...
+    duplicate_dist_m: 0.02     # fitted primitives this close, this similar in size, with no
+    duplicate_size_frac: 0.15  # shared frame are one fragmented track; the smaller is dropped
+                             # (s12 video_b breakfast tracks agree to 5 mm and 1%; the closest
+                             # distinct pair, s13 stacked boxes, differs by 48% in size)
     stack_gap_m: 0.015         # ... and the lowest points are this close to that object's top; s13 is 1.0 cm off
     stack_min_points: 20       # fewer points say nothing about where an object starts
     stack_percentile: 2.0      # the lowest points, without strays

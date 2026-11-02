@@ -14,6 +14,7 @@ from video2sim.stages.primitive_fit import (
     Kind,
     PrimitiveConfig,
     _outline,
+    drop_duplicate_fits,
     fit_clusters,
     seat_stacked,
 )
@@ -58,6 +59,8 @@ CFG = PrimitiveConfig(
     stack_gap_m=0.015,
     stack_min_points=20,
     stack_percentile=2.0,
+    duplicate_dist_m=0.02,
+    duplicate_size_frac=0.15,
 )
 
 
@@ -234,10 +237,47 @@ def test_outlines_cover_the_walls_not_just_rims_and_corners() -> None:
         assert cloud.min(axis=0)[2] == table_z
 
 
+def test_frame_disjoint_tracks_of_one_box_drop_to_one() -> None:
+    """A fragmented track fits the same box twice; the worse-supported half is dropped."""
+    world = _world()
+    solid = _solid("box", (0.30, 0.20, 0.10))
+    full = _masks(world, solid)
+    early = Track(0, {f: m for f, m in full.items() if f < 6})
+    late = Track(1, {f: m for f, m in full.items() if f >= 6})
+    points = _surface_sample(solid)
+    fits = fit_clusters([early, late], {0: points, 1: points}, world, LIFT, CFG)
+    assert all(f.primitive is not None for f in fits.values())
+    dropped = drop_duplicate_fits(fits, {0: early, 1: late}, CFG)
+    assert len(dropped) == 1
+    assert dropped[next(iter(dropped))].startswith("duplicate of track")
+
+
+def test_cooccurring_tracks_are_kept_despite_matching_fits() -> None:
+    """Identical fits with shared frames stay: stacked identical boxes co-occur, and only
+    a mask-IoU check could tell those apart from concurrent double tracks."""
+    world = _world()
+    solid = _solid("box", (0.30, 0.20, 0.10))
+    points = _surface_sample(solid)
+    both = [Track(0, _masks(world, solid)), Track(1, _masks(world, solid))]
+    fits = fit_clusters(both, {0: points, 1: points}, world, LIFT, CFG)
+    assert all(f.primitive is not None for f in fits.values())
+    assert drop_duplicate_fits(fits, {0: both[0], 1: both[1]}, CFG) == {}
+    near = _solid("box", (0.30, 0.20, 0.10)) + np.array([0.40, 0.0, 0.0])
+    pair = [Track(2, _masks(world, solid)), Track(3, _masks(world, near))]
+    fits = fit_clusters(pair, {2: points, 3: _surface_sample(near)}, world, LIFT, CFG)
+    assert drop_duplicate_fits(fits, {2: pair[0], 3: pair[1]}, CFG) == {}
+
+
 def test_config_rejects_bad_values() -> None:
     base = {k: getattr(CFG, k) for k in CFG.__dataclass_fields__}
     assert PrimitiveConfig.from_config({"segmentation": {"primitive_fit": base}}) == CFG
-    for key, value in (("iterations", 0), ("shrink", 1.0), ("max_cost", 0.0)):
+    for key, value in (
+        ("iterations", 0),
+        ("shrink", 1.0),
+        ("max_cost", 0.0),
+        ("duplicate_dist_m", 0.0),
+        ("duplicate_size_frac", 1.0),
+    ):
         with pytest.raises(ValueError):
             PrimitiveConfig.from_config({"segmentation": {"primitive_fit": {**base, key: value}}})
 
