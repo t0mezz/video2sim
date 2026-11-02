@@ -31,6 +31,7 @@ from video2sim.stages.marker_filter import (
     filter_marker_tracks,
     tag_mask,
 )
+from video2sim.stages.overlay_audit import OverlayAuditConfig
 from video2sim.stages.primitive_fit import (
     FitResult,
     PrimitiveConfig,
@@ -68,6 +69,7 @@ class GapFillConfig:
     max_noun_requests: int
     max_video_requests: int
     cluster: ClusterParams
+    audit: OverlayAuditConfig
     merge_iou: float
     part_inclusion: float
     box_mask_min_iou: float
@@ -78,8 +80,6 @@ class GapFillConfig:
     def from_config(cls, cfg: dict[str, Any]) -> GapFillConfig:
         g = cfg["segmentation"]["tracking"]["gap_fill"]
         c = g["cluster"]
-        if g.get("overlay_audit", {}).get("enabled", False):
-            raise ValueError("gap_fill.overlay_audit is not built yet (9.7)")
         out = cls(
             enabled=bool(g["enabled"]),
             max_rounds=int(g["max_rounds"]),
@@ -93,6 +93,7 @@ class GapFillConfig:
                 frames_per_cluster=int(c["frames_per_cluster"]),
                 min_azimuth_gap_deg=float(c["min_azimuth_gap_deg"]),
             ),
+            audit=OverlayAuditConfig.from_config(cfg),
             merge_iou=float(g["merge_iou"]),
             part_inclusion=float(g["part_inclusion"]),
             box_mask_min_iou=float(g["box_mask_min_iou"]),

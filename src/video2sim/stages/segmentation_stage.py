@@ -69,6 +69,7 @@ from video2sim.stages.material_pass import (
     decide_all,
     pick_frames,
 )
+from video2sim.stages.overlay_audit import audit_missing_nouns, render_tracks_video
 from video2sim.stages.primitive_fit import (
     FitResult,
     PrimitiveConfig,
@@ -317,6 +318,7 @@ class SegmentationStage:
             tcfg,
             work / "tracking_work",
         )
+        all_tracks = list(raw)
         raw, marker_report = filter_marker_tracks(raw, world, ctx.run_dir, marker_cfg)
         for track_id, reason in marker_report.dropped.items():
             scene_flags.append(f"track {track_id} dropped as a marker: {reason}")
@@ -351,7 +353,30 @@ class SegmentationStage:
                 lift_cfg.table_margin_m,
                 lift_cfg.max_height_m,
             )
-            if shortfall > 0 or clusters:
+            audit_missing: list[str] = []
+            audit_uncertain: list[str] = []
+            if gcfg.audit.enabled:
+                audit_views = list(route.view_frames) or [
+                    world.frames[i].frame_index
+                    for i in sample_frame_indices(len(world.frames), rcfg.n_frames)
+                ]
+                audit_missing, audit_uncertain, _ = audit_missing_nouns(
+                    world,
+                    ctx.run_dir,
+                    first.kept,
+                    audit_views,
+                    gcfg.audit,
+                    rcfg.noun_denylist,
+                    clients.router,
+                    ResponseCache(work / "audit_cache"),
+                    work / "audit",
+                )
+                if audit_missing or audit_uncertain:
+                    ctx.report(
+                        "overlay audit: missing "
+                        f"{audit_missing or []}, uncertain {audit_uncertain or []}"
+                    )
+            if shortfall > 0 or clusters or audit_missing:
                 if route.inventory:
                     nouns = [i.noun for i in route.inventory]
                     view_frames = list(route.view_frames)
@@ -366,6 +391,9 @@ class SegmentationStage:
                         order_all[i] for i in sample_frame_indices(len(order_all), rcfg.n_frames)
                     ]
                 order = [f.frame_index for f in world.frames]
+                if audit_missing:
+                    seen = set(audit_missing)
+                    nouns = [*audit_missing, *(n for n in nouns if n not in seen)]
                 plan = plan_gap_fill(
                     world,
                     cloud,
@@ -411,6 +439,8 @@ class SegmentationStage:
                     listed,
                     track_fn,
                 )
+                gap_notes["audit_missing"] = audit_missing
+                gap_notes["audit_uncertain"] = audit_uncertain
                 summary["gap_fill"] = gap_notes
                 gap_flag_reasons = {int(k): v for k, v in gap_notes["flag_reasons"].items()}
                 for note in gap_notes["report_lines"]:
@@ -419,6 +449,29 @@ class SegmentationStage:
         for track_id, reason in final.drops.items():
             scene_flags.append(f"track {track_id} dropped: {reason}")
             ctx.report(f"dropped track {track_id}: {reason}")
+        if gcfg.enabled and gcfg.audit.save_video:
+            by_id = {t.track_id: t for t in all_tracks}
+            for track in final.kept:
+                by_id[track.track_id] = track
+            notes = {}
+            for tid in sorted(by_id):
+                if tid in marker_report.dropped:
+                    notes[tid] = f"marker: {marker_report.dropped[tid]}"
+                elif tid in final.drops:
+                    notes[tid] = str(final.drops[tid])
+                else:
+                    notes[tid] = "kept"
+            preview = ctx.out_dir / "tracks_preview.mp4"
+            frames = render_tracks_video(
+                world,
+                ctx.run_dir,
+                [by_id[i] for i in sorted(by_id)],
+                {t.track_id for t in kept},
+                notes,
+                preview,
+                tcfg.fps,
+            )
+            ctx.report(f"tracks preview: {frames} frames in {preview.name}")
         check = compare_counts(route, len(kept))
         if check.missing_suspected:
             scene_flags.append(f"possible missing object: {check.reason}")

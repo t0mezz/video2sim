@@ -299,9 +299,11 @@ def test_plan_caps_requests_and_reports_coverage() -> None:
     assert 0.0 <= plan.view_coverage <= 1.0
 
 
-def test_gap_fill_defaults_keep_the_stage_identical() -> None:
+def test_gap_fill_defaults_run_one_audit_capped_round() -> None:
     cfg = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
-    assert GapFillConfig.from_config(cfg).enabled is False
+    gcfg = GapFillConfig.from_config(cfg)
+    assert gcfg.enabled is True  # S12.9.7: gap fill on; off keeps the stage byte-identical
+    assert gcfg.audit.enabled is True and gcfg.audit.n_views >= 1
     assert cfg["segmentation"]["router"]["views"]["mode"] == "even"
     from video2sim.stages.scene_router import Route
     from video2sim.stages.segmentation_stage import route_report

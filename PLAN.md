@@ -772,7 +772,7 @@ In order:
    - [x] **9.4** Multi-view router. Evidence: branch `s12-9-4-router`, map-reduce in `stages/scene_router.py` behind `views.mode` (even keeps today's single call and cache key), `merge_synonyms`/`noun_denylist`/`max_workers` config, `tests/test_scene_router.py` (22 tests incl. the even-mode pin)
    - [x] **9.6** Gap fill. Evidence: branch `s12-9-6-gapfill`, `stages/gap_fill.py` (unexplained clusters, noun/box requests, three-case merge, provenance), stage wiring with `DiscoveryCheck`/`found_by`/`route.json` gap section, `tests/test_gap_fill.py` (15 tests). Defaults off = byte-identical. Finding: the fill gate only binds when min_iou <= min_fill (IoU <= fill always)
    - [ ] **9.8** Dev evaluation of arms A to E
-   - [ ] **9.7** Overlay audit (optional)
+   - [x] **9.7** Overlay audit. Evidence: branch `s12-9-7-overlay-audit`, `stages/overlay_audit.py` (numbered overlays on the router views, one VLM call, strict noun parsing with uncertain never re-tracked), audit nouns head the 9.6 noun requests and can trigger the round alone, `defaults on` in `configs/default.yaml`, `tests/test_overlay_audit.py` (13 tests). s25 case: the audit names the untracked laptop while counts alone cannot say what is missing. `save_video` writes `tracks_preview.mp4` (every track, fate legend) into the stage folder, on by default
    - [ ] **9.9** Defaults, docs, tick
    - [ ] **9.10** Capture-side coverage check (optional)
 
