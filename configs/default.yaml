@@ -224,7 +224,10 @@ shape:
     sigma_mask_px: 3.0
     mask_weight: 1.0           # lambda in the PLAN.md cost
     huber_m: 0.005             # above this a point counts linearly, for SfM strays
-    inlier_m: 0.005            # fit score: observed points this close to the mesh
+    inlier_m: 0.010            # fit score: observed points this close to the mesh; 5 mm is
+                         # tighter than generative accuracy (D-030: 5 to 6% size error), which sent
+                         # the good s15 video_b basket (best fit 0.17) to a proxy hull; 10 mm takes
+                         # it to 0.75. A guess: validate proxy rate and size error on dev.
     yaw_hypotheses: 4          # starts at quarter turns about world up
     yaw_screen_iterations: 4   # rounds each start gets before the best one is refined
     outer_iterations: 50       # nearest-neighbour rounds; about 20 on the synthetic box
@@ -249,7 +252,7 @@ physics:
     coacd_resolution: 2000          # CoACD search resolution; 500 barely moves wall time on s02 obj_001, so this stays
     coacd_mcts_iterations: 30       # CoACD search iterations per cut; 30 keeps the s02/s12 part counts with all fit checks passing, ~2x faster than 150
     decomp_decimate: true           # decompose a decimated copy; the checks still run against the full mesh
-    decomp_max_faces: 4000          # a decomposition input above this many faces is decimated to it
+    decomp_max_faces: 2000          # a decomposition input above this many faces is decimated to it
     decomp_volume_change_frac: 0.05 # a decimated copy that moves the volume more than this is dropped
     adaptive_escalation: true       # try hull, then a cheap decomposition, then the full one; each rung must pass the checks
     cheap_threshold: 0.25           # concavity threshold of the cheap rung; coarser than coacd_threshold
@@ -280,7 +283,7 @@ physics:
   repair:                      # P4.1, stages/mesh_repair.py
     min_component_area_frac: 0.02   # a piece smaller than this share of the largest piece's area is a floater
     min_volume_m3: 1.0e-9           # below this the mesh is not a solid
-    max_triangles: 20000            # triangle budget per visual mesh; above it the mesh is decimated
+    max_triangles: 2000             # triangle budget per visual mesh; above it the mesh is decimated
     max_volume_change_frac: 0.02    # decimation that moves the volume more than this is rejected
     decimation_aggression: 5        # fast_simplification agg, 3 to 10; below 3 it stops short of the budget
 
