@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pytest
@@ -19,7 +20,14 @@ POSE = SE3.from_numpy(
     np.array([[1.0, 0, 0, 0], [0, -1.0, 0, 0], [0, 0, -1.0, 1.0], [0, 0, 0, 1.0]])
 )
 TABLE = Plane(normal=(0.0, 0.0, 1.0), offset_m=0.0)
-CFG = RepairConfig(merge_radius_m=0.05, split_gap_m=0.10, min_frames=3, sliver_frac=0.2)
+CFG = RepairConfig(
+    merge_radius_m=0.05,
+    split_gap_m=0.10,
+    min_frames=3,
+    sliver_frac=0.2,
+    merge_boundary_gap=2,
+    merge_boundary_iou=0.5,
+)
 
 
 def _blob(u: int, v: int) -> BoolMask:
@@ -52,6 +60,23 @@ def test_fragments_of_one_object_merge() -> None:
 
 def test_tracks_that_share_a_frame_are_never_merged() -> None:
     tracks, report = _repair([_track(0, range(0, 10), 30, 60), _track(1, range(5, 15), 31, 60)])
+    assert len(tracks) == 2 and report.merges == ()
+
+
+def test_fragments_with_distant_medians_merge_on_boundary_overlap() -> None:
+    # Same object, id switched away and back: track 1's first mask repeats track 0's
+    # last mask (adjacent frames, IoU 1), but both tracks' medians sit far apart
+    # because their other views cover different arcs, so the footprint rule cannot fire.
+    first = {f: _blob(30, 60) for f in range(10)}
+    second = {10: _blob(30, 60), **{f: _blob(70, 60) for f in range(11, 20)}}
+    tracks, report = _repair([Track(0, first), Track(1, second)])
+    assert [t.track_id for t in tracks] == [0]
+    assert sorted(tracks[0].masks) == list(range(20))
+    assert report.merges == ((0, 1),)
+
+
+def test_adjacent_tracks_of_different_objects_stay_apart() -> None:
+    tracks, report = _repair([_track(0, range(0, 10), 30, 60), _track(1, range(10, 20), 70, 60)])
     assert len(tracks) == 2 and report.merges == ()
 
 
@@ -101,6 +126,27 @@ def test_an_occlusion_sliver_does_not_found_a_new_group() -> None:
     tracks, report = _repair([Track(0, masks)])
     assert len(tracks) == 1 and report.splits == ()
     assert sorted(tracks[0].masks) == list(range(12))
+
+
+def _repair_section(**overrides: object) -> dict[str, Any]:
+    repair: dict[str, Any] = {
+        "merge_radius_m": 0.05,
+        "split_gap_m": 0.10,
+        "min_frames": 3,
+        "sliver_frac": 0.2,
+        "merge_boundary_gap": 2,
+        "merge_boundary_iou": 0.5,
+    }
+    repair.update(overrides)
+    return {"segmentation": {"tracking": {"repair": repair}}}
+
+
+def test_repair_config_reads_handoff_thresholds() -> None:
+    cfg = RepairConfig.from_config(_repair_section())
+    assert (cfg.merge_boundary_gap, cfg.merge_boundary_iou) == (2, 0.5)
+    for key, value in (("merge_boundary_gap", 0), ("merge_boundary_iou", 0.0)):
+        with pytest.raises(ValueError):
+            RepairConfig.from_config(_repair_section(**{key: value}))
 
 
 def test_config_rejects_bad_values() -> None:

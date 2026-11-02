@@ -14,6 +14,9 @@ together over all views, whatever the camera does.
 * Merge: two tracks that never appear in the same frame and share a footprint are one object.
   A shared frame means two objects were visible at once, so such tracks are never merged;
   this also keeps a stack apart, because the upper object's base projects to a different spot.
+  Median footprints over different view arcs are not comparable, so a handoff also merges:
+  the closest frames of the two tracks are adjacent and their masks overlap there, which is
+  what an id that switched away and back looks like.
 
 Footprints are the near edge of an object, not its center, so they wobble by up to an object
 radius between views. The thresholds in ``configs/default.yaml`` are guesses to tune on dev.
@@ -46,6 +49,8 @@ class RepairConfig:
     split_gap_m: float
     min_frames: int
     sliver_frac: float
+    merge_boundary_gap: int
+    merge_boundary_iou: float
 
     @classmethod
     def from_config(cls, cfg: dict[str, Any]) -> RepairConfig:
@@ -55,11 +60,17 @@ class RepairConfig:
             float(r["split_gap_m"]),
             int(r["min_frames"]),
             float(r["sliver_frac"]),
+            int(r["merge_boundary_gap"]),
+            float(r["merge_boundary_iou"]),
         )
         if out.merge_radius_m <= 0 or out.split_gap_m <= 0 or out.min_frames < 1:
             raise ValueError("repair thresholds must be positive")
         if not 0.0 <= out.sliver_frac < 1.0:
             raise ValueError("sliver_frac must be in [0, 1)")
+        if out.merge_boundary_gap < 1:
+            raise ValueError("merge_boundary_gap must be at least 1")
+        if not 0.0 < out.merge_boundary_iou < 1.0:
+            raise ValueError("merge_boundary_iou must be in (0, 1)")
         return out
 
 
@@ -160,10 +171,54 @@ def _split(track: Track, feet: Mapping[int, F64], cfg: RepairConfig, next_id: in
     return pieces
 
 
+def _mask_iou(a: BoolMask, b: BoolMask) -> float | None:
+    """Mask overlap, or None when the masks are not comparable."""
+    if a.shape != b.shape:
+        return None
+    union = int(np.logical_or(a, b).sum())
+    if union == 0:
+        return None
+    return float(np.logical_and(a, b).sum() / union)
+
+
+def _handover(a: Sequence[Track], b: Sequence[Track], cfg: RepairConfig) -> bool:
+    """Whether two frame-disjoint track groups meet at a handoff.
+
+    Their closest frames are within ``merge_boundary_gap`` and the masks there overlap
+    past ``merge_boundary_iou``: the new id's first mask repeats the old id's last mask
+    in an adjacent frame. Only the closest frame pair is scored, so the cost stays flat.
+    """
+    fa = sorted({f for t in a for f in t.masks})
+    fb = sorted({f for t in b for f in t.masks})
+    i = 0
+    j = 0
+    gap: int | None = None
+    while i < len(fa) and j < len(fb):
+        close = abs(fa[i] - fb[j])
+        if gap is None or close < gap:
+            gap = close
+        if fa[i] < fb[j]:
+            i += 1
+        else:
+            j += 1
+    if gap is None or gap > cfg.merge_boundary_gap:
+        return False
+    best = 0.0
+    for ta in a:
+        for frame_a, mask_a in ta.masks.items():
+            for tb in b:
+                for frame_b, mask_b in tb.masks.items():
+                    if abs(frame_a - frame_b) == gap:
+                        iou = _mask_iou(mask_a, mask_b)
+                        if iou is not None and iou > best:
+                            best = iou
+    return best >= cfg.merge_boundary_iou
+
+
 def _merge(
     tracks: Sequence[Track], feet: Mapping[int, Mapping[int, F64]], cfg: RepairConfig
 ) -> tuple[list[Track], list[tuple[int, ...]]]:
-    """Greedily merge frame-disjoint tracks whose median footprints are within the radius."""
+    """Greedily merge frame-disjoint tracks that share a footprint or a handoff."""
     centers = {
         t.track_id: np.median(list(feet[t.track_id].values()), axis=0)
         for t in tracks
@@ -178,14 +233,14 @@ def _merge(
     )
     owner = {t.track_id: t.track_id for t in tracks}
     for distance, a, b in pairs:
-        if distance > cfg.merge_radius_m:
-            break
         ga, gb = owner[a], owner[b]
         if ga == gb:
             continue
         frames_a = {f for t in groups[ga] for f in t.masks}
         frames_b = {f for t in groups[gb] for f in t.masks}
         if frames_a & frames_b:
+            continue
+        if distance > cfg.merge_radius_m and not _handover(groups[ga], groups[gb], cfg):
             continue
         keep, drop = min(ga, gb), max(ga, gb)
         groups[keep].extend(groups.pop(drop))

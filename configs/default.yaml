@@ -96,6 +96,8 @@ segmentation:
       min_hit_fraction: 0.2    # ... and this share of its frames where a tag was detected
     repair:                    # 3D identity repair; thresholds are guesses until tuned on dev scenes
       merge_radius_m: 0.05     # tracks with no shared frame whose table footprints are this close are one object
+      merge_boundary_gap: 2    # ... or whose closest frames are this far apart with masks overlapping past merge_boundary_iou (a handoff: the id switched away and back)
+      merge_boundary_iou: 0.5  # handoff mask overlap; disjoint raw s12_b track pairs all score 0.0, a true handoff near 1.0
       split_gap_m: 0.10        # a track whose footprints fall into groups this far apart is two objects
       min_frames: 3            # smallest group that counts as an object when splitting
       sliver_frac: 0.2         # feet from masks below this share of the track median are occlusion slivers, not new objects
@@ -256,7 +258,7 @@ physics:
     coacd_resolution: 2000          # CoACD search resolution; 500 barely moves wall time on s02 obj_001, so this stays
     coacd_mcts_iterations: 30       # CoACD search iterations per cut; 30 keeps the s02/s12 part counts with all fit checks passing, ~2x faster than 150
     decomp_decimate: true           # decompose a decimated copy; the checks still run against the full mesh
-    decomp_max_faces: 2000          # a decomposition input above this many faces is decimated to it
+    decomp_max_faces: 12000         # a decomposition input above this many faces is decimated to it
     decomp_volume_change_frac: 0.05 # a decimated copy that moves the volume more than this is dropped
     adaptive_escalation: true       # try hull, then a cheap decomposition, then the full one; each rung must pass the checks
     cheap_threshold: 0.25           # concavity threshold of the cheap rung; coarser than coacd_threshold
