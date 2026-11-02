@@ -216,6 +216,24 @@ def test_another_track_in_front_does_not_shrink_the_fit() -> None:
     assert got[0] >= 0.09  # not cut to the visible half
 
 
+def test_outlines_cover_the_walls_not_just_rims_and_corners() -> None:
+    """The outline doubles as the registration target: rims alone make the point term
+    brittle to rim wobble on generative meshes (s15 video_b basket: a good hamper
+    scored inlier 0 on two rim rings). Walls must carry most samples."""
+    table_z = 0.02
+    cyl = _outline("cylinder", np.array([0.0, 0.0, 0.0, 0.30, 0.30, 0.20]), table_z)
+    wall = cyl[(cyl[:, 2] > table_z + 0.02) & (cyl[:, 2] < table_z + 0.18)]
+    assert len(wall) > len(cyl) // 2
+    box = _outline("box", np.array([0.0, 0.0, 0.0, 0.30, 0.20, 0.10]), table_z)
+    interior = box[(np.abs(box[:, 0]) < 0.14) & (np.abs(box[:, 1]) < 0.09)]
+    assert len(interior) > 0
+    # The hull is unchanged: extents still read the sizes exactly.
+    for cloud, size in ((cyl, (0.30, 0.30, 0.20)), (box, (0.30, 0.20, 0.10))):
+        extent = cloud.max(axis=0) - cloud.min(axis=0)
+        assert np.allclose(extent, size, atol=1e-9)
+        assert cloud.min(axis=0)[2] == table_z
+
+
 def test_config_rejects_bad_values() -> None:
     base = {k: getattr(CFG, k) for k in CFG.__dataclass_fields__}
     assert PrimitiveConfig.from_config({"segmentation": {"primitive_fit": base}}) == CFG

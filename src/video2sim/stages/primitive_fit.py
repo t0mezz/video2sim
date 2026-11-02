@@ -44,7 +44,12 @@ KINDS: tuple[Kind, ...] = ("box", "cylinder", "sphere")
 
 # Outline samples: a cylinder ring and a sphere grid are convex, so the convex hull of these
 # projected samples is the silhouette to within a pixel at the mask scale used here.
+# The samples double as the shape stage's registration target, so the walls carry samples
+# too: rims alone make the point term brittle to rim wobble on generative meshes (s15
+# video_b basket: a good hamper scored inlier 0 on two rim rings).
 _RING = np.linspace(0.0, 2.0 * np.pi, 48, endpoint=False)
+_WALL_LEVELS = (0.0, 0.25, 0.5, 0.75, 1.0)  # rings up the wall, share of the height
+_FACE_STEPS = (-1.0, 0.0, 1.0)  # 3x3 grids on each box face, share of the half sizes
 _POLAR, _AZIMUTH = (
     a.ravel() for a in np.meshgrid(np.linspace(0.0, np.pi, 12), _RING[::2], indexing="ij")
 )
@@ -137,21 +142,38 @@ def _params(p: Primitive) -> F64:
 def _outline(kind: Kind, params: F64, table_z: float) -> F64:
     cx, cy, yaw, length, width, height = (float(v) for v in params)
     c, s = np.cos(yaw), np.sin(yaw)
+    turn = np.array([[c, s], [-s, c]])
     if kind == "box":
-        half = np.array([length, width]) / 2
-        local = np.array([[sx, sy] for sx in (-1, 1) for sy in (-1, 1)]) * half
+        half = np.array([length, width, height]) / 2
+        grids = []
+        for axis in range(3):
+            others = [a for a in range(3) if a != axis]
+            for side in (-1.0, 1.0):
+                a, b = np.meshgrid(_FACE_STEPS, _FACE_STEPS, indexing="ij")
+                face = np.zeros((9, 3))
+                face[:, axis] = side
+                face[:, others[0]] = a.ravel()
+                face[:, others[1]] = b.ravel()
+                grids.append(face * half)
+        local = np.vstack(grids)
+        local[:, 2] += half[2]  # faces span z in [0, height], like the corners did
     elif kind == "cylinder":
-        local = np.stack([length / 2 * np.cos(_RING), width / 2 * np.sin(_RING)], axis=1)
+        ring = np.stack([length / 2 * np.cos(_RING), width / 2 * np.sin(_RING)], axis=1)
+        local = np.vstack([ring for _ in _WALL_LEVELS])
     else:
         r = (length + width + height) / 6
         x = r * np.sin(_POLAR) * np.cos(_AZIMUTH)
         y = r * np.sin(_POLAR) * np.sin(_AZIMUTH)
         z = table_z + r + r * np.cos(_POLAR)
         return np.stack([cx + x, cy + y, z], axis=1)
-    xy = local @ np.array([[c, s], [-s, c]]) + np.array([cx, cy])
-    bottom = np.c_[xy, np.full(len(xy), table_z)]
-    top = np.c_[xy, np.full(len(xy), table_z + height)]
-    return np.vstack([bottom, top])
+    xy = local[:, :2] @ turn + np.array([cx, cy])
+    if kind == "cylinder":
+        levels = np.array(_WALL_LEVELS)
+        z = table_z + np.repeat(levels, len(ring)) * height
+    else:
+        z = table_z + local[:, 2]
+    out: F64 = np.c_[xy, z]
+    return out
 
 
 @dataclass(frozen=True)
