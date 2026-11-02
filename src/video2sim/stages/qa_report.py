@@ -81,6 +81,7 @@ def _object_row(
         "restitution": p.restitution.model_dump(),
         "flags": [f.value for f in asset.flags],
         "notes": [*instance.flag_reasons, *physics["reasons"]],
+        "found_by": getattr(instance, "found_by", "generic"),
         "stable_every_case": stable,
         "largest_drift_m": max(drifts.values(), default=None),
     }
@@ -123,10 +124,12 @@ def build_report(
     ]
     scene_stable = all(v.get("stable", False) for v in settling.values())
     good = not skipped and not missing and scene_stable and not urdf_check["problems"]
+    discovery = instances.discovery.model_dump() if instances.discovery is not None else None
     return {
         "run_id": run_id,
         "status": "ok" if good and not review else "review",
         "validated_in": VALIDATED_IN,
+        "discovery": discovery,
         "objects_found": len(by_instance),
         "objects_exported": len(rows) - len(skipped),
         "objects_skipped": len(skipped),
@@ -158,6 +161,9 @@ def _html(report: dict[str, Any]) -> str:
     rows = []
     for o in report["objects"]:
         drift = o["largest_drift_m"]
+        notes = [*o["flags"], *o["skip_reasons"], *o["notes"]]
+        if o.get("found_by", "generic") != "generic":
+            notes.append(f"found by gap fill: {o['found_by']}")
         cells = [
             o["object_id"],
             o["label"],
@@ -174,7 +180,7 @@ def _html(report: dict[str, Any]) -> str:
             _triple(o["restitution"]),
             "-" if drift is None else f"{drift * 100:.2f}",
             "yes" if o["stable_every_case"] else "NO",
-            "; ".join([*o["flags"], *o["skip_reasons"], *o["notes"]]),
+            "; ".join(notes),
         ]
         marked = o["object_id"] in report["objects_to_review"]
         rows.append(
@@ -195,6 +201,20 @@ def _html(report: dict[str, Any]) -> str:
         "URDF settling": "agrees" if report["urdf_check"]["agrees"] else "DISAGREES",
         "Scene flags": "; ".join(report["scene_flags"]) or "none",
     }
+    discovery = report.get("discovery")
+    if discovery is not None:
+        warnings = []
+        if discovery["unmatched"]:
+            warnings.append(f"unmatched inventory: {', '.join(discovery['unmatched'])}")
+        if discovery["unexplained_clusters"]:
+            warnings.append(f"{discovery['unexplained_clusters']} unexplained point clusters")
+        facts["Discovery"] = (
+            f"{discovery['tracked']} tracked of {discovery['listed']} listed, "
+            f"{discovery['recovered']} recovered, "
+            f"coverage {discovery['view_coverage']:.2f} over frames "
+            f"{', '.join(str(f) for f in discovery['view_frames'])}; "
+            + ("WARNING: " + "; ".join(warnings) if warnings else "no gaps")
+        )
     summary = "".join(f"<tr><th>{html.escape(k)}</th>{_cell(v)}</tr>" for k, v in facts.items())
     images = "".join(
         f'<img src="{html.escape(v)}" alt="real frame beside the simulated scene">'

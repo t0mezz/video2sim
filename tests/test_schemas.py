@@ -11,6 +11,7 @@ from pydantic import ValidationError
 from video2sim.schemas import (
     SE3,
     CaptureResult,
+    DiscoveryCheck,
     Estimate,
     Instances,
     ObjectInstance,
@@ -118,6 +119,67 @@ def test_object_ids_must_be_unique() -> None:
     Instances(objects=[obj("obj_000"), obj("obj_001")])
     with pytest.raises(ValidationError):
         Instances(objects=[obj("obj_000"), obj("obj_000")])
+
+
+def _discovery() -> DiscoveryCheck:
+    return DiscoveryCheck(
+        view_frames=[0, 10, 20],
+        view_coverage=0.9,
+        listed=3,
+        tracked=3,
+        missing_suspected=False,
+        unmatched=[],
+        unexplained_clusters=0,
+        recovered=1,
+        video_requests=2,
+    )
+
+
+class TestDiscovery:
+    def test_old_payload_without_discovery_loads_with_defaults(self) -> None:
+        old = {
+            "objects": [
+                {
+                    "object_id": "obj_000",
+                    "label": "mug",
+                    "mask_dir": "masks/obj_000",
+                    "point_cluster_path": "obj_000.ply",
+                    "keyframes": [0],
+                    "flags": [],
+                    "flag_reasons": [],
+                    "category": None,
+                    "material_class": None,
+                    "finish": None,
+                    "hollow": None,
+                    "rigidity": None,
+                    "material_confidence": None,
+                }
+            ],
+            "flags": [],
+        }
+        instances = Instances.model_validate(old)
+        assert instances.discovery is None
+        assert instances.objects[0].found_by == "generic"
+
+    def test_discovery_round_trip(self) -> None:
+        instances = Instances(
+            objects=[
+                ObjectInstance(
+                    object_id="obj_000",
+                    label="pliers",
+                    mask_dir="masks/obj_000",
+                    point_cluster_path="obj_000.ply",
+                    keyframes=[0],
+                    found_by="noun",
+                )
+            ],
+            discovery=_discovery(),
+        )
+        assert Instances.model_validate_json(instances.model_dump_json()) == instances
+
+    def test_discovery_rejects_zero_video_requests(self) -> None:
+        with pytest.raises(ValidationError):
+            DiscoveryCheck.model_validate({**_discovery().model_dump(), "video_requests": 0})
 
 
 def _props(inertia: list[list[float]]) -> PhysicalProperties:
