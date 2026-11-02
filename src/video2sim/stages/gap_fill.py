@@ -1,0 +1,759 @@
+"""One gap-fill round after tracking (S12.9, task 9.6).
+
+Tracking runs one generic SAM concept, so objects it never fires on leave two traces: the
+router's inventory lists more than the tracks cover, and the sparse cloud holds point
+clusters no track explains. Gap fill sends at most one round of extra SAM video requests —
+one per distinct inventory noun on a shortfall, one box-prompt request for the unexplained
+clusters (the 9.0 probe confirmed the hosted model accepts box prompts and tracks them) —
+then merges the new tracks into the generic set. Everything that survives goes through the
+same repair, lift, fit and duplicate rules as generic tracks.
+
+With ``enabled: false`` nothing here runs and the stage output is byte-identical.
+"""
+
+from __future__ import annotations
+
+from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Literal
+
+import numpy as np
+from numpy.typing import NDArray
+
+from video2sim.models.sam_prompts import ObjectPrompt, build_object_prompt
+from video2sim.schemas import SE3, DiscoveryCheck, WorldModel
+from video2sim.stages.lift import MIN_DEPTH_M, LiftConfig, _pixels, lift_points, lift_tracks
+from video2sim.stages.marker_detection import detect_tags
+from video2sim.stages.marker_filter import (
+    MarkerFilterConfig,
+    TagDetector,
+    filter_marker_tracks,
+    tag_mask,
+)
+from video2sim.stages.primitive_fit import (
+    FitResult,
+    PrimitiveConfig,
+    drop_duplicate_fits,
+    fit_clusters,
+)
+from video2sim.stages.track_repair import RepairConfig, RepairReport, _groups, repair_tracks
+from video2sim.stages.tracking import Track
+from video2sim.stages.view_select import ViewConfig, compute_visibility
+
+F64 = NDArray[np.float64]
+Box = tuple[int, int, int, int]  # inclusive x1, y1, x2, y2 in media pixels
+FoundBy = Literal["generic", "noun", "cluster_box"]
+
+CLUSTER_ID_BASE = 2000  # box-prompt ids (2000 + cluster index) never collide with tracks
+NOUN_ID_STEP = 1000  # noun request k uses ids offset by 1000 * k
+
+
+@dataclass(frozen=True)
+class ClusterParams:
+    radius_m: float
+    min_points: int
+    explained_dist_m: float
+    box_pad_px: int
+    frames_per_cluster: int
+    min_azimuth_gap_deg: float
+
+
+@dataclass(frozen=True)
+class GapFillConfig:
+    """Values from ``segmentation.tracking.gap_fill`` in ``configs/default.yaml``."""
+
+    enabled: bool
+    max_rounds: int
+    max_noun_requests: int
+    max_video_requests: int
+    cluster: ClusterParams
+    merge_iou: float
+    part_inclusion: float
+    box_mask_min_iou: float
+    box_mask_min_fill: float
+    box_mask_max_overfill: float
+
+    @classmethod
+    def from_config(cls, cfg: dict[str, Any]) -> GapFillConfig:
+        g = cfg["segmentation"]["tracking"]["gap_fill"]
+        c = g["cluster"]
+        if g.get("overlay_audit", {}).get("enabled", False):
+            raise ValueError("gap_fill.overlay_audit is not built yet (9.7)")
+        out = cls(
+            enabled=bool(g["enabled"]),
+            max_rounds=int(g["max_rounds"]),
+            max_noun_requests=int(g["max_noun_requests"]),
+            max_video_requests=int(g["max_video_requests"]),
+            cluster=ClusterParams(
+                radius_m=float(c["radius_m"]),
+                min_points=int(c["min_points"]),
+                explained_dist_m=float(c["explained_dist_m"]),
+                box_pad_px=int(c["box_pad_px"]),
+                frames_per_cluster=int(c["frames_per_cluster"]),
+                min_azimuth_gap_deg=float(c["min_azimuth_gap_deg"]),
+            ),
+            merge_iou=float(g["merge_iou"]),
+            part_inclusion=float(g["part_inclusion"]),
+            box_mask_min_iou=float(g["box_mask_min_iou"]),
+            box_mask_min_fill=float(g["box_mask_min_fill"]),
+            box_mask_max_overfill=float(g["box_mask_max_overfill"]),
+        )
+        if out.max_rounds != 1:
+            raise ValueError("only one gap-fill round is implemented")
+        if out.max_noun_requests < 0 or out.max_video_requests < 1:
+            raise ValueError("bad gap_fill request caps")
+        cc = out.cluster
+        if cc.radius_m <= 0 or cc.min_points < 1 or cc.explained_dist_m < 0:
+            raise ValueError("bad gap_fill cluster grouping")
+        if cc.box_pad_px < 0 or cc.frames_per_cluster < 1 or cc.min_azimuth_gap_deg < 0:
+            raise ValueError("bad gap_fill box placement")
+        for v in (
+            out.merge_iou,
+            out.part_inclusion,
+            out.box_mask_min_iou,
+            out.box_mask_min_fill,
+        ):
+            if not 0.0 < v <= 1.0:
+                raise ValueError("gap_fill IoU and fill gates must be in (0, 1]")
+        if out.box_mask_max_overfill < out.box_mask_min_fill:
+            raise ValueError("gap_fill overfill cap must clear the fill floor")
+        return out
+
+
+@dataclass(frozen=True)
+class GapRequest:
+    """One gap-fill video request's tracks, ready to merge."""
+
+    tracks: tuple[Track, ...]
+    found_by: FoundBy
+    note: str  # provenance recorded on surviving tracks, e.g. the noun
+    boxes: tuple[tuple[int, int, Box], ...] = ()  # (track_id, frame, prompted box)
+
+
+@dataclass(frozen=True)
+class MergeResult:
+    tracks: list[Track]
+    notes: dict[int, tuple[str, ...]]  # surviving track id -> provenance notes
+    dropped: dict[int, str]  # dropped new track id -> reason
+    remapped: tuple[tuple[int, int], ...] = ()  # (old, new) ids when a collision remapped
+
+
+def offset_tracks(tracks: Sequence[Track], offset: int) -> list[Track]:
+    """Tracks with ids shifted so requests never collide (1000 * k, 2000 + cluster)."""
+    return [Track(t.track_id + offset, dict(t.masks)) for t in tracks]
+
+
+def _near_any(points: F64, kept: Sequence[F64], dist_m: float) -> NDArray[np.bool_]:
+    """Points within ``dist_m`` of any kept-cluster point, in chunks."""
+    near = np.zeros(len(points), dtype=bool)
+    for cluster in kept:
+        if not len(cluster):
+            continue
+        for start in range(0, len(points), 4096):
+            block = points[start : start + 4096]
+            d = np.linalg.norm(block[:, None, :] - cluster[None, :, :], axis=2)
+            near[start : start + 4096] |= d.min(axis=1) <= dist_m
+        if near.all():
+            break
+    return near
+
+
+def _project(points: F64, pose: F64, k: Any) -> tuple[F64, F64, NDArray[np.bool_]]:
+    """Pixel coordinates and the in-front mask of world points in one frame."""
+    rot, center = pose[:3, :3], pose[:3, 3]
+    cam = (points - center) @ rot
+    z = cam[:, 2]
+    ok = z > MIN_DEPTH_M
+    u = np.full(len(points), -1.0)
+    v = np.full(len(points), -1.0)
+    if ok.any():
+        pu, pv = _pixels(cam[ok, 0] / z[ok], cam[ok, 1] / z[ok], k)
+        u[ok], v[ok] = pu, pv
+    return u, v, ok
+
+
+def is_board_cluster(
+    points: F64,
+    world: WorldModel,
+    run_dir: Path,
+    family: str,
+    detect: TagDetector | None = None,
+    min_tag_share: float = 0.5,
+) -> bool:
+    """True when most projected points land on detected tags in some frame: the cluster is
+    the printed board or a tag, not an object. ``detect`` defaults to OpenCV; tests inject."""
+    if not len(points):
+        return False
+    detect_fn = detect or (lambda p: _detect_file(p, family))
+    k = world.intrinsics
+    for frame in world.frames:
+        corners, (height, width) = detect_fn(run_dir / frame.image_path)
+        if not corners:
+            continue
+        pose = frame.T_world_from_camera.to_numpy()
+        u, v, ok = _project(points, pose, k)
+        inside_image = ok & (u >= 0) & (u < k.width_px) & (v >= 0) & (v < k.height_px)
+        if not inside_image.any():
+            continue
+        sy, sx = height / k.height_px, width / k.width_px
+        quads = [c * np.array([sx, sy]) for c in corners.values()]
+        tags = tag_mask(quads, (k.height_px, k.width_px), 0)
+        if (
+            float(tags[v[inside_image].astype(int), u[inside_image].astype(int)].mean())
+            >= min_tag_share
+        ):
+            return True
+    return False
+
+
+def _detect_file(path: Path, family: str) -> tuple[dict[int, F64], tuple[int, int]]:
+    """Tag corners of one frame file, as ``filter_marker_tracks`` reads them."""
+    import cv2  # heavy import, kept out of module import time
+
+    gray: Any = cv2.imread(str(path), cv2.IMREAD_GRAYSCALE)
+    if gray is None:
+        raise ValueError(f"cannot read {path}")
+    return detect_tags(gray, family), (int(gray.shape[0]), int(gray.shape[1]))
+
+
+def unexplained_clusters(
+    world: WorldModel,
+    cloud: F64,
+    kept: Mapping[int, F64],
+    run_dir: Path,
+    family: str,
+    cluster_cfg: ClusterParams,
+    table_margin_m: float,
+    max_height_m: float,
+    detect: TagDetector | None = None,
+) -> list[F64]:
+    """Above-table point groups no kept track explains, largest first (ties by centroid x
+    then y). Points within ``explained_dist_m`` of a kept cluster, inside the marker board
+    footprint, or in groups below ``min_points`` are not unexplained."""
+    plane_n = np.array(world.table_plane.normal, dtype=np.float64)
+    plane_d = float(world.table_plane.offset_m)
+    heights = cloud @ plane_n - plane_d
+    cand = np.nonzero(
+        (heights >= table_margin_m)
+        & (heights <= max_height_m)
+        & ~_near_any(cloud, list(kept.values()), cluster_cfg.explained_dist_m)
+    )[0]
+    if not len(cand):
+        return []
+    groups = [
+        g
+        for g in _groups(np.asarray(cloud[cand], dtype=np.float64), cluster_cfg.radius_m)
+        if len(g) >= cluster_cfg.min_points
+    ]
+    # Largest first, ties by centroid x then y, so the order is deterministic.
+    groups.sort(
+        key=lambda g: (
+            -len(g),
+            float(cloud[cand[g]].mean(axis=0)[0]),
+            float(cloud[cand[g]].mean(axis=0)[1]),
+        )
+    )
+    out = []
+    for group in groups:
+        points = np.asarray(cloud[cand[group]], dtype=np.float64)
+        if not is_board_cluster(points, world, run_dir, family, detect):
+            out.append(points)
+    return out
+
+
+def _frame_box(
+    world: WorldModel, pos: int, points: F64, pad_px: int
+) -> tuple[Box, tuple[float, float] | None] | None:
+    """Prompt box and median point on one clip position, or None when unusable.
+
+    The box is the 2D bounding box of the projected eight AABB corners plus their drops to
+    the table plane, padded and clamped; None when a corner is behind the camera or the
+    padded box is cut by the image border. The median point is omitted when behind.
+    """
+    frame = world.frames[pos]
+    k = world.intrinsics
+    pose = frame.T_world_from_camera.to_numpy()
+    plane_n = np.array(world.table_plane.normal, dtype=np.float64)
+    plane_d = float(world.table_plane.offset_m)
+    lo, hi = points.min(axis=0), points.max(axis=0)
+    corners = np.array(np.meshgrid(*zip(lo, hi, strict=True))).reshape(3, -1).T
+    drops = corners - plane_n[None, :] * ((corners @ plane_n - plane_d)[:, None])
+    u, v, ok = _project(np.concatenate([corners, drops]), pose, k)
+    if not ok.all():
+        return None
+    x1, y1 = int(np.min(u)), int(np.min(v))
+    x2, y2 = int(np.max(u)), int(np.max(v))
+    if x2 <= x1 or y2 <= y1:
+        return None
+    padded = (x1 - pad_px, y1 - pad_px, x2 + pad_px, y2 + pad_px)
+    clamped = (
+        max(padded[0], 0),
+        max(padded[1], 0),
+        min(padded[2], k.width_px - 1),
+        min(padded[3], k.height_px - 1),
+    )
+    if clamped != padded or clamped[2] <= clamped[0] or clamped[3] <= clamped[1]:
+        return None
+    median = np.median(points, axis=0)
+    mu, mv, mok = _project(median[None, :], pose, k)
+    point = (float(mu[0]), float(mv[0])) if mok[0] else None
+    return clamped, point
+
+
+def pick_prompt_frames(
+    world: WorldModel,
+    visibility: NDArray[np.bool_],
+    grid: tuple[F64, tuple[int, int]],
+    cell_m: float,
+    points: F64,
+    n_frames: int,
+    min_gap_deg: float,
+) -> list[int]:
+    """Clip positions prompting one cluster: largest visible share of its cells first, each
+    at least ``min_gap_deg`` of azimuth apart around the cluster centroid."""
+    lo, shape = grid
+    idx = ((points[:, :2] - lo) / cell_m).astype(int)
+    ok = (idx[:, 0] >= 0) & (idx[:, 0] < shape[0]) & (idx[:, 1] >= 0) & (idx[:, 1] < shape[1])
+    cells = np.unique(idx[ok, 1] * shape[0] + idx[ok, 0])
+    if not len(cells):
+        return []
+    share = visibility[:, cells].mean(axis=1)
+    centroid = np.median(points, axis=0)
+    azimuth = np.array(
+        [
+            np.arctan2(
+                f.T_world_from_camera.to_numpy()[1, 3] - centroid[1],
+                f.T_world_from_camera.to_numpy()[0, 3] - centroid[0],
+            )
+            for f in world.frames
+        ]
+    )
+    picked: list[int] = []
+    for pos in sorted(range(len(world.frames)), key=lambda p: (-share[p], p)):
+        if all(
+            abs((azimuth[pos] - azimuth[q] + np.pi) % (2 * np.pi) - np.pi)
+            >= np.deg2rad(min_gap_deg)
+            for q in picked
+        ):
+            picked.append(pos)
+        if len(picked) >= n_frames:
+            break
+    return picked
+
+
+def box_request(
+    world: WorldModel,
+    visibility: NDArray[np.bool_],
+    grid: tuple[F64, tuple[int, int]],
+    cell_m: float,
+    clusters: Sequence[F64],
+    size: tuple[int, int],
+    cluster_cfg: ClusterParams,
+    first_id: int = CLUSTER_ID_BASE,
+) -> tuple[str, dict[int, tuple[int, Box]], list[int]]:
+    """One object-prompt string for the unexplained clusters plus, per prompted id, the
+    prompted frame and box for the box gates. The same id is used on all its frames, and
+    the id encodes the cluster (``first_id`` + cluster index). Clusters with no placeable
+    box come back in ``unprompted`` and must be reported, never dropped quietly."""
+    prompts: dict[int, list[ObjectPrompt]] = {}
+    gated: dict[int, tuple[int, Box]] = {}
+    unprompted: list[int] = []
+    for index, points in enumerate(clusters):
+        track_id = first_id + index
+        for pos in pick_prompt_frames(
+            world,
+            visibility,
+            grid,
+            cell_m,
+            points,
+            cluster_cfg.frames_per_cluster,
+            cluster_cfg.min_azimuth_gap_deg,
+        ):
+            placed = _frame_box(world, pos, points, cluster_cfg.box_pad_px)
+            if placed is None:
+                continue
+            box, point = placed
+            prompt = ObjectPrompt(
+                object_id=track_id,
+                box=(float(box[0]), float(box[1]), float(box[2]), float(box[3])),
+                positive_points=(point,) if point is not None else (),
+            )
+            prompts.setdefault(pos, []).append(prompt)
+            gated.setdefault(track_id, (world.frames[pos].frame_index, box))
+        if track_id not in gated:
+            unprompted.append(index)
+    if not prompts:
+        raise ValueError("no cluster box could be placed on any frame")
+    return build_object_prompt(prompts, size), gated, unprompted
+
+
+def _overlaps(
+    a: Mapping[int, NDArray[np.bool_]], b: Mapping[int, NDArray[np.bool_]]
+) -> list[tuple[int, float, float]]:
+    """(frame, IoU, containment of a in b) over shared frames, 0.0 when incomparable."""
+    out = []
+    for frame in sorted(set(a) & set(b)):
+        ma, mb = a[frame], b[frame]
+        if ma.shape != mb.shape:
+            out.append((frame, 0.0, 0.0))
+            continue
+        inter = float(np.logical_and(ma, mb).sum())
+        union = float(np.logical_or(ma, mb).sum())
+        area = float(ma.sum())
+        out.append((frame, inter / union if union else 1.0, inter / area if area else 1.0))
+    return out
+
+
+def _box_canvas(shape: tuple[int, int], box: Box) -> NDArray[np.bool_]:
+    canvas = np.zeros(shape, dtype=bool)
+    canvas[box[1] : box[3] + 1, box[0] : box[2] + 1] = True
+    return canvas
+
+
+def _box_gates(track: Track, frame: int, box: Box, cfg: GapFillConfig) -> str | None:
+    """Rejection reason for a box-found track, or None when it passes. The prompted-frame
+    mask must overlap the prompted box (IoU), fill enough of it, and not sprawl past it —
+    a box over bare table returns a table patch (9.0 negative control). IoU never exceeds
+    fill, so the fill gate only binds when ``box_mask_min_iou`` is at most
+    ``box_mask_min_fill``."""
+    mask = track.masks.get(frame)
+    if mask is None:
+        return f"no mask on the prompted frame {frame}"
+    canvas = _box_canvas(mask.shape, box)
+    inter = float(np.logical_and(mask, canvas).sum())
+    union = float(np.logical_or(mask, canvas).sum())
+    box_area = float(canvas.sum())
+    mask_area = float(mask.sum())
+    iou = inter / union if union else 0.0
+    fill = inter / box_area if box_area else 0.0
+    over = mask_area / box_area if box_area else float("inf")
+    if iou < cfg.box_mask_min_iou:
+        return f"prompted-box IoU {iou:.2f} below {cfg.box_mask_min_iou}"
+    if fill < cfg.box_mask_min_fill:
+        return f"box fill {fill:.2f} below {cfg.box_mask_min_fill}"
+    if over > cfg.box_mask_max_overfill:
+        return f"box overfill {over:.2f} past {cfg.box_mask_max_overfill}"
+    return None
+
+
+def merge_requests(
+    generic: Sequence[Track], requests: Sequence[GapRequest], cfg: GapFillConfig
+) -> MergeResult:
+    """New tracks merged into the generic set. For a new track T against each existing
+    track E over shared frames S: no shared frames (new, the repair and duplicate rules
+    cover it after the fact); 1 or 2 shared frames (same object only if IoU >= merge_iou
+    on every frame, a part only if containment holds on every frame); 3 or more (median
+    IoU, median containment). Box-found tracks also pass the prompted-box gates. Ids that
+    still collide are remapped past the maximum in use."""
+    existing = list(generic)
+    used = {t.track_id for t in existing}
+    notes: dict[int, list[str]] = {t.track_id: [] for t in existing}
+    dropped: dict[int, str] = {}
+    remapped: list[tuple[int, int]] = []
+    for request in requests:
+        gated_boxes: dict[int, tuple[int, Box]] = {
+            tid: (frame, box) for tid, frame, box in request.boxes
+        }
+        for track in sorted(request.tracks, key=lambda t: t.track_id):
+            orig = track.track_id
+            tid = orig
+            if tid in used:
+                tid = max(used) + 1
+                track = Track(tid, dict(track.masks))
+                remapped.append((orig, tid))
+            if request.found_by == "cluster_box":
+                gated = gated_boxes.get(orig)
+                if gated is None:
+                    dropped[tid] = "cluster track without a prompted box"
+                    continue
+                frame, box = gated
+                reason = _box_gates(track, frame, box, cfg)
+                if reason is not None:
+                    dropped[tid] = reason
+                    continue
+            same: Track | None = None
+            part: Track | None = None
+            for other in sorted(existing, key=lambda t: t.track_id):
+                pairs = _overlaps(track.masks, other.masks)
+                if not pairs:
+                    continue
+                ious = [iou for _, iou, _ in pairs]
+                conts = [c for _, _, c in pairs]
+                if len(pairs) >= 3:
+                    if float(np.median(ious)) >= cfg.merge_iou:
+                        same = other
+                        break
+                    if float(np.median(conts)) >= cfg.part_inclusion:
+                        part = part or other
+                elif all(i >= cfg.merge_iou for i in ious):
+                    same = other
+                    break
+                elif all(c >= cfg.part_inclusion for c in conts):
+                    part = part or other
+            if same is not None:
+                notes[same.track_id].append(request.note)
+            elif part is not None:
+                dropped[tid] = f"part of obj_{part.track_id:03d}: {request.note}"
+            else:
+                existing.append(track)
+                used.add(tid)
+                notes[tid] = [request.note]
+    return MergeResult(existing, {k: tuple(v) for k, v in notes.items()}, dropped, tuple(remapped))
+
+
+def inherit_provenance(prov: Mapping[int, FoundBy], report: RepairReport) -> dict[int, FoundBy]:
+    """Found-by per track id after repair: splits inherit their parent, and a merge group
+    is generic when any member is (else the first member's wins)."""
+    out = dict(prov)
+    for orig, parts in report.splits:
+        for part in parts:
+            out.setdefault(part, out.get(orig, "generic"))
+    for group in report.merges:
+        members = sorted(group)
+        merged = (
+            "generic"
+            if any(out.get(m, "generic") == "generic" for m in members)
+            else out.get(members[0], "generic")
+        )
+        out[members[0]] = merged
+    return out
+
+
+@dataclass(frozen=True)
+class FitPass:
+    """One run of the lift-and-fit block: the kept tracks and their geometry."""
+
+    kept: list[Track]
+    hulls: Mapping[int, F64]
+    sparse: Mapping[int, F64]
+    fits: Mapping[int, FitResult]
+    drops: dict[int, str]  # track id -> message suffix after "track {id} "
+
+
+def fit_pass(
+    tracks: Sequence[Track],
+    world: WorldModel,
+    lift_cfg: LiftConfig,
+    prim_cfg: PrimitiveConfig,
+    cloud: F64,
+) -> FitPass:
+    """Repair-then-lift-and-fit block, run once on the generic tracks and, after gap fill,
+    again on the union. Drop messages match the stage's historical wording."""
+    hulls, hull_report = lift_tracks(tracks, world, lift_cfg)
+    kept = [t for t in tracks if t.track_id in hulls]
+    drops = {
+        t.track_id: f"dropped: {hull_report.dropped.get(t.track_id, 'no point cluster')}"
+        for t in tracks
+        if t.track_id not in hulls
+    }
+    sparse, _ = lift_points(kept, world, cloud, lift_cfg)
+    fits = fit_clusters(kept, sparse, world, lift_cfg, prim_cfg)
+    dups = drop_duplicate_fits(fits, {t.track_id: t for t in kept}, prim_cfg)
+    for i in dups:
+        fits.pop(i, None)
+    kept = [t for t in kept if t.track_id not in dups]
+    drops.update({i: f"dropped as a {reason}" for i, reason in dups.items()})
+    return FitPass(kept, hulls, sparse, fits, drops)
+
+
+@dataclass(frozen=True)
+class GapPlan:
+    """One gap-fill round, planned before any hosted call."""
+
+    nouns: tuple[str, ...]  # noun prompts in send order (box request goes first)
+    nouns_dropped: tuple[str, ...]  # over-cap nouns, never attempted
+    send_box: bool
+    box_prompt: str | None
+    box_gated: tuple[tuple[int, int, Box], ...]  # (track_id, frame, prompted box)
+    box_unprompted: tuple[int, ...]  # cluster indices with no placeable box
+    clusters_total: int
+    view_frames: list[int]  # frame_index values of the router views
+    view_coverage: float  # share of cells the router views see unoccluded
+    video_requests: int  # hosted video requests, generic one included
+
+
+def plan_gap_fill(
+    world: WorldModel,
+    cloud: F64,
+    nouns: Sequence[str],
+    clusters: Sequence[F64],
+    view_frames: Sequence[int],
+    order: Sequence[int],
+    view_cfg: ViewConfig,
+    cell_m: float,
+    min_views_per_cell: int,
+    gcfg: GapFillConfig,
+) -> GapPlan:
+    """Which requests a gap-fill round sends. Box prompts go first (probe-verified,
+    geometry-placed); nouns follow in inventory order. Past ``max_video_requests`` the
+    trailing nouns are dropped. Clusters past the 16-object API limit are not prompted."""
+    visibility, lo, shape = compute_visibility(world, cloud, view_cfg)
+    positions = [order.index(f) for f in view_frames if f in order]
+    if visibility.shape[1] and positions:
+        counts = visibility[positions].sum(axis=0)
+        coverage = float((counts >= min_views_per_cell).mean())
+    else:
+        coverage = 0.0
+    box_prompt: str | None = None
+    box_gated: tuple[tuple[int, int, Box], ...] = ()
+    box_unprompted: tuple[int, ...] = ()
+    use_box = bool(clusters) and gcfg.max_video_requests >= 2
+    if use_box:
+        size = (world.intrinsics.width_px, world.intrinsics.height_px)
+        prompt, gated, unprompted = box_request(
+            world, visibility, (lo, shape), cell_m, clusters[:16], size, gcfg.cluster
+        )
+        box_prompt, box_unprompted = prompt, tuple(unprompted)
+        box_gated = tuple((tid, frame, box) for tid, (frame, box) in gated.items())
+    budget = gcfg.max_video_requests - 1 - (1 if use_box else 0)
+    keep = min(len(nouns), gcfg.max_noun_requests, max(budget, 0))
+    return GapPlan(
+        nouns=tuple(nouns[:keep]),
+        nouns_dropped=tuple(nouns[keep:]),
+        send_box=use_box,
+        box_prompt=box_prompt,
+        box_gated=box_gated,
+        box_unprompted=box_unprompted,
+        clusters_total=len(clusters),
+        view_frames=list(view_frames),
+        view_coverage=coverage,
+        video_requests=1 + keep + (1 if use_box else 0),
+    )
+
+
+def execute_gap_fill(
+    world: WorldModel,
+    run_dir: Path,
+    plan: GapPlan,
+    gcfg: GapFillConfig,
+    lift_cfg: LiftConfig,
+    prim_cfg: PrimitiveConfig,
+    repair_cfg: RepairConfig,
+    marker_cfg: MarkerFilterConfig,
+    cloud: F64,
+    poses: Mapping[int, SE3],
+    generic_kept: Sequence[Track],
+    shortfall: int,
+    listed: int,
+    track_fn: Callable[[str, int], tuple[list[Track], bool]],
+) -> tuple[FitPass, DiscoveryCheck, dict[str, Any], dict[int, FoundBy]]:
+    """Send the planned requests, merge, and run the lift-and-fit block on the union.
+
+    ``track_fn(prompt, offset)`` sends one video request and returns its tracks with ids
+    shifted plus whether the answer came from the response cache. Returns the second fit
+    pass, the discovery audit, the ``route.json`` gap section (counts and names only, no
+    arrays) and found-by per union track id.
+    """
+    requests: list[GapRequest] = []
+    records: list[dict[str, Any]] = []
+    marker_dropped = 0
+    if plan.send_box:
+        assert plan.box_prompt is not None
+        tracks, cached = track_fn(plan.box_prompt, 0)
+        kept_box, mrep = filter_marker_tracks(tracks, world, run_dir, marker_cfg)
+        marker_dropped += len(mrep.dropped)
+        requests.append(
+            GapRequest(tuple(kept_box), "cluster_box", "unexplained point cluster", plan.box_gated)
+        )
+        records.append({"kind": "cluster_box", "cached": cached, "tracks": len(kept_box)})
+    for k, noun in enumerate(plan.nouns):
+        tracks, cached = track_fn(noun, NOUN_ID_STEP * (k + 1))
+        kept_noun, mrep = filter_marker_tracks(tracks, world, run_dir, marker_cfg)
+        marker_dropped += len(mrep.dropped)
+        requests.append(GapRequest(tuple(kept_noun), "noun", f"noun '{noun}'"))
+        records.append({"kind": "noun", "noun": noun, "cached": cached, "tracks": len(kept_noun)})
+    merged = merge_requests(list(generic_kept), requests, gcfg)
+    prov: dict[int, FoundBy] = {t.track_id: "generic" for t in generic_kept}
+    for request in requests:
+        for track in request.tracks:
+            prov.setdefault(track.track_id, request.found_by)
+    for old, new in merged.remapped:
+        prov[new] = prov.get(old, "generic")
+    repaired, report = repair_tracks(
+        merged.tracks, poses, world.intrinsics, world.table_plane, repair_cfg
+    )
+    prov = inherit_provenance(prov, report)
+    second = fit_pass(repaired, world, lift_cfg, prim_cfg, cloud)
+    requested = [r["noun"] for r in records if r["kind"] == "noun"]
+    survived = {note for notes in merged.notes.values() for note in notes}
+    unmatched = [n for n in requested if f"noun '{n}'" not in survived]
+    unmatched += [n for n in plan.nouns_dropped if n not in requested]
+    recovered = sum(1 for t in second.kept if prov.get(t.track_id, "generic") != "generic")
+    discovery = DiscoveryCheck(
+        view_frames=plan.view_frames,
+        view_coverage=plan.view_coverage,
+        listed=listed,
+        tracked=len(second.kept),
+        missing_suspected=listed > len(second.kept),
+        unmatched=unmatched,
+        unexplained_clusters=plan.clusters_total,
+        recovered=recovered,
+        video_requests=plan.video_requests,
+    )
+    report_lines = [f"gap fill: {recovered} object(s) recovered in {len(records)} extra request(s)"]
+    flag_reasons: dict[str, str] = {}
+    for t in second.kept:
+        note = _origin_note(t.track_id, merged.notes, report)
+        if note is None:
+            continue
+        if prov.get(t.track_id, "generic") != "generic":
+            flag_reasons[str(t.track_id)] = f"found by gap fill: {note}"
+        else:
+            flag_reasons[str(t.track_id)] = f"also found by gap fill: {note}"
+    for t in second.kept:
+        if str(t.track_id) in flag_reasons:
+            report_lines.append(f"obj_{t.track_id:03d}: {flag_reasons[str(t.track_id)]}")
+    for index in plan.box_unprompted:
+        report_lines.append(f"gap fill: cluster {index} has no placeable box")
+    gap_notes: dict[str, Any] = {
+        "listed": listed,
+        "shortfall_trigger": shortfall,
+        "unexplained_clusters": plan.clusters_total,
+        "requests": records,
+        "marker_dropped": marker_dropped,
+        "merged_notes": {str(k): list(v) for k, v in merged.notes.items() if v},
+        "dropped": {str(k): v for k, v in merged.dropped.items()},
+        "unprompted_clusters": list(plan.box_unprompted),
+        "recovered": recovered,
+        "video_requests": plan.video_requests,
+        "report_lines": report_lines,
+        "flag_reasons": flag_reasons,
+    }
+    return second, discovery, gap_notes, prov
+
+
+def _origin_note(
+    tid: int, notes: Mapping[int, tuple[str, ...]], report: RepairReport
+) -> str | None:
+    """Provenance note for a post-repair track: its own, else its split parent's."""
+    if notes.get(tid):
+        return notes[tid][0]
+    for orig, parts in report.splits:
+        if tid in parts and notes.get(orig):
+            return notes[orig][0]
+    return None
+
+
+__all__ = [
+    "CLUSTER_ID_BASE",
+    "NOUN_ID_STEP",
+    "Box",
+    "ClusterParams",
+    "FitPass",
+    "FoundBy",
+    "GapFillConfig",
+    "GapPlan",
+    "GapRequest",
+    "MergeResult",
+    "box_request",
+    "execute_gap_fill",
+    "fit_pass",
+    "inherit_provenance",
+    "is_board_cluster",
+    "merge_requests",
+    "offset_tracks",
+    "pick_prompt_frames",
+    "plan_gap_fill",
+    "unexplained_clusters",
+]

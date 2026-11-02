@@ -32,7 +32,7 @@ import json
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import numpy as np
 from numpy.typing import NDArray
@@ -40,10 +40,26 @@ from numpy.typing import NDArray
 from video2sim.models.hosted import ResponseCache
 from video2sim.models.vlm import make_vlm_client
 from video2sim.runner import StageContext
-from video2sim.schemas import Flag, Instances, ObjectInstance, StageName, WorldModel
+from video2sim.schemas import (
+    DiscoveryCheck,
+    Flag,
+    Instances,
+    ObjectInstance,
+    StageName,
+    WorldModel,
+)
 from video2sim.stages.depth_flags import DepthConfig, depth_signals, judge
+from video2sim.stages.gap_fill import (
+    FoundBy,
+    GapFillConfig,
+    execute_gap_fill,
+    fit_pass,
+    offset_tracks,
+    plan_gap_fill,
+    unexplained_clusters,
+)
 from video2sim.stages.keyframes import KeyframeChoice, KeyframeConfig, keyframes_for_tracks
-from video2sim.stages.lift import LiftConfig, lift_points, lift_tracks, load_points
+from video2sim.stages.lift import LiftConfig, load_points
 from video2sim.stages.marker_filter import MarkerFilterConfig, filter_marker_tracks
 from video2sim.stages.material_pass import (
     MaterialClient,
@@ -56,8 +72,6 @@ from video2sim.stages.material_pass import (
 from video2sim.stages.primitive_fit import (
     FitResult,
     PrimitiveConfig,
-    drop_duplicate_fits,
-    fit_clusters,
 )
 from video2sim.stages.scene_router import (
     Route,
@@ -65,8 +79,10 @@ from video2sim.stages.scene_router import (
     RouterConfig,
     compare_counts,
     route_scene,
+    sanitise_noun,
     tracking_prompt,
 )
+from video2sim.stages.segmentation import sample_frame_indices
 from video2sim.stages.shape_flags import ShapeConfig, judge_all, shape_signals
 from video2sim.stages.track_repair import RepairConfig, RepairReport, repair_tracks
 from video2sim.stages.tracking import (
@@ -104,8 +120,9 @@ def route_report(
     route: Route, raw: list[Track], repaired: list[Track], report: RepairReport
 ) -> dict[str, Any]:
     """JSON-serializable tracking summary for ``route.json``: the router's path and what
-    tracking and 3D repair made of it. Counts and names only, so it is deterministic."""
-    return {
+    tracking and 3D repair made of it. Counts and names only, so it is deterministic. The
+    inventory keys appear only in coverage mode, so even mode stays byte-identical."""
+    summary: dict[str, Any] = {
         "surface": route.surface,
         "prompt": route.prompt,
         "objects": list(route.objects),
@@ -116,6 +133,13 @@ def route_report(
         "splits": [[a, list(b)] for a, b in report.splits],
         "merges": [list(m) for m in report.merges],
     }
+    if route.inventory:
+        summary["inventory"] = [
+            {"noun": i.noun, "count": i.count, "max_hidden_seen": i.max_hidden_seen}
+            for i in route.inventory
+        ]
+        summary["view_frames"] = list(route.view_frames)
+    return summary
 
 
 def tracking_live_line(summary: dict[str, Any]) -> str:
@@ -217,6 +241,7 @@ def build_object(
     flags: list[Flag],
     reasons: list[str],
     decision: MaterialDecision,
+    found_by: Literal["generic", "noun", "cluster_box"] = "generic",
 ) -> ObjectInstance:
     answer = decision.answer
     return ObjectInstance(
@@ -227,6 +252,7 @@ def build_object(
         keyframes=[k.frame_index for k in keyframes],
         flags=flags,
         flag_reasons=reasons,
+        found_by=found_by,
         category=answer.category if answer is not None else None,
         material_class=answer.material_class if answer is not None else None,
         finish=answer.finish if answer is not None else None,
@@ -266,15 +292,23 @@ class SegmentationStage:
         clients = self._clients(cfg)
         rcfg = RouterConfig.from_config(cfg)
         lift_cfg, depth_cfg = LiftConfig.from_config(cfg), DepthConfig.from_config(cfg)
+        prim_cfg = PrimitiveConfig.from_config(cfg)
         material_cfg, shape_cfg = MaterialConfig.from_config(cfg), ShapeConfig.from_config(cfg)
         scene_flags: list[str] = []
 
+        cloud = load_points(ctx.run_dir / world.point_cloud_path)
         route = route_scene(
-            world, ctx.run_dir, clients.router, ResponseCache(work / "router_cache"), rcfg
+            world,
+            ctx.run_dir,
+            clients.router,
+            ResponseCache(work / "router_cache"),
+            rcfg,
+            cloud,
         )
         if route.fell_back:
             scene_flags.append(f"router fell back to the {route.surface} prompt: {route.reason}")
         tcfg = replace(TrackingConfig.from_config(cfg), prompt=tracking_prompt(route, rcfg))
+        marker_cfg = MarkerFilterConfig.from_config(cfg)
         raw = track_objects(
             world,
             ctx.run_dir,
@@ -283,9 +317,7 @@ class SegmentationStage:
             tcfg,
             work / "tracking_work",
         )
-        raw, marker_report = filter_marker_tracks(
-            raw, world, ctx.run_dir, MarkerFilterConfig.from_config(cfg)
-        )
+        raw, marker_report = filter_marker_tracks(raw, world, ctx.run_dir, marker_cfg)
         for track_id, reason in marker_report.dropped.items():
             scene_flags.append(f"track {track_id} dropped as a marker: {reason}")
             ctx.report(f"dropped track {track_id}: marker ({reason})")
@@ -294,36 +326,110 @@ class SegmentationStage:
             raw, poses, world.intrinsics, world.table_plane, RepairConfig.from_config(cfg)
         )
         summary = route_report(route, raw, repaired, report)
+        ctx.report(tracking_live_line(summary))
+
+        first = fit_pass(repaired, world, lift_cfg, prim_cfg, cloud)
+        gcfg = GapFillConfig.from_config(cfg)
+        listed = sum(i.count for i in route.inventory) if route.inventory else len(route.objects)
+        shortfall = listed - len(first.kept)
+        final = first
+        discovery: DiscoveryCheck | None = None
+        prov: dict[int, FoundBy] = {t.track_id: "generic" for t in first.kept}
+        gap_flag_reasons: dict[int, str] = {}
+        if gcfg.enabled:
+            kept_points = {
+                t.track_id: first.sparse.get(t.track_id, first.hulls[t.track_id])
+                for t in first.kept
+            }
+            clusters = unexplained_clusters(
+                world,
+                cloud,
+                kept_points,
+                ctx.run_dir,
+                marker_cfg.family,
+                gcfg.cluster,
+                lift_cfg.table_margin_m,
+                lift_cfg.max_height_m,
+            )
+            if shortfall > 0 or clusters:
+                if route.inventory:
+                    nouns = [i.noun for i in route.inventory]
+                    view_frames = list(route.view_frames)
+                else:
+                    nouns = []
+                    for name in route.objects:
+                        clean = sanitise_noun(name, rcfg.noun_denylist)
+                        if clean is not None and clean not in nouns:
+                            nouns.append(clean)
+                    order_all = [f.frame_index for f in world.frames]
+                    view_frames = [
+                        order_all[i] for i in sample_frame_indices(len(order_all), rcfg.n_frames)
+                    ]
+                order = [f.frame_index for f in world.frames]
+                plan = plan_gap_fill(
+                    world,
+                    cloud,
+                    nouns,
+                    clusters,
+                    view_frames,
+                    order,
+                    rcfg.views,
+                    rcfg.views.cell_m,
+                    rcfg.views.min_views_per_cell,
+                    gcfg,
+                )
+                tracking_cache = ResponseCache(work / "tracking_cache")
+                cache_dir = work / "tracking_cache"
+
+                def track_fn(prompt: str, offset: int) -> tuple[list[Track], bool]:
+                    before = {p.name for p in cache_dir.glob("*.txt")}
+                    rtcfg = replace(tcfg, prompt=prompt)
+                    tracks = track_objects(
+                        world,
+                        ctx.run_dir,
+                        clients.tracking,
+                        tracking_cache,
+                        rtcfg,
+                        work / "tracking_work",
+                    )
+                    cached = not ({p.name for p in cache_dir.glob("*.txt")} - before)
+                    return offset_tracks(tracks, offset), cached
+
+                final, discovery, gap_notes, prov = execute_gap_fill(
+                    world,
+                    ctx.run_dir,
+                    plan,
+                    gcfg,
+                    lift_cfg,
+                    prim_cfg,
+                    RepairConfig.from_config(cfg),
+                    marker_cfg,
+                    cloud,
+                    poses,
+                    first.kept,
+                    shortfall,
+                    listed,
+                    track_fn,
+                )
+                summary["gap_fill"] = gap_notes
+                gap_flag_reasons = {int(k): v for k, v in gap_notes["flag_reasons"].items()}
+                for note in gap_notes["report_lines"]:
+                    ctx.report(note)
+        kept = final.kept
+        for track_id, reason in final.drops.items():
+            scene_flags.append(f"track {track_id} dropped: {reason}")
+            ctx.report(f"dropped track {track_id}: {reason}")
+        check = compare_counts(route, len(kept))
+        if check.missing_suspected:
+            scene_flags.append(f"possible missing object: {check.reason}")
         (ctx.out_dir / "route.json").write_text(
             json.dumps(summary, indent=2) + "\n",
             encoding="utf-8",
         )
-        ctx.report(tracking_live_line(summary))
-
-        hulls, hull_report = lift_tracks(repaired, world, lift_cfg)
-        kept = [t for t in repaired if t.track_id in hulls]
-        for t in repaired:
-            if t.track_id not in hulls:
-                reason = hull_report.dropped.get(t.track_id, "no point cluster")
-                scene_flags.append(f"track {t.track_id} dropped: {reason}")
-                ctx.report(f"dropped track {t.track_id}: {reason}")
-        check = compare_counts(route, len(kept))
-        if check.missing_suspected:
-            scene_flags.append(f"possible missing object: {check.reason}")
         if not kept:
             scene_flags.append("no objects tracked")
-            return Instances(objects=[], flags=scene_flags)
-
-        cloud = load_points(ctx.run_dir / world.point_cloud_path)
-        sparse, _ = lift_points(kept, world, cloud, lift_cfg)
-        prim_cfg = PrimitiveConfig.from_config(cfg)
-        fits = fit_clusters(kept, sparse, world, lift_cfg, prim_cfg)
-        dups = drop_duplicate_fits(fits, {t.track_id: t for t in kept}, prim_cfg)
-        for i, reason in dups.items():
-            fits.pop(i, None)
-            scene_flags.append(f"track {i} dropped as a {reason}")
-            ctx.report(f"dropped track {i}: {reason}")
-        kept = [t for t in kept if t.track_id not in dups]
+            return Instances(objects=[], flags=scene_flags, discovery=discovery)
+        hulls, sparse, fits = final.hulls, final.sparse, final.fits
         ctx.out_dir.mkdir(parents=True, exist_ok=True)
         (ctx.out_dir / "fit.json").write_text(
             json.dumps(fit_report(fits), indent=2) + "\n", encoding="utf-8"
@@ -389,6 +495,10 @@ class SegmentationStage:
             if note is not None:
                 reasons.append(note)
             mask_dir, cluster_path = write_object_files(ctx.out_dir, object_id, t, cluster, extra)
+            found_by = prov.get(t.track_id, "generic")
+            gap_reason = gap_flag_reasons.get(t.track_id)
+            if gap_reason is not None:
+                reasons.append(gap_reason)
             objects.append(
                 build_object(
                     object_id,
@@ -398,9 +508,10 @@ class SegmentationStage:
                     flags,
                     reasons,
                     decision,
+                    found_by,
                 )
             )
             if flags:
                 label = decision.answer.category if decision.answer is not None else "object"
                 ctx.report(flag_live_line(object_id, label, [f.value for f in flags]))
-        return Instances(objects=objects, flags=scene_flags)
+        return Instances(objects=objects, flags=scene_flags, discovery=discovery)
