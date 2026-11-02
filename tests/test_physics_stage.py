@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from collections.abc import Sequence
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 import cv2
 import numpy as np
@@ -76,6 +76,7 @@ def run_stage(
     pose: SE3,
     client: FakeClient | None = WIDE,
     vlm_mass: bool = True,
+    visual: dict[str, Any] | None = None,
 ) -> tuple[SimAssets, Path]:
     run_dir = tmp_path / "run"
     (run_dir / "frames").mkdir(parents=True)
@@ -125,6 +126,7 @@ def run_stage(
 
     cfg = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
     cfg["physics"]["vlm_mass"]["enabled"] = vlm_mass
+    cfg["physics"]["visual"].update(visual or {})
     targets = yaml.safe_load((ROOT / "configs/targets.yaml").read_text(encoding="utf-8"))
     out_dir = run_dir / "physics.tmp"
     out_dir.mkdir()
@@ -288,3 +290,53 @@ def test_disabled_vlm_mass_needs_no_client_or_key_and_raises_no_flag(
     report = json.loads((run_dir / "physics" / "report.json").read_text())
     assert report["obj_000"]["mass_source"] == "geometry_only"
     assert not (run_dir / "physics.work" / "vlm_mass_cache").exists()
+
+
+def ball() -> trimesh.Trimesh:
+    return cast(trimesh.Trimesh, trimesh.creation.icosphere(subdivisions=4, radius=0.04))
+
+
+def ball_on_table() -> SE3:
+    pose = np.eye(4)
+    pose[2, 3] = 0.04
+    return SE3.from_numpy(pose)
+
+
+def test_mass_comes_from_the_full_mesh_whatever_the_visual_budget(tmp_path: Path) -> None:
+    pytest.importorskip("fast_simplification")
+    light = {"max_triangles": 200, "fallback_triangles": [], "max_surface_error": 0.5}
+    full, _ = run_stage(
+        tmp_path / "a",
+        ball(),
+        ball_on_table(),
+        visual={"max_triangles": 10000, "fallback_triangles": []},
+    )
+    small, run_dir = run_stage(tmp_path / "b", ball(), ball_on_table(), visual=light)
+    report = json.loads((run_dir / "physics" / "report.json").read_text())["obj_000"]
+    assert report["visual_faces"] <= 200 and report["physics_faces"] == 5120
+    a, b = full.assets[0].properties, small.assets[0].properties
+    assert b.mass_kg == a.mass_kg and b.inertia_kg_m2 == a.inertia_kg_m2
+    assert small.assets[0].is_valid
+
+
+def test_a_visual_over_budget_ships_flagged_and_over_the_ceiling_is_blocked(
+    tmp_path: Path,
+) -> None:
+    pytest.importorskip("fast_simplification")
+    strict = {"max_triangles": 100, "max_surface_error": 1e-6}
+    heavy, run_dir = run_stage(
+        tmp_path / "a", ball(), ball_on_table(), visual={**strict, "fallback_triangles": [6000]}
+    )
+    asset = heavy.assets[0]
+    assert asset.is_valid and Flag.OVER_TRIANGLE_BUDGET in asset.flags
+    assert Flag.FAILED_VALIDATION not in asset.flags
+    report = json.loads((run_dir / "physics" / "report.json").read_text())["obj_000"]
+    assert report["visual_advisory"] == {"within_triangle_budget": False}
+    assert any("over the budget" in r for r in report["reasons"])
+
+    blocked, _ = run_stage(
+        tmp_path / "b", ball(), ball_on_table(), visual={**strict, "fallback_triangles": [1000]}
+    )
+    asset = blocked.assets[0]
+    assert not asset.is_valid and not asset.checks["within_triangle_ceiling"]
+    assert Flag.FAILED_VALIDATION in asset.flags

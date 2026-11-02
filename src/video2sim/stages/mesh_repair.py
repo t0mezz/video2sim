@@ -15,13 +15,23 @@ silently.
   ``manifold`` (also consistent winding, so the faces form one oriented surface) and
   ``positive_volume`` (outward normals; the signed volume is above ``min_volume_m3``).
 
-* A mesh above ``max_triangles`` is decimated by quadric edge collapse (``fast_simplification``)
-  to the budget. Collapse can leave edges shared by three or more faces; those faces are dropped
-  and the hole closed again. The result must pass the checks above and keep its volume within
-  ``max_volume_change_frac``; otherwise the repaired, undecimated mesh stands and
-  the ``within_triangle_budget`` check is false, so export is blocked rather than shipping a
-  mesh that is too heavy or distorted. Without ``fast_simplification`` an over-budget mesh gets
-  the same verdict, with ``steps["decimation_unavailable"]`` set.
+The repaired mesh is not decimated: mass, inertia and collision geometry are computed from it at
+full detail (D-033). ``visual_mesh`` makes the light copy that is rendered:
+
+* A mesh above ``physics.visual.max_triangles`` is decimated by quadric edge collapse
+  (``fast_simplification``). Collapse can leave edges shared by three or more faces; those faces
+  are dropped and the hole closed again. A copy is kept if it is still closed and consistently
+  wound and its surface stays within ``max_surface_error``: the 95th percentile of the surface
+  distances in both directions, as a share of the bounding box diagonal. Volume is not the test,
+  because the visual mesh does not carry the mass; collapsing a ridged surface (a Rubik's cube in
+  s12) moves the volume by 6% while moving the surface by about half a millimeter.
+* If no copy at the budget keeps the shape, the larger budgets of ``fallback_triangles`` are
+  tried in turn. A copy over the budget is shipped and reported (``within_triangle_budget`` in
+  ``VisualResult.advisory``), not blocked, because a heavy object in the scene is better than a
+  missing one. The last budget is the ceiling: if no copy passes there either, the full mesh
+  stands and the ``within_triangle_ceiling`` check is false, so export is blocked. Without
+  ``fast_simplification`` an over-budget mesh is handled the same way, with
+  ``steps["decimation_unavailable"]`` set.
 
 ``repair_file`` is the same on a mesh file: read, repair, and write the result.
 """
@@ -34,9 +44,13 @@ from typing import Any
 
 import numpy as np
 import trimesh
+from numpy.typing import NDArray
 
-# Fractions of the budget that decimation aims for, in turn, until one result passes the checks.
+# Fractions of each budget that decimation aims for, in turn, until one result passes the checks.
 DECIMATION_TARGET_MARGINS = (0.98, 0.95, 0.9)
+# Surface points drawn on each mesh for the surface error, and candidate faces per point.
+SURFACE_SAMPLES = 20000
+NEAREST_FACES = 16
 
 
 @dataclass(frozen=True)
@@ -45,9 +59,6 @@ class RepairConfig:
 
     min_component_area_frac: float
     min_volume_m3: float
-    max_triangles: int
-    max_volume_change_frac: float
-    decimation_aggression: int
 
     @classmethod
     def from_config(cls, cfg: dict[str, Any]) -> RepairConfig:
@@ -55,20 +66,51 @@ class RepairConfig:
         out = cls(
             min_component_area_frac=float(c["min_component_area_frac"]),
             min_volume_m3=float(c["min_volume_m3"]),
-            max_triangles=int(c["max_triangles"]),
-            max_volume_change_frac=float(c["max_volume_change_frac"]),
-            decimation_aggression=int(c["decimation_aggression"]),
         )
         if not 0 <= out.min_component_area_frac < 1:
             raise ValueError("physics.repair.min_component_area_frac must be in [0, 1)")
         if out.min_volume_m3 <= 0:
             raise ValueError("physics.repair.min_volume_m3 must be positive")
+        return out
+
+
+@dataclass(frozen=True)
+class VisualConfig:
+    """Values from ``physics.visual`` in ``configs/default.yaml``."""
+
+    max_triangles: int
+    fallback_triangles: tuple[int, ...]
+    max_surface_error: float
+    decimation_aggression: int
+    seed: int = 0
+
+    @property
+    def budgets(self) -> tuple[int, ...]:
+        """The budgets tried in turn; the last is the ceiling."""
+        return (self.max_triangles, *self.fallback_triangles)
+
+    @property
+    def ceiling(self) -> int:
+        return self.budgets[-1]
+
+    @classmethod
+    def from_config(cls, cfg: dict[str, Any]) -> VisualConfig:
+        c = cfg["physics"]["visual"]
+        out = cls(
+            max_triangles=int(c["max_triangles"]),
+            fallback_triangles=tuple(int(n) for n in c.get("fallback_triangles") or ()),
+            max_surface_error=float(c["max_surface_error"]),
+            decimation_aggression=int(c["decimation_aggression"]),
+            seed=int(c.get("seed", 0)),
+        )
         if out.max_triangles < 4:
-            raise ValueError("physics.repair.max_triangles must be at least 4")
-        if not 0 < out.max_volume_change_frac < 1:
-            raise ValueError("physics.repair.max_volume_change_frac must be in (0, 1)")
+            raise ValueError("physics.visual.max_triangles must be at least 4")
+        if any(b <= a for a, b in zip(out.budgets[:-1], out.budgets[1:], strict=True)):
+            raise ValueError("physics.visual.fallback_triangles must rise above max_triangles")
+        if not 0 < out.max_surface_error < 1:
+            raise ValueError("physics.visual.max_surface_error must be in (0, 1)")
         if not 3 <= out.decimation_aggression <= 10:
-            raise ValueError("physics.repair.decimation_aggression must be in [3, 10]")
+            raise ValueError("physics.visual.decimation_aggression must be in [3, 10]")
         return out
 
 
@@ -83,6 +125,17 @@ class RepairResult:
         return all(self.checks.values())
 
 
+@dataclass(frozen=True)
+class VisualResult:
+    """The visual copy. ``checks`` block export; ``advisory`` is reported and flagged only."""
+
+    mesh: trimesh.Trimesh
+    checks: dict[str, bool]
+    advisory: dict[str, bool]
+    surface_error: float | None  # against the repaired mesh; None if it was not decimated
+    steps: dict[str, int] = field(default_factory=dict)
+
+
 def validate_mesh(mesh: trimesh.Trimesh, cfg: RepairConfig) -> dict[str, bool]:
     """Named pass or fail checks for one mesh."""
     finite = bool(len(mesh.vertices)) and bool(np.isfinite(mesh.vertices).all())
@@ -92,7 +145,6 @@ def validate_mesh(mesh: trimesh.Trimesh, cfg: RepairConfig) -> dict[str, bool]:
             "watertight": False,
             "manifold": False,
             "positive_volume": False,
-            "within_triangle_budget": len(mesh.faces) <= cfg.max_triangles,
         }
     watertight = bool(mesh.is_watertight)
     return {
@@ -100,7 +152,6 @@ def validate_mesh(mesh: trimesh.Trimesh, cfg: RepairConfig) -> dict[str, bool]:
         "watertight": watertight,
         "manifold": watertight and bool(mesh.is_winding_consistent),
         "positive_volume": watertight and float(mesh.volume) > cfg.min_volume_m3,
-        "within_triangle_budget": len(mesh.faces) <= cfg.max_triangles,
     }
 
 
@@ -204,47 +255,108 @@ def _drop_nonmanifold_faces(m: trimesh.Trimesh) -> trimesh.Trimesh:
     return out
 
 
-def _decimate(m: trimesh.Trimesh, cfg: RepairConfig, steps: dict[str, int]) -> trimesh.Trimesh:
-    """Collapse edges down to the triangle budget, or return ``m`` if that would not be safe.
+def _distance_to_surface(points: NDArray[np.float64], mesh: trimesh.Trimesh) -> NDArray[np.float64]:
+    """Distance from each point to the nearest of ``mesh``'s faces near it.
 
-    Edge collapse can leave a few edges shared by three or more faces. The faces on them are
-    dropped and the hole is closed again; the result is kept only if it passes the checks.
+    The candidates are the faces with the ``NEAREST_FACES`` nearest centroids, so no ``rtree`` is
+    needed. On a sliver far longer than its neighbors this can overestimate, never underestimate.
     """
-    if len(m.faces) <= cfg.max_triangles or not m.is_watertight:
-        return m
-    try:
-        import fast_simplification  # type: ignore[import-untyped]  # heavy import
-    except ImportError:
-        steps["decimation_unavailable"] = 1
-        return m
-    before = float(m.volume)
-    for margin in DECIMATION_TARGET_MARGINS:
-        # aim under the budget: closing the holes left by dropped faces adds a few back
-        v, f = fast_simplification.simplify(
-            np.asarray(m.vertices, dtype=np.float64),
-            np.asarray(m.faces, dtype=np.int32),
-            target_count=int(cfg.max_triangles * margin),
-            agg=cfg.decimation_aggression,
-        )
-        small = trimesh.Trimesh(v, f, process=False)
-        small.merge_vertices()
-        small.update_faces(small.nondegenerate_faces())
-        small.remove_unreferenced_vertices()
-        small = _close_holes(_drop_nonmanifold_faces(small), {})
-        if (
-            small.is_watertight
-            and small.is_winding_consistent
-            and len(small.faces) <= cfg.max_triangles
-            and abs(float(small.volume) - before) <= cfg.max_volume_change_frac * before
-        ):
-            steps["faces_removed_by_decimation"] = len(m.faces) - len(small.faces)
-            return small
+    from scipy.spatial import cKDTree  # type: ignore[import-untyped]  # heavy import
+
+    k = min(NEAREST_FACES, len(mesh.faces))
+    idx = cKDTree(np.asarray(mesh.triangles_center)).query(points, k=k)[1].reshape(len(points), k)
+    tri = np.asarray(mesh.triangles)[idx.reshape(-1)]
+    closest = trimesh.triangles.closest_point(  # type: ignore[no-untyped-call]  # trimesh is untyped
+        tri, np.repeat(points, k, axis=0)
+    )
+    d = np.linalg.norm(closest - np.repeat(points, k, axis=0), axis=1).reshape(len(points), k)
+    return np.asarray(d.min(axis=1), dtype=np.float64)
+
+
+def surface_error(mesh: trimesh.Trimesh, other: trimesh.Trimesh, seed: int = 0) -> float:
+    """95th percentile of the point to surface distances in both directions, over ``mesh``'s
+    bounding box diagonal."""
+    a = np.asarray(trimesh.sample.sample_surface(mesh, SURFACE_SAMPLES, seed=seed)[0])
+    b = np.asarray(trimesh.sample.sample_surface(other, SURFACE_SAMPLES, seed=seed)[0])
+    d = np.concatenate([_distance_to_surface(a, other), _distance_to_surface(b, mesh)])
+    return float(np.percentile(d, 95)) / float(np.linalg.norm(mesh.extents))
+
+
+def _collapse(m: trimesh.Trimesh, target: int, aggression: int) -> trimesh.Trimesh:
+    import fast_simplification  # type: ignore[import-untyped,unused-ignore]  # heavy import
+
+    v, f = fast_simplification.simplify(
+        np.asarray(m.vertices, dtype=np.float64),
+        np.asarray(m.faces, dtype=np.int32),
+        target_count=target,
+        agg=aggression,
+    )
+    small = trimesh.Trimesh(v, f, process=False)
+    small.merge_vertices()
+    small.update_faces(small.nondegenerate_faces())
+    small.remove_unreferenced_vertices()
+    return _close_holes(_drop_nonmanifold_faces(small), {})
+
+
+def visual_mesh(mesh: trimesh.Trimesh, cfg: VisualConfig) -> VisualResult:
+    """The copy of the repaired ``mesh`` that is rendered, decimated as the module says.
+
+    ``mesh`` is not modified; it is itself the result when it is within the budget, open, or
+    cannot be decimated within ``cfg.max_surface_error`` up to the ceiling.
+    """
+    steps: dict[str, int] = {}
+    chosen, error = mesh, None
+    if len(mesh.faces) > cfg.max_triangles and mesh.is_watertight:
+        try:
+            chosen, error = _decimate(mesh, cfg, steps)
+        except ImportError:
+            steps["decimation_unavailable"] = 1
+    faces = len(chosen.faces)
+    return VisualResult(
+        chosen,
+        {"within_triangle_ceiling": faces <= cfg.ceiling},
+        {"within_triangle_budget": faces <= cfg.max_triangles},
+        error,
+        steps,
+    )
+
+
+def _decimate(
+    m: trimesh.Trimesh, cfg: VisualConfig, steps: dict[str, int]
+) -> tuple[trimesh.Trimesh, float | None]:
+    """The first copy that passes, trying each budget and each margin in turn; or ``m``.
+
+    Raises ``ImportError`` without ``fast_simplification``.
+    """
+    for rung, budget in enumerate(cfg.budgets):
+        if len(m.faces) <= budget:
+            steps["budget_rung"] = rung
+            return m, None
+        for margin in DECIMATION_TARGET_MARGINS:
+            # aim under the budget: closing the holes left by dropped faces adds a few back
+            small = _collapse(m, int(budget * margin), cfg.decimation_aggression)
+            if not (
+                small.is_watertight
+                and small.is_winding_consistent
+                and len(small.faces) <= budget
+                and float(small.volume) > 0
+            ):
+                continue
+            error = surface_error(m, small, cfg.seed)
+            if error <= cfg.max_surface_error:
+                steps["budget_rung"] = rung
+                steps["faces_removed_by_decimation"] = len(m.faces) - len(small.faces)
+                return small, error
+        steps[f"decimation_rejected_at_{budget}"] = 1
     steps["decimation_rejected"] = 1
-    return m
+    return m, None
 
 
 def repair_mesh(mesh: trimesh.Trimesh, cfg: RepairConfig) -> RepairResult:
-    """Clean ``mesh`` and return the result with its checks. The input is not modified."""
+    """Clean ``mesh`` and return the result with its checks. The input is not modified.
+
+    The result is at full detail; ``visual_mesh`` makes the light copy.
+    """
     m = mesh.copy()
     steps: dict[str, int] = {}
     if len(m.faces) == 0 or not np.isfinite(m.vertices).all():
@@ -259,7 +371,6 @@ def repair_mesh(mesh: trimesh.Trimesh, cfg: RepairConfig) -> RepairResult:
 
     m, steps["floaters_removed"] = _drop_floaters(m, cfg.min_component_area_frac)
     m = _close_holes(m, steps)
-    m = _decimate(m, cfg, steps)
     if m.is_watertight and m.volume < 0:
         m.invert()
     return RepairResult(m, validate_mesh(m, cfg), steps)

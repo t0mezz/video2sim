@@ -2,7 +2,9 @@
 
 Each object goes through repair (P4.1), collision geometry (P4.2), its material (P4.4) and mass
 (P4.5, P4.6), which the vision-language model's mass may replace (D-024,
-``stages/vlm_mass.py``); the body stays, so inertia scales with the mass. The body gives the
+``stages/vlm_mass.py``); the body stays, so inertia scales with the mass. Collision and mass use
+the full repaired mesh; only the visual mesh is a decimated copy (D-033,
+``mesh_repair.visual_mesh``). The body gives the
 center of mass, and the asset's frame moves there: meshes shift by it and
 ``T_world_from_object`` takes it up, so the world surface stays where it was and ``AGENTS.md``'s
 object frame holds. Inertia is about that point already.
@@ -10,7 +12,9 @@ object frame holds. Inertia is about that point already.
 The scene is then settled (P4.7, D-021) for the nominal values and each low and high friction and
 mass. The result goes to ``physics/settling.json`` for the QA report and does not change
 ``SimAsset.checks``: an object that drifts stays in the scene, and the report says so (D-023). An
-object that fails a check is written with ``Flag.FAILED_VALIDATION``, and export blocks it.
+object that fails a check is written with ``Flag.FAILED_VALIDATION``, and export blocks it. A visual
+mesh over its triangle budget but under the ceiling is written with ``Flag.OVER_TRIANGLE_BUDGET``
+and is not blocked.
 """
 
 from __future__ import annotations
@@ -56,7 +60,7 @@ from video2sim.stages.material_pass import (
     pick_frames,
 )
 from video2sim.stages.material_table import MaterialTable, load_material_table
-from video2sim.stages.mesh_repair import RepairConfig, repair_mesh
+from video2sim.stages.mesh_repair import RepairConfig, VisualConfig, repair_mesh, visual_mesh
 from video2sim.stages.physics import object_material
 from video2sim.stages.settling import SettleBody, SettlingConfig, is_round, settle_scene
 from video2sim.stages.shape import load_masks
@@ -69,6 +73,7 @@ CASES = ("nominal", "friction_low", "friction_high", "mass_low", "mass_high")
 @dataclass(frozen=True)
 class PhysicsConfig:
     repair: RepairConfig
+    visual: VisualConfig
     collision: CollisionConfig
     mass: MassConfig
     settling: SettlingConfig
@@ -83,6 +88,7 @@ class PhysicsConfig:
         full: dict[str, Any] = {"physics": cfg["physics"]}
         return cls(
             repair=RepairConfig.from_config(full),
+            visual=VisualConfig.from_config(full),
             collision=CollisionConfig.from_config(full),
             mass=MassConfig.from_config(full),
             settling=SettlingConfig.from_config(full, {"targets": cfg["stability"]}),
@@ -147,7 +153,8 @@ def prepare_object(
     inertia = mass.inertia_kg_m2 * final_mass.nominal / mass.mass_kg.nominal  # same body
 
     offset = mass.center_of_mass_m
-    visual = repaired.mesh.copy()
+    light = visual_mesh(repaired.mesh, cfg.visual)
+    visual = light.mesh.copy()
     _carry_colors(visual, mesh)
     visual.apply_translation(-offset)
     parts = [p.copy() for p in collision.parts]
@@ -165,8 +172,9 @@ def prepare_object(
         replace(collision, parts=parts), out_dir / "collision", registered.object_id
     )
 
-    checks = {**repaired.checks, **collision.checks}
+    checks = {**repaired.checks, **light.checks, **collision.checks}
     failed = (Flag.FAILED_VALIDATION,) if not all(checks.values()) else ()
+    heavy = (Flag.OVER_TRIANGLE_BUDGET,) if not all(light.advisory.values()) else ()
     no_answer = (Flag.LOW_CONFIDENCE_MATERIAL,) if mass_source == "geometry_no_answer" else ()
     round_flag = (Flag.IGNORED_ROUND,) if is_round(visual, cfg.settling.round_tolerance) else ()
     numbers = material.numbers
@@ -186,12 +194,17 @@ def prepare_object(
             confidence=material.confidence,
         ),
         checks=checks,
-        flags=_flags(registered.flags, material.flags, no_answer, round_flag, failed),
+        flags=_flags(registered.flags, material.flags, no_answer, round_flag, heavy, failed),
     )
     entry = {
         "collision_kind": collision.kind,
         "collision_parts": len(parts),
         "repair_steps": repaired.steps,
+        "visual_steps": light.steps,
+        "visual_faces": len(visual.faces),
+        "physics_faces": len(repaired.mesh.faces),
+        "visual_surface_error": light.surface_error,
+        "visual_advisory": light.advisory,
         "collision_steps": collision.steps,
         "fill_fraction": mass.fill_fraction.nominal,
         "mass_source": mass_source,
@@ -202,6 +215,14 @@ def prepare_object(
             *material.reasons,
             *mass.reasons,
             *(["no mass from the model: kept the geometry mass"] if no_answer else []),
+            *(
+                [
+                    f"visual mesh has {len(visual.faces)} faces, over the budget of "
+                    f"{cfg.visual.max_triangles}: no lighter copy kept the shape"
+                ]
+                if heavy
+                else []
+            ),
         ],
     }
     return PreparedObject(asset, parts), entry

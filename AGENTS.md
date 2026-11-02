@@ -150,6 +150,8 @@ notice. Breaking one gives a scene that loads fine and behaves wrongly.
 
   where $\mathbf{r}$ is measured from the center of mass. Hollow objects use an effective
   volume, never the filled one.
+* Mass, inertia and collision come from the full repaired mesh. The visual mesh is a decimated
+  copy for rendering only and never feeds a physical property (D-033).
 * Size errors are amplified in mass, which is why scale accuracy matters:
 
   $$\frac{\delta m}{m} \approx 3\,\frac{\delta s}{s} + \frac{\delta \rho}{\rho}$$

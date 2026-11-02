@@ -9,7 +9,15 @@ import pytest
 import trimesh
 import yaml
 
-from video2sim.stages.mesh_repair import RepairConfig, repair_file, repair_mesh, validate_mesh
+from video2sim.stages.mesh_repair import (
+    RepairConfig,
+    VisualConfig,
+    repair_file,
+    repair_mesh,
+    surface_error,
+    validate_mesh,
+    visual_mesh,
+)
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -17,6 +25,13 @@ ROOT = Path(__file__).resolve().parent.parent
 @pytest.fixture
 def cfg() -> RepairConfig:
     return RepairConfig.from_config(
+        yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
+    )
+
+
+@pytest.fixture
+def vcfg() -> VisualConfig:
+    return VisualConfig.from_config(
         yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
     )
 
@@ -89,44 +104,86 @@ def sphere(subdivisions: int) -> trimesh.Trimesh:
     return cast(trimesh.Trimesh, trimesh.creation.icosphere(subdivisions=subdivisions))
 
 
-def small_budget(cfg: RepairConfig, n: int) -> RepairConfig:
-    return RepairConfig(
-        cfg.min_component_area_frac,
-        cfg.min_volume_m3,
-        n,
-        cfg.max_volume_change_frac,
-        cfg.decimation_aggression,
-    )
+def visual(n: int, fallback: tuple[int, ...] = (), error: float = 0.5) -> VisualConfig:
+    return VisualConfig(n, fallback, error, 5)
 
 
-def test_a_mesh_within_budget_is_not_decimated(cfg: RepairConfig) -> None:
-    res = repair_mesh(sphere(2), cfg)
-    assert res.ok and "faces_removed_by_decimation" not in res.steps
+def test_repair_keeps_every_face_for_physics(cfg: RepairConfig) -> None:
+    m = sphere(4)  # 5120 faces, over the visual budget of the tests below
+    res = repair_mesh(m, cfg)
+    assert res.ok and len(res.mesh.faces) == len(m.faces)
+    assert "within_triangle_budget" not in res.checks
 
 
-def test_over_budget_mesh_is_decimated_and_stays_a_solid(cfg: RepairConfig) -> None:
+def test_a_mesh_within_budget_is_not_decimated(vcfg: VisualConfig) -> None:
+    m = sphere(2)
+    res = visual_mesh(m, vcfg)
+    assert res.mesh is m and res.surface_error is None
+    assert all(res.checks.values()) and all(res.advisory.values())
+
+
+def test_over_budget_mesh_is_decimated_and_keeps_its_shape() -> None:
     pytest.importorskip("fast_simplification")
-    m = sphere(4)  # 5120 faces
-    res = repair_mesh(m, small_budget(cfg, 1000))
-    assert res.ok and len(res.mesh.faces) <= 1000
-    assert res.mesh.volume == pytest.approx(m.volume, rel=0.02)
+    m = sphere(4)
+    res = visual_mesh(m, visual(1000, error=0.005))
+    assert len(res.mesh.faces) <= 1000 and res.mesh.is_watertight
+    assert res.surface_error is not None and res.surface_error <= 0.005
+    assert res.steps["budget_rung"] == 0
+    assert all(res.checks.values()) and all(res.advisory.values())
+    assert len(m.faces) == 5120  # the input is not modified
 
 
-def test_decimation_that_distorts_the_volume_is_rejected(cfg: RepairConfig) -> None:
+def test_a_copy_that_loses_the_shape_steps_up_to_a_larger_budget() -> None:
     pytest.importorskip("fast_simplification")
-    tight = RepairConfig(cfg.min_component_area_frac, cfg.min_volume_m3, 100, 1e-6, 5)
-    res = repair_mesh(sphere(4), tight)
-    assert res.steps.get("decimation_rejected") == 1
-    assert not res.checks["within_triangle_budget"] and not res.ok
+    # at 50 faces a unit sphere is off by 2% of its diagonal, at 1000 by 0.1%
+    res = visual_mesh(sphere(4), visual(50, (1000,), error=0.003))
+    assert res.steps["decimation_rejected_at_50"] == 1 and res.steps["budget_rung"] == 1
+    assert 50 < len(res.mesh.faces) <= 1000
+    assert res.checks == {"within_triangle_ceiling": True}
+    assert res.advisory == {"within_triangle_budget": False}
 
 
-def test_over_budget_without_a_simplifier_blocks_export(
-    cfg: RepairConfig, monkeypatch: pytest.MonkeyPatch
+def test_a_mesh_under_the_next_budget_ships_whole_with_a_note() -> None:
+    pytest.importorskip("fast_simplification")
+    m = sphere(4)
+    res = visual_mesh(m, visual(50, (6000,), error=1e-6))
+    assert res.mesh is m and res.steps["budget_rung"] == 1
+    assert res.checks["within_triangle_ceiling"] and not res.advisory["within_triangle_budget"]
+
+
+def test_no_copy_up_to_the_ceiling_blocks_export() -> None:
+    pytest.importorskip("fast_simplification")
+    m = sphere(4)
+    res = visual_mesh(m, visual(50, (1000,), error=1e-6))
+    assert res.steps["decimation_rejected"] == 1 and res.mesh is m
+    assert not res.checks["within_triangle_ceiling"]
+
+
+def test_over_budget_without_a_simplifier_is_judged_on_the_ceiling(
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setitem(sys.modules, "fast_simplification", None)  # makes the import fail
-    res = repair_mesh(sphere(3), small_budget(cfg, 100))
+    res = visual_mesh(sphere(3), visual(100))
     assert res.steps["decimation_unavailable"] == 1
-    assert res.checks["watertight"] and not res.checks["within_triangle_budget"]
+    assert not res.checks["within_triangle_ceiling"]
+    res = visual_mesh(sphere(3), visual(100, (2000,)))
+    assert res.checks["within_triangle_ceiling"] and not res.advisory["within_triangle_budget"]
+
+
+def test_surface_error_matches_a_closed_form() -> None:
+    m = sphere(4)
+    assert surface_error(m, m.copy()) == pytest.approx(0.0, abs=1e-12)
+    bigger = m.copy()
+    bigger.vertices *= 1.01  # every point moves 0.01 of the radius; the diagonal is 2 sqrt(3)
+    assert surface_error(m, bigger) == pytest.approx(0.01 / (2 * np.sqrt(3)), rel=0.02)
+
+
+def test_the_visual_config_needs_rising_budgets(vcfg: VisualConfig) -> None:
+    assert vcfg.budgets[0] == vcfg.max_triangles and vcfg.ceiling == vcfg.budgets[-1]
+    raw = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
+    raw["physics"]["visual"]["fallback_triangles"] = [1000]
+    with pytest.raises(ValueError, match="rise"):
+        VisualConfig.from_config(raw)
 
 
 def test_repair_file_round_trips_and_writes_a_failing_mesh_too(

@@ -4,7 +4,8 @@
 
 Reads every ``runs/*/shape.work/sam3d_cache/*.glb`` (raw samples in the object frame, before
 registration), repairs each with ``stages/mesh_repair.py`` and reports the checks, the triangle
-counts and the volume change from decimation. No hosted call and no GPU.
+counts, the volume change from repair, and the visual copy: its triangle count, the budget it
+reached and its surface error (D-033). No hosted call and no GPU.
 """
 
 from __future__ import annotations
@@ -17,7 +18,13 @@ from typing import Any
 import trimesh
 import yaml
 
-from video2sim.stages.mesh_repair import RepairConfig, repair_mesh, validate_mesh
+from video2sim.stages.mesh_repair import (
+    RepairConfig,
+    VisualConfig,
+    repair_mesh,
+    validate_mesh,
+    visual_mesh,
+)
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -39,13 +46,13 @@ def main() -> None:
     ap.add_argument("--runs", type=Path, default=ROOT / "runs")
     ap.add_argument("--out", type=Path, default=ROOT / "benchmark/results/p4_1_mesh_repair.json")
     args = ap.parse_args()
-    cfg = RepairConfig.from_config(
-        yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
-    )
+    raw = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
+    cfg, vcfg = RepairConfig.from_config(raw), VisualConfig.from_config(raw)
     rows: list[dict[str, Any]] = []
     for path in sorted(args.runs.glob("*/shape.work/sam3d_cache/*.glb")):
         mesh = load_mesh(path)
         res = repair_mesh(mesh, cfg)
+        vis = visual_mesh(res.mesh, vcfg)
         raw_vol = float(mesh.volume) if mesh.is_watertight else None
         rows.append(
             {
@@ -55,7 +62,12 @@ def main() -> None:
                 "checks_before": validate_mesh(mesh, cfg),
                 "checks_after": res.checks,
                 "steps": res.steps,
-                "ok": res.ok,
+                "visual_faces": len(vis.mesh.faces),
+                "visual_checks": vis.checks,
+                "visual_advisory": vis.advisory,
+                "visual_surface_error": vis.surface_error,
+                "visual_steps": vis.steps,
+                "ok": res.ok and all(vis.checks.values()),
                 "volume_change_frac": (
                     (float(res.mesh.volume) - raw_vol) / raw_vol
                     if raw_vol and res.mesh.is_watertight
@@ -67,7 +79,8 @@ def main() -> None:
         "meshes": len(rows),
         "pass_before": sum(all(r["checks_before"].values()) for r in rows),
         "pass_after": sum(r["ok"] for r in rows),
-        "config": cfg.__dict__,
+        "within_budget": sum(r["visual_advisory"]["within_triangle_budget"] for r in rows),
+        "config": {"repair": cfg.__dict__, "visual": vcfg.__dict__},
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps({"summary": summary, "meshes": rows}, indent=2), "utf-8")

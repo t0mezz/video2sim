@@ -156,6 +156,7 @@ class Flag(str, Enum):
     LOW_CONFIDENCE_MATERIAL = "low_confidence_material"
     FAILED_VALIDATION = "failed_validation"
     IGNORED_ROUND = "ignored_round"
+    OVER_TRIANGLE_BUDGET = "over_triangle_budget"  # visual mesh shipped above its budget, D-033
 
 
 # ---------------------------------------------------------------------------
