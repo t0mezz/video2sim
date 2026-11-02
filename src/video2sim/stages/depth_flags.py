@@ -171,7 +171,7 @@ def depth_signals(
     views = _views(world, lift)
     ratio = _vote(world, tracks, points, views)
     height = points[:, 2] - world.table_plane.offset_m
-    inside_band = (height > lift.table_margin_m) & (height < lift.max_height_m)
+    inside_band = (height > lift.table_margin_m) & (height < lift.tall_height_m)
     on_table = np.abs(height) < lift.table_margin_m
     table_err = float(np.median(err[on_table])) if on_table.any() else None
     best, top = ratio.argmax(axis=0), ratio.max(axis=0)

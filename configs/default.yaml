@@ -134,7 +134,11 @@ segmentation:
       sliver_frac: 0.2         # feet from masks below this share of the track median are occlusion slivers, not new objects
   lift:                        # P2.3: masks to point clusters by voting over views (visual hull)
     voxel_m: 0.005             # grid resolution; a cluster point is a voxel centre
-    max_height_m: 0.35         # grid top above the table plane; objects taller than this are cut off
+    max_height_m: 0.35         # first-pass grid top; tracks reaching it are re-voted on the tall grid
+    tall_height_m: 1.0         # second-pass grid top, paid only when a track reaches the first pass;
+                               # walls (room height) still run through it and are dropped by the cap test
+    cap_top_m: 0.02            # top band whose occupancy must fall off for a capped column; guesses
+    cap_frac: 0.5              # at most this share of the peak layer occupancy in that band; a guess
     margin_m: 0.10             # grid extends this far beyond the track footprints
     max_extent_m: 2            # refuse a grid wider than this (a stray track far from the others)
     max_views: 40              # frames used, spread evenly; cost is voxels x views x tracks
