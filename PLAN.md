@@ -755,6 +755,27 @@ In order:
    that runs alongside the MuJoCo checks: load the exported USD scenes in Isaac Sim and compare
    their behavior under PhysX with the MuJoCo results.
 
+9. **Occlusion-robust object discovery (from P2.1, P2.5).** Optimisation of stage 3. The router
+   sees 3 evenly spaced frames and tracking uses one generic SAM concept, so 3 of 59 dev objects
+   get no track (s13 stack member, s18 pliers, s24 glossy cube). Build: coverage-based view
+   selection for the router, a multi-view router with a merged object inventory, and a gap-fill
+   round after tracking (per-noun SAM requests and box prompts placed on unexplained point
+   clusters), with a `DiscoveryCheck` in `Instances` (schema change approved by the human). Human
+   decision 2026-11-02: item added, schema change approved, hosted calls on dev approved. Plan,
+   research on SAM 3.1 box and point prompts, tasks 9.0 to 9.10 and risks:
+   `docs/research/occlusion_robust_discovery_plan.md`. The test split is not run before a gate.
+   - [x] **9.5** Schema and QA report. Evidence: branch `s12-9-5-schema-qa`, `DiscoveryCheck`/`found_by`/`discovery` in `schemas.py`, Discovery block in `qa_report.py`, `tests/test_schemas.py::TestDiscovery`, new `tests/test_qa_report.py`, doc clarifications in `docs/research/occlusion_robust_discovery_plan.md`
+   - [x] **9.1** Object-prompt builder. Evidence: branch `s12-9-1-prompt-builder`, `models/sam_prompts.py`, `tests/test_sam_prompts.py` (6 tests)
+   - [x] **9.0** Live probe of object prompts (gate for the cluster-box path). Evidence: `benchmark/probe_object_prompts.py`, `benchmark/results/s12_9_probe.json`, caches in `runs_instances/s02_b/segmentation.work/probe_object_prompts/`. Gate PASSED: 4/4 requests accepted on s02_b (s02_a has no finished run), ids preserved, box tracks cover all 50 frames (prompted-frame IoU vs GT box 0.56 to 0.64), empty-table box returns a table patch on 11/50 frames with fill decaying 0.61 to 0.02. Cost $0.04. Cluster-box path confirmed; section 2 open points settled (same `input_text` part, `<Nf>` is the 0-based clip position)
+   - [x] **9.2** Offline view-coverage experiment (gate for 9.3 and 9.4). Evidence: `benchmark/eval_view_coverage.py`, `benchmark/results/s12_9_coverage.json`. Outcome: even-3 already shows every GT object at >=0.3 visible fraction in >=1 view on all 12 scored dev scenes (min 2 to 3 views), coverage-6 adds nothing; multi-view routing NOT justified by occlusion (misses look like SAM misses). 9.3 built regardless per human decision; 9.4 needs a human call
+   - [x] **9.3** View selection. Evidence: branch `s12-9-0-probe` (uncommitted chain), `stages/view_select.py` (`compute_visibility`, `select_views`, `ViewConfig`), `configs/default.yaml` `router.views` block, `tests/test_view_select.py` (6 tests incl. closed-form shadow L = d h/(H-h))
+   - [ ] **9.4** Multi-view router
+   - [ ] **9.6** Gap fill
+   - [ ] **9.8** Dev evaluation of arms A to E
+   - [ ] **9.7** Overlay audit (optional)
+   - [ ] **9.9** Defaults, docs, tick
+   - [ ] **9.10** Capture-side coverage check (optional)
+
 ## 13. Changelog
 
 | Date | Change |
@@ -813,3 +834,4 @@ In order:
 | 2026-10-31 | P5.4 ticked under D-029: 7 of 7 chosen dev objects pass nominal, 5 pass every case; demo exit criterion ticked |
 | 2026-10-31 | P5.1 to P5.3 ticked: export stage writes USD, URDF and the QA report on 13 rigid dev scenes, 61 objects; `video2sim run` added, P5.5 stays open until a run from a fresh video |
 | 2026-10-31 | D-028: `SceneExport` added to `schemas.py`, `usd-core` 26.8 added, P5.1 uses `displayColor`, container image removed from P5.5 |
+| 2026-11-02 | Section 12 item 9 added: occlusion-robust object discovery (multi-view router, gap fill, `DiscoveryCheck`); plan and SAM 3.1 object-prompt research in `docs/research/occlusion_robust_discovery_plan.md`; nothing built yet |
