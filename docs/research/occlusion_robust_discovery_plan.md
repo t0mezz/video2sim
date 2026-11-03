@@ -321,70 +321,63 @@ Tests (`tests/test_scene_router.py`): fake client returning different lists per 
 with identical objects; synonym merge on and off; one view failing does not fail the scene;
 `mode: even` reproduces today's single call and its cache key.
 
-### 9.6 Gap fill (changes `tracking.py`, new `stages/gap_fill.py`, `segmentation_stage.py`)
+### 9.6 Gap fill, redesigned (residual clusters -> VLM check -> one box request)
 
-Run at most `max_rounds` (1) round, and only when there is something to fill:
+Redesign of 2026-11-03 on `lift-tall-cap`, replacing the noun-first design below it in git
+history. A scene with no residual cluster makes no extra VLM call and no extra video request;
+otherwise it makes k parallel VLM calls (one per cluster) and at most one box request.
 
-*Trigger.* $\text{shortfall} = \text{listed} - \text{tracked} > 0$, or at least one unexplained cluster.
+1. *Per-point vote* (`lift.lift_points` also returns it): for each sparse point the best
+   agreement ratio `max_t h_t(p)/s_t(p)` over the kept tracks and the winning track. A point
+   is explained when the ratio clears `cluster_check.explain_ratio` (0.5, a guess) and the
+   winner saw it in at least `min_views` views. The vote is already computed, so it is free.
+2. *Table region and board* (`gap_fill.table_region`, `gap_fill.board_hull`): near-plane
+   points are gridded; the connected piece containing the world origin, widened by
+   `dilate_m`, is the table. Tag corners are triangulated with the known poses; the board
+   footprint is their convex hull plus `board_margin_m`. No triangulated tag: skip the board
+   test and record a flag.
+3. *Residual clusters* (`gap_fill.residual_clusters`): unexplained points between
+   `table_margin_m` and `max_height_m` over the table region and outside the board, grouped
+   by KD-tree (`cKDTree.query_pairs` plus connected components, in `track_repair._groups`),
+   at least `min_points` per group, largest first. This replaces `unexplained_clusters`,
+   `_near_any` and `is_board_cluster`.
+4. *Views and crops* (`stages/cluster_check.py`): frames rank by box fit, kept-mask
+   coverage of the box, then box area; `views_per_cluster` (2) picks at least
+   `min_azimuth_gap_deg` apart, falling through until boxes fit. The crop margin is
+   `margin_frac` of the box side (at least `min_margin_px`), kept-mask pixels are dimmed,
+   the cluster box is drawn, and the crop is resized to at most `max_px` (512). No
+   `compute_visibility` and no `pick_prompt_frames` for box frames any more.
+5. *VLM check*: one call per cluster with both crops, thread pool of `max_workers`, cached
+   on the crop bytes. Strict JSON `is_object`, `noun`, `count`, `confidence`; the prompt
+   rules out board, sheet, shadow, reflection, hand, table texture and background. Accept
+   when `is_object`, confidence clears `min_confidence` and the cleaned noun is off the
+   denylist. A failed or unreadable call is `unchecked` with a scene flag, never a silent
+   drop.
+6. *Requests*: one box request for the accepted clusters (up to 16; the rest are reported),
+   prompt frames from step 4, each id encoding its cluster. A noun request only for an
+   accepted cluster whose box track fails step 7, in parallel within `max_video_requests`;
+   fallback offsets (`NOUN_ID_BASE + 1000*k`) cannot overlap the box ids. The batched audit
+   prompt and `BATCH_OFFSET` are removed; the clip is encoded once.
+7. *Geometric acceptance* (`gap_fill.cluster_gate`, replacing `_box_gates`): a box track
+   passes when the median per-point vote of its own cluster under its masks clears
+   `accept_ratio`. Merge, repair, lift, fit and duplicate rules after it are unchanged.
 
-*Unexplained clusters* (`gap_fill.unexplained_clusters(world, cloud, kept_clusters, cfg)`): sparse
-points between `table_margin_m` and `max_height_m` above the plane, not within `explained_dist_m`
-of any kept track's cluster, not inside the marker board footprint, grouped by connected components
-at `radius_m` (generalise `track_repair._groups`, no randomness), kept when they have at least
-`min_points` points. Order clusters by size, ties by centroid x then y.
+*Wiring* (`segmentation_stage.py`): first fit pass, steps 2-7, then the second fit pass
+only when a track was added. First-pass drops are reported in the flags and the preview
+notes. `route.json` gap section: per cluster its point count, crop files, verdict, noun,
+track id and gate result. `DiscoveryCheck.view_coverage` is computed only for the router
+frames over the table region; `unmatched` lists accepted nouns without a surviving track;
+`found_by` is `cluster_box` for box tracks and `noun` for fallback tracks.
 
-*Requests.* All through the existing `track_objects`, only the prompt differs:
+Config is `gap_fill.cluster_check` (step 9 of the redesign note); `gap_fill.enabled` stays
+false until 9.8/9.9 decide the defaults.
 
-1. One **noun request** per distinct inventory noun (up to `max_noun_requests`), in parallel, only
-   when there is a shortfall. Ids are offset by `1000 * k` so they never collide.
-2. One **box request** for the unexplained clusters (up to 16, the API limit), only if 9.0 passed.
-   For each cluster choose the two best frames from `compute_visibility` over all registered
-   frames (largest visible share of its cells, at least 25 degrees of azimuth apart, box not
-   cut by the image border). The
-   box is the 2D bounding box of the projected eight corners of the cluster's axis-aligned box,
-   extended down to the table plane, padded by `box_pad_px`; add one positive point at the
-   projected cluster median. The same object id is used on both frames, and the id encodes the cluster
-   (`2000 + cluster_index`) so a returned track maps back to its cluster.
-3. Total hosted video requests per scene are capped by `max_video_requests` (default 8). When the
-   cap would be exceeded, drop the lowest-priority requests, and record it in `route.json`.
-
-*Merge* (`tracking.merge_requests`): run `filter_marker_tracks` on every request's tracks first, then
-merge into the generic set. For a new track $T$ against each existing track $E$ over shared frames
-$S$, three cases:
-
-* $|S| = 0$: $T$ is new. The existing after-the-fact rules still apply: `repair_tracks`
-  merges tracks with no shared frame whose table footprints are within 5 cm, and
-  `drop_duplicate_fits` drops fits within 2 cm and 15% size that share no frame.
-* $|S| = 1$ or $2$: the repair and duplicate rules cannot see these pairs (both require
-  no shared frame), so compare on those frames with a stricter rule than the median: same
-  object only if the mask IoU is at least `merge_iou` (0.5) on **every** shared frame, in
-  which case keep $E$ and record the noun on it; a part only if $T$ is at least
-  `part_inclusion` (0.9) inside $E$ on **every** shared frame, in which case drop $T$ and
-  name it in the report; otherwise $T$ is new.
-* $|S| \ge 3$: median mask IoU over $S$ at least `merge_iou` (0.5): same object, keep $E$,
-  record the noun on it; $T$ at least `part_inclusion` (0.9) inside $E$ on $S$: a part, drop
-  $T$ and name it in the report; otherwise $T$ is new and keeps its provenance (`noun` or
-  `cluster_box`).
-
-A box-found track is also rejected when its mask on the prompted frame has IoU with the prompted box
-below `box_mask_min_iou`, or fills the box below `box_mask_min_fill` or beyond `box_mask_max_overfill`
-(a box over bare table can return a table patch, the negative control of 9.0 sets the numbers).
-Everything that survives goes through the same `repair_tracks`, `lift_tracks`, `fit_clusters`
-and `drop_duplicate_fits` as generic tracks, so a recovered object must also pass the 3D
-voting and the primitive-fit cost gate. Provenance follows splits and merges
-(`inherit_provenance(prov, RepairReport)`: a merge group is generic if any member is).
-
-*Wiring.* Extract the lift-and-fit block of `SegmentationStage.run` into a helper so it runs
-twice (generic only, then union) and reuse everything else. Fill `ObjectInstance.found_by`, add a
-`flag_reasons` line for recovered objects ("found by gap fill: noun 'pliers'" or "...: unexplained
-point cluster"), and set `Instances.discovery`. Write the same data to `route.json` (counts,
-nouns, request kinds and cache hits, no arrays). Add live-log lines through `ctx.report`.
-
-Tests: build-prompt-through-fake-client end to end with `FakeVideoSamClient` replaying recorded
-answers; merge cases (duplicate, part, new, collision of ids); cap on requests; cluster grouping on a
-synthetic cloud with two blobs; box from a known cluster projects to a hand-computed box;
-the pinned byte-identical invariant for the defaults; a scene with no shortfall makes exactly one
-video request.
+Known limits: an object with few sparse points (glossy or plain, like the s24 cube) leaves
+no cluster - an optional shortfall noun request, capped at one and off by default, can
+follow later. An object SAM merged into another track is explained away by that track (the
+s13 stack member); that needs a split, not a gap fill. In s16 the warped board rises above
+3 mm; the board margin and the VLM verdict both guard against that "paper sheet" false
+positive (s16 is a test scene and is not used here).
 
 ### 9.8 Evaluation (hosted; keys and `api.meta.ai` access needed)
 
@@ -412,12 +405,15 @@ script aborts a run that would exceed the plan's count.
 Do **not** run the test split. s15 and s16 are test scenes. Running them is a phase-gate action and
 needs a human go-ahead (AGENTS.md).
 
-### 9.7 Overlay audit (optional, hosted)
+### 9.7 Overlay audit - superseded
 
-Build only if arms C to E leave a dev miss that a human accepts as worth the extra call. New
-`stages/overlay_audit.py`: render the kept tracks as numbered coloured masks on one selected view,
-ask the VLM which physical objects have no coloured mask, parse nouns, feed them to the noun
-requests of 9.6 (same sanitising and caps). Config `gap_fill.overlay_audit.enabled: false`.
+The overlay audit (`stages/overlay_audit.py`, one VLM call over numbered overlays on the
+router views) is superseded by the per-cluster VLM check of the redesigned 9.6 above: the
+check now runs per residual cluster, on dimmed crops, before any video request, instead of
+one scene-level call whose nouns headed the noun requests. `stages/overlay_audit.py` and
+`tests/test_overlay_audit.py` were deleted on 2026-11-03; `render_tracks_video` (the
+`tracks_preview.mp4` fate video) moved into `segmentation_stage.py`. The task is unticked
+in `PLAN.md` with this note. Historical design: branch `s12-9-7-overlay-audit`.
 
 ### 9.9 Defaults, docs, tick
 
@@ -475,7 +471,7 @@ segmentation:
       box_mask_min_iou: 0.5
       box_mask_min_fill: 0.2
       box_mask_max_overfill: 1.5
-      overlay_audit: {enabled: false}
+      cluster_check: {explain_ratio: 0.5, accept_ratio: 0.5, min_confidence: 0.5}
 ```
 
 ## 8. Risks and fallbacks

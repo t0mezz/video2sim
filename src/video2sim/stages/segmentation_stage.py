@@ -29,7 +29,7 @@ built by ``clients`` and can be replaced in tests.
 from __future__ import annotations
 
 import json
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Literal
@@ -76,7 +76,6 @@ from video2sim.stages.material_pass import (
     decide_all,
     pick_frames,
 )
-from video2sim.stages.overlay_audit import render_tracks_video
 from video2sim.stages.primitive_fit import (
     FitResult,
     PrimitiveConfig,
@@ -89,7 +88,7 @@ from video2sim.stages.scene_router import (
     route_scene,
     tracking_prompt,
 )
-from video2sim.stages.segmentation import sample_frame_indices
+from video2sim.stages.segmentation import BoolMask, sample_frame_indices
 from video2sim.stages.shape_flags import ShapeConfig, judge_all, shape_signals
 from video2sim.stages.track_repair import RepairConfig, RepairReport, repair_tracks
 from video2sim.stages.tracking import (
@@ -281,6 +280,148 @@ def build_object(
         rigidity=answer.rigidity if answer is not None else None,
         material_confidence=answer.confidence if answer is not None else None,
     )
+
+
+PALETTE: tuple[tuple[int, int, int], ...] = (  # BGR, distinct on print and screen
+    (0, 0, 255),
+    (0, 165, 255),
+    (0, 255, 0),
+    (255, 0, 0),
+    (0, 255, 255),
+    (255, 0, 255),
+    (255, 255, 0),
+    (128, 0, 255),
+    (255, 128, 0),
+    (0, 128, 255),
+    (128, 255, 0),
+    (255, 0, 128),
+)
+
+
+def _draw_masks(
+    overlay: NDArray[np.uint8],
+    masks: Mapping[int, BoolMask],
+    colors: Mapping[int, tuple[int, int, int]],
+) -> list[int]:
+    """Track masks tinted, contoured and numbered onto ``overlay``; ids drawn, sorted.
+
+    Masks at another resolution than the frame are resampled nearest-neighbour,
+    explicitly, like the tracking masks. Colours come from ``track_colors`` so one
+    track keeps its colour across views and frames.
+    """
+    import cv2  # heavy import, kept out of module import time
+
+    drawn: list[int] = []
+    for tid in sorted(masks):
+        mask = masks[tid]
+        if mask.shape != overlay.shape[:2]:
+            small = cv2.resize(
+                mask.astype("uint8"),
+                (overlay.shape[1], overlay.shape[0]),
+                interpolation=cv2.INTER_NEAREST,
+            ).astype(bool)
+        else:
+            small = mask
+        if not small.any():
+            continue
+        color = colors[tid]
+        tint = overlay.copy()
+        tint[small] = color
+        cv2.addWeighted(tint, 0.22, overlay, 0.78, 0, overlay)
+        contours, _ = cv2.findContours(
+            small.astype("uint8"), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+        )
+        cv2.drawContours(overlay, contours, -1, color, 2)
+        # The label sits inside the object, at the mask's median point, sized
+        # with the image so it stays legible at the size the model receives.
+        ys, xs = small.nonzero()
+        label = str(tid)
+        height, width = overlay.shape[:2]
+        scale = min(max(max(height, width) / 1024.0, 0.5), 2.0)
+        font_scale = 0.9 * scale
+        thickness = max(1, round(2 * scale))
+        (tw, th), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, font_scale, thickness)
+        pad = max(3, round(3 * scale))
+        cx, cy = int(np.median(xs)), int(np.median(ys))
+        x = min(max(cx - tw // 2, 0), max(width - tw - 2 * pad, 0))
+        baseline = min(max(cy + th // 2, th + pad), height - pad)
+        cv2.rectangle(
+            overlay, (x, baseline - th - pad), (x + tw + 2 * pad, baseline + pad), color, -1
+        )
+        blue, green, red = (float(c) for c in color)
+        ink = (0, 0, 0) if 0.114 * blue + 0.587 * green + 0.299 * red > 140 else (255, 255, 255)
+        cv2.putText(
+            overlay,
+            label,
+            (x + pad, baseline),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            font_scale,
+            ink,
+            thickness,
+        )
+        drawn.append(tid)
+    return drawn
+
+
+def track_colors(ids: Sequence[int]) -> dict[int, tuple[int, int, int]]:
+    """Legend colour per track id, in sorted-id order."""
+    ordered = sorted(ids)
+    return {tid: PALETTE[pos % len(PALETTE)] for pos, tid in enumerate(ordered)}
+
+
+def render_tracks_video(
+    world: WorldModel,
+    run_dir: Path,
+    tracks: Sequence[Track],
+    kept: set[int],
+    notes: Mapping[int, str],
+    out_path: Path,
+    fps: float = 5.0,
+) -> int:
+    """Every track over every frame, tinted and numbered, with a fate legend.
+
+    ``notes`` names each track's fate (``kept …`` or the drop reason); kept ids
+    show green, the rest red. Returns the frames written.
+    """
+    import cv2  # heavy import, kept out of module import time
+
+    first = cv2.imread(str(run_dir / world.frames[0].image_path))
+    if first is None:
+        raise ValueError(f"cannot read {world.frames[0].image_path}")
+    height, width = first.shape[:2]
+    colors = track_colors([t.track_id for t in tracks])
+    by_frame: dict[int, list[Track]] = {}
+    for track in tracks:
+        for frame_index in track.masks:
+            by_frame.setdefault(frame_index, []).append(track)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    # VideoWriter_fourcc is missing from the cv2 stubs.
+    fourcc = cv2.VideoWriter_fourcc(*"mp4v")  # type: ignore[attr-defined]
+    writer = cv2.VideoWriter(str(out_path), fourcc, fps, (width, height))
+    written = 0
+    try:
+        for frame in world.frames:
+            image = cv2.imread(str(run_dir / frame.image_path))
+            if image is None:
+                raise ValueError(f"cannot read {frame.image_path}")
+            overlay = image.copy()
+            present = {
+                t.track_id: t.masks[frame.frame_index] for t in by_frame.get(frame.frame_index, [])
+            }
+            _draw_masks(overlay, present, colors)
+            y = 24
+            for tid in sorted(colors):
+                color = (0, 200, 0) if tid in kept else (60, 60, 220)
+                line = f"T{tid}: {notes.get(tid, '?')}"
+                (tw, th), _ = cv2.getTextSize(line, cv2.FONT_HERSHEY_SIMPLEX, 0.55, 1)
+                cv2.rectangle(overlay, (8, y - th - 6), (8 + tw + 8, y + 2), (0, 0, 0), -1)
+                cv2.putText(overlay, line, (12, y), cv2.FONT_HERSHEY_SIMPLEX, 0.55, color, 1)
+                y += 22
+            writer.write(overlay)
+            written += 1
+    finally:
+        writer.release()
+    return written
 
 
 class SegmentationStage:
