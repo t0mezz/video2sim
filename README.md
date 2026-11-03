@@ -67,6 +67,8 @@ Inference for the project research was supported with credits from
 
 Thank you for making this project possible!
 
+---
+
 ## Where to read next
 
 | File | What it tells you |
