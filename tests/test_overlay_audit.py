@@ -283,9 +283,11 @@ def test_audit_cache_keys_on_rendered_bytes_not_file_names(tmp_path: Path) -> No
 
 
 def test_audit_config_defaults_off() -> None:
+    # Superseded by the cluster check (step 9): the overlay_audit block is
+    # gone from the config; this file is removed in the next commit.
     cfg = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
-    audit = cfg["segmentation"]["tracking"]["gap_fill"]["overlay_audit"]
-    assert set(audit) >= {"enabled", "n_views", "save_video"}
+    gap = cfg["segmentation"]["tracking"]["gap_fill"]
+    assert "overlay_audit" not in gap and "cluster_check" in gap
 
 
 def test_tracks_video_writes_every_frame(tmp_path: Path) -> None:

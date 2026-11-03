@@ -107,31 +107,36 @@ segmentation:
       min_tag_share: 0.2       # ... or this share of the tags lies in the mask
       min_hit_frames: 2        # a track is dropped with at least this many hit frames ...
       min_hit_fraction: 0.2    # ... and this share of its frames where a tag was detected
-    gap_fill:                  # S12.9: one gap-fill round after tracking (9.6); guesses until tuned on dev
+    gap_fill:                  # S12.9: residual clusters -> VLM check -> one box request; guesses until tuned on dev
       enabled: false           # off until the 9.8 dev evaluation decides defaults (9.9); off keeps the stage byte-identical
       max_rounds: 1            # rounds per scene; only 1 is implemented
-      max_noun_requests: 6     # one video request per distinct inventory noun, most first
+      max_noun_requests: 6     # noun fallback requests, one per failed accepted cluster
       max_video_requests: 8    # hosted video requests per scene, generic one included
       max_workers: 4           # gap-fill video requests in flight at once; the result does not depend on it
-      cluster:                 # unexplained point clusters that place box prompts
+      save_video: true         # every track over every frame, as tracks_preview.mp4 in the stage folder
+      cluster:                 # residual point clusters (step 3)
         radius_m: 0.03         # connected-component link distance
         min_points: 12         # smaller groups are noise
-        explained_dist_m: 0.03 # points this close to a kept cluster are explained
-        area_margin_m: 0.5     # candidates further than this (XY) from a kept track are not clusters; a guess until tuned on dev
-        box_pad_px: 8          # pad around the projected cluster box
-        frames_per_cluster: 2  # prompt frames per cluster (API allows 16 objects per request)
+      cluster_check:           # per-cluster VLM check (steps 1-7); every value a guess until tuned on dev
+        explain_ratio: 0.5     # tau_explain: best per-point vote at or above this explains a point
+        accept_ratio: 0.5      # tau_accept: median cluster vote a box track must clear
+        table_region:          # connected near-plane piece containing the world origin (step 2)
+          cell_m: 0.05         # grid cell of the table-region flood fill
+          dilate_m: 0.10       # the table region grows by this much
+        board_margin_m: 0.02   # the triangulated board footprint grows by this much
+        views_per_cluster: 2   # cropped views sent to the VLM per cluster
         min_azimuth_gap_deg: 25.0  # prompt views must be this far apart around the cluster
+        box_pad_px: 8          # pad around the projected cluster box
+        crop:                  # the VLM crop of one cluster view (step 4)
+          margin_frac: 0.5     # crop margin, times the box's long side
+          min_margin_px: 16    # ... and at least this many pixels
+          max_px: 512          # crops are resized to at most this long side
+          dim: 0.35            # kept-mask pixels are multiplied by this in the crop
+        min_confidence: 0.5    # the VLM verdict must clear this to accept a cluster
+        max_workers: 4         # cluster checks in flight at once; the result does not depend on it
       merge_iou: 0.5           # median mask IoU that makes a new track a duplicate
       merge_new_iou: 0.35      # lower bar when the other track is gap-fill new too: two prompts of one object draw different extents; a guess until tuned on dev
       part_inclusion: 0.9      # containment that makes a new track a part
-      box_mask_min_iou: 0.5    # prompted-frame mask IoU with the prompted box, else reject
-      box_mask_min_fill: 0.2   # mask fill of the prompted box, else reject
-      box_mask_max_overfill: 1.5  # mask area over box area, else reject
-      overlay_audit:               # 9.7: VLM check of the kept overlays for untracked objects
-        enabled: false           # off until the 9.8 dev evaluation decides defaults (9.9)
-        n_views: 2               # labeled router views sent to the model; guesses until tuned on dev
-        max_image_px: 1024       # audit views are downscaled to this long side before labels are drawn
-        save_video: true         # every track over every frame, as tracks_preview.mp4 in the stage folder
     repair:                    # 3D identity repair; thresholds are guesses until tuned on dev scenes
       merge_radius_m: 0.05     # tracks with no shared frame whose table footprints are this close are one object
       merge_boundary_gap: 2    # ... or whose closest frames are this far apart with masks overlapping past merge_boundary_iou (a handoff: the id switched away and back)

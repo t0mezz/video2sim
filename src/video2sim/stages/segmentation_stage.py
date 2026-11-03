@@ -48,16 +48,18 @@ from video2sim.schemas import (
     StageName,
     WorldModel,
 )
+from video2sim.stages.cluster_check import check_clusters
 from video2sim.stages.depth_flags import DepthConfig, depth_signals, judge
 from video2sim.stages.gap_fill import (
     FitPass,
     FoundBy,
     GapFillConfig,
+    board_hull,
     execute_gap_fill,
     fit_pass,
     offset_tracks,
-    plan_gap_fill,
-    unexplained_clusters,
+    residual_clusters,
+    table_view_coverage,
 )
 from video2sim.stages.keyframes import KeyframeChoice, KeyframeConfig, keyframes_for_tracks
 from video2sim.stages.lift import LiftConfig, load_points
@@ -74,7 +76,7 @@ from video2sim.stages.material_pass import (
     decide_all,
     pick_frames,
 )
-from video2sim.stages.overlay_audit import audit_missing_nouns, render_tracks_video
+from video2sim.stages.overlay_audit import render_tracks_video
 from video2sim.stages.primitive_fit import (
     FitResult,
     PrimitiveConfig,
@@ -85,7 +87,6 @@ from video2sim.stages.scene_router import (
     RouterConfig,
     compare_counts,
     route_scene,
-    sanitise_noun,
     tracking_prompt,
 )
 from video2sim.stages.segmentation import sample_frame_indices
@@ -353,85 +354,81 @@ class SegmentationStage:
         first = fit_pass(repaired, world, lift_cfg, prim_cfg, cloud)
         gcfg = GapFillConfig.from_config(cfg)
         listed = sum(i.count for i in route.inventory) if route.inventory else len(route.objects)
-        shortfall = listed - len(first.kept)
         final = first
         discovery: DiscoveryCheck | None = None
         prov: dict[int, FoundBy] = {t.track_id: "generic" for t in first.kept}
         gap_flag_reasons: dict[int, str] = {}
         if gcfg.enabled:
-            kept_points = {}
-            for t in first.kept:
-                # Hull plus sparse points: the trimmed sparse set alone leaves
-                # the hull's edges looking unexplained.
-                parts = [
-                    p
-                    for p in (first.sparse.get(t.track_id), first.hulls[t.track_id])
-                    if p is not None and len(p)
-                ]
-                kept_points[t.track_id] = np.concatenate(parts) if len(parts) > 1 else parts[0]
-            clusters = unexplained_clusters(
+            # Residual clusters -> VLM check -> one box request (steps 2-7).
+            # No cluster: no extra VLM call and no extra video request.
+            hull = board_hull(world, ctx.run_dir, marker_cfg.family, tag_detect)
+            if hull is None:
+                scene_flags.append(
+                    "board footprint unavailable: no tag could be triangulated; "
+                    "board exclusion skipped"
+                )
+            assert first.vote is not None
+            clusters = residual_clusters(
                 world,
                 cloud,
-                kept_points,
-                ctx.run_dir,
-                marker_cfg.family,
-                gcfg.cluster,
+                first.vote,
+                gcfg.residual_params(lift_cfg.min_views),
                 lift_cfg.table_margin_m,
                 lift_cfg.max_height_m,
-                tag_detect,
+                hull,
             )
-            audit_missing: list[str] = []
-            audit_uncertain: list[str] = []
-            if gcfg.audit.enabled:
-                audit_views = list(route.view_frames) or [
-                    world.frames[i].frame_index
-                    for i in sample_frame_indices(len(world.frames), rcfg.n_frames)
-                ]
-                audit_missing, audit_uncertain, _ = audit_missing_nouns(
+            order = [f.frame_index for f in world.frames]
+            view_frames = list(route.view_frames) or [
+                order[i] for i in sample_frame_indices(len(order), rcfg.n_frames)
+            ]
+            coverage = table_view_coverage(
+                world,
+                cloud,
+                view_frames,
+                order,
+                rcfg.views,
+                rcfg.views.cell_m,
+                rcfg.views.min_views_per_cell,
+                gcfg.residual_params(lift_cfg.min_views),
+                lift_cfg.table_margin_m,
+            )
+            if not clusters:
+                discovery = DiscoveryCheck(
+                    view_frames=view_frames,
+                    view_coverage=coverage,
+                    listed=listed,
+                    tracked=len(first.kept),
+                    missing_suspected=listed > len(first.kept),
+                    unmatched=[],
+                    unexplained_clusters=0,
+                    recovered=0,
+                    video_requests=1,
+                )
+                summary["gap_fill"] = {
+                    "listed": listed,
+                    "unexplained_clusters": 0,
+                    "clusters": [],
+                    "video_requests": 1,
+                    "board_flag": hull is None,
+                }
+            else:
+                checks = check_clusters(
                     world,
                     ctx.run_dir,
-                    first.kept,
-                    audit_views,
-                    gcfg.audit,
-                    rcfg.noun_denylist,
-                    clients.router,
-                    ResponseCache(work / "audit_cache"),
-                    work / "audit",
-                )
-                if audit_missing or audit_uncertain:
-                    ctx.report(
-                        "overlay audit: missing "
-                        f"{audit_missing or []}, uncertain {audit_uncertain or []}"
-                    )
-            if shortfall > 0 or clusters or audit_missing:
-                if route.inventory:
-                    nouns = [i.noun for i in route.inventory]
-                    view_frames = list(route.view_frames)
-                else:
-                    nouns = []
-                    for name in route.objects:
-                        clean = sanitise_noun(name, rcfg.noun_denylist)
-                        if clean is not None and clean not in nouns:
-                            nouns.append(clean)
-                    order_all = [f.frame_index for f in world.frames]
-                    view_frames = [
-                        order_all[i] for i in sample_frame_indices(len(order_all), rcfg.n_frames)
-                    ]
-                order = [f.frame_index for f in world.frames]
-                plan = plan_gap_fill(
-                    world,
-                    cloud,
-                    nouns,
                     clusters,
-                    view_frames,
-                    order,
-                    rcfg.views,
-                    rcfg.views.cell_m,
-                    rcfg.views.min_views_per_cell,
-                    gcfg,
-                    audit_nouns=tuple(audit_missing),
-                    shortfall=shortfall,
+                    first.kept,
+                    clients.router,
+                    ResponseCache(work / "cluster_check_cache"),
+                    work / "cluster_check",
+                    gcfg.check,
+                    rcfg.noun_denylist,
                 )
+                for cluster_check in checks:
+                    if cluster_check.verdict.status == "unchecked":
+                        scene_flags.append(
+                            f"cluster {cluster_check.index} unchecked: "
+                            f"{cluster_check.verdict.reason}"
+                        )
                 tracking_cache = ResponseCache(work / "tracking_cache")
                 # One clip for every gap-fill request: the generic request
                 # already encoded it, unless its answer was cached.
@@ -461,7 +458,7 @@ class SegmentationStage:
                 final, discovery, gap_notes, prov = execute_gap_fill(
                     world,
                     ctx.run_dir,
-                    plan,
+                    checks,
                     gcfg,
                     lift_cfg,
                     prim_cfg,
@@ -470,14 +467,14 @@ class SegmentationStage:
                     cloud,
                     poses,
                     first.kept,
-                    shortfall,
                     listed,
+                    view_frames,
+                    coverage,
                     track_fn,
                     first=first,
                     detect=tag_detect,
                 )
-                gap_notes["audit_missing"] = audit_missing
-                gap_notes["audit_uncertain"] = audit_uncertain
+                gap_notes["board_flag"] = hull is None
                 summary["gap_fill"] = gap_notes
                 gap_flag_reasons = {int(k): v for k, v in gap_notes["flag_reasons"].items()}
                 for note in gap_notes["report_lines"]:
@@ -487,7 +484,7 @@ class SegmentationStage:
         for track_id, reason in drops.items():
             scene_flags.append(f"track {track_id} dropped: {reason}")
             ctx.report(f"dropped track {track_id}: {reason}")
-        if gcfg.enabled and gcfg.audit.save_video:
+        if gcfg.enabled and gcfg.save_video:
             by_id = {t.track_id: t for t in all_tracks}
             for track in final.kept:
                 by_id[track.track_id] = track
