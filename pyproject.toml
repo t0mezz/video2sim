@@ -67,6 +67,13 @@ ignore_missing_imports = true
 module = ["pxr", "pxr.*"]
 ignore_missing_imports = true
 
+# Only the Linux/macOS pycolmap wheels ship stubs; the Windows wheel (4.2.1, checked
+# 2026-11-03) has no .pyi files, so mypy sees an empty pycolmap namespace there and fails
+# every pycolmap attribute with attr-defined. Skip following it; it is Any everywhere.
+[[tool.mypy.overrides]]
+module = ["pycolmap", "pycolmap.*"]
+follow_imports = "skip"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
