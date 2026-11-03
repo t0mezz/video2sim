@@ -1,13 +1,18 @@
 """End-of-segmentation coverage verification.
 
-After gap fill, one VLM look over whole-scene views with the kept tracks'
-outlines drawn asks which router-listed nouns are visible but untracked.
-Each missing noun that survives the router denylist earns one SAM noun
-video request, ``max_noun_requests`` at most; survivors go through the
-same merge, repair, lift and fit block as gap-fill tracks. Tracks found
-this way keep ``found_by`` ``"noun"`` (they are noun-prompted tracks), so
-no contract changes; the verification provenance lives in the per-object
-reasons and in the ``verify`` section of ``route.json``.
+After gap fill, a VLM look over whole-scene views with the kept tracks'
+outlines drawn asks which router-listed nouns are visible but untracked,
+then each missing noun earns one SAM noun video request and survivors go
+through the same merge, repair, lift and fit block as gap-fill tracks.
+The check loops: a new round re-verifies with the recovered tracks
+outlined, so nouns the VLM names again (or names for the first time) get
+prompted until nothing missing remains, ``max_turns`` rounds are done, or
+the VLM answer cannot be read. ``max_turns: -1`` loops until a round
+prompts nothing new, which always ends because a noun is prompted at most
+once per scene (a repeated prompt would serve the cached answer anyway).
+Tracks found this way keep ``found_by`` ``"noun"`` (they are noun-prompted
+tracks), so no contract changes; the verification provenance lives in the
+per-object reasons and in the ``verify`` section of ``route.json``.
 
 A scene with nothing missing makes no extra video request, and an
 unreadable VLM answer verifies nothing: both keep the gap-fill result as
@@ -48,7 +53,7 @@ from video2sim.stages.marker_filter import (
 )
 from video2sim.stages.primitive_fit import PrimitiveConfig
 from video2sim.stages.scene_router import sanitise_noun
-from video2sim.stages.track_repair import RepairConfig, repair_tracks
+from video2sim.stages.track_repair import RepairConfig, RepairReport, repair_tracks
 from video2sim.stages.tracking import Track
 
 logger = logging.getLogger(__name__)
@@ -64,7 +69,8 @@ class VerifyConfig:
     """Values from ``segmentation.verify`` in ``configs/default.yaml``."""
 
     enabled: bool
-    max_noun_requests: int  # targeted SAM video requests per scene at most
+    max_turns: int  # verification rounds at most; -1 loops until a round prompts nothing new
+    max_noun_requests: int  # targeted SAM video requests per round at most
     views: int  # whole-scene frames the VLM checks
     max_image_px: int  # overlays are downscaled to this long side
     min_confidence: float  # below this the VLM answer is ignored
@@ -76,6 +82,7 @@ class VerifyConfig:
         v = cfg.get("segmentation", {}).get("verify", {}) or {}
         out = cls(
             enabled=bool(v.get("enabled", False)),
+            max_turns=int(v.get("max_turns", 3)),
             max_noun_requests=int(v.get("max_noun_requests", 4)),
             views=int(v.get("views", 3)),
             max_image_px=int(v.get("max_image_px", 1024)),
@@ -83,8 +90,10 @@ class VerifyConfig:
             timeout_s=float(v.get("timeout_s", 300)),
             retries=int(v.get("retries", 3)),
         )
-        if not 0 <= out.max_noun_requests <= 8:
-            raise ValueError("verify max_noun_requests must be in [0, 8]")
+        if out.max_turns == 0 or out.max_turns < -1:
+            raise ValueError("verify max_turns must be -1 or at least 1")
+        if not 1 <= out.max_noun_requests <= 8:
+            raise ValueError("verify max_noun_requests must be in [1, 8]")
         if out.views < 1 or out.max_image_px < 1 or out.retries < 1 or out.timeout_s <= 0:
             raise ValueError("verify views, max_image_px and retries need at least 1")
         if not 0.0 <= out.min_confidence <= 1.0:
@@ -104,7 +113,7 @@ class VerifyVerdict:
 
 
 def build_verify_prompt(tracked: int, listed: Sequence[str]) -> str:
-    """Ask which listed nouns are visible but have no outline, as JSON and nothing else."""
+    """Ask which listed nouns are visible, trackable and have no outline, as JSON."""
     names = ", ".join(listed)
     outline = "one outlined object" if tracked == 1 else f"{tracked} outlined objects"
     return (
@@ -112,10 +121,12 @@ def build_verify_prompt(tracked: int, listed: Sequence[str]) -> str:
         f"outlines mark objects this pipeline already tracks ({outline}). The "
         f"earlier inventory of this scene listed: {names}. Answer with a single "
         "JSON object and nothing else, with two keys: "
-        '"missing" (the listed nouns that are clearly visible in these images '
-        "and have no outline around them, in the order listed above) and "
-        '"confidence" (a number from 0 to 1). A noun that is not visible, or '
-        "that already has an outline, is not missing."
+        '"missing" (the listed nouns that are clearly visible in these images, '
+        "distinct enough to follow across frames, and have no outline around "
+        "them, in the order listed above) and "
+        '"confidence" (a number from 0 to 1). A noun that is not visible, is '
+        "too small or indistinct to track, or already has an outline, "
+        "is not missing."
     )
 
 
@@ -261,84 +272,162 @@ def execute_verify(
 ) -> tuple[
     FitPass, DiscoveryCheck | None, dict[str, Any], dict[int, FoundBy], dict[str, str], list[Track]
 ]:
-    """One verification round: VLM coverage check, then noun prompts for missing nouns.
+    """Verification rounds: VLM coverage check, then noun prompts for missing nouns.
 
-    Returns the fit pass to continue with (the input ``final`` when nothing
-    was missing or nothing survived), the discovery audit, the ``route.json``
-    records, the provenance per track id, the per-object reasons, and every
-    new track for the tracks preview.
+    Every round re-verifies with the recovered tracks outlined, so nouns the
+    VLM names again (or for the first time) get prompted until no unprompted
+    noun remains, ``max_turns`` rounds are done, or the VLM answer cannot be
+    read. A noun is prompted at most once: a repeat would serve the cached
+    answer. Returns the fit pass to continue with (the input ``final`` when
+    nothing was missing or nothing survived), the discovery audit, the
+    ``route.json`` records, the provenance per track id, the per-object
+    reasons, and every new track for the tracks preview.
     """
-    overlays = make_overlays(world, run_dir, kept, positions, work_dir, vcfg.max_image_px)
-    verdict = check_coverage(overlays, listed, len(kept), client, cache, vcfg, denylist)
     report_lines: list[str] = []
     scene_flags: list[str] = []
-    if verdict.status == "unchecked":
-        scene_flags.append(f"verify unchecked: {verdict.reason}")
-        notes = _notes(listed, verdict, [], [], [], 0, 1, report_lines, {}, scene_flags)
-        return final, discovery, notes, dict(prov), {}, []
-    if not verdict.missing:
-        report_lines.append("verify: no missing nouns in the overlaid views")
-        notes = _notes(listed, verdict, [], [], [], 0, 1, report_lines, {}, scene_flags)
-        return final, discovery, notes, dict(prov), {}, []
-    wanted = list(verdict.missing[: max(vcfg.max_noun_requests, 0)])
-    capped = list(verdict.missing[len(wanted) :])
-    report_lines.append(f"verify: VLM names {len(verdict.missing)} missing noun(s)")
-    for noun in capped:
-        report_lines.append(f"verify: noun '{noun}' past the cap, not prompted")
-
-    requests: list[GapRequest] = []
+    rounds: list[dict[str, Any]] = []
+    round_states: list[tuple[Mapping[int, tuple[str, ...]], Any]] = []
     records: list[dict[str, Any]] = []
-    marker_dropped = 0
     new_tracks: list[Track] = []
-    for k, noun in enumerate(wanted):
-        tracks, cached = track_fn(noun, VERIFY_ID_BASE + VERIFY_ID_STEP * k)
-        kept_noun, mrep = filter_marker_tracks(tracks, world, run_dir, marker_cfg, detect)
-        marker_dropped += len(mrep.dropped)
-        report_lines.append(f"verify: noun '{noun}' prompt: {len(kept_noun)} track(s)")
-        records.append({"kind": "noun", "noun": noun, "cached": cached, "tracks": len(kept_noun)})
-        if kept_noun:
-            requests.append(GapRequest(tuple(kept_noun), "noun", f"verify '{noun}'"))
-            new_tracks.extend(kept_noun)
-    video_requests = 1 + len(records)
-
-    merged = merge_requests(list(kept), requests, gcfg)
+    prompted: list[str] = []
+    pending: list[str] = []
+    marker_dropped = 0
+    second = final
     out_prov: dict[int, FoundBy] = dict(prov)
-    for request in requests:
-        for track in request.tracks:
-            out_prov.setdefault(track.track_id, "noun")
-    for old, new in merged.remapped:
-        out_prov[new] = out_prov.get(old, "generic")
-    repaired, repair_report = repair_tracks(
-        merged.tracks, poses, world.intrinsics, world.table_plane, repair_cfg
-    )
-    out_prov = inherit_provenance(out_prov, repair_report)
-    kept_ids = {t.track_id for t in kept}
-    if requests and not ({t.track_id for t in merged.tracks} - kept_ids):
-        second = final  # no new track survived: the union lift-and-fit would repeat this
-    else:
-        lifted = fit_pass(repaired, world, lift_cfg, prim_cfg, cloud)
-        # The stage reports drops of both passes, so carry the earlier ones along.
-        second = replace(lifted, drops={**final.drops, **lifted.drops})
+    accum_drops = dict(final.drops)
+    turn = 0
+    stop_reason = ""
+    last_verdict = VerifyVerdict("ready", reason="no round ran")
+    while True:
+        if vcfg.max_turns >= 0 and turn >= vcfg.max_turns:
+            stop_reason = f"max turns ({vcfg.max_turns}) reached"
+            break
+        turn += 1
+        overlays = make_overlays(
+            world,
+            run_dir,
+            list(second.kept),
+            positions,
+            work_dir / f"round_{turn:02d}",
+            vcfg.max_image_px,
+        )
+        verdict = check_coverage(overlays, listed, len(second.kept), client, cache, vcfg, denylist)
+        last_verdict = verdict
+        if verdict.status == "unchecked":
+            scene_flags.append(f"verify unchecked: {verdict.reason}")
+            rounds.append({"round": turn, "verdict": "unchecked", "reason": verdict.reason})
+            stop_reason = "VLM answer unreadable"
+            break
+        for noun in verdict.missing:
+            if noun not in prompted and noun not in pending:
+                pending.append(noun)
+        if not pending:
+            report_lines.append(f"verify round {turn}: no missing nouns in the overlaid views")
+            rounds.append({"round": turn, "verdict": "ready", "missing": [], "prompted": []})
+            stop_reason = "nothing missing"
+            break
+        todo = pending[: vcfg.max_noun_requests]
+        pending = pending[vcfg.max_noun_requests :]
+        report_lines.append(
+            f"verify round {turn}: VLM names {len(verdict.missing)} missing noun(s), "
+            f"{len(todo)} prompted"
+        )
+        requests: list[GapRequest] = []
+        for noun in todo:
+            tracks, cached = track_fn(noun, VERIFY_ID_BASE + VERIFY_ID_STEP * len(prompted))
+            kept_noun, mrep = filter_marker_tracks(tracks, world, run_dir, marker_cfg, detect)
+            marker_dropped += len(mrep.dropped)
+            prompted.append(noun)
+            report_lines.append(
+                f"verify round {turn}: noun '{noun}' prompt: {len(kept_noun)} track(s)"
+            )
+            records.append(
+                {
+                    "kind": "noun",
+                    "noun": noun,
+                    "cached": cached,
+                    "tracks": len(kept_noun),
+                    "round": turn,
+                }
+            )
+            if kept_noun:
+                requests.append(GapRequest(tuple(kept_noun), "noun", f"verify '{noun}'"))
+                new_tracks.extend(kept_noun)
+        kept_ids = {t.track_id for t in second.kept}
+        non_generic_before = sum(1 for t in second.kept if out_prov.get(t.track_id) != "generic")
+        if requests:
+            merged = merge_requests(list(second.kept), requests, gcfg)
+            for request in requests:
+                for track in request.tracks:
+                    out_prov.setdefault(track.track_id, "noun")
+            for old, new in merged.remapped:
+                out_prov[new] = out_prov.get(old, "generic")
+            repaired, repair_report = repair_tracks(
+                merged.tracks, poses, world.intrinsics, world.table_plane, repair_cfg
+            )
+            out_prov = inherit_provenance(out_prov, repair_report)
+            round_states.append((merged.notes, repair_report))
+            if {t.track_id for t in merged.tracks} - kept_ids:
+                lifted = fit_pass(repaired, world, lift_cfg, prim_cfg, cloud)
+                accum_drops.update(lifted.drops)
+                second = replace(lifted, drops=dict(accum_drops))
+            round_recovered = (
+                sum(1 for t in second.kept if out_prov.get(t.track_id) != "generic")
+                - non_generic_before
+            )
+        else:
+            round_states.append(({}, RepairReport(splits=(), merges=())))
+            round_recovered = 0
+        rounds.append(
+            {
+                "round": turn,
+                "verdict": "ready",
+                "missing": list(verdict.missing),
+                "prompted": list(todo),
+                "recovered": round_recovered,
+            }
+        )
+        report_lines.append(f"verify round {turn}: {round_recovered} object(s) recovered")
 
     matched = {
         note.split("verify '", 1)[1][:-1]
-        for notes in merged.notes.values()
-        for note in notes
+        for notes, _ in round_states
+        for note_list in notes.values()
+        for note in note_list
         if note.startswith("verify '") and note.endswith("'")
     }
-    still_missing = [n for n in wanted if n not in matched]
-    recovered = sum(1 for t in second.kept if _verify_note(t.track_id, merged.notes, repair_report))
+    still_missing = [n for n in prompted if n not in matched]
+    capped = list(pending)
+    for noun in capped:
+        report_lines.append(f"verify: noun '{noun}' never prompted ({stop_reason})")
+    recovered = sum(
+        1
+        for t in second.kept
+        if out_prov.get(t.track_id, "generic") != "generic"
+        and any(
+            _verify_note(t.track_id, notes, report) is not None for notes, report in round_states
+        )
+    )
     flag_reasons: dict[str, str] = {}
     for t in second.kept:
-        note = _verify_note(t.track_id, merged.notes, repair_report)
+        note = next(
+            (
+                _verify_note(t.track_id, notes, report)
+                for notes, report in round_states
+                if _verify_note(t.track_id, notes, report) is not None
+            ),
+            None,
+        )
         if note is None:
             continue
         if out_prov.get(t.track_id, "generic") != "generic":
             flag_reasons[str(t.track_id)] = f"found by verify: {note}"
         else:
             flag_reasons[str(t.track_id)] = f"also found by verify: {note}"
+    video_requests = 1 + len(records)
     report_lines.append(
-        f"verify: {recovered} object(s) recovered in {len(records)} extra request(s)"
+        f"verify: {recovered} object(s) recovered in {len(records)} extra request(s) "
+        f"over {turn} round(s)"
     )
     for t in second.kept:
         if str(t.track_id) in flag_reasons:
@@ -352,7 +441,7 @@ def execute_verify(
                 "missing_suspected": discovery.listed > len(second.kept),
                 "unmatched": [
                     *discovery.unmatched,
-                    *[n for n in still_missing if n not in discovery.unmatched],
+                    *[n for n in [*still_missing, *capped] if n not in discovery.unmatched],
                 ],
                 "recovered": discovery.recovered + recovered,
                 "video_requests": discovery.video_requests + len(records),
@@ -360,8 +449,8 @@ def execute_verify(
         )
     notes = _notes(
         listed,
-        verdict,
-        wanted,
+        last_verdict,
+        prompted,
         capped,
         records,
         marker_dropped,
@@ -369,9 +458,11 @@ def execute_verify(
         report_lines,
         flag_reasons,
         scene_flags,
-        merged,
+        None,
         still_missing,
         recovered,
+        rounds,
+        stop_reason,
     )
     return second, discovery2, notes, out_prov, flag_reasons, new_tracks
 
@@ -400,6 +491,8 @@ def _notes(
     merged: Any = None,
     still_missing: Sequence[str] = (),
     recovered: int = 0,
+    rounds: Sequence[dict[str, Any]] = (),
+    stop_reason: str = "",
 ) -> dict[str, Any]:
     return {
         "listed": list(listed),
@@ -411,6 +504,9 @@ def _notes(
         "prompted": list(wanted),
         "capped": list(capped),
         "requests": list(records),
+        "rounds": list(rounds),
+        "stop_reason": stop_reason,
+        "turns": len(rounds),
         "marker_dropped": marker_dropped,
         "merged_notes": (
             {str(k): list(v) for k, v in merged.notes.items() if v} if merged is not None else {}

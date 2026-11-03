@@ -108,7 +108,7 @@ segmentation:
       min_hit_frames: 2        # a track is dropped with at least this many hit frames ...
       min_hit_fraction: 0.2    # ... and this share of its frames where a tag was detected
     gap_fill:                  # S12.9: residual clusters -> VLM check -> one box request; guesses until tuned on dev
-      enabled: false           # off until the 9.8 dev evaluation decides defaults (9.9); off keeps the stage byte-identical
+      enabled: true            # session-only: enabled locally to optimise gap fill; committed default stays off until 9.9
       max_rounds: 1            # rounds per scene; only 1 is implemented
       max_noun_requests: 6     # noun fallback requests, one per failed accepted cluster
       max_video_requests: 8    # hosted video requests per scene, generic one included
@@ -137,14 +137,6 @@ segmentation:
       merge_iou: 0.5           # median mask IoU that makes a new track a duplicate
       merge_new_iou: 0.35      # lower bar when the other track is gap-fill new too: two prompts of one object draw different extents; a guess until tuned on dev
       part_inclusion: 0.9      # containment that makes a new track a part
-    verify:                      # end-of-segmentation coverage check: one VLM look, then noun prompts for missing nouns
-      enabled: true            # session-only: enabled locally after the test.MOV miss; committed default stays off until tuned
-      max_noun_requests: 4     # targeted SAM video requests per scene at most
-      views: 3                 # whole-scene frames with kept-track outlines sent to the VLM
-      max_image_px: 1024       # overlays are downscaled to this long side
-      min_confidence: 0.5      # below this the VLM answer verifies nothing
-      timeout_s: 300           # the VLM call budget, like the router's
-      retries: 3
     repair:                    # 3D identity repair; thresholds are guesses until tuned on dev scenes
       merge_radius_m: 0.05     # tracks with no shared frame whose table footprints are this close are one object
       merge_boundary_gap: 2    # ... or whose closest frames are this far apart with masks overlapping past merge_boundary_iou (a handoff: the id switched away and back)
@@ -152,6 +144,15 @@ segmentation:
       split_gap_m: 0.10        # a track whose footprints fall into groups this far apart is two objects
       min_frames: 3            # smallest group that counts as an object when splitting
       sliver_frac: 0.2         # feet from masks below this share of the track median are occlusion slivers, not new objects
+  verify:                      # end-of-segmentation coverage check: VLM look plus noun prompts, looped
+    enabled: true              # session-only: enabled locally after the test.MOV miss; committed default stays off until tuned
+    max_turns: 3               # verification rounds at most; -1 loops until a round prompts nothing new
+    max_noun_requests: 4       # targeted SAM video requests per round at most
+    views: 3                   # whole-scene frames with kept-track outlines sent to the VLM
+    max_image_px: 1024         # overlays are downscaled to this long side
+    min_confidence: 0.5        # below this the VLM answer verifies nothing
+    timeout_s: 300             # the VLM call budget, like the router's
+    retries: 3
   lift:                        # P2.3: masks to point clusters by voting over views (visual hull)
     voxel_m: 0.005             # grid resolution; a cluster point is a voxel centre
     max_height_m: 0.35         # first-pass grid top; tracks reaching it are re-voted on the tall grid
@@ -314,7 +315,7 @@ physics:
     coacd_resolution: 2000          # CoACD search resolution; 500 barely moves wall time on s02 obj_001, so this stays
     coacd_mcts_iterations: 30       # CoACD search iterations per cut; 30 keeps the s02/s12 part counts with all fit checks passing, ~2x faster than 150
     decomp_decimate: true           # decompose a decimated copy; the checks still run against the full mesh
-    decomp_max_faces: 12000         # a decomposition input above this many faces is decimated to it
+    decomp_max_faces: 80000         # a decomposition input above this many faces is decimated to it
     decomp_volume_change_frac: 0.05 # a decimated copy that moves the volume more than this is dropped
     adaptive_escalation: true       # try hull, then a cheap decomposition, then the full one; each rung must pass the checks
     cheap_threshold: 0.25           # concavity threshold of the cheap rung; coarser than coacd_threshold
@@ -345,7 +346,7 @@ physics:
   repair:                      # P4.1, stages/mesh_repair.py
     min_component_area_frac: 0.02   # a piece smaller than this share of the largest piece's area is a floater
     min_volume_m3: 1.0e-9           # below this the mesh is not a solid
-    max_triangles: 20000            # triangle budget per visual mesh; above it the mesh is decimated
+    max_triangles: 100000           # triangle budget per visual mesh; above it the mesh is decimated
     max_volume_change_frac: 0.02    # decimation that moves the volume more than this is rejected
     decimation_aggression: 5        # fast_simplification agg, 3 to 10; below 3 it stops short of the budget
 
