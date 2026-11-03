@@ -68,7 +68,7 @@ without repaired track masks in `segmentation/masks/`, see `benchmark/run_tracki
 `--fail-on-target` is given. The metric definitions are decision D-012 in `PLAN.md`.
 
 CI (`.github/workflows/ci.yml`) runs ruff check, `ruff format --check`, mypy and the fast
-pytest set on every push, on Python 3.10 and 3.12, with `uv sync --locked`. A change that
+pytest set on every push, on Python 3.10 and 3.12 across ubuntu, macOS and Windows, with `uv sync --locked`. A change that
 touches dependencies commits the updated `uv.lock`. To reproduce the 3.10 run locally:
 `uv run --python 3.10 --isolated mypy`.
 
