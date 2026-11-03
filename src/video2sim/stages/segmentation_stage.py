@@ -404,7 +404,7 @@ def render_tracks_video(
             image = cv2.imread(str(run_dir / frame.image_path))
             if image is None:
                 raise ValueError(f"cannot read {frame.image_path}")
-            overlay = image.copy()
+            overlay: NDArray[np.uint8] = np.asarray(image.copy(), dtype=np.uint8)
             present = {
                 t.track_id: t.masks[frame.frame_index] for t in by_frame.get(frame.frame_index, [])
             }
