@@ -282,8 +282,8 @@ def test_board_hull_triangulates_tag_corners() -> None:
     hull = board_hull(world, Path("/none"), "aruco", detect=tags)
     assert hull is not None
     # u=10..54, v=10..38 at fx=50, cx=32, cy=24 from z=1: x in [-0.44, 0.44], y in [-0.28, 0.28].
-    assert abs(float(hull[:, 0].min()) - -0.44) < 0.02
-    assert abs(float(hull[:, 0].max()) - 0.44) < 0.02
+    assert abs(float(np.min(hull[:, 0])) - -0.44) < 0.02
+    assert abs(float(np.max(hull[:, 0])) - 0.44) < 0.02
     assert board_hull(world, Path("/none"), "aruco", detect=lambda p: ({}, (48, 64))) is None
 
 
@@ -308,9 +308,9 @@ def test_box_projection_matches_hand_math() -> None:
     world = _world(n=1)
     # A 4 cm cube centred at (0, 0, 0.05): projects to u = 50 x + 32, v = -50 y + 24.
     cube = np.array([[x, y, z] for x in (-0.02, 0.02) for y in (-0.02, 0.02) for z in (0.03, 0.07)])
-    from video2sim.stages.gap_fill import _frame_box
+    from video2sim.stages.cluster_check import frame_box
 
-    placed = _frame_box(world, 0, cube, 0)
+    placed = frame_box(world, 0, cube, 0)
     assert placed is not None
     (x1, y1, x2, y2), point = placed
     assert (x1, y1, x2, y2) == (30, 22, 33, 25)
@@ -560,11 +560,10 @@ def test_box_request_tries_more_frames_until_a_box_fits(monkeypatch: Any) -> Non
     cfg = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
     gcfg = GapFillConfig.from_config(cfg)
     vcfg = _vcfg()
-    from video2sim.stages import gap_fill as gap_module
+    from video2sim.stages.cluster_check import frame_box as real_frame_box
     from video2sim.stages.view_select import compute_visibility
 
     visibility, lo, shape = compute_visibility(world, blob, vcfg)
-    real_frame_box = gap_module._frame_box
     calls = {"n": 0}
 
     def flaky(*args: Any, **kwargs: Any) -> Any:
@@ -573,7 +572,7 @@ def test_box_request_tries_more_frames_until_a_box_fits(monkeypatch: Any) -> Non
             return None  # the best-ranked frames cannot place the box
         return real_frame_box(*args, **kwargs)
 
-    monkeypatch.setattr(gap_module, "_frame_box", flaky)
+    monkeypatch.setattr("video2sim.stages.gap_fill._frame_box", flaky)
     _, gated, unprompted = box_request(
         world, visibility, (lo, shape), vcfg.cell_m, [blob], (64, 48), gcfg.cluster
     )

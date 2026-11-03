@@ -23,11 +23,12 @@ from numpy.typing import NDArray
 
 from video2sim.models.sam_prompts import ObjectPrompt, build_object_prompt
 from video2sim.schemas import SE3, DiscoveryCheck, WorldModel
+from video2sim.stages.cluster_check import _far_enough, azimuths
+from video2sim.stages.cluster_check import frame_box as _frame_box
+from video2sim.stages.cluster_check import project_points as _project
 from video2sim.stages.lift import (
-    MIN_DEPTH_M,
     LiftConfig,
     PointVote,
-    _pixels,
     lift_points,
     lift_tracks,
 )
@@ -356,20 +357,6 @@ def residual_clusters(
     return [pts[g] for g in groups]
 
 
-def _project(points: F64, pose: F64, k: Any) -> tuple[F64, F64, NDArray[np.bool_]]:
-    """Pixel coordinates and the in-front mask of world points in one frame."""
-    rot, center = pose[:3, :3], pose[:3, 3]
-    cam = (points - center) @ rot
-    z = cam[:, 2]
-    ok = z > MIN_DEPTH_M
-    u = np.full(len(points), -1.0)
-    v = np.full(len(points), -1.0)
-    if ok.any():
-        pu, pv = _pixels(cam[ok, 0] / z[ok], cam[ok, 1] / z[ok], k)
-        u[ok], v[ok] = pu, pv
-    return u, v, ok
-
-
 def is_board_cluster(
     points: F64,
     world: WorldModel,
@@ -459,67 +446,6 @@ def unexplained_clusters(
     return out
 
 
-def _frame_box(
-    world: WorldModel, pos: int, points: F64, pad_px: int
-) -> tuple[Box, tuple[float, float] | None] | None:
-    """Prompt box and median point on one clip position, or None when unusable.
-
-    The box is the 2D bounding box of the projected eight AABB corners plus their drops to
-    the table plane, padded and clamped; None when a corner is behind the camera or the
-    padded box is cut by the image border. The median point is omitted when behind.
-    """
-    frame = world.frames[pos]
-    k = world.intrinsics
-    pose = frame.T_world_from_camera.to_numpy()
-    plane_n = np.array(world.table_plane.normal, dtype=np.float64)
-    plane_d = float(world.table_plane.offset_m)
-    lo, hi = points.min(axis=0), points.max(axis=0)
-    corners = np.array(np.meshgrid(*zip(lo, hi, strict=True))).reshape(3, -1).T
-    drops = corners - plane_n[None, :] * ((corners @ plane_n - plane_d)[:, None])
-    u, v, ok = _project(np.concatenate([corners, drops]), pose, k)
-    if not ok.all():
-        return None
-    x1, y1 = int(np.min(u)), int(np.min(v))
-    x2, y2 = int(np.max(u)), int(np.max(v))
-    if x2 <= x1 or y2 <= y1:
-        return None
-    padded = (x1 - pad_px, y1 - pad_px, x2 + pad_px, y2 + pad_px)
-    clamped = (
-        max(padded[0], 0),
-        max(padded[1], 0),
-        min(padded[2], k.width_px - 1),
-        min(padded[3], k.height_px - 1),
-    )
-    if clamped != padded or clamped[2] <= clamped[0] or clamped[3] <= clamped[1]:
-        return None
-    median = np.median(points, axis=0)
-    mu, mv, mok = _project(median[None, :], pose, k)
-    point = (float(mu[0]), float(mv[0])) if mok[0] else None
-    return clamped, point
-
-
-def _azimuths(world: WorldModel, centroid: F64) -> NDArray[np.float64]:
-    """Camera azimuth around a point, per clip position."""
-    return np.array(
-        [
-            np.arctan2(
-                f.T_world_from_camera.to_numpy()[1, 3] - centroid[1],
-                f.T_world_from_camera.to_numpy()[0, 3] - centroid[0],
-            )
-            for f in world.frames
-        ]
-    )
-
-
-def _far_enough(
-    pos: int, placed: Sequence[int], azimuth: NDArray[np.float64], gap_deg: float
-) -> bool:
-    return all(
-        abs((azimuth[pos] - azimuth[q] + np.pi) % (2 * np.pi) - np.pi) >= np.deg2rad(gap_deg)
-        for q in placed
-    )
-
-
 def _ranked_positions(
     world: WorldModel,
     visibility: NDArray[np.bool_],
@@ -549,7 +475,7 @@ def pick_prompt_frames(
 ) -> list[int]:
     """Clip positions prompting one cluster: largest visible share of its cells first, each
     at least ``min_gap_deg`` of azimuth apart around the cluster centroid."""
-    azimuth = _azimuths(world, np.median(points, axis=0))
+    azimuth = azimuths(world, np.median(points, axis=0))
     picked: list[int] = []
     for pos in _ranked_positions(world, visibility, grid, cell_m, points):
         if _far_enough(pos, picked, azimuth, min_gap_deg):
@@ -578,7 +504,7 @@ def box_request(
     unprompted: list[int] = []
     for index, points in enumerate(clusters):
         track_id = first_id + index
-        azimuth = _azimuths(world, np.median(points, axis=0))
+        azimuth = azimuths(world, np.median(points, axis=0))
         placed_positions: list[int] = []
         # Try frames in visibility order until frames_per_cluster boxes fit; a
         # frame whose box is cut by the image border does not end the search.
