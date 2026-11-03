@@ -192,7 +192,7 @@ def sample_and_check(
                 gray = np.asarray(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), dtype=np.uint8)
                 tag_hits += bool(detect_tags(gray, cfg.marker_family))
                 rel = Path(frames_subdir) / f"{wanted[index]:05d}.png"
-                written.append(str(rel))
+                written.append(rel.as_posix())  # manifest paths are POSIX on every OS
                 frames_dir.mkdir(parents=True, exist_ok=True)
                 cv2.imwrite(str(run_dir / rel), frame)
             index += 1
