@@ -12,7 +12,7 @@
   <img alt="python" src="https://img.shields.io/badge/python-3.10%2B-3776ab">
   <img alt="sim" src="https://img.shields.io/badge/validated%20in-MuJoCo-4c8bf5">
   <img alt="export" src="https://img.shields.io/badge/export-USD%20%2B%20URDF-76b900">
-  <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-MIT-yellow"></a>
+  <a href="docs/licenses.md"><img alt="licenses" src="https://img.shields.io/badge/licenses-docs%2Flicenses.md-lightgrey"></a>
   <a href="https://github.com/t0mezz/video2sim/actions/workflows/ci.yml"><img alt="ci" src="https://github.com/t0mezz/video2sim/actions/workflows/ci.yml/badge.svg"></a>
   <a href=".github/workflows/ci.yml"><img alt="platform" src="https://img.shields.io/badge/platform-linux%20%7C%20macOS%20%7C%20windows-E95420"></a>
 </p>
