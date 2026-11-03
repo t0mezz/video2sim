@@ -58,6 +58,13 @@ All three model endpoints are configurable: [docs/model_interfaces.md](docs/mode
 
 `scene/` holds `scene.usd`, one URDF per object in `urdf/`, and `qa_report.html` (confidence, fallbacks, mass range, settling result). For the pick-and-place demo, run [scripts/fetch_panda.sh](scripts/fetch_panda.sh) and see [benchmark/run_pick_place.py](benchmark/run_pick_place.py).
 
+## Dataset
+
+The benchmark scene captures and the object inventory are public on Hugging Face:
+[TomKrb/video2sim-captures](https://huggingface.co/datasets/TomKrb/video2sim-captures). Use them
+to reproduce the evaluation or to try the pipeline without filming your own table. How the scenes
+and ground truth are laid out is in [benchmark/README.md](benchmark/README.md).
+
 ## Acknowledgements
 
 Inference for the project research was supported with credits from
@@ -78,6 +85,7 @@ Thank you for making this project possible!
 | [docs/decisions.md](docs/decisions.md) | Every decision (D-001 to D-033) with its evidence. |
 | [docs/history/](docs/history/) | Full task and evidence records of the finished phases, the old changelog, and the retired `PLAN.md`. |
 | [benchmark/README.md](benchmark/README.md) | How benchmark scenes and ground truth are laid out. |
+| [Hugging Face dataset](https://huggingface.co/datasets/TomKrb/video2sim-captures) | The public benchmark captures and object inventory. |
 | [docs/capture_protocol.md](docs/capture_protocol.md) | How to film a scene. |
 | [docs/model_interfaces.md](docs/model_interfaces.md) | Hooking up your own VLM, SAM 3D and SAM 3.1 instances, or swapping the models. |
 | [docs/licenses.md](docs/licenses.md) | License status of every model and tool we depend on. |
