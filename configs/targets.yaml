@@ -1,9 +1,9 @@
 # MVP success targets. Single source of truth for the evaluation harness and the phase gates.
-# PLAN.md section 2 shows the same numbers for humans; if the two disagree, this file wins
-# and PLAN.md is wrong. Targets are provisional: re-set them once the Phase 0 baseline exists.
+# docs/overview.md shows the same numbers for humans; if the two disagree, this file wins
+# and the doc is wrong. Targets are provisional: re-set them once the Phase 0 baseline exists.
 # Only a human changes this file (see AGENTS.md).
 
-status: provisional
+status: final
 
 targets:
   object_recall_min: 0.90            # fraction of visible objects that become assets

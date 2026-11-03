@@ -73,7 +73,10 @@ Thank you for making this project possible!
 
 | File | What it tells you |
 | --- | --- |
-| [PLAN.md](PLAN.md) | Scope, targets, phases, task list, risks, decisions. |
+| [TODO.md](TODO.md) | Open work: unmet exit criteria, missed targets, known gaps, and the backlog after the MVP. |
+| [docs/README.md](docs/README.md) | Index of the docs: [overview](docs/overview.md), [stages](docs/stages.md), [lessons](docs/lessons.md). |
+| [docs/decisions.md](docs/decisions.md) | Every decision (D-001 to D-033) with its evidence. |
+| [docs/history/](docs/history/) | Full task and evidence records of the finished phases, the old changelog, and the retired `PLAN.md`. |
 | [benchmark/README.md](benchmark/README.md) | How benchmark scenes and ground truth are laid out. |
 | [docs/capture_protocol.md](docs/capture_protocol.md) | How to film a scene. |
 | [docs/model_interfaces.md](docs/model_interfaces.md) | Hooking up your own VLM, SAM 3D and SAM 3.1 instances, or swapping the models. |

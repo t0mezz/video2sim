@@ -2,7 +2,7 @@
 
 24 tabletop scenes, with ground truth. This is how we know whether a change
 helped. Videos and meshes are large and may show people or private spaces, so they are
-**not in git**; `benchmark/scenes/` is ignored. Where they live is decision D-006 in PLAN.md.
+**not in git**; `benchmark/scenes/` is ignored. Where they live is decision D-006 in `docs/decisions.md`.
 
 ## Tiers
 

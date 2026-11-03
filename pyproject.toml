@@ -26,7 +26,7 @@ v2s = "video2sim.cli:main"
 
 # Heavy, GPU-bound dependencies (torch, reconstruction, mesh and USD libraries)
 # are added per phase, behind optional extras, so that the schema layer and the
-# test suite install and run on any machine. See PLAN.md.
+# test suite install and run on any machine.
 
 [dependency-groups]
 dev = [

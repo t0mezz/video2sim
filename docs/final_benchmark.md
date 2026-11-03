@@ -24,4 +24,4 @@ Pick-and-place is not a target. 2 of 8 test scenes had a graspable object under 
 
 Limits: test scenes were seen in Phases 1 to 4, so this is not a clean first look (D-026). Size and mass targets are provisional; mass was lowered from 70% (D-025). Friction/restitution are mostly unsourced placeholders (D-019); restitution was never simulated. Pick-and-place control is open loop and skips difficult objects.
 
-Note: this run used 6 SAM 3D draws per object. D-030 later set the default to 2 based on dev-only measurement (`docs/research/sample_counts.md`).
+Note: this run used 6 SAM 3D draws per object. D-030 later set the default to 2 based on dev-only measurement (`docs/research/sample_counts.md`); D-033 dropped D-030, and the default is now one draw on each of up to 5 keyframes.

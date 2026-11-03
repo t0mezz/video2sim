@@ -352,7 +352,7 @@ def test_verify_config_defaults_and_validation() -> None:
     file_cfg = _cfg()
     assert "verify" in file_cfg["segmentation"]  # the documented wiring path
     file_vcfg = VerifyConfig.from_config(file_cfg)
-    assert file_vcfg.enabled is True and file_vcfg.max_turns == 3
+    assert file_vcfg.enabled is False and file_vcfg.max_turns == 3  # off in the committed config
     for bad in ({"max_turns": 0}, {"max_turns": -2}, {"max_noun_requests": 0}):
         try:
             VerifyConfig.from_config({"segmentation": {"verify": bad}})

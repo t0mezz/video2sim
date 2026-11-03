@@ -4,7 +4,7 @@
   and known noise must give a known error, so it tests the metrics. It is not a floor.
 * ``constant_box`` knows nothing about the scene: one fixed box on the board. It is the
   floor any real method has to beat. The mask-based baseline replaces it in a later
-  iteration (see PLAN.md).
+  iteration (see TODO.md).
 """
 
 from __future__ import annotations

@@ -13,19 +13,21 @@ physics, export. Each stage hands the next one a typed object and some files.
 
 1. The human's current instruction
 2. `configs/targets.yaml` for every number that gates a decision
-3. `PLAN.md` for scope, schedule and status
+3. `docs/decisions.md` for decisions and `docs/overview.md` for scope; a later decision
+   supersedes an earlier one
 4. This file for how to work
 5. Code comments
 
 If two of them conflict, stop and ask. Do not pick one silently.
 
-**Where we are:** the status table at the top of `PLAN.md`. Work on tasks of the current
-phase. Tasks have ids such as `P3.2`; use them in branch names and commit messages.
+**Where we are:** the MVP phases are done (`docs/overview.md`) and `TODO.md` lists what is
+open. Pick an item from it and use its id (`item 8`, `9.8`) in branch names and commit
+messages. Work that is not in `TODO.md` needs a human's go-ahead first.
 
 ## Repo map
 
 ```
-AGENTS.md  PLAN.md  README.md
+AGENTS.md  TODO.md  README.md
 configs/
   default.yaml           pipeline settings; hashed into every run manifest
   targets.yaml           MVP success targets and phase gates (human-edited only)
@@ -41,7 +43,8 @@ src/video2sim/
   cli.py                 the `video2sim` command (`eval` and `run`)
 tests/                   fast tests; no GPU, weights or network needed
 benchmark/               ground-truth format; scene data itself is not in git
-docs/                    capture protocol, license tracker
+docs/                    overview, stages, lessons, decisions, capture protocol, license tracker;
+                         research/ and history/ hold the evidence
 data/  runs/             large artifacts; ignored by git
 ```
 
@@ -66,7 +69,7 @@ scores one scene. `--stage segmentation` scores the point clusters in `segmentat
 scene outside `CLEAN_ALIGNED` has no usable prediction) instead of the shape meshes and adds a Phase 2 section (cluster box error on easy scenes,
 identity switches, flags on s17 to s20; switches stay `no_data` for baselines and for runs
 without repaired track masks in `segmentation/masks/`, see `benchmark/run_tracking.py`). Scenes with a deformable object are left out (D-014) unless named with `--scene`. It writes `report.json` and `report.html` and exits 0 unless
-`--fail-on-target` is given. The metric definitions are decision D-012 in `PLAN.md`.
+`--fail-on-target` is given. The metric definitions are decision D-012 in `docs/decisions.md`.
 
 CI (`.github/workflows/ci.yml`) runs ruff check, `ruff format --check`, mypy and the fast
 pytest set on every push, on Python 3.10 and 3.12 across ubuntu, macOS and Windows, with `uv sync --locked`. A change that
@@ -112,7 +115,7 @@ MuJoCo for the nominal, low and high friction and mass (P4.7, D-021), caching ea
 
 `$ISAACLAB/.venv/bin/python benchmark/run_isaac_settling.py RUN_DIR ... --out FILE.json` (with `PYTHONPATH=src` and
 `OMNI_KIT_ACCEPT_EULA=YES`) settles `export/scene.usd` of finished runs in Isaac Sim under PhysX for the same five cases as
-`run_settling.py` and the same gate (D-027, section 12 item 8 of `PLAN.md`); the USD logic is in `src/video2sim/isaac_verify.py`; it makes no hosted call.
+`run_settling.py` and the same gate (D-027, `TODO.md` item 8); the USD logic is in `src/video2sim/isaac_verify.py`; it makes no hosted call.
 
 `python benchmark/run_sample_counts.py` replays cached SAM 3D draws on the dev scenes with n = 1, 2 and 6 into `runs_samples/` for `benchmark/compare_shape_arms.py`; it makes no hosted call (`docs/research/sample_counts.md`).
 
@@ -185,7 +188,7 @@ notice. Breaking one gives a scene that loads fine and behaves wrongly.
 * No videos, meshes, point clouds, model weights or secrets in git. The `.gitignore` covers
   the usual extensions; do not add exceptions. Keys live in `.env`, listed in `.env.example`.
 * Videos of workspaces can show people, screens and documents. Treat benchmark videos as
-  private. Decision D-004 in `PLAN.md` allows sending benchmark videos to hosted APIs (Meta Model
+  private. Decision D-004 in `docs/decisions.md` allows sending benchmark videos to hosted APIs (Meta Model
   API; Modal or Baseten under D-015). Never use the Muse "contributor" modes, which let
   Meta train on the content. Retention terms are not yet read, so ask before the first
   upload.
@@ -223,7 +226,7 @@ notice. Breaking one gives a scene that loads fine and behaves wrongly.
 
 ## Working agreements for agents
 
-**Before you start.** Find the task id in `PLAN.md`. Say what you understood the task to be
+**Before you start.** Find the item in `TODO.md`. Say what you understood the task to be
 and what done means. For a change that touches a contract (`schemas.py`) or more than three
 files, write a short plan and get agreement before editing.
 
@@ -231,6 +234,8 @@ files, write a short plan and get agreement before editing.
 
 * change a field in `schemas.py`, `configs/targets.yaml`, benchmark ground truth, or a
   phase's exit criteria;
+* change the MVP scope or a decision: propose it. A new decision is a new row in
+  `docs/decisions.md` that supersedes the old one, and old rows are never rewritten;
 * add a dependency, especially a heavy one, or download weights;
 * call a paid or external API, or upload any data anywhere;
 * delete files or rewrite git history.
@@ -241,16 +246,17 @@ files, write a short plan and get agreement before editing.
 * tune on the test split;
 * invent a physical constant, material number or license fact. Cite it, or leave it empty
   and say so;
-* tick a checkbox in `PLAN.md` without linking the evidence (a report, a PR, a run id);
+* tick a checkbox in `TODO.md` without linking the evidence (a report, a PR, a run id);
 * silence a linter, type checker or validator without a comment that says why.
 
-**Definition of done.** Tests, `ruff` and `mypy` pass. The task's checkbox in `PLAN.md` is
+**Definition of done.** Tests, `ruff` and `mypy` pass. The item's checkbox in `TODO.md` is
 ticked with evidence, or the remaining work is written there. If you added a command or
 changed a convention, this file says so.
 
-**Git.** One branch named like `p3-2-registration`. Small commits, imperative
-mood, task id first: `P3.2: add one-sided chamfer registration`. A pull request says what
-changed, why, the metric evidence, and what could go wrong.
+**Git.** One branch named after the item, like `item8-isaac-verifier` or `9-8-dev-eval`. Small
+commits, imperative mood, item id first: `9.8: add the dev evaluation arms`. Commits before
+2026-11-03 use the old task ids (`P3.2`, `S12.9.8`); `docs/history/` explains them. A pull
+request says what changed, why, the metric evidence, and what could go wrong.
 
 ## Known pitfalls
 

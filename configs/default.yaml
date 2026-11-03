@@ -1,11 +1,11 @@
 # Default pipeline configuration. Everything that changes a result belongs here, so that the
-# config hash in the run manifest identifies it. Values marked TODO are decided in a PLAN.md phase.
+# config hash in the run manifest identifies it. Values marked TODO are decided when the matching item in TODO.md is done.
 
 seed: 0
 
 capture:
   target_fps: 5                # frame sampling rate: one frame, the sharpest, per 1/target_fps window
-  quality:                     # P1.4 capture gate. All guesses tuned on dev videos; see PLAN.md
+  quality:                     # P1.4 capture gate. All guesses tuned on dev videos; see docs/stages.md
     blur_relative_floor: 0.3        # a frame is blurred below this fraction of the video's sharp level
     blur_reference_percentile: 90   # the sharp level: this percentile of per-window sharpness
     min_median_sharpness: 50        # Laplacian variance at 960 px; below it the whole video is soft
@@ -23,7 +23,7 @@ reconstruction:
   quality:                     # P1.4; registered fraction and reprojection gates are in targets.yaml
     min_azimuth_coverage_deg: 60    # TODO(P1.6): guess from the capture protocol's "three different directions"; tune in Phase 3
   backend: pycolmap            # CPU SfM, decision D-016; VGGT and CUDA build deferred past the MVP
-  sfm:                         # PLAN.md item 6b; sequential matching is 2 to 4x faster than exhaustive on long videos
+  sfm:                         # TODO.md item 6b; sequential matching is 2 to 4x faster than exhaustive on long videos
     matcher: sequential        # exhaustive or sequential; frames must be in video order
     sequential_overlap: 10
     loop_stride: 0             # sequential only: also match every n-th frame with all others
@@ -58,7 +58,7 @@ vlm:                           # the model behind the router, the material pass 
   roles: {}                    # per-role overrides of any field above, under router, material, mass or verify
 
 segmentation:
-  sam_backend: null            # "api" or "self_hosted", see PLAN.md decision D-004
+  sam_backend: null            # "api" or "self_hosted", see decision D-004 in docs/decisions.md
   router:                      # P2.1/P2.2: one VLM request per scene picks the SAM prompt and lists the objects
     n_frames: 3                # frames sent, spread evenly over the registered frames
     max_objects: 30            # longer lists are cut
@@ -145,7 +145,7 @@ segmentation:
       min_frames: 3            # smallest group that counts as an object when splitting
       sliver_frac: 0.2         # feet from masks below this share of the track median are occlusion slivers, not new objects
   verify:                      # end-of-segmentation coverage check: VLM look plus noun prompts, looped
-    enabled: true              # session-only: enabled locally after the test.MOV miss; committed default stays off until tuned
+    enabled: false             # off until it is evaluated (TODO.md item 9); turn it on per run to try it. Off keeps the stage byte-identical
     max_turns: 3               # verification rounds at most; -1 loops until a round prompts nothing new
     max_noun_requests: 4       # targeted SAM video requests per round at most
     views: 3                   # whole-scene frames with kept-track outlines sent to the VLM
@@ -261,7 +261,7 @@ shape:
     timeout_s: 600
     retries: 3
   keyframes_per_object: 6      # P3.4: best keyframes the model is run on
-  samples_per_keyframe: 1      # seeds per keyframe; 2 draws per object, 5.7% size error against 5.0% with 6 (D-030)
+  samples_per_keyframe: 1      # seeds per keyframe; one draw on each of up to keyframes_per_object keyframes (D-033 dropped D-030's 2 draws; a dev replay gave 5.7% size error with 2 against 5.0% with 6)
   max_views: 12                # frames whose masks enter registration, spread over the video
   min_fit_score: 0.5           # below this the convex hull of the cluster stands in; a guess
   support_gap_m: 0.01          # a cluster this close to the table rests on it (P3.5)
@@ -285,7 +285,7 @@ shape:
     max_target_points: 2000    # observed points kept, chosen at random by the seed
     sigma_points_m: 0.003
     sigma_mask_px: 3.0
-    mask_weight: 1.0           # lambda in the PLAN.md cost
+    mask_weight: 1.0           # lambda in the registration cost (docs/stages.md)
     huber_m: 0.005             # above this a point counts linearly, for SfM strays
     inlier_m: 0.010            # fit score: observed points this close to the mesh; 5 mm is
                          # tighter than generative accuracy (D-030: 5 to 6% size error), which sent

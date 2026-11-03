@@ -16,4 +16,4 @@ Source priority for "where to look": geometry (point-cloud clusters — no VLM g
 
 Schema (`src/video2sim/schemas.py`, human-approved; old payloads still validate): `DiscoveryCheck` (`view_frames`, `view_coverage` ∈ [0,1], `listed` lower-bound inventory count, `tracked`, `missing_suspected`, `unmatched` nouns, `unexplained_clusters`, `recovered`, `video_requests` ≥1); `ObjectInstance.found_by ∈ {generic, noun, cluster_box}` (default `generic`); `Instances.discovery`. QA report (`stages/qa_report.py`) shows a Discovery block with `unmatched`/`unexplained_clusters` as warnings and per-object `found_by`.
 
-Cost today: 1 VLM call + 1 video request (~$0.017 for 84 frames at $0.20/1k, min 50/request). Build status and acceptance live in `PLAN.md` section 12 item 9.
+Cost today: 1 VLM call + 1 video request (~$0.017 for 84 frames at $0.20/1k, min 50/request). Build status and acceptance live in `TODO.md` item 9.

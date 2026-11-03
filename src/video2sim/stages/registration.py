@@ -2,7 +2,7 @@
 
 A shape model returns a mesh in its own frame and units with a guessed pose. This finds the
 similarity transform (scale, rotation, translation) that places it on the object in the metric
-world frame, by minimising the PLAN.md cost
+world frame, by minimising the cost (docs/stages.md, section 4)
 
     mean_y min_x |y - (s R x + t)|^2  +  lambda * sum_f L_mask(projection in frame f, mask f)
 

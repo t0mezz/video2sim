@@ -3,7 +3,7 @@
     uv run python benchmark/sweep_sfm.py s16/video_a --out benchmark/results/x.json \
         --variant seq10=fps=3,matcher=sequential,sequential_overlap=10
 
-PLAN.md item 6b. A variant is ``name=key=value,key=value``; ``fps`` is the frame sampling rate
+TODO.md item 6b. A variant is ``name=key=value,key=value``; ``fps`` is the frame sampling rate
 (default 3) and every other key is a field of ``SfmOptions``. ``baseline`` is always run first
 unless ``--no-baseline`` is given. Each variant starts from scratch in its own work folder, and
 is scored with ``eval_world_frame.evaluate`` (tag distance against the printed board, up-axis,

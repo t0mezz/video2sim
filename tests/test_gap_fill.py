@@ -278,7 +278,7 @@ def test_prompt_round_trip_through_a_fake_client() -> None:
 def test_gap_fill_defaults_off_until_dev_evaluation() -> None:
     cfg = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
     gcfg = GapFillConfig.from_config(cfg)
-    # PLAN.md 9.6/9.9: defaults off until 9.8 evaluates and 9.9 decides them.
+    # TODO.md 9.6/9.9: defaults off until 9.8 evaluates and 9.9 decides them.
     assert gcfg.enabled is False  # off keeps the stage byte-identical
     assert "overlay_audit" not in cfg["segmentation"]["tracking"]["gap_fill"]
     assert gcfg.check.views_per_cluster >= 1 and gcfg.check.max_workers >= 1
