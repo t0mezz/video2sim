@@ -15,6 +15,7 @@ import hashlib
 import json
 import os
 import re
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -66,7 +67,11 @@ class ResponseCache:
         path = self._dir / f"{key}.txt"
         text = call()
         self._dir.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="utf-8")
+        # Atomic publish: parallel callers on the same key (parallel router
+        # views, cluster checks) must never read a half-written answer.
+        tmp = self._dir / f"{key}.{threading.get_ident()}.tmp"
+        tmp.write_text(text, encoding="utf-8")
+        tmp.replace(path)
         return text
 
 

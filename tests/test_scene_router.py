@@ -158,7 +158,10 @@ class MapClient:
 
 def _coverage_world(run_dir: Path, n: int = 4) -> WorldModel:
     for i in range(n):
-        cv2.imwrite(str(run_dir / f"{i:05d}.png"), np.full((48, 64, 3), 128, np.uint8))
+        # Distinct gray per frame: byte-identical frames share one
+        # byte-keyed cache entry, so parallel views would read each other's
+        # answer (the intermittent CI failure in the two coverage tests).
+        cv2.imwrite(str(run_dir / f"{i:05d}.png"), np.full((48, 64, 3), 100 + 20 * i, np.uint8))
     (run_dir / "points.ply").write_text(
         "ply\nformat ascii 1.0\nelement vertex 4\nproperty float x\nproperty float y\n"
         "property float z\nend_header\n" + "".join(f"{x} 0 0.01\n" for x in (-0.2, -0.1, 0.1, 0.2)),
