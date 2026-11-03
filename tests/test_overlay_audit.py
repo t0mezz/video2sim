@@ -13,6 +13,7 @@ from numpy.typing import NDArray
 from video2sim.models.hosted import ResponseCache
 from video2sim.schemas import SE3, CameraFrame, Intrinsics, Plane, WorldModel
 from video2sim.stages.overlay_audit import (
+    AuditHit,
     OverlayAuditConfig,
     audit_missing_nouns,
     build_audit_prompt,
@@ -96,24 +97,33 @@ def test_prompt_names_the_tracked_count() -> None:
 
 
 def test_parse_missing_and_uncertain() -> None:
-    text = '{"missing": ["Laptop", "bead"], "uncertain": ["shadow"]}'
+    text = (
+        '{"missing": [{"noun": "Laptop", "near": null}, {"noun": "bead", "near": 5}], '
+        '"uncertain": ["shadow"]}'
+    )
     missing, uncertain = parse_audit_answer(text, ("table",))
-    assert missing == ["laptop", "bead"]
+    assert missing == [AuditHit("laptop", None), AuditHit("bead", 5)]
     assert uncertain == ["shadow"]
 
 
 def test_parse_drops_denied_duplicates_and_garbage() -> None:
     text = (
-        '{"missing": ["table", "red shiny laptop computer pro max", '
-        '"bead", "bead", ""], "uncertain": []}'
+        '{"missing": [{"noun": "table", "near": null}, '
+        '{"noun": "red shiny laptop computer pro max", "near": null}, '
+        '{"noun": "bead", "near": "5"}, {"noun": "bead", "near": null}, '
+        '{"noun": "", "near": null}, "bead", {"near": 2}], "uncertain": []}'
     )
     missing, _ = parse_audit_answer(text, ("table",))
-    assert missing == ["bead"]
+    assert missing == [AuditHit("bead", None)]
 
 
 def test_parse_unreadable_answer_gives_no_nouns() -> None:
     assert parse_audit_answer("no json here", ()) == ([], [])
     assert parse_audit_answer('{"missing": "laptop"}', ()) == ([], [])
+    assert parse_audit_answer('{"missing": [{"noun": "laptop"}], "uncertain": {}}', ()) == (
+        [],
+        [],
+    )
 
 
 def test_render_draws_ids_and_returns_them(tmp_path: Path) -> None:
@@ -144,7 +154,7 @@ def test_audit_names_the_uncovered_noun(tmp_path: Path) -> None:
         Track(2, {0: _mask(slice(4, 12), slice(4, 12)), 1: _mask(slice(4, 12), slice(4, 12))}),
         Track(5, {0: _mask(slice(20, 30), slice(40, 50))}),
     ]
-    client = FakeAuditClient('{"missing": ["laptop"], "uncertain": []}')
+    client = FakeAuditClient('{"missing": [{"noun": "laptop", "near": null}], "uncertain": []}')
     cache = ResponseCache(tmp_path / "cache")
     missing, uncertain, images = audit_missing_nouns(
         world, tmp_path, kept, (0, 1, 2), _acfg(), (), client, cache, tmp_path / "work"
@@ -167,6 +177,23 @@ def test_audit_skips_frames_without_masks(tmp_path: Path) -> None:
     assert [p.name for p in images] == ["audit_00002.png"]
 
 
+def test_audit_drops_nouns_cited_next_to_kept_labels(tmp_path: Path) -> None:
+    world = _world(tmp_path)
+    kept = [
+        Track(2, {0: _mask(slice(4, 12), slice(4, 12))}),
+        Track(5, {0: _mask(slice(20, 30), slice(40, 50))}),
+    ]
+    client = FakeAuditClient(
+        '{"missing": [{"noun": "glasses", "near": 5}, {"noun": "laptop", "near": null}, '
+        '{"noun": "bead", "near": 9}], "uncertain": []}'
+    )
+    cache = ResponseCache(tmp_path / "cache")
+    missing, _, _ = audit_missing_nouns(
+        world, tmp_path, kept, (0,), _acfg(), (), client, cache, tmp_path / "work"
+    )
+    assert missing == ["laptop", "bead"]
+
+
 def test_audit_without_client_names_nothing(tmp_path: Path) -> None:
     world = _world(tmp_path)
     kept = [Track(2, {0: _mask(slice(4, 12), slice(4, 12))})]
@@ -179,7 +206,7 @@ def test_audit_without_client_names_nothing(tmp_path: Path) -> None:
 def test_audit_answer_is_cached(tmp_path: Path) -> None:
     world = _world(tmp_path)
     kept = [Track(2, {0: _mask(slice(4, 12), slice(4, 12))})]
-    client = FakeAuditClient('{"missing": ["laptop"], "uncertain": []}')
+    client = FakeAuditClient('{"missing": [{"noun": "laptop", "near": null}], "uncertain": []}')
     cache = ResponseCache(tmp_path / "cache")
     cfg = _acfg()
     first, _, _ = audit_missing_nouns(

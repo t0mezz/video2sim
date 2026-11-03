@@ -73,19 +73,29 @@ def build_audit_prompt(n_tracked: int) -> str:
         "The photo shows physical objects resting on a surface. Each coloured region "
         f"with a white number marks one already-tracked object ({n_tracked} tracked). "
         "Answer with a single JSON object and nothing else, with two keys: "
-        '"missing" (a JSON array with one short singular noun per distinct physical '
-        "object with NO coloured number on it — count identical objects once each; "
-        "leave out the surface, printed boards, sheets and markers, shadows, hands "
-        'and arms; an empty array when everything visible is marked), "uncertain" '
-        "(objects you cannot decide on; they are never re-tracked)."
+        '"missing" (a JSON array with one entry per distinct physical object with '
+        'NO coloured number on it — each entry has "noun" (one short singular noun, '
+        'count identical objects once each) and "near" (the white number closest to '
+        "it, or null when it sits far from every number); leave out the surface, "
+        "printed boards, sheets and markers, shadows, hands and arms; an empty array "
+        'when everything visible is marked), "uncertain" (nouns you cannot decide '
+        "on; they are never re-tracked)."
     )
 
 
-def parse_audit_answer(text: str, denylist: tuple[str, ...]) -> tuple[list[str], list[str]]:
-    """Sanitised missing and uncertain nouns, or empty lists when unreadable.
+@dataclass(frozen=True)
+class AuditHit:
+    """One missing noun with the overlaid label the model saw closest to it."""
 
-    Only nouns from the answer survive, each once and in order; overlong,
-    multi-word and denylisted entries are dropped, like the router nouns.
+    noun: str
+    near: int | None  # nearest white label number, null when far from every label
+
+
+def parse_audit_answer(text: str, denylist: tuple[str, ...]) -> tuple[list[AuditHit], list[str]]:
+    """Sanitised missing hits and uncertain nouns, or empties when unreadable.
+
+    Only well-formed entries survive: a short sanitised noun, each once and in
+    order, with ``near`` kept only when it is an integer label number.
     """
     match = re.search(r"\{.*\}", text, flags=re.DOTALL)
     if match is None:
@@ -95,11 +105,29 @@ def parse_audit_answer(text: str, denylist: tuple[str, ...]) -> tuple[list[str],
         missing, uncertain = raw.get("missing", []), raw.get("uncertain", [])
         if not isinstance(missing, list) or not isinstance(uncertain, list):
             return [], []
-        missing = [str(o).strip().lower() for o in missing]
-        uncertain = [str(o).strip().lower() for o in uncertain]
     except (ValueError, AttributeError, TypeError):
         return [], []
-    return _clean(missing, denylist), _clean(uncertain, denylist)
+    hits: list[AuditHit] = []
+    seen: set[str] = set()
+    for entry in missing:
+        noun, near = _hit(entry, denylist)
+        if noun is not None and noun not in seen:
+            seen.add(noun)
+            hits.append(AuditHit(noun, near))
+    return hits, _clean([str(o).strip().lower() for o in uncertain], denylist)
+
+
+def _hit(entry: object, denylist: tuple[str, ...]) -> tuple[str | None, int | None]:
+    """Sanitised noun and label number of one missing entry, or (None, None)."""
+    if not isinstance(entry, dict):
+        return None, None
+    clean = sanitise_noun(str(entry.get("noun", "")).strip().lower(), denylist)
+    if clean is None:
+        return None, None
+    near = entry.get("near", None)
+    if isinstance(near, bool) or not isinstance(near, int):
+        near = None
+    return clean, near
 
 
 def _clean(nouns: Sequence[str], denylist: tuple[str, ...]) -> list[str]:
@@ -260,7 +288,8 @@ def audit_missing_nouns(
 
     No client (dry run) or an unreadable answer contributes no nouns. Views come
     first from the coverage-selected router frames; frames with none of the kept
-    masks are skipped, so a view always shows something to judge against.
+    masks are skipped, so a view always shows something to judge against. A noun
+    the model cites next to a kept label is already tracked and never re-tracked.
     """
     if not cfg.enabled or client is None or not kept or not view_frames:
         return [], [], []
@@ -283,5 +312,7 @@ def audit_missing_nouns(
     prompt = build_audit_prompt(len(kept))
     parts = [prompt, cache_model(client), *[p.name for p in images]]
     text = cache.get_or_call(parts, lambda: client.ask(prompt, images))
-    missing, uncertain = parse_audit_answer(text, denylist)
+    hits, uncertain = parse_audit_answer(text, denylist)
+    kept_ids = {t.track_id for t in kept}
+    missing = [h.noun for h in hits if h.near not in kept_ids]
     return missing, uncertain, images

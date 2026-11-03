@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
 
 import numpy as np
@@ -12,6 +13,7 @@ from video2sim.models.hosted import parse_sam_text
 from video2sim.schemas import SE3, CameraFrame, Intrinsics, Plane, WorldModel
 from video2sim.stages.gap_fill import (
     GapFillConfig,
+    GapPlan,
     GapRequest,
     box_request,
     inherit_provenance,
@@ -304,6 +306,7 @@ def test_gap_fill_defaults_run_one_audit_capped_round() -> None:
     gcfg = GapFillConfig.from_config(cfg)
     assert gcfg.enabled is True  # S12.9.7: gap fill on; off keeps the stage byte-identical
     assert gcfg.audit.enabled is True and gcfg.audit.n_views >= 1
+    assert gcfg.merge_new_iou <= gcfg.merge_iou
     assert cfg["segmentation"]["router"]["views"]["mode"] == "even"
     from video2sim.stages.scene_router import Route
     from video2sim.stages.segmentation_stage import route_report
@@ -334,3 +337,98 @@ def test_plan_defaults_send_nouns_then_box() -> None:
     assert not plan.send_box and plan.box_prompt is None
     assert plan.nouns == ("mug", "cup")
     assert plan.video_requests == 3  # generic + two nouns, under the cap of 8
+
+
+def _plan(
+    world: WorldModel,
+    blob: NDArray[np.float64],
+    nouns: Sequence[str],
+    clusters: Sequence[NDArray[np.float64]],
+    frames: Sequence[int],
+    order: Sequence[int],
+    vcfg: ViewConfig,
+    gcfg: GapFillConfig,
+    audit: Sequence[str] = (),
+) -> GapPlan:
+    return plan_gap_fill(
+        world,
+        blob,
+        nouns,
+        clusters,
+        frames,
+        order,
+        vcfg,
+        vcfg.cell_m,
+        1,
+        gcfg,
+        audit_nouns=audit,
+    )
+
+
+def test_plan_batches_audit_nouns_into_one_request() -> None:
+    world = _world()
+    gcfg, vcfg = _gcfg(), _vcfg()
+    order = [f.frame_index for f in world.frames]
+    plan = _plan(
+        world,
+        np.zeros((10, 3)),
+        ["mug", "cup"],
+        [],
+        [0, 1],
+        order,
+        vcfg,
+        gcfg,
+        audit=["laptop", "tape dispenser"],
+    )
+    assert plan.audit_nouns == ("laptop", "tape dispenser")
+    assert plan.audit_prompt == "laptop, tape dispenser"
+    assert plan.nouns == ("mug", "cup")
+    assert plan.video_requests == 4  # generic + batch + two nouns, under the cap of 8
+
+
+def test_plan_batch_takes_reserved_budget_first() -> None:
+    world = _world()
+    cfg = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
+    cfg["segmentation"]["tracking"]["gap_fill"]["max_video_requests"] = 2
+    gcfg, vcfg = GapFillConfig.from_config(cfg), _vcfg()
+    order = [f.frame_index for f in world.frames]
+    plan = _plan(
+        world,
+        np.zeros((10, 3)),
+        ["mug"],
+        [],
+        [0, 1],
+        order,
+        vcfg,
+        gcfg,
+        audit=["laptop"],
+    )
+    assert plan.audit_nouns == ("laptop",)
+    assert plan.nouns == () and plan.nouns_dropped == ("mug",)
+    assert plan.video_requests == 2
+
+
+def test_merge_new_tracks_use_the_lower_bar() -> None:
+    cfg = _gcfg()
+    first = _mask(slice(10, 20), slice(10, 20))
+    shifted = _mask(slice(10, 20), slice(14, 24))  # IoU 60/140 against first
+    generic = [_track(0, {0: first, 1: first, 2: first})]
+    noun = _track(1000, {0: shifted, 1: shifted, 2: shifted})
+    box = _track(2000, {0: shifted, 1: shifted, 2: shifted})
+    out = merge_requests(
+        generic,
+        [
+            GapRequest((noun,), "noun", "noun 'laptop'"),
+            GapRequest(
+                (box,),
+                "cluster_box",
+                "unexplained point cluster",
+                ((2000, 0, (14, 10, 23, 19)),),
+            ),
+        ],
+        cfg,
+    )
+    # 0.43 clears merge_new_iou (0.35) but not merge_iou (0.5): the box twin joins
+    # the noun track while the noun track stays separate from the generic one.
+    assert [t.track_id for t in out.tracks] == [0, 1000]
+    assert out.notes[1000] == ("noun 'laptop'", "unexplained point cluster")

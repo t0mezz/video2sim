@@ -48,6 +48,7 @@ FoundBy = Literal["generic", "noun", "cluster_box"]
 
 CLUSTER_ID_BASE = 2000  # box-prompt ids (2000 + cluster index) never collide with tracks
 NOUN_ID_STEP = 1000  # noun request k uses ids offset by 1000 * k
+BATCH_OFFSET = 9000  # the one batched audit-noun request; remapped past the max on collision
 
 
 @dataclass(frozen=True)
@@ -71,6 +72,7 @@ class GapFillConfig:
     cluster: ClusterParams
     audit: OverlayAuditConfig
     merge_iou: float
+    merge_new_iou: float
     part_inclusion: float
     box_mask_min_iou: float
     box_mask_min_fill: float
@@ -95,6 +97,7 @@ class GapFillConfig:
             ),
             audit=OverlayAuditConfig.from_config(cfg),
             merge_iou=float(g["merge_iou"]),
+            merge_new_iou=float(g["merge_new_iou"]),
             part_inclusion=float(g["part_inclusion"]),
             box_mask_min_iou=float(g["box_mask_min_iou"]),
             box_mask_min_fill=float(g["box_mask_min_fill"]),
@@ -111,12 +114,15 @@ class GapFillConfig:
             raise ValueError("bad gap_fill box placement")
         for v in (
             out.merge_iou,
+            out.merge_new_iou,
             out.part_inclusion,
             out.box_mask_min_iou,
             out.box_mask_min_fill,
         ):
             if not 0.0 < v <= 1.0:
                 raise ValueError("gap_fill IoU and fill gates must be in (0, 1]")
+        if out.merge_new_iou > out.merge_iou:
+            raise ValueError("gap_fill merge_new_iou must not clear merge_iou")
         if out.box_mask_max_overfill < out.box_mask_min_fill:
             raise ValueError("gap_fill overfill cap must clear the fill floor")
         return out
@@ -443,12 +449,16 @@ def merge_requests(
 ) -> MergeResult:
     """New tracks merged into the generic set. For a new track T against each existing
     track E over shared frames S: no shared frames (new, the repair and duplicate rules
-    cover it after the fact); 1 or 2 shared frames (same object only if IoU >= merge_iou
+    cover it after the fact); 1 or 2 shared frames (same object only if IoU >= the bar
     on every frame, a part only if containment holds on every frame); 3 or more (median
-    IoU, median containment). Box-found tracks also pass the prompted-box gates. Ids that
+    IoU, median containment). The bar is ``merge_iou`` against a generic track and the
+    lower ``merge_new_iou`` when E is gap-fill new itself: two prompts of one object
+    (a noun and a box) draw different extents, so their masks agree less than two
+    views of one prompt. Box-found tracks also pass the prompted-box gates. Ids that
     still collide are remapped past the maximum in use."""
     existing = list(generic)
-    used = {t.track_id for t in existing}
+    generic_ids = {t.track_id for t in existing}
+    used = set(generic_ids)
     notes: dict[int, list[str]] = {t.track_id: [] for t in existing}
     dropped: dict[int, str] = {}
     remapped: list[tuple[int, int]] = []
@@ -479,15 +489,16 @@ def merge_requests(
                 pairs = _overlaps(track.masks, other.masks)
                 if not pairs:
                     continue
+                bar = cfg.merge_iou if other.track_id in generic_ids else cfg.merge_new_iou
                 ious = [iou for _, iou, _ in pairs]
                 conts = [c for _, _, c in pairs]
                 if len(pairs) >= 3:
-                    if float(np.median(ious)) >= cfg.merge_iou:
+                    if float(np.median(ious)) >= bar:
                         same = other
                         break
                     if float(np.median(conts)) >= cfg.part_inclusion:
                         part = part or other
-                elif all(i >= cfg.merge_iou for i in ious):
+                elif all(i >= bar for i in ious):
                     same = other
                     break
                 elif all(c >= cfg.part_inclusion for c in conts):
@@ -572,6 +583,15 @@ class GapPlan:
     view_frames: list[int]  # frame_index values of the router views
     view_coverage: float  # share of cells the router views see unoccluded
     video_requests: int  # hosted video requests, generic one included
+    audit_nouns: tuple[str, ...] = ()  # batched into one request, after the box request
+    audit_prompt: str | None = None  # the batched concepts, None when not sent
+
+
+def batch_prompt(nouns: Sequence[str]) -> str:
+    """One video prompt for the audit nouns: SAM answers per-object ids anyway, so one
+    request covers them all. Multi-concept prompts are new (9.7); the dev eval (9.8)
+    confirms the hosted model honours every noun."""
+    return ", ".join(nouns)
 
 
 def plan_gap_fill(
@@ -585,10 +605,12 @@ def plan_gap_fill(
     cell_m: float,
     min_views_per_cell: int,
     gcfg: GapFillConfig,
+    audit_nouns: Sequence[str] = (),
 ) -> GapPlan:
     """Which requests a gap-fill round sends. Box prompts go first (probe-verified,
-    geometry-placed); nouns follow in inventory order. Past ``max_video_requests`` the
-    trailing nouns are dropped. Clusters past the 16-object API limit are not prompted."""
+    geometry-placed); the audit nouns follow batched into one request; inventory
+    nouns follow one per request. Past ``max_video_requests`` the trailing nouns
+    are dropped. Clusters past the 16-object API limit are not prompted."""
     visibility, lo, shape = compute_visibility(world, cloud, view_cfg)
     positions = [order.index(f) for f in view_frames if f in order]
     if visibility.shape[1] and positions:
@@ -607,11 +629,16 @@ def plan_gap_fill(
         )
         box_prompt, box_unprompted = prompt, tuple(unprompted)
         box_gated = tuple((tid, frame, box) for tid, (frame, box) in gated.items())
-    budget = gcfg.max_video_requests - 1 - (1 if use_box else 0)
+    use_batch = bool(audit_nouns) and gcfg.max_video_requests >= 2 + (1 if use_box else 0)
+    budget = gcfg.max_video_requests - 1 - (1 if use_box else 0) - (1 if use_batch else 0)
     keep = min(len(nouns), gcfg.max_noun_requests, max(budget, 0))
+    dropped = list(nouns[keep:])
+    batch: tuple[str, ...] = tuple(audit_nouns) if use_batch else ()
+    if audit_nouns and not use_batch:
+        dropped = [*audit_nouns, *dropped]
     return GapPlan(
         nouns=tuple(nouns[:keep]),
-        nouns_dropped=tuple(nouns[keep:]),
+        nouns_dropped=tuple(dropped),
         send_box=use_box,
         box_prompt=box_prompt,
         box_gated=box_gated,
@@ -619,7 +646,9 @@ def plan_gap_fill(
         clusters_total=len(clusters),
         view_frames=list(view_frames),
         view_coverage=coverage,
-        video_requests=1 + keep + (1 if use_box else 0),
+        video_requests=1 + keep + (1 if use_box else 0) + (1 if use_batch else 0),
+        audit_nouns=batch,
+        audit_prompt=batch_prompt(batch) if use_batch else None,
     )
 
 
@@ -658,6 +687,22 @@ def execute_gap_fill(
             GapRequest(tuple(kept_box), "cluster_box", "unexplained point cluster", plan.box_gated)
         )
         records.append({"kind": "cluster_box", "cached": cached, "tracks": len(kept_box)})
+    batch_note = ""
+    if plan.audit_nouns:
+        assert plan.audit_prompt is not None
+        tracks, cached = track_fn(plan.audit_prompt, BATCH_OFFSET)
+        kept_batch, mrep = filter_marker_tracks(tracks, world, run_dir, marker_cfg)
+        marker_dropped += len(mrep.dropped)
+        batch_note = "audit nouns " + ", ".join(f"'{n}'" for n in plan.audit_nouns)
+        requests.append(GapRequest(tuple(kept_batch), "noun", batch_note))
+        records.append(
+            {
+                "kind": "audit_batch",
+                "nouns": list(plan.audit_nouns),
+                "cached": cached,
+                "tracks": len(kept_batch),
+            }
+        )
     for k, noun in enumerate(plan.nouns):
         tracks, cached = track_fn(noun, NOUN_ID_STEP * (k + 1))
         kept_noun, mrep = filter_marker_tracks(tracks, world, run_dir, marker_cfg)
@@ -679,6 +724,8 @@ def execute_gap_fill(
     requested = [r["noun"] for r in records if r["kind"] == "noun"]
     survived = {note for notes in merged.notes.values() for note in notes}
     unmatched = [n for n in requested if f"noun '{n}'" not in survived]
+    if batch_note and batch_note not in survived:
+        unmatched += [n for n in plan.audit_nouns if n not in requested]
     unmatched += [n for n in plan.nouns_dropped if n not in requested]
     recovered = sum(1 for t in second.kept if prov.get(t.track_id, "generic") != "generic")
     discovery = DiscoveryCheck(
@@ -737,6 +784,7 @@ def _origin_note(
 
 
 __all__ = [
+    "BATCH_OFFSET",
     "CLUSTER_ID_BASE",
     "NOUN_ID_STEP",
     "Box",
@@ -747,6 +795,7 @@ __all__ = [
     "GapPlan",
     "GapRequest",
     "MergeResult",
+    "batch_prompt",
     "box_request",
     "execute_gap_fill",
     "fit_pass",

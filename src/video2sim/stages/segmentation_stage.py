@@ -391,9 +391,6 @@ class SegmentationStage:
                         order_all[i] for i in sample_frame_indices(len(order_all), rcfg.n_frames)
                     ]
                 order = [f.frame_index for f in world.frames]
-                if audit_missing:
-                    seen = set(audit_missing)
-                    nouns = [*audit_missing, *(n for n in nouns if n not in seen)]
                 plan = plan_gap_fill(
                     world,
                     cloud,
@@ -405,6 +402,7 @@ class SegmentationStage:
                     rcfg.views.cell_m,
                     rcfg.views.min_views_per_cell,
                     gcfg,
+                    audit_nouns=tuple(audit_missing),
                 )
                 tracking_cache = ResponseCache(work / "tracking_cache")
                 cache_dir = work / "tracking_cache"

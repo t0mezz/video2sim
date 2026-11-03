@@ -120,6 +120,7 @@ segmentation:
         frames_per_cluster: 2  # prompt frames per cluster (API allows 16 objects per request)
         min_azimuth_gap_deg: 25.0  # prompt views must be this far apart around the cluster
       merge_iou: 0.5           # median mask IoU that makes a new track a duplicate
+      merge_new_iou: 0.35      # lower bar when the other track is gap-fill new too: two prompts of one object draw different extents; a guess until tuned on dev
       part_inclusion: 0.9      # containment that makes a new track a part
       box_mask_min_iou: 0.5    # prompted-frame mask IoU with the prompted box, else reject
       box_mask_min_fill: 0.2   # mask fill of the prompted box, else reject
