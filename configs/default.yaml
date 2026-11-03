@@ -55,7 +55,7 @@ vlm:                           # the model behind the router, the material pass 
   temperature: 0               # null leaves it to the server
   extra_body: {}               # merged into every request body, for provider options
   extra_headers: {}
-  roles: {}                    # per-role overrides of any field above, under router, material or mass
+  roles: {}                    # per-role overrides of any field above, under router, material, mass or verify
 
 segmentation:
   sam_backend: null            # "api" or "self_hosted", see PLAN.md decision D-004
@@ -137,6 +137,14 @@ segmentation:
       merge_iou: 0.5           # median mask IoU that makes a new track a duplicate
       merge_new_iou: 0.35      # lower bar when the other track is gap-fill new too: two prompts of one object draw different extents; a guess until tuned on dev
       part_inclusion: 0.9      # containment that makes a new track a part
+    verify:                      # end-of-segmentation coverage check: one VLM look, then noun prompts for missing nouns
+      enabled: true            # session-only: enabled locally after the test.MOV miss; committed default stays off until tuned
+      max_noun_requests: 4     # targeted SAM video requests per scene at most
+      views: 3                 # whole-scene frames with kept-track outlines sent to the VLM
+      max_image_px: 1024       # overlays are downscaled to this long side
+      min_confidence: 0.5      # below this the VLM answer verifies nothing
+      timeout_s: 300           # the VLM call budget, like the router's
+      retries: 3
     repair:                    # 3D identity repair; thresholds are guesses until tuned on dev scenes
       merge_radius_m: 0.05     # tracks with no shared frame whose table footprints are this close are one object
       merge_boundary_gap: 2    # ... or whose closest frames are this far apart with masks overlapping past merge_boundary_iou (a handoff: the id switched away and back)

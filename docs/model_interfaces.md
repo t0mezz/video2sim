@@ -33,7 +33,7 @@ vlm:
   temperature: 0                # null leaves it to the server
   extra_body: {}                # merged into every request body (provider options)
   extra_headers: {}
-  roles: {}                     # per-role overrides: router, material or mass
+  roles: {}                     # per-role overrides: router, material, mass or verify
 ```
 
 - `openai_chat` works with any server that implements OpenAI chat completions with `image_url`

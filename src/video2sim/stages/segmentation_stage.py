@@ -38,7 +38,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from video2sim.models.hosted import ResponseCache
-from video2sim.models.vlm import make_vlm_client
+from video2sim.models.vlm import VlmClient, make_vlm_client
 from video2sim.runner import StageContext
 from video2sim.schemas import (
     DiscoveryCheck,
@@ -100,6 +100,7 @@ from video2sim.stages.tracking import (
     track_objects,
     tracking_is_cached,
 )
+from video2sim.stages.verify_coverage import VerifyConfig, execute_verify
 
 F64 = NDArray[np.float64]
 
@@ -112,15 +113,18 @@ class SegmentationClients:
     router: RouterClient | None
     tracking: VideoSamClient
     material: MaterialClient | None
+    verify: VlmClient | None = None
 
 
 def default_clients(cfg: dict[str, Any]) -> SegmentationClients:
     """Clients for the hosted APIs. Keys come from the environment or ``.env``."""
     router, material = RouterConfig.from_config(cfg), MaterialConfig.from_config(cfg)
+    verify = VerifyConfig.from_config(cfg)
     return SegmentationClients(
         make_vlm_client(cfg, router.timeout_s, router.retries, "router"),
         make_tracking_client(cfg),
         make_vlm_client(cfg, material.timeout_s, material.retries, "material"),
+        make_vlm_client(cfg, verify.timeout_s, verify.retries, "verify"),
     )
 
 
@@ -620,6 +624,71 @@ class SegmentationStage:
                 gap_flag_reasons = {int(k): v for k, v in gap_notes["flag_reasons"].items()}
                 for note in gap_notes["report_lines"]:
                     ctx.report(note)
+        vcfg = VerifyConfig.from_config(cfg)
+        if vcfg.enabled:
+            # Coverage verification: one VLM look over whole-scene views with
+            # the kept tracks outlined, then noun prompts for listed nouns the
+            # VLM still sees untracked. Survivors join the kept tracks below.
+            order = [f.frame_index for f in world.frames]
+            verify_positions = sample_frame_indices(len(order), vcfg.views)
+            verify_cache = ResponseCache(work / "tracking_cache")
+            verify_clip = work / "tracking_work" / "clip.mp4"
+            if not verify_clip.is_file():
+                verify_clip.parent.mkdir(parents=True, exist_ok=True)
+                encode_clip(
+                    [ctx.run_dir / f.image_path for f in world.frames],
+                    tcfg.fps,
+                    verify_clip,
+                )
+
+            def verify_track_fn(prompt: str, offset: int) -> tuple[list[Track], bool]:
+                rtcfg = replace(tcfg, prompt=prompt)
+                cached = tracking_is_cached(world, ctx.run_dir, verify_cache, rtcfg)
+                tracks = track_objects(
+                    world,
+                    ctx.run_dir,
+                    clients.tracking,
+                    verify_cache,
+                    rtcfg,
+                    work / "tracking_work",
+                    clip_path=verify_clip,
+                )
+                return offset_tracks(tracks, offset), cached
+
+            verify_listed = (
+                [i.noun for i in route.inventory] if route.inventory else list(route.objects)
+            )
+            final, discovery, verify_notes, prov, vreasons, verify_new = execute_verify(
+                world,
+                ctx.run_dir,
+                list(final.kept),
+                list(dict.fromkeys(verify_listed)),
+                vcfg,
+                gcfg,
+                lift_cfg,
+                prim_cfg,
+                RepairConfig.from_config(cfg),
+                marker_cfg,
+                cloud,
+                poses,
+                verify_track_fn,
+                final,
+                discovery,
+                prov,
+                verify_positions,
+                clients.verify,
+                ResponseCache(work / "verify_cache"),
+                work / "verify_views",
+                rcfg.noun_denylist,
+                tag_detect,
+            )
+            all_tracks.extend(verify_new)
+            gap_flag_reasons.update({int(k): v for k, v in vreasons.items()})
+            summary["verify"] = verify_notes
+            for note in verify_notes["report_lines"]:
+                ctx.report(note)
+            for flag in verify_notes["scene_flags"]:
+                scene_flags.append(flag)
         kept = final.kept
         drops = drop_reasons(first, final, {t.track_id for t in kept})
         for track_id, reason in drops.items():
