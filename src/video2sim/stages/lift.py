@@ -368,34 +368,44 @@ def lift_tracks(
     voxels: dict[int, int] = {}
     top_layer = shape[2] - 1
     tall_rows: list[int] = []
+    tall_low_cells: dict[int, I64] = {}
     for row, track in enumerate(tracks):
         member = np.nonzero((ratio[row] >= agree[row]) & (best == row))[0]
         if member.size == 0:
             dropped[track.track_id] = "no voxel is inside the mask in enough views"
             continue
         cells = np.stack(np.unravel_index(member, shape), axis=1).astype(np.int64)
+        raw_cells = cells
         keep = _largest_component(cells)
         member, cells = member[keep], cells[keep]
         if len(member) < minvox[row]:
             dropped[track.track_id] = f"only {len(member)} voxels agree"
         elif int(np.max(cells[:, 2])) >= top_layer:
             tall_rows.append(row)  # decided on the tall grid below
+            tall_low_cells[row] = raw_cells  # reused below; the tall vote covers the rest
         else:
             clusters[track.track_id] = centers[member]
             voxels[track.track_id] = len(member)
     if tall_rows:
-        # Second pass, paid only when something reaches the first pass: the same vote on
-        # a taller grid over the same footprint, so a tall object can show its cap.
+        # Second pass, paid only when something reaches the first pass. The layers below
+        # the first-pass top reuse that vote; only the layers above it are re-voted, on
+        # the same footprint, so a tall object can show its cap.
         tall_centers, tall_shape = _grid(xy, world.table_plane, cfg, cfg.tall_height_m)
-        tall_ratio, tall_best = _vote(tall_centers, tracks, world, cfg, views)
+        nx, ny, nz = tall_shape
+        low_layers = shape[2]
+        high_centers = tall_centers.reshape(nx, ny, nz, 3)[:, :, low_layers:, :].reshape(-1, 3)
+        tall_ratio, tall_best = _vote(high_centers, tracks, world, cfg, views)
         tall_top = tall_shape[2] - 1
         for row in tall_rows:
             track = tracks[row]
-            member = np.nonzero((tall_ratio[row] >= agree[row]) & (tall_best == row))[0]
+            pos = np.nonzero((tall_ratio[row] >= agree[row]) & (tall_best == row))[0]
+            hx, hy, hz = np.unravel_index(pos, (nx, ny, nz - low_layers))
+            high_cells = np.stack((hx, hy, hz + low_layers), axis=1).astype(np.int64)
+            cells = np.concatenate((tall_low_cells[row], high_cells))
+            member = (cells[:, 0] * ny + cells[:, 1]) * nz + cells[:, 2]
             if member.size == 0:
                 dropped[track.track_id] = "no voxel is inside the mask in enough views"
                 continue
-            cells = np.stack(np.unravel_index(member, tall_shape), axis=1).astype(np.int64)
             keep = _largest_component(cells)
             member, cells = member[keep], cells[keep]
             if len(member) < minvox[row]:

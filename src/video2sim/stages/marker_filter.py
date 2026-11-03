@@ -64,6 +64,25 @@ class MarkerFilterReport:
     dropped: Mapping[int, str]  # track id -> reason
 
 
+def cached_tag_detector(family: str, detect: TagDetector | None = None) -> TagDetector:
+    """A tag detector that reads each frame file at most once.
+
+    One stage run checks the same frames in the marker filter, in every
+    gap-fill request's marker filter and in the board check; the frames do
+    not change during a run, so callers share one of these instead of
+    re-detecting (and re-decoding) every frame for every check.
+    """
+    base = detect or (lambda p: _detect_file(p, family))
+    cache: dict[Path, Detections] = {}
+
+    def detect_once(path: Path) -> Detections:
+        if path not in cache:
+            cache[path] = base(path)
+        return cache[path]
+
+    return detect_once
+
+
 def tag_mask(corners: Sequence[F64], shape: tuple[int, int], erode_px: int) -> BoolMask:
     """Filled tag quads on a ``shape`` canvas, each shrunk by ``erode_px`` pixels."""
     import cv2

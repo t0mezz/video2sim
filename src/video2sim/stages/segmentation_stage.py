@@ -50,6 +50,7 @@ from video2sim.schemas import (
 )
 from video2sim.stages.depth_flags import DepthConfig, depth_signals, judge
 from video2sim.stages.gap_fill import (
+    FitPass,
     FoundBy,
     GapFillConfig,
     execute_gap_fill,
@@ -60,7 +61,11 @@ from video2sim.stages.gap_fill import (
 )
 from video2sim.stages.keyframes import KeyframeChoice, KeyframeConfig, keyframes_for_tracks
 from video2sim.stages.lift import LiftConfig, load_points
-from video2sim.stages.marker_filter import MarkerFilterConfig, filter_marker_tracks
+from video2sim.stages.marker_filter import (
+    MarkerFilterConfig,
+    cached_tag_detector,
+    filter_marker_tracks,
+)
 from video2sim.stages.material_pass import (
     MaterialClient,
     MaterialConfig,
@@ -163,6 +168,18 @@ def repaired_ids(report: RepairReport) -> set[int]:
     ids = {i for _, parts in report.splits for i in parts}
     ids |= {min(group) for group in report.merges}
     return ids
+
+
+def drop_reasons(first: FitPass, final: FitPass, kept_ids: set[int]) -> dict[int, str]:
+    """Every dropped track's reason, first pass and gap-fill pass, by track id.
+
+    A track the first pass dropped is not in the second pass's drops, and gap
+    fill only receives the first pass's kept tracks, so reporting only the
+    final pass would drop those tracks quietly. A track that ends up kept
+    (recovered under the same id) is not reported as dropped.
+    """
+    merged = {**first.drops, **final.drops}
+    return {tid: merged[tid] for tid in sorted(merged) if tid not in kept_ids}
 
 
 def object_flags(
@@ -319,7 +336,8 @@ class SegmentationStage:
             work / "tracking_work",
         )
         all_tracks = list(raw)
-        raw, marker_report = filter_marker_tracks(raw, world, ctx.run_dir, marker_cfg)
+        tag_detect = cached_tag_detector(marker_cfg.family)
+        raw, marker_report = filter_marker_tracks(raw, world, ctx.run_dir, marker_cfg, tag_detect)
         for track_id, reason in marker_report.dropped.items():
             scene_flags.append(f"track {track_id} dropped as a marker: {reason}")
             ctx.report(f"dropped track {track_id}: marker ({reason})")
@@ -352,6 +370,7 @@ class SegmentationStage:
                 gcfg.cluster,
                 lift_cfg.table_margin_m,
                 lift_cfg.max_height_m,
+                tag_detect,
             )
             audit_missing: list[str] = []
             audit_uncertain: list[str] = []
@@ -436,6 +455,8 @@ class SegmentationStage:
                     shortfall,
                     listed,
                     track_fn,
+                    first=first,
+                    detect=tag_detect,
                 )
                 gap_notes["audit_missing"] = audit_missing
                 gap_notes["audit_uncertain"] = audit_uncertain
@@ -444,7 +465,8 @@ class SegmentationStage:
                 for note in gap_notes["report_lines"]:
                     ctx.report(note)
         kept = final.kept
-        for track_id, reason in final.drops.items():
+        drops = drop_reasons(first, final, {t.track_id for t in kept})
+        for track_id, reason in drops.items():
             scene_flags.append(f"track {track_id} dropped: {reason}")
             ctx.report(f"dropped track {track_id}: {reason}")
         if gcfg.enabled and gcfg.audit.save_video:
@@ -455,8 +477,8 @@ class SegmentationStage:
             for tid in sorted(by_id):
                 if tid in marker_report.dropped:
                     notes[tid] = f"marker: {marker_report.dropped[tid]}"
-                elif tid in final.drops:
-                    notes[tid] = str(final.drops[tid])
+                elif tid in drops:
+                    notes[tid] = drops[tid]
                 else:
                     notes[tid] = "kept"
             preview = ctx.out_dir / "tracks_preview.mp4"

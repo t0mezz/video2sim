@@ -131,6 +131,26 @@ def test_a_tall_box_is_kept_when_it_caps_below_the_tall_grid() -> None:
     assert np.max(clusters[0][:, 2]) <= 0.5 + 0.02
 
 
+def test_the_tall_pass_only_votes_above_the_first_pass(monkeypatch: Any) -> None:
+    from video2sim.stages import lift as lift_module
+
+    world = _world(radius=1.2, height=1.0, tz=0.3)
+    tall = replace(CFG, max_height_m=0.2, tall_height_m=0.6)
+    voted: list[np.ndarray[Any, Any]] = []
+    real_vote = lift_module._vote
+
+    def spy(centers: Any, tracks: Any, w: Any, cfg: Any, views: Any) -> Any:
+        voted.append(np.asarray(centers))
+        return real_vote(centers, tracks, w, cfg, views)
+
+    monkeypatch.setattr(lift_module, "_vote", spy)
+    size = (0.08, 0.06, 0.5)
+    clusters, report = lift_tracks([Track(0, _box_masks(world, size, (0.0, 0.0)))], world, tall)
+    assert 0 in clusters, report.dropped
+    assert len(voted) == 2
+    assert float(voted[1][:, 2].min()) >= tall.max_height_m
+
+
 def test_a_column_through_the_tall_grid_is_dropped_as_background() -> None:
     world = _world(radius=1.2, height=1.0, tz=0.3)
     tall = replace(CFG, max_height_m=0.2, tall_height_m=0.6)

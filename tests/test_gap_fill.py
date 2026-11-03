@@ -12,16 +12,25 @@ from numpy.typing import NDArray
 from video2sim.models.hosted import parse_sam_text
 from video2sim.schemas import SE3, CameraFrame, Intrinsics, Plane, WorldModel
 from video2sim.stages.gap_fill import (
+    CLUSTER_ID_BASE,
+    NOUN_ID_BASE,
+    NOUN_ID_STEP,
+    FitPass,
     GapFillConfig,
     GapPlan,
     GapRequest,
     box_request,
+    execute_gap_fill,
     inherit_provenance,
     merge_requests,
     offset_tracks,
     plan_gap_fill,
     unexplained_clusters,
 )
+from video2sim.stages.lift import LiftConfig
+from video2sim.stages.marker_filter import MarkerFilterConfig
+from video2sim.stages.primitive_fit import PrimitiveConfig
+from video2sim.stages.track_repair import RepairConfig
 from video2sim.stages.tracking import Track
 from video2sim.stages.view_select import ViewConfig
 
@@ -301,11 +310,12 @@ def test_plan_caps_requests_and_reports_coverage() -> None:
     assert 0.0 <= plan.view_coverage <= 1.0
 
 
-def test_gap_fill_defaults_run_one_audit_capped_round() -> None:
+def test_gap_fill_defaults_off_until_dev_evaluation() -> None:
     cfg = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
     gcfg = GapFillConfig.from_config(cfg)
-    assert gcfg.enabled is True  # S12.9.7: gap fill on; off keeps the stage byte-identical
-    assert gcfg.audit.enabled is True and gcfg.audit.n_views >= 1
+    # PLAN.md 9.6/9.9: defaults off until 9.8 evaluates and 9.9 decides them.
+    assert gcfg.enabled is False  # off keeps the stage byte-identical
+    assert gcfg.audit.enabled is False and gcfg.audit.n_views >= 1
     assert gcfg.merge_new_iou <= gcfg.merge_iou
     assert cfg["segmentation"]["router"]["views"]["mode"] == "even"
     from video2sim.stages.scene_router import Route
@@ -432,3 +442,72 @@ def test_merge_new_tracks_use_the_lower_bar() -> None:
     # the noun track while the noun track stays separate from the generic one.
     assert [t.track_id for t in out.tracks] == [0, 1000]
     assert out.notes[1000] == ("noun 'laptop'", "unexplained point cluster")
+
+
+def test_board_check_detects_tags_once_per_frame_for_all_clusters() -> None:
+    world = _world()
+    rng = np.random.default_rng(4)
+    blob_a = rng.normal([0.5, 0.0, 0.05], 0.005, (40, 3))
+    blob_b = rng.normal([-0.5, 0.0, 0.05], 0.005, (40, 3))
+    cloud = np.concatenate([blob_a, blob_b])
+    cfg = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
+    gcfg = GapFillConfig.from_config(cfg)
+    calls: list[str] = []
+
+    def detect(path: Path) -> tuple[dict[int, NDArray[np.float64]], tuple[int, int]]:
+        calls.append(path.name)
+        return {}, (48, 64)
+
+    out = unexplained_clusters(
+        world, cloud, {}, Path("/none"), "aruco", gcfg.cluster, 0.003, 0.35, detect=detect
+    )
+    assert len(out) == 2
+    assert sorted(calls) == [f"{i:05d}.png" for i in range(4)]
+
+
+def test_execute_reuses_first_pass_when_no_new_track_survives(tmp_path: Path) -> None:
+    world = _world()
+    cfg = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
+    generic = _track(0, {0: _mask(slice(10, 20), slice(10, 20))})
+    first = FitPass([generic], {0: np.zeros((3, 3))}, {}, {}, {7: "only 3 voxels agree"})
+    plan = GapPlan(
+        nouns=("mug", "cup"),
+        nouns_dropped=(),
+        send_box=False,
+        box_prompt=None,
+        box_gated=(),
+        box_unprompted=(),
+        clusters_total=0,
+        view_frames=[0, 1],
+        view_coverage=0.0,
+        video_requests=3,
+    )
+    offsets: list[int] = []
+
+    def track_fn(prompt: str, offset: int) -> tuple[list[Track], bool]:
+        offsets.append(offset)
+        return [], False
+
+    second, discovery, _, prov = execute_gap_fill(
+        world,
+        tmp_path,
+        plan,
+        _gcfg(),
+        LiftConfig.from_config(cfg),
+        PrimitiveConfig.from_config(cfg),
+        RepairConfig.from_config(cfg),
+        MarkerFilterConfig.from_config(cfg),
+        np.zeros((3, 3)),
+        {f.frame_index: f.T_world_from_camera for f in world.frames},
+        [generic],
+        shortfall=2,
+        listed=3,
+        track_fn=track_fn,
+        first=first,
+    )
+    assert second is first
+    assert discovery.tracked == 1 and discovery.recovered == 0
+    assert prov == {0: "generic"}
+    # Noun ids live in their own range, clear of the box-prompt ids.
+    assert offsets == [NOUN_ID_BASE, NOUN_ID_BASE + NOUN_ID_STEP]
+    assert not (CLUSTER_ID_BASE <= offsets[-1] < CLUSTER_ID_BASE + 1000)

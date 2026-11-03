@@ -24,10 +24,10 @@ from numpy.typing import NDArray
 from video2sim.models.sam_prompts import ObjectPrompt, build_object_prompt
 from video2sim.schemas import SE3, DiscoveryCheck, WorldModel
 from video2sim.stages.lift import MIN_DEPTH_M, LiftConfig, _pixels, lift_points, lift_tracks
-from video2sim.stages.marker_detection import detect_tags
 from video2sim.stages.marker_filter import (
     MarkerFilterConfig,
     TagDetector,
+    cached_tag_detector,
     filter_marker_tracks,
     tag_mask,
 )
@@ -46,9 +46,10 @@ F64 = NDArray[np.float64]
 Box = tuple[int, int, int, int]  # inclusive x1, y1, x2, y2 in media pixels
 FoundBy = Literal["generic", "noun", "cluster_box"]
 
-CLUSTER_ID_BASE = 2000  # box-prompt ids (2000 + cluster index) never collide with tracks
-NOUN_ID_STEP = 1000  # noun request k uses ids offset by 1000 * k
-BATCH_OFFSET = 9000  # the one batched audit-noun request; remapped past the max on collision
+CLUSTER_ID_BASE = 2000  # box-prompt ids: 2000 + cluster index (at most 16 clusters)
+NOUN_ID_BASE = 10000  # noun requests: NOUN_ID_BASE + NOUN_ID_STEP * k; clear of the box ids
+NOUN_ID_STEP = 1000  # per-request stride; a request returns far fewer tracks than this
+BATCH_OFFSET = 90000  # the one batched audit-noun request; clear of box and noun ids
 
 
 @dataclass(frozen=True)
@@ -147,7 +148,7 @@ class MergeResult:
 
 
 def offset_tracks(tracks: Sequence[Track], offset: int) -> list[Track]:
-    """Tracks with ids shifted so requests never collide (1000 * k, 2000 + cluster)."""
+    """Tracks with ids shifted so requests never collide (see the id bases above)."""
     return [Track(t.track_id + offset, dict(t.masks)) for t in tracks]
 
 
@@ -192,7 +193,7 @@ def is_board_cluster(
     the printed board or a tag, not an object. ``detect`` defaults to OpenCV; tests inject."""
     if not len(points):
         return False
-    detect_fn = detect or (lambda p: _detect_file(p, family))
+    detect_fn = detect or cached_tag_detector(family)
     k = world.intrinsics
     for frame in world.frames:
         corners, (height, width) = detect_fn(run_dir / frame.image_path)
@@ -212,16 +213,6 @@ def is_board_cluster(
         ):
             return True
     return False
-
-
-def _detect_file(path: Path, family: str) -> tuple[dict[int, F64], tuple[int, int]]:
-    """Tag corners of one frame file, as ``filter_marker_tracks`` reads them."""
-    import cv2  # heavy import, kept out of module import time
-
-    gray: Any = cv2.imread(str(path), cv2.IMREAD_GRAYSCALE)
-    if gray is None:
-        raise ValueError(f"cannot read {path}")
-    return detect_tags(gray, family), (int(gray.shape[0]), int(gray.shape[1]))
 
 
 def unexplained_clusters(
@@ -261,10 +252,11 @@ def unexplained_clusters(
             float(cloud[cand[g]].mean(axis=0)[1]),
         )
     )
+    detect_once = cached_tag_detector(family, detect)
     out = []
     for group in groups:
         points = np.asarray(cloud[cand[group]], dtype=np.float64)
-        if not is_board_cluster(points, world, run_dir, family, detect):
+        if not is_board_cluster(points, world, run_dir, family, detect_once):
             out.append(points)
     return out
 
@@ -540,7 +532,7 @@ class FitPass:
     hulls: Mapping[int, F64]
     sparse: Mapping[int, F64]
     fits: Mapping[int, FitResult]
-    drops: dict[int, str]  # track id -> message suffix after "track {id} "
+    drops: dict[int, str]  # track id -> bare reason; the stage adds "track {id} dropped:"
 
 
 def fit_pass(
@@ -551,11 +543,11 @@ def fit_pass(
     cloud: F64,
 ) -> FitPass:
     """Repair-then-lift-and-fit block, run once on the generic tracks and, after gap fill,
-    again on the union. Drop messages match the stage's historical wording."""
+    again on the union."""
     hulls, hull_report = lift_tracks(tracks, world, lift_cfg)
     kept = [t for t in tracks if t.track_id in hulls]
     drops = {
-        t.track_id: f"dropped: {hull_report.dropped.get(t.track_id, 'no point cluster')}"
+        t.track_id: hull_report.dropped.get(t.track_id, "no point cluster")
         for t in tracks
         if t.track_id not in hulls
     }
@@ -565,7 +557,7 @@ def fit_pass(
     for i in dups:
         fits.pop(i, None)
     kept = [t for t in kept if t.track_id not in dups]
-    drops.update({i: f"dropped as a {reason}" for i, reason in dups.items()})
+    drops.update(dups)
     return FitPass(kept, hulls, sparse, fits, drops)
 
 
@@ -667,21 +659,27 @@ def execute_gap_fill(
     shortfall: int,
     listed: int,
     track_fn: Callable[[str, int], tuple[list[Track], bool]],
+    first: FitPass | None = None,
+    detect: TagDetector | None = None,
 ) -> tuple[FitPass, DiscoveryCheck, dict[str, Any], dict[int, FoundBy]]:
     """Send the planned requests, merge, and run the lift-and-fit block on the union.
 
     ``track_fn(prompt, offset)`` sends one video request and returns its tracks with ids
     shifted plus whether the answer came from the response cache. Returns the second fit
     pass, the discovery audit, the ``route.json`` gap section (counts and names only, no
-    arrays) and found-by per union track id.
+    arrays) and found-by per union track id. When no new track survives the merge and
+    ``first`` (the generic tracks' fit pass) is given, it is returned as-is instead of
+    paying for the same lift-and-fit again. Tag detection is shared across every
+    marker filter here, one detection per frame.
     """
+    detect_once = cached_tag_detector(marker_cfg.family, detect)
     requests: list[GapRequest] = []
     records: list[dict[str, Any]] = []
     marker_dropped = 0
     if plan.send_box:
         assert plan.box_prompt is not None
         tracks, cached = track_fn(plan.box_prompt, 0)
-        kept_box, mrep = filter_marker_tracks(tracks, world, run_dir, marker_cfg)
+        kept_box, mrep = filter_marker_tracks(tracks, world, run_dir, marker_cfg, detect_once)
         marker_dropped += len(mrep.dropped)
         requests.append(
             GapRequest(tuple(kept_box), "cluster_box", "unexplained point cluster", plan.box_gated)
@@ -691,7 +689,7 @@ def execute_gap_fill(
     if plan.audit_nouns:
         assert plan.audit_prompt is not None
         tracks, cached = track_fn(plan.audit_prompt, BATCH_OFFSET)
-        kept_batch, mrep = filter_marker_tracks(tracks, world, run_dir, marker_cfg)
+        kept_batch, mrep = filter_marker_tracks(tracks, world, run_dir, marker_cfg, detect_once)
         marker_dropped += len(mrep.dropped)
         batch_note = "audit nouns " + ", ".join(f"'{n}'" for n in plan.audit_nouns)
         requests.append(GapRequest(tuple(kept_batch), "noun", batch_note))
@@ -704,8 +702,8 @@ def execute_gap_fill(
             }
         )
     for k, noun in enumerate(plan.nouns):
-        tracks, cached = track_fn(noun, NOUN_ID_STEP * (k + 1))
-        kept_noun, mrep = filter_marker_tracks(tracks, world, run_dir, marker_cfg)
+        tracks, cached = track_fn(noun, NOUN_ID_BASE + NOUN_ID_STEP * k)
+        kept_noun, mrep = filter_marker_tracks(tracks, world, run_dir, marker_cfg, detect_once)
         marker_dropped += len(mrep.dropped)
         requests.append(GapRequest(tuple(kept_noun), "noun", f"noun '{noun}'"))
         records.append({"kind": "noun", "noun": noun, "cached": cached, "tracks": len(kept_noun)})
@@ -720,7 +718,11 @@ def execute_gap_fill(
         merged.tracks, poses, world.intrinsics, world.table_plane, repair_cfg
     )
     prov = inherit_provenance(prov, report)
-    second = fit_pass(repaired, world, lift_cfg, prim_cfg, cloud)
+    generic_ids = {t.track_id for t in generic_kept}
+    if first is not None and not ({t.track_id for t in merged.tracks} - generic_ids):
+        second = first  # no new track survived: the union lift-and-fit would repeat this
+    else:
+        second = fit_pass(repaired, world, lift_cfg, prim_cfg, cloud)
     requested = [r["noun"] for r in records if r["kind"] == "noun"]
     survived = {note for notes in merged.notes.values() for note in notes}
     unmatched = [n for n in requested if f"noun '{n}'" not in survived]
@@ -786,6 +788,7 @@ def _origin_note(
 __all__ = [
     "BATCH_OFFSET",
     "CLUSTER_ID_BASE",
+    "NOUN_ID_BASE",
     "NOUN_ID_STEP",
     "Box",
     "ClusterParams",

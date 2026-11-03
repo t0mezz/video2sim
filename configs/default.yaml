@@ -108,7 +108,7 @@ segmentation:
       min_hit_frames: 2        # a track is dropped with at least this many hit frames ...
       min_hit_fraction: 0.2    # ... and this share of its frames where a tag was detected
     gap_fill:                  # S12.9: one gap-fill round after tracking (9.6); guesses until tuned on dev
-      enabled: true            # one gap-fill round after tracking; off keeps the stage byte-identical
+      enabled: false           # off until the 9.8 dev evaluation decides defaults (9.9); off keeps the stage byte-identical
       max_rounds: 1            # rounds per scene; only 1 is implemented
       max_noun_requests: 6     # one video request per distinct inventory noun, most first
       max_video_requests: 8    # hosted video requests per scene, generic one included
@@ -126,7 +126,7 @@ segmentation:
       box_mask_min_fill: 0.2   # mask fill of the prompted box, else reject
       box_mask_max_overfill: 1.5  # mask area over box area, else reject
       overlay_audit:               # 9.7: VLM check of the kept overlays for untracked objects
-        enabled: true            # audit nouns head the gap-fill noun requests
+        enabled: false           # off until the 9.8 dev evaluation decides defaults (9.9)
         n_views: 2               # labeled router views sent to the model; guesses until tuned on dev
         save_video: true         # every track over every frame, as tracks_preview.mp4 in the stage folder
     repair:                    # 3D identity repair; thresholds are guesses until tuned on dev scenes
