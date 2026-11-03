@@ -11,7 +11,7 @@ do not tangle with a spinner, and adds the run id and the cache keys. Standard l
 
 With ``runs_root`` a finished stage (``done`` or ``cached``) gains up to two summary lines read
 from that stage's own ``output.json`` and its sidecars: frame counts, the router's path, proxy
-fallbacks, mass sources. Each summary line starts with an arrow (``⇾`` on UTF-8 streams,
+fallbacks, mass sources. Each summary line starts with an arrow (``↳`` on UTF-8 streams,
 ``->`` elsewhere) in the spinner/checkmark column. A missing or unreadable file means
 no summary lines, never an error,
 so dry runs and foreign folders stay quiet.
@@ -303,7 +303,7 @@ class ProgressReporter:
         # as the gray switch for live lines below.
         self._color = bool(self._mark)
         self._frames = _BRAILLE if encoding.startswith("utf") else _ASCII
-        self._arrow = "⇾ " if encoding.startswith("utf") else "-> "
+        self._arrow = "↳ " if encoding.startswith("utf") else "-> "
         self._lock = threading.Lock()
         # Serializes spinner transitions (halt/resume) across the runner thread and
         # stage worker threads reporting live lines. Reentrant: _halt/_resume below
@@ -340,7 +340,7 @@ class ProgressReporter:
     def _report_summaries(self, event: StageEvent) -> None:
         """Summary lines for a finished stage, read from its own outputs when known.
 
-        Each line gets an arrow marker (``⇾`` on UTF-8 streams, ``->`` elsewhere)
+        Each line gets an arrow marker (``↳`` on UTF-8 streams, ``->`` elsewhere)
         in the spinner/checkmark column, so summaries stand out from live lines
         and result lines.
         """
