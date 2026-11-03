@@ -166,6 +166,23 @@ class LiftReport:
     dropped: Mapping[int, str]
 
 
+@dataclass(frozen=True)
+class PointVote:
+    """Per-point best mask agreement over the tracks (step 1 of the residual design).
+
+    ``best_ratio[i]`` is ``max_t h_t(p_i) / s_t(p_i)`` over tracks that saw point
+    ``i`` in at least ``min_views`` views (0 when no track qualifies),
+    ``best_track[i]`` is the winning track id (-1 for none) and ``best_seen[i]``
+    is that track's view count. A point is explained when ``best_ratio`` clears
+    the explain threshold and ``best_seen`` clears ``min_views``; the vote is a
+    by-product of the lift, so it costs nothing extra.
+    """
+
+    best_ratio: F64
+    best_track: I64
+    best_seen: I64
+
+
 def _grid(
     centers_xy: F64, plane: Plane, cfg: LiftConfig, height_m: float
 ) -> tuple[F64, tuple[int, int, int]]:
@@ -481,17 +498,14 @@ def load_points(path: Path) -> F64:
     return np.asarray(cloud.vertices, dtype=np.float64)
 
 
-def lift_points(
+def point_vote(
     tracks: Sequence[Track], world: WorldModel, points: F64, cfg: LiftConfig
-) -> tuple[dict[int, F64], LiftReport]:
-    """The second lift: sparse SfM points that the masks agree on, per track id.
+) -> PointVote:
+    """Best per-point agreement ratio over ``tracks`` and the winning track id.
 
-    Each point was triangulated from image features, so it lies on a visible surface. It is
-    kept for the track whose mask holds it in at least ``min_agreement`` of the views that
-    see it, with the same view rules as ``lift_tracks``. There is no volume, so the box of a
-    cluster follows the visible faces, but a plain or glossy object may have few points or
-    none, and a point in front of the object's edge can pass the vote (there is no occlusion
-    test). Each cluster goes through ``trim_extremes`` to drop stray points.
+    For each point and track, ``s`` counts the views where the track has a mask
+    and the point projects inside the frame, ``h`` those where the mask also
+    covers it; the ratio is ``h / s`` and is zeroed when ``s < min_views``.
     """
     k = world.intrinsics
     views = _views(world, cfg)
@@ -515,21 +529,52 @@ def lift_points(
             seen[row] += ok
             hits[row] += ok & mask[vi, ui]
     ratio = np.where(seen >= cfg.min_views, hits / np.maximum(seen, 1), 0.0)
-    if len(tracks) == 0:
-        return {}, LiftReport(len(views), {}, {})
+    if len(tracks) == 0 or len(points) == 0:
+        return PointVote(
+            np.zeros(len(points)),
+            np.full(len(points), -1, dtype=np.int64),
+            np.zeros(len(points), dtype=np.int64),
+        )
     best = ratio.argmax(axis=0)
+    rows = np.arange(len(points))
+    return PointVote(
+        best_ratio=np.asarray(ratio[best, rows], dtype=np.float64),
+        best_track=np.array([tracks[int(b)].track_id for b in best], dtype=np.int64),
+        best_seen=np.asarray(seen[best, rows], dtype=np.int64),
+    )
+
+
+def lift_points(
+    tracks: Sequence[Track], world: WorldModel, points: F64, cfg: LiftConfig
+) -> tuple[dict[int, F64], LiftReport, PointVote]:
+    """The second lift: sparse SfM points that the masks agree on, per track id.
+
+    Each point was triangulated from image features, so it lies on a visible surface. It is
+    kept for the track whose mask holds it in at least ``min_agreement`` of the views that
+    see it, with the same view rules as ``lift_tracks``. There is no volume, so the box of a
+    cluster follows the visible faces, but a plain or glossy object may have few points or
+    none, and a point in front of the object's edge can pass the vote (there is no occlusion
+    test). Each cluster goes through ``trim_extremes`` to drop stray points.
+
+    Also returns the per-point vote (best ratio and winning track) that the
+    residual-cluster step uses to decide which points are already explained.
+    """
+    vote = point_vote(tracks, world, points, cfg)
+    views = _views(world, cfg)
+    if len(tracks) == 0:
+        return {}, LiftReport(len(views), {}, {}), vote
     height = points[:, 2] - world.table_plane.offset_m
-    usable = (ratio.max(axis=0) >= cfg.min_agreement) & (height > cfg.table_margin_m)
+    usable = (vote.best_ratio >= cfg.min_agreement) & (height > cfg.table_margin_m)
     usable &= height < cfg.tall_height_m
     clusters: dict[int, F64] = {}
     dropped: dict[int, str] = {}
     counts: dict[int, int] = {}
-    for row, track in enumerate(tracks):
-        voted = points[usable & (best == row)]
+    for track in tracks:
+        voted = points[usable & (vote.best_track == track.track_id)]
         chosen = trim_extremes(voted, cfg.trim_points_per_side, cfg.min_points)
         if len(chosen) < cfg.min_points:
             dropped[track.track_id] = f"only {len(chosen)} sparse points agree"
         else:
             clusters[track.track_id] = chosen
             counts[track.track_id] = len(chosen)
-    return clusters, LiftReport(len(views), counts, dropped)
+    return clusters, LiftReport(len(views), counts, dropped), vote

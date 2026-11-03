@@ -23,7 +23,14 @@ from numpy.typing import NDArray
 
 from video2sim.models.sam_prompts import ObjectPrompt, build_object_prompt
 from video2sim.schemas import SE3, DiscoveryCheck, WorldModel
-from video2sim.stages.lift import MIN_DEPTH_M, LiftConfig, _pixels, lift_points, lift_tracks
+from video2sim.stages.lift import (
+    MIN_DEPTH_M,
+    LiftConfig,
+    PointVote,
+    _pixels,
+    lift_points,
+    lift_tracks,
+)
 from video2sim.stages.marker_filter import (
     MarkerFilterConfig,
     TagDetector,
@@ -173,6 +180,180 @@ def _near_any(points: F64, kept: Sequence[F64], dist_m: float) -> NDArray[np.boo
         if near.all():
             break
     return near
+
+
+@dataclass(frozen=True)
+class ResidualParams:
+    """Thresholds of the residual-cluster step (steps 1-3); guesses until tuned on dev.
+
+    The stage reads these from ``gap_fill.cluster_check`` (see
+    ``ClusterCheckConfig``); the defaults here only serve tests and callers
+    that build the params directly.
+    """
+
+    explain_ratio: float = 0.5  # tau_explain: best vote at or above this explains a point
+    min_views: int = 5  # the winning track must have seen the point this often
+    radius_m: float = 0.03  # connected-component link distance
+    min_points: int = 12  # smaller groups are noise
+    table_cell_m: float = 0.05  # grid cell of the table-region flood fill
+    table_dilate_m: float = 0.10  # the table region grows by this much
+    board_margin_m: float = 0.02  # the board footprint grows by this much
+
+
+def table_region(
+    points: F64, world: WorldModel, table_margin_m: float, cell_m: float, dilate_m: float
+) -> NDArray[np.bool_]:
+    """Per-point membership in the table region.
+
+    Points within ``table_margin_m`` of the table plane are gridded in XY;
+    the connected occupied piece that contains the world origin (which sits
+    on the reference tag) is the table, widened by ``dilate_m``. A wall or a
+    far desk at table height forms its own piece and never joins, so its
+    points are outside. With no near-plane point at all, nothing is inside.
+    """
+    from scipy import ndimage  # type: ignore[import-untyped]  # heavy import
+
+    inside = np.zeros(len(points), dtype=bool)
+    if not len(points) or cell_m <= 0:
+        return inside
+    plane_n = np.array(world.table_plane.normal, dtype=np.float64)
+    heights = points @ plane_n - float(world.table_plane.offset_m)
+    near = np.nonzero(np.abs(heights) <= table_margin_m)[0]
+    if not len(near):
+        return inside
+    xy = points[near, :2]
+    lo = np.minimum(xy.min(axis=0), np.array([0.0, 0.0]))
+    cells = ((xy - lo) / cell_m).astype(np.int64)
+    origin = ((np.array([0.0, 0.0]) - lo) / cell_m).astype(np.int64)
+    shape = tuple((cells.max(axis=0) + 2).tolist())
+    grid = np.zeros(shape, dtype=bool)
+    grid[cells[:, 0], cells[:, 1]] = True
+    labels, _ = ndimage.label(grid, structure=np.ones((3, 3), dtype=int))
+    home = int(labels[origin[0], origin[1]])
+    if home == 0:  # no table point under the origin: take the nearest piece
+        occupied = np.argwhere(grid)
+        dist = np.sum((occupied - origin) ** 2, axis=1)
+        home = int(labels[tuple(occupied[int(np.argmin(dist))])])
+    piece = labels == home
+    steps = int(np.ceil(dilate_m / cell_m)) if dilate_m > 0 else 0
+    if steps:
+        piece = ndimage.binary_dilation(piece, iterations=steps)
+    all_cells = ((points[:, :2] - lo) / cell_m).astype(np.int64)
+    ok = (
+        (all_cells[:, 0] >= 0)
+        & (all_cells[:, 0] < piece.shape[0])
+        & (all_cells[:, 1] >= 0)
+        & (all_cells[:, 1] < piece.shape[1])
+    )
+    inside[ok] = piece[all_cells[ok, 0], all_cells[ok, 1]]
+    return inside
+
+
+def board_hull(
+    world: WorldModel,
+    run_dir: Path,
+    family: str,
+    detect: TagDetector | None = None,
+) -> F64 | None:
+    """Convex hull (XY, ordered) of the triangulated tag corners, or None.
+
+    Each detected corner is back-projected (pinhole, distortion ignored: a
+    corner is a few pixels of error at most) and intersected with the table
+    plane, so the footprint follows the printed board even on a clean board
+    whose layout is unknown. ``detect`` is the shared once-per-frame detector
+    of fix 3. None when no tag corner could be triangulated; the caller then
+    skips the board test and records a flag.
+    """
+    detect_fn = detect or cached_tag_detector(family)
+    k = world.intrinsics
+    plane_n = np.array(world.table_plane.normal, dtype=np.float64)
+    plane_d = float(world.table_plane.offset_m)
+    corners_world: list[F64] = []
+    for frame in world.frames:
+        corners, (height, width) = detect_fn(run_dir / frame.image_path)
+        if not corners:
+            continue
+        pose = frame.T_world_from_camera.to_numpy()
+        rot, center = pose[:3, :3], pose[:3, 3]
+        for quad in corners.values():
+            scaled = np.asarray(quad, dtype=np.float64) * np.array(
+                [k.width_px / width, k.height_px / height]
+            )
+            for u, v in scaled:
+                ray_cam = np.array([(u - k.cx) / k.fx, (v - k.cy) / k.fy, 1.0])
+                ray = rot @ ray_cam
+                denom = float(plane_n @ ray)
+                if abs(denom) < 1e-9:
+                    continue
+                s = (plane_d - float(plane_n @ center)) / denom
+                if s <= 0:
+                    continue
+                corners_world.append((center + s * ray)[None, :])
+    if len(corners_world) < 3:
+        return None
+    pts = np.concatenate(corners_world)[:, :2]
+    if float(np.ptp(pts[:, 0])) < 1e-6 or float(np.ptp(pts[:, 1])) < 1e-6:
+        return None
+    from scipy.spatial import ConvexHull  # heavy import, scipy is untyped here
+
+    hull = ConvexHull(pts)
+    return np.asarray(pts[hull.vertices], dtype=np.float64)
+
+
+def outside_board(points: F64, hull: F64 | None, margin_m: float) -> NDArray[np.bool_]:
+    """True for points further than ``margin_m`` outside the board hull (all True if None)."""
+    if hull is None or not len(points):
+        return np.ones(len(points), dtype=bool)
+    import cv2  # heavy import, kept out of module import time
+
+    out = np.empty(len(points), dtype=bool)
+    for i, p in enumerate(points):
+        dist = cv2.pointPolygonTest(
+            np.asarray(hull, dtype=np.float32), (float(p[0]), float(p[1])), True
+        )
+        out[i] = dist < -margin_m
+    return out
+
+
+def residual_clusters(
+    world: WorldModel,
+    cloud: F64,
+    vote: PointVote,
+    params: ResidualParams,
+    table_margin_m: float,
+    max_height_m: float,
+    hull: F64 | None,
+) -> list[F64]:
+    """Point groups no kept track explains (step 3), largest first.
+
+    A point is residual when its best vote is under ``explain_ratio`` (or its
+    winning track saw it in fewer than ``min_views`` views), it sits between
+    ``table_margin_m`` and ``max_height_m`` above the plane, over the table
+    region and outside the board footprint. Groups come from the KD-tree
+    grouping of ``track_repair._groups``; ties break by centroid x then y, so
+    the order is deterministic. This replaces ``unexplained_clusters``,
+    ``_near_any`` and ``is_board_cluster`` in the wired stage.
+    """
+    if not len(cloud):
+        return []
+    plane_n = np.array(world.table_plane.normal, dtype=np.float64)
+    heights = cloud @ plane_n - float(world.table_plane.offset_m)
+    explained = (vote.best_ratio >= params.explain_ratio) & (vote.best_seen >= params.min_views)
+    cand = np.nonzero(
+        ~explained
+        & (heights >= table_margin_m)
+        & (heights <= max_height_m)
+        & table_region(cloud, world, table_margin_m, params.table_cell_m, params.table_dilate_m)
+        & outside_board(cloud, hull, params.board_margin_m)
+    )[0]
+    if not len(cand):
+        return []
+    pts = np.asarray(cloud[cand], dtype=np.float64)
+    groups = [g for g in _groups(pts, params.radius_m) if len(g) >= params.min_points]
+    groups.sort(
+        key=lambda g: (-len(g), float(pts[g].mean(axis=0)[0]), float(pts[g].mean(axis=0)[1]))
+    )
+    return [pts[g] for g in groups]
 
 
 def _project(points: F64, pose: F64, k: Any) -> tuple[F64, F64, NDArray[np.bool_]]:
@@ -571,6 +752,7 @@ class FitPass:
     sparse: Mapping[int, F64]
     fits: Mapping[int, FitResult]
     drops: dict[int, str]  # track id -> bare reason; the stage adds "track {id} dropped:"
+    vote: PointVote | None = None  # per-point vote over the cloud, for residual clusters
 
 
 def fit_pass(
@@ -589,14 +771,14 @@ def fit_pass(
         for t in tracks
         if t.track_id not in hulls
     }
-    sparse, _ = lift_points(kept, world, cloud, lift_cfg)
+    sparse, _, vote = lift_points(kept, world, cloud, lift_cfg)
     fits = fit_clusters(kept, sparse, world, lift_cfg, prim_cfg)
     dups = drop_duplicate_fits(fits, {t.track_id: t for t in kept}, prim_cfg)
     for i in dups:
         fits.pop(i, None)
     kept = [t for t in kept if t.track_id not in dups]
     drops.update(dups)
-    return FitPass(kept, hulls, sparse, fits, drops)
+    return FitPass(kept, hulls, sparse, fits, drops, vote)
 
 
 @dataclass(frozen=True)
@@ -875,7 +1057,9 @@ __all__ = [
     "GapPlan",
     "GapRequest",
     "MergeResult",
+    "ResidualParams",
     "batch_prompt",
+    "board_hull",
     "box_request",
     "execute_gap_fill",
     "fit_pass",
@@ -883,7 +1067,10 @@ __all__ = [
     "is_board_cluster",
     "merge_requests",
     "offset_tracks",
+    "outside_board",
     "pick_prompt_frames",
     "plan_gap_fill",
+    "residual_clusters",
+    "table_region",
     "unexplained_clusters",
 ]

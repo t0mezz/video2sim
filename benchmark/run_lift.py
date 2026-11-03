@@ -130,7 +130,7 @@ def main() -> None:
         hull_s = time.perf_counter() - started
         started = time.perf_counter()
         cloud = load_points(run_dir / world.point_cloud_path)
-        points, points_report = lift_points(tracks, world, cloud, lcfg)
+        points, points_report, _vote = lift_points(tracks, world, cloud, lcfg)
         points_s = time.perf_counter() - started
         started = time.perf_counter()
         fits = fit_clusters(tracks, points, world, lcfg, pcfg)

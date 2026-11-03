@@ -20,15 +20,19 @@ from video2sim.stages.gap_fill import (
     GapFillConfig,
     GapPlan,
     GapRequest,
+    ResidualParams,
+    board_hull,
     box_request,
     execute_gap_fill,
     inherit_provenance,
     merge_requests,
     offset_tracks,
     plan_gap_fill,
+    residual_clusters,
+    table_region,
     unexplained_clusters,
 )
-from video2sim.stages.lift import LiftConfig
+from video2sim.stages.lift import LiftConfig, PointVote
 from video2sim.stages.marker_filter import MarkerFilterConfig
 from video2sim.stages.primitive_fit import PrimitiveConfig
 from video2sim.stages.track_repair import RepairConfig
@@ -226,6 +230,61 @@ def test_unexplained_clusters_split_explained_and_noise() -> None:
     )
     assert len(out) == 1
     assert abs(out[0][:, 0].mean() - 0.5) < 0.05
+
+
+def _vote(n: int, explained: slice) -> PointVote:
+    ratio = np.zeros(n)
+    ratio[explained] = 0.9
+    seen = np.full(n, 10, dtype=np.int64)
+    track = np.where(ratio >= 0.5, 0, -1).astype(np.int64)
+    return PointVote(ratio, track, seen)
+
+
+def test_table_region_keeps_only_the_origin_table() -> None:
+    world = _world()
+    rng = np.random.default_rng(7)
+    table = rng.uniform([-0.1, -0.1, 0.0], [0.1, 0.1, 0.001], (40, 3))
+    desk = rng.uniform([1.9, -0.1, 0.0], [2.1, 0.1, 0.001], (40, 3))  # far desk at table height
+    wall = rng.uniform([2.0, 0.5, 0.0], [2.0, 0.6, 0.3], (20, 3))
+    cloud = np.concatenate([table, desk, wall])
+    inside = table_region(cloud, world, 0.003, 0.05, 0.10)
+    assert inside[:40].all()
+    assert not inside[40:].any()
+
+
+def test_residual_clusters_two_blobs_explained_wall_board() -> None:
+    world = _world()
+    rng = np.random.default_rng(8)
+    # Table surface around the origin so the table region forms.
+    table = rng.uniform([-0.15, -0.15, 0.0], [0.15, 0.15, 0.001], (60, 3))
+    blob_a = rng.normal([0.10, 0.0, 0.05], 0.004, (30, 3))
+    blob_b = rng.normal([-0.10, 0.05, 0.05], 0.004, (25, 3))
+    explained_blob = rng.normal([0.0, -0.10, 0.05], 0.004, (30, 3))
+    wall = rng.uniform([2.0, 0.0, 0.05], [2.0, 0.2, 0.06], (30, 3))
+    board_blob = rng.normal([0.0, 0.0, 0.01], 0.002, (20, 3))  # inside the tag hull below
+    cloud = np.concatenate([table, blob_a, blob_b, explained_blob, wall, board_blob])
+    n_table = len(table)
+    vote = _vote(len(cloud), slice(n_table + 55, n_table + 85))  # the explained blob
+    hull = np.array([[-0.05, -0.05], [0.05, -0.05], [0.05, 0.05], [-0.05, 0.05]])
+    out = residual_clusters(world, cloud, vote, ResidualParams(min_points=12), 0.003, 0.35, hull)
+    assert len(out) == 2
+    centers = sorted(float(c[:, 0].mean()) for c in out)
+    assert abs(centers[0] - -0.10) < 0.03 and abs(centers[1] - 0.10) < 0.03
+
+
+def test_board_hull_triangulates_tag_corners() -> None:
+    world = _world(n=1)
+
+    def tags(_: Path) -> tuple[dict[int, NDArray[np.float64]], tuple[int, int]]:
+        quad = np.array([[10.0, 10.0], [54.0, 10.0], [54.0, 38.0], [10.0, 38.0]])
+        return {0: quad}, (48, 64)
+
+    hull = board_hull(world, Path("/none"), "aruco", detect=tags)
+    assert hull is not None
+    # u=10..54, v=10..38 at fx=50, cx=32, cy=24 from z=1: x in [-0.44, 0.44], y in [-0.28, 0.28].
+    assert abs(float(hull[:, 0].min()) - -0.44) < 0.02
+    assert abs(float(hull[:, 0].max()) - 0.44) < 0.02
+    assert board_hull(world, Path("/none"), "aruco", detect=lambda p: ({}, (48, 64))) is None
 
 
 def test_board_clusters_are_not_unexplained() -> None:

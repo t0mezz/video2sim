@@ -287,7 +287,7 @@ def test_voted_points_follow_the_surface_and_leave_out_the_table() -> None:
     table = np.array([[0.02, 0.0, 0.001], [0.0, 0.02, 0.0]])  # under table_margin_m
     far = np.array([[0.15, 0.15, 0.03]])  # on the table, outside every mask
     cloud = np.concatenate([box, table, far])
-    clusters, report = lift_points(
+    clusters, report, _vote = lift_points(
         [Track(4, _box_masks(world, size, (0.0, 0.0)))], world, cloud, CFG
     )
     assert report.dropped == {}
@@ -301,12 +301,29 @@ def test_voted_points_follow_the_surface_and_leave_out_the_table() -> None:
     assert np.all(_extent(kept) <= np.array(size) + 1e-9)
 
 
+def test_point_vote_names_the_explaining_track() -> None:
+    world = _world()
+    size = (0.08, 0.06, 0.05)
+    box = _surface_points(size, (0.0, 0.0))
+    far = np.array([[0.15, 0.15, 0.03]])
+    cloud = np.concatenate([box, far])
+    _, _, vote = lift_points([Track(4, _box_masks(world, size, (0.0, 0.0)))], world, cloud, CFG)
+    inside = vote.best_ratio[: len(box)]
+    # Surface points are explained by track 4; the far table point by nothing.
+    assert float(np.median(inside)) >= 0.5
+    assert np.all(vote.best_track[: len(box)][inside >= 0.5] == 4)
+    assert vote.best_ratio[-1] == 0.0
+    assert vote.best_seen[-1] >= CFG.min_views  # seen, just never inside a mask
+
+
 def test_points_of_a_track_seen_in_one_view_are_dropped() -> None:
     world = _world()
     size = (0.05, 0.05, 0.05)
     masks = _box_masks(world, size, (0.0, 0.0))
     cloud = _surface_points(size, (0.0, 0.0))
-    clusters, report = lift_points([Track(0, masks), Track(1, {0: masks[0]})], world, cloud, CFG)
+    clusters, report, _vote = lift_points(
+        [Track(0, masks), Track(1, {0: masks[0]})], world, cloud, CFG
+    )
     assert 0 in clusters and 1 not in clusters
     assert "sparse points" in report.dropped[1]
 
@@ -347,8 +364,8 @@ def test_lift_points_trims_each_cluster() -> None:
     size = (0.08, 0.06, 0.05)
     cloud = np.concatenate([_surface_points(size, (0.0, 0.0)), [[0.0, 0.0, 0.07]]])
     masks = _box_masks(world, size, (0.0, 0.0))
-    untrimmed, _ = lift_points([Track(4, masks)], world, cloud, CFG)
-    trimmed, _ = lift_points(
+    untrimmed, _, _v1 = lift_points([Track(4, masks)], world, cloud, CFG)
+    trimmed, _, _v2 = lift_points(
         [Track(4, masks)], world, cloud, LiftConfig(**{**CFG.__dict__, "trim_points_per_side": 2})
     )
     assert len(trimmed[4]) == len(untrimmed[4]) - 12
