@@ -98,7 +98,7 @@ def test_prompt_names_the_tracked_count() -> None:
 
 def test_parse_missing_and_uncertain() -> None:
     text = (
-        '{"missing": [{"noun": "Laptop", "near": null}, {"noun": "bead", "near": 5}], '
+        '{"missing": [{"noun": "Laptop", "covered_by": null}, {"noun": "bead", "covered_by": 5}], '
         '"uncertain": ["shadow"]}'
     )
     missing, uncertain = parse_audit_answer(text, ("table",))
@@ -108,10 +108,10 @@ def test_parse_missing_and_uncertain() -> None:
 
 def test_parse_drops_denied_duplicates_and_garbage() -> None:
     text = (
-        '{"missing": [{"noun": "table", "near": null}, '
-        '{"noun": "red shiny laptop computer pro max", "near": null}, '
-        '{"noun": "bead", "near": "5"}, {"noun": "bead", "near": null}, '
-        '{"noun": "", "near": null}, "bead", {"near": 2}], "uncertain": []}'
+        '{"missing": [{"noun": "table", "covered_by": null}, '
+        '{"noun": "red shiny laptop computer pro max", "covered_by": null}, '
+        '{"noun": "bead", "covered_by": "5"}, {"noun": "bead", "covered_by": null}, '
+        '{"noun": "", "covered_by": null}, "bead", {"covered_by": 2}], "uncertain": []}'
     )
     missing, _ = parse_audit_answer(text, ("table",))
     assert missing == [AuditHit("bead", None)]
@@ -154,7 +154,9 @@ def test_audit_names_the_uncovered_noun(tmp_path: Path) -> None:
         Track(2, {0: _mask(slice(4, 12), slice(4, 12)), 1: _mask(slice(4, 12), slice(4, 12))}),
         Track(5, {0: _mask(slice(20, 30), slice(40, 50))}),
     ]
-    client = FakeAuditClient('{"missing": [{"noun": "laptop", "near": null}], "uncertain": []}')
+    client = FakeAuditClient(
+        '{"missing": [{"noun": "laptop", "covered_by": null}], "uncertain": []}'
+    )
     cache = ResponseCache(tmp_path / "cache")
     missing, uncertain, images = audit_missing_nouns(
         world, tmp_path, kept, (0, 1, 2), _acfg(), (), client, cache, tmp_path / "work"
@@ -177,15 +179,16 @@ def test_audit_skips_frames_without_masks(tmp_path: Path) -> None:
     assert [p.name for p in images] == ["audit_00002.png"]
 
 
-def test_audit_drops_nouns_cited_next_to_kept_labels(tmp_path: Path) -> None:
+def test_audit_drops_only_nouns_covered_by_a_kept_label(tmp_path: Path) -> None:
     world = _world(tmp_path)
     kept = [
         Track(2, {0: _mask(slice(4, 12), slice(4, 12))}),
         Track(5, {0: _mask(slice(20, 30), slice(40, 50))}),
     ]
     client = FakeAuditClient(
-        '{"missing": [{"noun": "glasses", "near": 5}, {"noun": "laptop", "near": null}, '
-        '{"noun": "bead", "near": 9}], "uncertain": []}'
+        '{"missing": [{"noun": "glasses", "covered_by": 5}, '
+        '{"noun": "laptop", "covered_by": null}, '
+        '{"noun": "bead", "covered_by": 9}], "uncertain": []}'
     )
     cache = ResponseCache(tmp_path / "cache")
     missing, _, _ = audit_missing_nouns(
@@ -206,7 +209,9 @@ def test_audit_without_client_names_nothing(tmp_path: Path) -> None:
 def test_audit_answer_is_cached(tmp_path: Path) -> None:
     world = _world(tmp_path)
     kept = [Track(2, {0: _mask(slice(4, 12), slice(4, 12))})]
-    client = FakeAuditClient('{"missing": [{"noun": "laptop", "near": null}], "uncertain": []}')
+    client = FakeAuditClient(
+        '{"missing": [{"noun": "laptop", "covered_by": null}], "uncertain": []}'
+    )
     cache = ResponseCache(tmp_path / "cache")
     cfg = _acfg()
     first, _, _ = audit_missing_nouns(
@@ -217,6 +222,64 @@ def test_audit_answer_is_cached(tmp_path: Path) -> None:
     )
     assert (first, second) == (["laptop"], ["laptop"])
     assert client.calls == 1
+
+
+def test_render_downscales_before_drawing(tmp_path: Path) -> None:
+    frame = tmp_path / "big.png"
+    cv2.imwrite(str(frame), np.full((96, 128, 3), 128, dtype=np.uint8))
+    out = tmp_path / "audit.png"
+    drawn = render_audit_view(frame, {2: _mask(slice(4, 12), slice(4, 12))}, out, max_image_px=32)
+    rendered = cv2.imread(str(out))
+    assert drawn == [2]
+    assert rendered is not None and rendered.shape == (24, 32, 3)
+
+
+def test_audit_failure_names_nothing_and_does_not_raise(tmp_path: Path) -> None:
+    world = _world(tmp_path)
+    kept = [Track(2, {0: _mask(slice(4, 12), slice(4, 12))})]
+
+    class FailingClient:
+        model = "fake-audit"
+
+        def ask(self, prompt: str, images: Sequence[Path]) -> str:
+            raise RuntimeError("provider down")
+
+    missing, uncertain, images = audit_missing_nouns(
+        world,
+        tmp_path,
+        kept,
+        (0,),
+        _acfg(),
+        (),
+        FailingClient(),
+        ResponseCache(tmp_path / "cache"),
+        tmp_path / "work",
+    )
+    assert missing == [] and uncertain == [] and len(images) == 1
+
+
+def test_audit_cache_keys_on_rendered_bytes_not_file_names(tmp_path: Path) -> None:
+    world = _world(tmp_path)
+    cache = ResponseCache(tmp_path / "cache")
+    cfg = _acfg()
+    first_client = FakeAuditClient(
+        '{"missing": [{"noun": "laptop", "covered_by": null}], "uncertain": []}'
+    )
+    kept_a = [Track(2, {0: _mask(slice(4, 12), slice(4, 12))})]
+    first, _, _ = audit_missing_nouns(
+        world, tmp_path, kept_a, (0,), cfg, (), first_client, cache, tmp_path / "w"
+    )
+    # Same output file name and prompt, but the overlay moved: a name key
+    # would serve the first answer without calling again.
+    second_client = FakeAuditClient(
+        '{"missing": [{"noun": "bead", "covered_by": null}], "uncertain": []}'
+    )
+    kept_b = [Track(2, {0: _mask(slice(30, 40), slice(40, 55))})]
+    second, _, _ = audit_missing_nouns(
+        world, tmp_path, kept_b, (0,), cfg, (), second_client, cache, tmp_path / "w"
+    )
+    assert first == ["laptop"] and second == ["bead"]
+    assert first_client.calls == 1 and second_client.calls == 1
 
 
 def test_audit_config_defaults_off() -> None:

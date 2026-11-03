@@ -95,8 +95,10 @@ from video2sim.stages.tracking import (
     Track,
     TrackingConfig,
     VideoSamClient,
+    encode_clip,
     make_tracking_client,
     track_objects,
+    tracking_is_cached,
 )
 
 F64 = NDArray[np.float64]
@@ -357,10 +359,16 @@ class SegmentationStage:
         prov: dict[int, FoundBy] = {t.track_id: "generic" for t in first.kept}
         gap_flag_reasons: dict[int, str] = {}
         if gcfg.enabled:
-            kept_points = {
-                t.track_id: first.sparse.get(t.track_id, first.hulls[t.track_id])
-                for t in first.kept
-            }
+            kept_points = {}
+            for t in first.kept:
+                # Hull plus sparse points: the trimmed sparse set alone leaves
+                # the hull's edges looking unexplained.
+                parts = [
+                    p
+                    for p in (first.sparse.get(t.track_id), first.hulls[t.track_id])
+                    if p is not None and len(p)
+                ]
+                kept_points[t.track_id] = np.concatenate(parts) if len(parts) > 1 else parts[0]
             clusters = unexplained_clusters(
                 world,
                 cloud,
@@ -422,13 +430,23 @@ class SegmentationStage:
                     rcfg.views.min_views_per_cell,
                     gcfg,
                     audit_nouns=tuple(audit_missing),
+                    shortfall=shortfall,
                 )
                 tracking_cache = ResponseCache(work / "tracking_cache")
-                cache_dir = work / "tracking_cache"
+                # One clip for every gap-fill request: the generic request
+                # already encoded it, unless its answer was cached.
+                clip_path = work / "tracking_work" / "clip.mp4"
+                if not clip_path.is_file():
+                    clip_path.parent.mkdir(parents=True, exist_ok=True)
+                    encode_clip(
+                        [ctx.run_dir / f.image_path for f in world.frames],
+                        tcfg.fps,
+                        clip_path,
+                    )
 
                 def track_fn(prompt: str, offset: int) -> tuple[list[Track], bool]:
-                    before = {p.name for p in cache_dir.glob("*.txt")}
                     rtcfg = replace(tcfg, prompt=prompt)
+                    cached = tracking_is_cached(world, ctx.run_dir, tracking_cache, rtcfg)
                     tracks = track_objects(
                         world,
                         ctx.run_dir,
@@ -436,8 +454,8 @@ class SegmentationStage:
                         tracking_cache,
                         rtcfg,
                         work / "tracking_work",
+                        clip_path=clip_path,
                     )
-                    cached = not ({p.name for p in cache_dir.glob("*.txt")} - before)
                     return offset_tracks(tracks, offset), cached
 
                 final, discovery, gap_notes, prov = execute_gap_fill(

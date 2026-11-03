@@ -60,6 +60,7 @@ class ClusterParams:
     box_pad_px: int
     frames_per_cluster: int
     min_azimuth_gap_deg: float
+    area_margin_m: float = 0.5  # XY distance from a kept track that bounds candidates
 
 
 @dataclass(frozen=True)
@@ -70,6 +71,7 @@ class GapFillConfig:
     max_rounds: int
     max_noun_requests: int
     max_video_requests: int
+    max_workers: int
     cluster: ClusterParams
     audit: OverlayAuditConfig
     merge_iou: float
@@ -88,6 +90,7 @@ class GapFillConfig:
             max_rounds=int(g["max_rounds"]),
             max_noun_requests=int(g["max_noun_requests"]),
             max_video_requests=int(g["max_video_requests"]),
+            max_workers=int(g.get("max_workers", 4)),
             cluster=ClusterParams(
                 radius_m=float(c["radius_m"]),
                 min_points=int(c["min_points"]),
@@ -95,6 +98,7 @@ class GapFillConfig:
                 box_pad_px=int(c["box_pad_px"]),
                 frames_per_cluster=int(c["frames_per_cluster"]),
                 min_azimuth_gap_deg=float(c["min_azimuth_gap_deg"]),
+                area_margin_m=float(c.get("area_margin_m", 0.5)),
             ),
             audit=OverlayAuditConfig.from_config(cfg),
             merge_iou=float(g["merge_iou"]),
@@ -106,10 +110,10 @@ class GapFillConfig:
         )
         if out.max_rounds != 1:
             raise ValueError("only one gap-fill round is implemented")
-        if out.max_noun_requests < 0 or out.max_video_requests < 1:
+        if out.max_noun_requests < 0 or out.max_video_requests < 1 or out.max_workers < 1:
             raise ValueError("bad gap_fill request caps")
         cc = out.cluster
-        if cc.radius_m <= 0 or cc.min_points < 1 or cc.explained_dist_m < 0:
+        if cc.radius_m <= 0 or cc.min_points < 1 or cc.explained_dist_m < 0 or cc.area_margin_m < 0:
             raise ValueError("bad gap_fill cluster grouping")
         if cc.box_pad_px < 0 or cc.frames_per_cluster < 1 or cc.min_azimuth_gap_deg < 0:
             raise ValueError("bad gap_fill box placement")
@@ -153,15 +157,19 @@ def offset_tracks(tracks: Sequence[Track], offset: int) -> list[Track]:
 
 
 def _near_any(points: F64, kept: Sequence[F64], dist_m: float) -> NDArray[np.bool_]:
-    """Points within ``dist_m`` of any kept-cluster point, in chunks."""
+    """Points within ``dist_m`` of any kept-cluster point (KD-tree per cluster)."""
+    from scipy.spatial import cKDTree  # type: ignore[import-untyped]  # heavy import
+
     near = np.zeros(len(points), dtype=bool)
+    if not len(points):
+        return near
     for cluster in kept:
         if not len(cluster):
             continue
-        for start in range(0, len(points), 4096):
-            block = points[start : start + 4096]
-            d = np.linalg.norm(block[:, None, :] - cluster[None, :, :], axis=2)
-            near[start : start + 4096] |= d.min(axis=1) <= dist_m
+        dist, _ = cKDTree(np.asarray(cluster, dtype=np.float64)).query(
+            np.asarray(points, dtype=np.float64), k=1, distance_upper_bound=dist_m
+        )
+        near |= dist <= dist_m
         if near.all():
             break
     return near
@@ -227,15 +235,24 @@ def unexplained_clusters(
     detect: TagDetector | None = None,
 ) -> list[F64]:
     """Above-table point groups no kept track explains, largest first (ties by centroid x
-    then y). Points within ``explained_dist_m`` of a kept cluster, inside the marker board
-    footprint, or in groups below ``min_points`` are not unexplained."""
+    then y). Points within ``explained_dist_m`` of a kept cluster, further than
+    ``area_margin_m`` (XY) from every kept track, inside the marker board
+    footprint, or in groups below ``min_points`` are not unexplained. With no
+    kept track there is no area to bound to, so every group counts."""
     plane_n = np.array(world.table_plane.normal, dtype=np.float64)
     plane_d = float(world.table_plane.offset_m)
     heights = cloud @ plane_n - plane_d
+    kept_list = [p for p in kept.values() if len(p)]
+    in_area = (
+        _near_any(cloud[:, :2], [p[:, :2] for p in kept_list], cluster_cfg.area_margin_m)
+        if kept_list
+        else np.ones(len(cloud), dtype=bool)
+    )
     cand = np.nonzero(
         (heights >= table_margin_m)
         & (heights <= max_height_m)
-        & ~_near_any(cloud, list(kept.values()), cluster_cfg.explained_dist_m)
+        & in_area
+        & ~_near_any(cloud, kept_list, cluster_cfg.explained_dist_m)
     )[0]
     if not len(cand):
         return []
@@ -300,6 +317,46 @@ def _frame_box(
     return clamped, point
 
 
+def _azimuths(world: WorldModel, centroid: F64) -> NDArray[np.float64]:
+    """Camera azimuth around a point, per clip position."""
+    return np.array(
+        [
+            np.arctan2(
+                f.T_world_from_camera.to_numpy()[1, 3] - centroid[1],
+                f.T_world_from_camera.to_numpy()[0, 3] - centroid[0],
+            )
+            for f in world.frames
+        ]
+    )
+
+
+def _far_enough(
+    pos: int, placed: Sequence[int], azimuth: NDArray[np.float64], gap_deg: float
+) -> bool:
+    return all(
+        abs((azimuth[pos] - azimuth[q] + np.pi) % (2 * np.pi) - np.pi) >= np.deg2rad(gap_deg)
+        for q in placed
+    )
+
+
+def _ranked_positions(
+    world: WorldModel,
+    visibility: NDArray[np.bool_],
+    grid: tuple[F64, tuple[int, int]],
+    cell_m: float,
+    points: F64,
+) -> list[int]:
+    """Clip positions by visible share of the cluster's cells, best first."""
+    lo, shape = grid
+    idx = ((points[:, :2] - lo) / cell_m).astype(int)
+    ok = (idx[:, 0] >= 0) & (idx[:, 0] < shape[0]) & (idx[:, 1] >= 0) & (idx[:, 1] < shape[1])
+    cells = np.unique(idx[ok, 1] * shape[0] + idx[ok, 0])
+    if not len(cells):
+        return []
+    share = visibility[:, cells].mean(axis=1)
+    return sorted(range(len(world.frames)), key=lambda p: (-share[p], p))
+
+
 def pick_prompt_frames(
     world: WorldModel,
     visibility: NDArray[np.bool_],
@@ -311,30 +368,10 @@ def pick_prompt_frames(
 ) -> list[int]:
     """Clip positions prompting one cluster: largest visible share of its cells first, each
     at least ``min_gap_deg`` of azimuth apart around the cluster centroid."""
-    lo, shape = grid
-    idx = ((points[:, :2] - lo) / cell_m).astype(int)
-    ok = (idx[:, 0] >= 0) & (idx[:, 0] < shape[0]) & (idx[:, 1] >= 0) & (idx[:, 1] < shape[1])
-    cells = np.unique(idx[ok, 1] * shape[0] + idx[ok, 0])
-    if not len(cells):
-        return []
-    share = visibility[:, cells].mean(axis=1)
-    centroid = np.median(points, axis=0)
-    azimuth = np.array(
-        [
-            np.arctan2(
-                f.T_world_from_camera.to_numpy()[1, 3] - centroid[1],
-                f.T_world_from_camera.to_numpy()[0, 3] - centroid[0],
-            )
-            for f in world.frames
-        ]
-    )
+    azimuth = _azimuths(world, np.median(points, axis=0))
     picked: list[int] = []
-    for pos in sorted(range(len(world.frames)), key=lambda p: (-share[p], p)):
-        if all(
-            abs((azimuth[pos] - azimuth[q] + np.pi) % (2 * np.pi) - np.pi)
-            >= np.deg2rad(min_gap_deg)
-            for q in picked
-        ):
+    for pos in _ranked_positions(world, visibility, grid, cell_m, points):
+        if _far_enough(pos, picked, azimuth, min_gap_deg):
             picked.append(pos)
         if len(picked) >= n_frames:
             break
@@ -360,15 +397,15 @@ def box_request(
     unprompted: list[int] = []
     for index, points in enumerate(clusters):
         track_id = first_id + index
-        for pos in pick_prompt_frames(
-            world,
-            visibility,
-            grid,
-            cell_m,
-            points,
-            cluster_cfg.frames_per_cluster,
-            cluster_cfg.min_azimuth_gap_deg,
-        ):
+        azimuth = _azimuths(world, np.median(points, axis=0))
+        placed_positions: list[int] = []
+        # Try frames in visibility order until frames_per_cluster boxes fit; a
+        # frame whose box is cut by the image border does not end the search.
+        for pos in _ranked_positions(world, visibility, grid, cell_m, points):
+            if len(placed_positions) >= cluster_cfg.frames_per_cluster:
+                break
+            if not _far_enough(pos, placed_positions, azimuth, cluster_cfg.min_azimuth_gap_deg):
+                continue
             placed = _frame_box(world, pos, points, cluster_cfg.box_pad_px)
             if placed is None:
                 continue
@@ -380,6 +417,7 @@ def box_request(
             )
             prompts.setdefault(pos, []).append(prompt)
             gated.setdefault(track_id, (world.frames[pos].frame_index, box))
+            placed_positions.append(pos)
         if track_id not in gated:
             unprompted.append(index)
     if not prompts:
@@ -598,12 +636,20 @@ def plan_gap_fill(
     min_views_per_cell: int,
     gcfg: GapFillConfig,
     audit_nouns: Sequence[str] = (),
+    shortfall: int | None = None,
 ) -> GapPlan:
     """Which requests a gap-fill round sends. Box prompts go first (probe-verified,
     geometry-placed); the audit nouns follow batched into one request; inventory
-    nouns follow one per request. Past ``max_video_requests`` the trailing nouns
-    are dropped. Clusters past the 16-object API limit are not prompted."""
-    visibility, lo, shape = compute_visibility(world, cloud, view_cfg)
+    nouns follow one per request, and only on a shortfall (``shortfall`` > 0;
+    None means the caller did not count, so they are sent). Past
+    ``max_video_requests`` the trailing nouns are dropped. Clusters past the
+    16-object API limit are not prompted. Visibility is computed over the
+    cluster points only when there are clusters, not the whole cloud."""
+    cluster_points = [np.asarray(c, dtype=np.float64) for c in clusters if len(c)]
+    vis_points = np.concatenate(cluster_points) if cluster_points else cloud
+    visibility, lo, shape = compute_visibility(world, vis_points, view_cfg)
+    if shortfall is not None and shortfall <= 0:
+        nouns = ()
     positions = [order.index(f) for f in view_frames if f in order]
     if visibility.shape[1] and positions:
         counts = visibility[positions].sum(axis=0)
@@ -673,40 +719,71 @@ def execute_gap_fill(
     marker filter here, one detection per frame.
     """
     detect_once = cached_tag_detector(marker_cfg.family, detect)
-    requests: list[GapRequest] = []
-    records: list[dict[str, Any]] = []
-    marker_dropped = 0
+    # (prompt, offset, found_by, note, boxes, record) per request, in send order.
+    specs: list[
+        tuple[str, int, FoundBy, str, tuple[tuple[int, int, Box], ...], dict[str, Any]]
+    ] = []
     if plan.send_box:
         assert plan.box_prompt is not None
-        tracks, cached = track_fn(plan.box_prompt, 0)
-        kept_box, mrep = filter_marker_tracks(tracks, world, run_dir, marker_cfg, detect_once)
-        marker_dropped += len(mrep.dropped)
-        requests.append(
-            GapRequest(tuple(kept_box), "cluster_box", "unexplained point cluster", plan.box_gated)
+        specs.append(
+            (
+                plan.box_prompt,
+                0,
+                "cluster_box",
+                "unexplained point cluster",
+                plan.box_gated,
+                {"kind": "cluster_box"},
+            )
         )
-        records.append({"kind": "cluster_box", "cached": cached, "tracks": len(kept_box)})
     batch_note = ""
     if plan.audit_nouns:
         assert plan.audit_prompt is not None
-        tracks, cached = track_fn(plan.audit_prompt, BATCH_OFFSET)
-        kept_batch, mrep = filter_marker_tracks(tracks, world, run_dir, marker_cfg, detect_once)
-        marker_dropped += len(mrep.dropped)
         batch_note = "audit nouns " + ", ".join(f"'{n}'" for n in plan.audit_nouns)
-        requests.append(GapRequest(tuple(kept_batch), "noun", batch_note))
-        records.append(
-            {
-                "kind": "audit_batch",
-                "nouns": list(plan.audit_nouns),
-                "cached": cached,
-                "tracks": len(kept_batch),
-            }
+        specs.append(
+            (
+                plan.audit_prompt,
+                BATCH_OFFSET,
+                "noun",
+                batch_note,
+                (),
+                {"kind": "audit_batch", "nouns": list(plan.audit_nouns)},
+            )
         )
     for k, noun in enumerate(plan.nouns):
-        tracks, cached = track_fn(noun, NOUN_ID_BASE + NOUN_ID_STEP * k)
-        kept_noun, mrep = filter_marker_tracks(tracks, world, run_dir, marker_cfg, detect_once)
-        marker_dropped += len(mrep.dropped)
-        requests.append(GapRequest(tuple(kept_noun), "noun", f"noun '{noun}'"))
-        records.append({"kind": "noun", "noun": noun, "cached": cached, "tracks": len(kept_noun)})
+        specs.append(
+            (
+                noun,
+                NOUN_ID_BASE + NOUN_ID_STEP * k,
+                "noun",
+                f"noun '{noun}'",
+                (),
+                {"kind": "noun", "noun": noun},
+            )
+        )
+
+    def run_one(
+        spec: tuple[str, int, FoundBy, str, tuple[tuple[int, int, Box], ...], dict[str, Any]],
+    ) -> tuple[GapRequest, dict[str, Any], int]:
+        prompt, offset, found_by, note, boxes, record = spec
+        tracks, cached = track_fn(prompt, offset)
+        kept_tracks, mrep = filter_marker_tracks(tracks, world, run_dir, marker_cfg, detect_once)
+        return (
+            GapRequest(tuple(kept_tracks), found_by, note, boxes),
+            {**record, "cached": cached, "tracks": len(kept_tracks)},
+            len(mrep.dropped),
+        )
+
+    # Requests are independent hosted calls; results are merged in plan order.
+    if len(specs) > 1 and gcfg.max_workers > 1:
+        from concurrent.futures import ThreadPoolExecutor
+
+        with ThreadPoolExecutor(max_workers=gcfg.max_workers) as pool:
+            results = list(pool.map(run_one, specs))
+    else:
+        results = [run_one(spec) for spec in specs]
+    requests = [r for r, _, _ in results]
+    records = [rec for _, rec, _ in results]
+    marker_dropped = sum(n for _, _, n in results)
     merged = merge_requests(list(generic_kept), requests, gcfg)
     prov: dict[int, FoundBy] = {t.track_id: "generic" for t in generic_kept}
     for request in requests:

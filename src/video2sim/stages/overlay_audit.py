@@ -14,6 +14,7 @@ answer contributes no nouns, never a guess.
 from __future__ import annotations
 
 import json
+import logging
 import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
@@ -23,12 +24,14 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from video2sim.models.hosted import ResponseCache
+from video2sim.models.hosted import ResponseCache, file_digest
 from video2sim.models.vlm import cache_model
 from video2sim.schemas import WorldModel
 from video2sim.stages.scene_router import RouterClient, sanitise_noun
 from video2sim.stages.segmentation import BoolMask
 from video2sim.stages.tracking import Track
+
+logger = logging.getLogger(__name__)
 
 PALETTE: tuple[tuple[int, int, int], ...] = (  # BGR, distinct on print and screen
     (0, 0, 255),
@@ -53,6 +56,7 @@ class OverlayAuditConfig:
     enabled: bool
     n_views: int  # labeled views sent to the model, router-view order
     save_video: bool  # every track over every frame, as tracks_preview.mp4 in the stage folder
+    max_image_px: int = 1024  # views are downscaled to this long side before drawing
 
     @classmethod
     def from_config(cls, cfg: dict[str, Any]) -> OverlayAuditConfig:
@@ -61,9 +65,10 @@ class OverlayAuditConfig:
             enabled=bool(g.get("enabled", False)),
             n_views=int(g.get("n_views", 2)),
             save_video=bool(g.get("save_video", True)),
+            max_image_px=int(g.get("max_image_px", 1024)),
         )
-        if out.n_views < 1:
-            raise ValueError("overlay_audit n_views must be at least 1")
+        if out.n_views < 1 or out.max_image_px < 1:
+            raise ValueError("overlay_audit n_views and max_image_px must be at least 1")
         return out
 
 
@@ -71,12 +76,13 @@ def build_audit_prompt(n_tracked: int) -> str:
     """Ask for the physical objects with no overlay, as JSON and nothing else."""
     return (
         "The photo shows physical objects resting on a surface. Each coloured region "
-        f"with a white number marks one already-tracked object ({n_tracked} tracked). "
+        f"with a number marks one already-tracked object ({n_tracked} tracked). "
         "Answer with a single JSON object and nothing else, with two keys: "
         '"missing" (a JSON array with one entry per distinct physical object with '
-        'NO coloured number on it — each entry has "noun" (one short singular noun, '
-        'count identical objects once each) and "near" (the white number closest to '
-        "it, or null when it sits far from every number); leave out the surface, "
+        'NO coloured region covering it — each entry has "noun" (one short singular '
+        'noun, count identical objects once each) and "covered_by" (the number of '
+        "the coloured region that covers this object, or null when no coloured "
+        "region covers it; proximity alone is not coverage); leave out the surface, "
         "printed boards, sheets and markers, shadows, hands and arms; an empty array "
         'when everything visible is marked), "uncertain" (nouns you cannot decide '
         "on; they are never re-tracked)."
@@ -85,17 +91,17 @@ def build_audit_prompt(n_tracked: int) -> str:
 
 @dataclass(frozen=True)
 class AuditHit:
-    """One missing noun with the overlaid label the model saw closest to it."""
+    """One missing noun with the label of any tracked region covering it."""
 
     noun: str
-    near: int | None  # nearest white label number, null when far from every label
+    covered_by: int | None  # label covering the object, null when none covers it
 
 
 def parse_audit_answer(text: str, denylist: tuple[str, ...]) -> tuple[list[AuditHit], list[str]]:
     """Sanitised missing hits and uncertain nouns, or empties when unreadable.
 
     Only well-formed entries survive: a short sanitised noun, each once and in
-    order, with ``near`` kept only when it is an integer label number.
+    order, with ``covered_by`` kept only when it is an integer label number.
     """
     match = re.search(r"\{.*\}", text, flags=re.DOTALL)
     if match is None:
@@ -110,24 +116,24 @@ def parse_audit_answer(text: str, denylist: tuple[str, ...]) -> tuple[list[Audit
     hits: list[AuditHit] = []
     seen: set[str] = set()
     for entry in missing:
-        noun, near = _hit(entry, denylist)
+        noun, covered_by = _hit(entry, denylist)
         if noun is not None and noun not in seen:
             seen.add(noun)
-            hits.append(AuditHit(noun, near))
+            hits.append(AuditHit(noun, covered_by))
     return hits, _clean([str(o).strip().lower() for o in uncertain], denylist)
 
 
 def _hit(entry: object, denylist: tuple[str, ...]) -> tuple[str | None, int | None]:
-    """Sanitised noun and label number of one missing entry, or (None, None)."""
+    """Sanitised noun and covering label of one missing entry, or (None, None)."""
     if not isinstance(entry, dict):
         return None, None
     clean = sanitise_noun(str(entry.get("noun", "")).strip().lower(), denylist)
     if clean is None:
         return None, None
-    near = entry.get("near", None)
-    if isinstance(near, bool) or not isinstance(near, int):
-        near = None
-    return clean, near
+    covered_by = entry.get("covered_by", None)
+    if isinstance(covered_by, bool) or not isinstance(covered_by, int):
+        covered_by = None
+    return clean, covered_by
 
 
 def _clean(nouns: Sequence[str], denylist: tuple[str, ...]) -> list[str]:
@@ -173,19 +179,32 @@ def _draw_masks(
             small.astype("uint8"), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
         )
         cv2.drawContours(overlay, contours, -1, color, 2)
+        # The label sits inside the object, at the mask's median point, sized
+        # with the image so it stays legible at the size the model receives.
         ys, xs = small.nonzero()
         label = str(tid)
-        org = (int(np.min(xs)), int(max(int(np.min(ys)) - 6, 0)))
-        (tw, th), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.9, 2)
-        cv2.rectangle(overlay, (org[0], org[1] - th - 6), (org[0] + tw + 6, org[1]), color, -1)
+        height, width = overlay.shape[:2]
+        scale = min(max(max(height, width) / 1024.0, 0.5), 2.0)
+        font_scale = 0.9 * scale
+        thickness = max(1, round(2 * scale))
+        (tw, th), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, font_scale, thickness)
+        pad = max(3, round(3 * scale))
+        cx, cy = int(np.median(xs)), int(np.median(ys))
+        x = min(max(cx - tw // 2, 0), max(width - tw - 2 * pad, 0))
+        baseline = min(max(cy + th // 2, th + pad), height - pad)
+        cv2.rectangle(
+            overlay, (x, baseline - th - pad), (x + tw + 2 * pad, baseline + pad), color, -1
+        )
+        blue, green, red = (float(c) for c in color)
+        ink = (0, 0, 0) if 0.114 * blue + 0.587 * green + 0.299 * red > 140 else (255, 255, 255)
         cv2.putText(
             overlay,
             label,
-            (org[0] + 3, org[1] - 6),
+            (x + pad, baseline),
             cv2.FONT_HERSHEY_SIMPLEX,
-            0.9,
-            (255, 255, 255),
-            2,
+            font_scale,
+            ink,
+            thickness,
         )
         drawn.append(tid)
     return drawn
@@ -195,9 +214,13 @@ def render_audit_view(
     frame_path: Path,
     masks: Mapping[int, BoolMask],
     out_path: Path,
+    max_image_px: int = 1024,
 ) -> list[int]:
     """Frame with each track mask tinted, contoured and numbered; ids drawn, sorted.
 
+    The frame is downscaled to ``max_image_px`` on its long side before
+    anything is drawn, so the labels are drawn at the size the model will
+    actually see (as the router does) instead of shrinking afterwards.
     Returns the drawn ids.
     """
     import cv2  # heavy import, kept out of module import time
@@ -205,6 +228,10 @@ def render_audit_view(
     frame = cv2.imread(str(frame_path))
     if frame is None:
         raise ValueError(f"cannot read {frame_path}")
+    long_side = max(frame.shape[:2])
+    if long_side > max_image_px:
+        scale = max_image_px / long_side
+        frame = cv2.resize(frame, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
     overlay = frame.copy()
     drawn = _draw_masks(overlay, masks, track_colors(list(masks)))
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -286,10 +313,12 @@ def audit_missing_nouns(
 ) -> tuple[list[str], list[str], list[Path]]:
     """Nouns the model sees without an overlay, plus uncertain ones and the views.
 
-    No client (dry run) or an unreadable answer contributes no nouns. Views come
+    No client (dry run), a failed call or an unreadable answer contributes no
+    nouns; a failed call is logged, never raised into the stage. Views come
     first from the coverage-selected router frames; frames with none of the kept
     masks are skipped, so a view always shows something to judge against. A noun
-    the model cites next to a kept label is already tracked and never re-tracked.
+    covered by a kept track's region is already tracked and never re-tracked;
+    mere proximity to a label does not drop it.
     """
     if not cfg.enabled or client is None or not kept or not view_frames:
         return [], [], []
@@ -305,14 +334,20 @@ def audit_missing_nouns(
         if not masks:
             continue
         out = work_dir / f"audit_{frame_index:05d}.png"
-        render_audit_view(run_dir / frame.image_path, masks, out)
+        render_audit_view(run_dir / frame.image_path, masks, out, cfg.max_image_px)
         images.append(out)
     if not images:
         return [], [], []
     prompt = build_audit_prompt(len(kept))
-    parts = [prompt, cache_model(client), *[p.name for p in images]]
-    text = cache.get_or_call(parts, lambda: client.ask(prompt, images))
+    # Key on the rendered bytes, not the file names: the same name is reused
+    # when the tracks change, and a name key would serve the stale answer.
+    parts = [prompt, cache_model(client), *[file_digest(p) for p in images]]
+    try:
+        text = cache.get_or_call(parts, lambda: client.ask(prompt, images))
+    except Exception:  # the audit must not abort the stage
+        logger.warning("overlay audit call failed; no nouns from the audit", exc_info=True)
+        return [], [], images
     hits, uncertain = parse_audit_answer(text, denylist)
     kept_ids = {t.track_id for t in kept}
-    missing = [h.noun for h in hits if h.near not in kept_ids]
+    missing = [h.noun for h in hits if h.covered_by not in kept_ids]
     return missing, uncertain, images

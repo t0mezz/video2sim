@@ -200,6 +200,20 @@ def tracks_from_text(
     return [Track(i, masks[i]) for i in sorted(masks)]
 
 
+def _cache_parts(paths: list[Path], cfg: TrackingConfig) -> list[str]:
+    """Cache key parts of one video request: model, prompt, direction, frame digests."""
+    digest = hashlib.sha256(json.dumps([file_digest(p) for p in paths]).encode()).hexdigest()
+    return ["sam_video", SAM_MODEL, cfg.prompt, cfg.direction, f"{cfg.fps}", digest]
+
+
+def tracking_is_cached(
+    world: WorldModel, run_dir: Path, cache: ResponseCache, cfg: TrackingConfig
+) -> bool:
+    """Whether this exact request already has a cached answer."""
+    paths = [run_dir / f.image_path for f in world.frames]
+    return cache.get(_cache_parts(paths, cfg)) is not None
+
+
 def track_objects(
     world: WorldModel,
     run_dir: Path,
@@ -208,19 +222,29 @@ def track_objects(
     cfg: TrackingConfig,
     work_dir: Path,
     decode: MaskDecoder = decode_sam_mask,
+    clip_path: Path | None = None,
 ) -> list[Track]:
-    """Track every object over all registered frames with one hosted request (cached)."""
+    """Track every object over all registered frames with one hosted request (cached).
+
+    A cache hit returns without touching the clip. On a miss the clip is
+    encoded once to ``clip_path`` (default ``work_dir / "clip.mp4"``); a
+    caller sending several prompts for the same frames passes one shared
+    ``clip_path`` and the first miss encodes it, the rest only read it.
+    """
     paths = [run_dir / f.image_path for f in world.frames]
-    work_dir.mkdir(parents=True, exist_ok=True)
-    clip = work_dir / "clip.mp4"
-    encode_clip(paths, cfg.fps, clip)
     # Key on the frames, not the clip bytes, so a new encoder build does not void the cache.
-    digest = hashlib.sha256(json.dumps([file_digest(p) for p in paths]).encode()).hexdigest()
+    parts = _cache_parts(paths, cfg)
+    frame_indices = [f.frame_index for f in world.frames]
+    cached = cache.get(parts)
+    if cached is not None:
+        return tracks_from_text(cached, frame_indices, decode)
+    work_dir.mkdir(parents=True, exist_ok=True)
+    clip = clip_path if clip_path is not None else work_dir / "clip.mp4"
+    if clip_path is None or not clip.is_file():
+        encode_clip(paths, cfg.fps, clip)
     call: Callable[[], str] = lambda: client.track(clip, cfg.prompt, cfg.direction)  # noqa: E731
-    text = cache.get_or_call(
-        ["sam_video", SAM_MODEL, cfg.prompt, cfg.direction, f"{cfg.fps}", digest], call
-    )
-    return tracks_from_text(text, [f.frame_index for f in world.frames], decode)
+    text = cache.get_or_call(parts, call)
+    return tracks_from_text(text, frame_indices, decode)
 
 
 def save_tracks(tracks: list[Track], out_dir: Path) -> None:

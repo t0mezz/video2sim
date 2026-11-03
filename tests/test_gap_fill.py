@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import yaml
@@ -444,6 +445,83 @@ def test_merge_new_tracks_use_the_lower_bar() -> None:
     assert out.notes[1000] == ("noun 'laptop'", "unexplained point cluster")
 
 
+def test_plan_sends_nouns_only_on_a_shortfall() -> None:
+    world = _world()
+    gcfg, vcfg = _gcfg(), _vcfg()
+    order = [f.frame_index for f in world.frames]
+
+    def plan(shortfall: int) -> GapPlan:
+        return plan_gap_fill(
+            world,
+            np.zeros((10, 3)),
+            ["mug", "cup"],
+            [],
+            [0, 1],
+            order,
+            vcfg,
+            vcfg.cell_m,
+            1,
+            gcfg,
+            shortfall=shortfall,
+        )
+
+    no_shortfall = plan(0)
+    assert no_shortfall.nouns == () and no_shortfall.nouns_dropped == ()
+    assert no_shortfall.video_requests == 1
+    short = plan(1)
+    assert short.nouns == ("mug", "cup") and short.video_requests == 3
+
+
+def test_clusters_far_from_every_kept_track_are_not_unexplained() -> None:
+    world = _world()
+    rng = np.random.default_rng(5)
+    kept_blob = rng.normal([0.0, 0.0, 0.05], 0.005, (30, 3))
+    room_blob = rng.normal([2.0, 0.0, 0.05], 0.005, (40, 3))
+    cloud = np.concatenate([kept_blob, room_blob])
+    cfg = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
+    gcfg = GapFillConfig.from_config(cfg)
+    out = unexplained_clusters(
+        world,
+        cloud,
+        {0: kept_blob},
+        Path("/none"),
+        "aruco",
+        gcfg.cluster,
+        0.003,
+        0.35,
+        detect=lambda p: ({}, (48, 64)),
+    )
+    assert out == []
+
+
+def test_box_request_tries_more_frames_until_a_box_fits(monkeypatch: Any) -> None:
+    world = _world(n=4)
+    rng = np.random.default_rng(6)
+    blob = rng.normal([0.05, 0.0, 0.05], 0.004, (30, 3))
+    cfg = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
+    gcfg = GapFillConfig.from_config(cfg)
+    vcfg = _vcfg()
+    from video2sim.stages import gap_fill as gap_module
+    from video2sim.stages.view_select import compute_visibility
+
+    visibility, lo, shape = compute_visibility(world, blob, vcfg)
+    real_frame_box = gap_module._frame_box
+    calls = {"n": 0}
+
+    def flaky(*args: Any, **kwargs: Any) -> Any:
+        calls["n"] += 1
+        if calls["n"] <= 2:
+            return None  # the best-ranked frames cannot place the box
+        return real_frame_box(*args, **kwargs)
+
+    monkeypatch.setattr(gap_module, "_frame_box", flaky)
+    _, gated, unprompted = box_request(
+        world, visibility, (lo, shape), vcfg.cell_m, [blob], (64, 48), gcfg.cluster
+    )
+    assert calls["n"] > 2
+    assert list(gated) == [2000] and unprompted == []
+
+
 def test_board_check_detects_tags_once_per_frame_for_all_clusters() -> None:
     world = _world()
     rng = np.random.default_rng(4)
@@ -508,6 +586,7 @@ def test_execute_reuses_first_pass_when_no_new_track_survives(tmp_path: Path) ->
     assert second is first
     assert discovery.tracked == 1 and discovery.recovered == 0
     assert prov == {0: "generic"}
-    # Noun ids live in their own range, clear of the box-prompt ids.
-    assert offsets == [NOUN_ID_BASE, NOUN_ID_BASE + NOUN_ID_STEP]
-    assert not (CLUSTER_ID_BASE <= offsets[-1] < CLUSTER_ID_BASE + 1000)
+    # Requests run in parallel, so offsets arrive in any order; the noun ids
+    # live in their own range, clear of the box-prompt ids.
+    assert sorted(offsets) == [NOUN_ID_BASE, NOUN_ID_BASE + NOUN_ID_STEP]
+    assert not (CLUSTER_ID_BASE <= max(offsets) < CLUSTER_ID_BASE + 1000)

@@ -119,23 +119,32 @@ def _footprints(
 
 
 def _groups(points: NDArray[np.float64], link_m: float) -> list[list[int]]:
-    """Connected groups of points where any two within ``link_m`` are linked."""
+    """Connected groups of points where any two within ``link_m`` are linked.
+
+    KD-tree pairs plus a sparse connected-components pass: the pairwise
+    distance matrix this replaces needs about 32 bytes per point squared,
+    which is gigabytes on a room-sized cloud.
+    """
+    from scipy.sparse import coo_matrix  # type: ignore[import-untyped]  # heavy import
+    from scipy.sparse.csgraph import connected_components  # type: ignore[import-untyped]
+    from scipy.spatial import cKDTree  # type: ignore[import-untyped]  # heavy import
+
     n = len(points)
-    parent = list(range(n))
-
-    def find(i: int) -> int:
-        while parent[i] != i:
-            parent[i] = parent[parent[i]]
-            i = parent[i]
-        return i
-
-    dist = np.linalg.norm(points[:, None, :] - points[None, :, :], axis=2)
-    for i, j in zip(*np.nonzero(np.triu(dist <= link_m, k=1)), strict=True):
-        parent[find(int(i))] = find(int(j))
+    if n == 0:
+        return []
+    if n == 1 or link_m < 0:
+        return [[i] for i in range(n)]
+    pairs = cKDTree(np.asarray(points, dtype=np.float64)).query_pairs(link_m, output_type="ndarray")
+    if not len(pairs):
+        return [[i] for i in range(n)]
+    rows = np.concatenate((pairs[:, 0], pairs[:, 1]))
+    cols = np.concatenate((pairs[:, 1], pairs[:, 0]))
+    graph = coo_matrix((np.ones(len(rows), dtype=np.int32), (rows, cols)), shape=(n, n))
+    _, labels = connected_components(graph, directed=False)
     groups: dict[int, list[int]] = {}
     for i in range(n):
-        groups.setdefault(find(i), []).append(i)
-    return list(groups.values())
+        groups.setdefault(int(labels[i]), []).append(i)
+    return sorted(groups.values(), key=lambda g: g[0])
 
 
 def _split(track: Track, feet: Mapping[int, F64], cfg: RepairConfig, next_id: int) -> list[Track]:

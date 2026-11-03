@@ -11,6 +11,7 @@ them. Detection runs on the registered frames again, which is cheap next to the 
 
 from __future__ import annotations
 
+import threading
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -74,11 +75,13 @@ def cached_tag_detector(family: str, detect: TagDetector | None = None) -> TagDe
     """
     base = detect or (lambda p: _detect_file(p, family))
     cache: dict[Path, Detections] = {}
+    lock = threading.Lock()
 
     def detect_once(path: Path) -> Detections:
-        if path not in cache:
-            cache[path] = base(path)
-        return cache[path]
+        with lock:
+            if path not in cache:
+                cache[path] = base(path)
+            return cache[path]
 
     return detect_once
 
