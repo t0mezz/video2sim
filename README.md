@@ -30,32 +30,25 @@ capture -> reconstruction -> segmentation -> shape -> physics -> export
 ## Quick start
 
 ```bash
-uv sync                  # install runtime and dev dependencies
-cp .env.example .env     # then fill in META_MODEL_API_KEY and BASETEN_API_KEY
-uv run pytest -m "not gpu and not slow and not network"   # fast tests, no GPU or weights
-uv run video2sim run my_table.mp4 --out scene/            # film first, see below
+uv sync
+cp .env.example .env     # fill in META_MODEL_API_KEY and BASETEN_API_KEY
+uv run video2sim doctor  # check the model endpoints; --offline checks keys only
+uv run video2sim run my_table.mp4 --out scene/
 ```
 
-Every model endpoint (VLM, SAM 3D, SAM 3.1) is configurable, so you can point the pipeline at your
-own instance or swap in an equivalent model: [docs/model_interfaces.md](docs/model_interfaces.md).
-`uv run video2sim doctor` checks the endpoints before a run.
+All three model endpoints (VLM, SAM 3D, SAM 3.1) are configurable: [docs/model_interfaces.md](docs/model_interfaces.md).
 
 ## Make a scene
 
-1. Film the table as [docs/capture_protocol.md](docs/capture_protocol.md) says, with the printed
-   marker board in view.
-2. Set up the hosted services: the keys in `.env`, and a Modal account with the SAM 3D worker
-   deployed (`AGENTS.md` has the commands). Video frames and object crops are sent to them.
-3. Run `uv run video2sim run my_table.mp4 --out scene/`.
+1. Film the table per [docs/capture_protocol.md](docs/capture_protocol.md), marker board in view.
+2. Set keys in `.env` and deploy the SAM 3D worker on Modal ([AGENTS.md](AGENTS.md) has the commands). Frames and crops are sent to these services.
+3. Run `uv run video2sim run my_table.mp4 --out scene/` (`--run-id` resumes; `--quiet` / `--verbose` control progress on stderr).
 
-Progress goes to stderr, one line per stage (a spinner on a terminal); `--quiet` turns it off, and
-`--verbose` adds the run id, cache keys and the COLMAP and CoACD logs. Stdout keeps only the final
-line.
+`scene/` holds `scene.usd`, one URDF per object in `urdf/`, and `qa_report.html` (confidence, fallbacks, mass range, settling result). For the pick-and-place demo, run [scripts/fetch_panda.sh](scripts/fetch_panda.sh) and see [benchmark/run_pick_place.py](benchmark/run_pick_place.py).
 
-`scene/` holds `scene.usd`, one URDF per object in `urdf/`, and `qa_report.html` with each
-object's confidence, fallbacks, mass range and settling result. Run again with `--run-id` to
-resume from the last finished stage. For the pick-and-place demo, run `scripts/fetch_panda.sh`
-and see `benchmark/run_pick_place.py`.
+## Acknowledgements
+
+Inference for the project research was supported with free credits from [Meta](https://dev.meta.ai) (SAM 3.1 through the Meta Model API), [Modal](https://modal.com) (GPU hosting for the SAM 3D worker), and [Baseten](https://www.baseten.co) (hosted VLM inference). Thank you for making this work possible!
 
 ## Where to read next
 
@@ -67,3 +60,4 @@ and see `benchmark/run_pick_place.py`.
 | [docs/capture_protocol.md](docs/capture_protocol.md) | How to film a scene. |
 | [docs/model_interfaces.md](docs/model_interfaces.md) | Hooking up your own VLM, SAM 3D and SAM 3.1 instances, or swapping the models. |
 | [docs/licenses.md](docs/licenses.md) | License status of every model and tool we depend on. |
+| [docs/final_benchmark.md](docs/final_benchmark.md) | End-to-end results on the test split (P5.6). |
