@@ -55,7 +55,7 @@ vlm:                           # the model behind the router, the material pass 
   temperature: 0               # null leaves it to the server
   extra_body: {}               # merged into every request body, for provider options
   extra_headers: {}
-  roles: {}                    # per-role overrides of any field above, under router, material or mass
+  roles: {}                    # per-role overrides of any field above, under router, material, mass or verify
 
 segmentation:
   sam_backend: null            # "api" or "self_hosted", see PLAN.md decision D-004
@@ -144,6 +144,15 @@ segmentation:
       split_gap_m: 0.10        # a track whose footprints fall into groups this far apart is two objects
       min_frames: 3            # smallest group that counts as an object when splitting
       sliver_frac: 0.2         # feet from masks below this share of the track median are occlusion slivers, not new objects
+  verify:                      # end-of-segmentation coverage check: VLM look plus noun prompts, looped
+    enabled: true              # session-only: enabled locally after the test.MOV miss; committed default stays off until tuned
+    max_turns: 3               # verification rounds at most; -1 loops until a round prompts nothing new
+    max_noun_requests: 4       # targeted SAM video requests per round at most
+    views: 3                   # whole-scene frames with kept-track outlines sent to the VLM
+    max_image_px: 1024         # overlays are downscaled to this long side
+    min_confidence: 0.5        # below this the VLM answer verifies nothing
+    timeout_s: 300             # the VLM call budget, like the router's
+    retries: 3
   lift:                        # P2.3: masks to point clusters by voting over views (visual hull)
     voxel_m: 0.005             # grid resolution; a cluster point is a voxel centre
     max_height_m: 0.35         # first-pass grid top; tracks reaching it are re-voted on the tall grid

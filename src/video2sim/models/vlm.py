@@ -30,7 +30,7 @@ from video2sim.models.hosted import (
 )
 
 PROTOCOLS = ("openai_chat", "anthropic_messages")
-ROLES = ("router", "material", "mass")
+ROLES = ("router", "material", "mass", "verify")
 ANTHROPIC_VERSION = "2023-06-01"
 BASETEN_BASE_URL = BASETEN_URL.removesuffix("/chat/completions")
 

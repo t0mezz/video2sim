@@ -57,6 +57,21 @@ class StageFailed(Exception):
         self.manifest = manifest
 
 
+class RunRejected(Exception):
+    """A stage's output ends the run: nothing after it can proceed.
+
+    This is not a failure: the output is valid and recorded as done (a rejected
+    capture names its reasons), but the run stops here instead of failing in the
+    next stage.
+    """
+
+    def __init__(self, stage: StageName, manifest: RunManifest, reasons: str) -> None:
+        super().__init__(f"run stopped after {stage!r}: {reasons}")
+        self.stage = stage
+        self.manifest = manifest
+        self.reasons = reasons
+
+
 @dataclass(frozen=True)
 class StageEvent:
     """What the runner tells a listener: a stage is cached, starts, finishes or fails.
@@ -257,7 +272,9 @@ class Runner:
         """Run every stage that is not cached. Passing an existing ``run_id`` resumes it.
 
         ``force_from`` re-runs that stage and every stage after it.
-        Raises ``StageFailed`` (carrying the manifest) when a stage raises.
+        Raises ``StageFailed`` (carrying the manifest) when a stage raises, and
+        ``RunRejected`` (also carrying the manifest) when a stage's output ends the
+        run, such as a rejected capture.
         """
         video_sha = sha256_file(video)
         if run_id is None:
@@ -283,8 +300,9 @@ class Runner:
                 and (run_dir / stage.name).is_dir()
             ):
                 self._emit("cached", stage.name, detail=f"key {key[:8]}")
-                continue
-            manifest = self._execute(stage, run_dir, video, manifest, key)
+            else:
+                manifest = self._execute(stage, run_dir, video, manifest, key)
+            self._stop_if_terminal(stage, run_dir, manifest)
         return manifest
 
     # -- internals -----------------------------------------------------------------------
@@ -369,6 +387,22 @@ class Runner:
         if shared := self._shared(stage):  # absent when empty, so earlier keys stay valid
             payload["shared"] = shared
         return canonical_sha256(payload)
+
+    def _stop_if_terminal(self, stage: Stage, run_dir: Path, manifest: RunManifest) -> None:
+        """Stop the run when a stage's output says nothing after it can proceed.
+
+        A stage opts in with a ``stop_after(output)`` hook returning the reasons to
+        stop, or None to continue; stages without the hook never stop the run. The
+        check also runs on cache hits, so resuming a rejected run stops again.
+        """
+        stop_after = getattr(stage, "stop_after", None)
+        if stop_after is None:
+            return
+        output = stage.output_type.model_validate_json(
+            (run_dir / stage.name / OUTPUT_FILE).read_text()
+        )
+        if reasons := stop_after(output):
+            raise RunRejected(stage.name, manifest, reasons)
 
     def _execute(
         self, stage: Stage, run_dir: Path, video: Path, manifest: RunManifest, key: str

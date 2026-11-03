@@ -20,6 +20,9 @@ Small stations (lower case) sit in the middle of each 100 mm cell: "a1" is x = 5
 Print at 100 % ("actual size", no fit to page), let the sheet settle, then measure the tag edge
 and the distances between tags with calipers. Put the measured values in the marker config.
 
+With --pair, print a small scale-marker sheet instead: two large tags (default ids 0 and 1,
+100 mm) side by side on A4 landscape, with a 100 mm check bar. Same patterns, same pipeline.
+
 Standard library only. The tag bit patterns were generated once with
 cv2.aruco.generateImageMarker(DICT_4X4_50, id, 6); '1' is a black cell, row 0 is the top.
 """
@@ -29,12 +32,15 @@ from __future__ import annotations
 import argparse
 import json
 import math
+from collections.abc import Sequence
 from pathlib import Path
 
 PT_PER_MM = 72.0 / 25.4
 
 PAGES_MM = {"A1": (841.0, 594.0), "A2": (594.0, 420.0), "A3": (420.0, 297.0)}
 DEFAULT_TAG_MM = {"A1": 100.0, "A2": 70.0, "A3": 50.0}
+PAIR_PAGE_MM = (297.0, 210.0)  # A4 landscape: two 100 mm tags fit side by side with quiet zones
+PAIR_TAG_MM = 100.0
 
 TAG_PATTERNS = {
     0: ["111111", "101001", "110101", "111001", "111011", "111111"],
@@ -305,6 +311,73 @@ def build(size: str, tag_mm: float, clean: bool) -> tuple[Canvas, dict[str, obje
     return canvas, layout
 
 
+def build_pair(
+    tag_ids: Sequence[int] = (0, 1), tag_mm: float = PAIR_TAG_MM
+) -> tuple[Canvas, dict[str, object]]:
+    """Two large tags side by side on A4 landscape, a small scale-marker sheet.
+
+    Same tag patterns and the same pipeline (DICT_4X4_50, measured tag edge in
+    `capture.marker`) as the grid board, for captures that need only a scale marker.
+    """
+    unknown = [tag_id for tag_id in tag_ids if tag_id not in TAG_PATTERNS]
+    if unknown:
+        raise ValueError(f"no pattern for tag ids {unknown}; have {sorted(TAG_PATTERNS)}")
+    page_w, page_h = PAIR_PAGE_MM
+    quiet = max(tag_mm / 6.0, 5.0)  # white margin around each tag
+    keepout = tag_mm + 2 * quiet
+    total = len(tag_ids) * keepout
+    if total > page_w - 2 * PAGE_MARGIN_MM:
+        raise ValueError(f"{len(tag_ids)} tags of {tag_mm} mm need {total:.0f} mm; A4 fits less")
+
+    canvas = Canvas()
+    x0 = (page_w - total) / 2.0
+    y_tag = (page_h - tag_mm) / 2.0 + 8.0  # lifted for the footer check bar
+    tags = {tag_id: (x0 + quiet + i * keepout, y_tag) for i, tag_id in enumerate(tag_ids)}
+
+    canvas.fill_grey(1.0)
+    for x, y in tags.values():
+        canvas.rect_fill(x - quiet, y - quiet, keepout, keepout)
+    for tag_id, (x, y) in tags.items():
+        draw_tag(canvas, tag_id, x, y, tag_mm)
+        _centered(canvas, x + tag_mm / 2.0, y - quiet + 4.5, 7.0, f"id {tag_id}", 0.0)
+
+    _centered(
+        canvas,
+        page_w / 2.0,
+        page_h - 14.0,
+        5.0,
+        f"video2sim marker sheet | A4 landscape | ArUco DICT_4X4_50 "
+        f"ids {','.join(str(tag_id) for tag_id in tag_ids)} | "
+        f"tag {_num(tag_mm)} mm (nominal)",
+        0.25,
+    )
+    bar_y = 18.0
+    canvas.stroke_grey(0.0)
+    canvas.line_width(0.6)
+    canvas.line(page_w / 2.0 - 50.0, bar_y, page_w / 2.0 + 50.0, bar_y)
+    canvas.line(page_w / 2.0 - 50.0, bar_y - 1.5, page_w / 2.0 - 50.0, bar_y + 1.5)
+    canvas.line(page_w / 2.0 + 50.0, bar_y - 1.5, page_w / 2.0 + 50.0, bar_y + 1.5)
+    _centered(canvas, page_w / 2.0, bar_y + 4.0, 3.0, "This bar must measure 100 mm.", 0.0)
+    _centered(canvas, page_w / 2.0, bar_y - 8.0, 2.6, "Print at 100 % (actual size).", 0.25)
+
+    layout: dict[str, object] = {
+        "size": "A4-landscape",
+        "page_mm": [page_w, page_h],
+        "origin": "bottom-left corner of the sheet; +X right (long edge), +Y up (short edge)",
+        "tag_dictionary": "DICT_4X4_50",
+        "tag_edge_mm_nominal": tag_mm,
+        "tags": {
+            str(tag_id): {
+                "lower_left_mm": [x, y],
+                "center_mm": [x + tag_mm / 2.0, y + tag_mm / 2.0],
+            }
+            for tag_id, (x, y) in tags.items()
+        },
+        "note": "Nominal values. Measure the printed tags with calipers and use the measured edge.",
+    }
+    return canvas, layout
+
+
 def _centered(canvas: Canvas, cx: float, y: float, size: float, label: str, grey: float) -> None:
     canvas.text(cx - 0.28 * size * len(label), y, size, label, grey)  # Helvetica ~0.56 em/char
 
@@ -394,13 +467,21 @@ def main() -> None:
     parser.add_argument("--size", choices=sorted(PAGES_MM), default="A2")
     parser.add_argument("--tag-mm", type=float, help="tag edge in mm (default depends on size)")
     parser.add_argument("--clean", action="store_true", help="tags only, no grid or stations")
+    parser.add_argument("--pair", action="store_true", help="two-tag A4 sheet instead of the grid")
+    parser.add_argument("--ids", nargs="+", type=int, default=[0, 1], help="tag ids for --pair")
     parser.add_argument("--out", type=Path, help="output PDF (default board_<size>[_clean].pdf)")
     args = parser.parse_args()
 
-    tag_mm = args.tag_mm or DEFAULT_TAG_MM[args.size]
-    out = args.out or Path(f"board_{args.size.lower()}{'_clean' if args.clean else ''}.pdf")
-    canvas, layout = build(args.size, tag_mm, args.clean)
-    page_w, page_h = PAGES_MM[args.size]
+    if args.pair:
+        tag_mm = args.tag_mm or PAIR_TAG_MM
+        out = args.out or Path("board_a4_pair.pdf")
+        canvas, layout = build_pair(tuple(args.ids), tag_mm)
+        page_w, page_h = PAIR_PAGE_MM
+    else:
+        tag_mm = args.tag_mm or DEFAULT_TAG_MM[args.size]
+        out = args.out or Path(f"board_{args.size.lower()}{'_clean' if args.clean else ''}.pdf")
+        canvas, layout = build(args.size, tag_mm, args.clean)
+        page_w, page_h = PAGES_MM[args.size]
     write_pdf(out, page_w, page_h, canvas)
     out.with_suffix(".json").write_text(json.dumps(layout, indent=2) + "\n")
     print(f"wrote {out} and {out.with_suffix('.json')}")

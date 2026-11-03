@@ -30,6 +30,7 @@ from video2sim.runner import (
     MANIFEST_FILE,
     OUTPUT_FILE,
     VERBOSE_ENV,
+    RunRejected,
     StageFailed,
     _code_version,
     sha256_file,
@@ -277,7 +278,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
     runner = build_runner(args.runs, cfg, targets, Path.cwd(), on_event=reporter)
     try:
         manifest = runner.run(args.video, run_id=args.run_id)
-    except StageFailed as error:
+    except (StageFailed, RunRejected) as error:
         print(str(error), file=sys.stderr)
         return 1
     finally:
