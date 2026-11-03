@@ -267,13 +267,20 @@ class CaptureStage:
 
     Its config section is ``capture`` from ``default.yaml``. A video that fails the gate is a
     valid output (``accepted=False`` with reasons), not an exception, so the reasons reach the
-    manifest and the next stage can quote them. ``quality.json`` holds the measurements.
+    manifest and the runner stops the run here instead of failing in the next stage.
+    ``quality.json`` holds the measurements.
     """
 
     name: StageName = "capture"
     output_type = CaptureResult
     dependencies: tuple[StageName, ...] = ()
     extra_inputs: tuple[Path, ...] = ()
+
+    def stop_after(self, output: CaptureResult) -> str | None:
+        """A rejection ends the run: later stages have no frames to work on."""
+        if output.accepted:
+            return None
+        return "capture rejected the video: " + "; ".join(output.reasons)
 
     def run(self, ctx: StageContext) -> CaptureResult:
         cfg = CaptureQualityConfig.from_config({"capture": dict(ctx.config)})

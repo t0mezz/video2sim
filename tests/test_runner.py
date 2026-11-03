@@ -9,6 +9,7 @@ from video2sim.runner import (
     OUTPUT_FILE,
     Runner,
     RunnerError,
+    RunRejected,
     StageContext,
     StageEvent,
     StageFailed,
@@ -42,6 +43,12 @@ class FakeStage:
         self.fail = False
         self.crash = False
         self.symlink_to: Path | None = None
+        self.stop: str | None = None
+
+    def stop_after(self, output: Out) -> str | None:
+        """End the run when set, mirroring a rejected capture."""
+        _ = output
+        return self.stop
 
     def run(self, ctx: StageContext) -> Out:
         self.calls += 1
@@ -192,6 +199,26 @@ def test_failure_stops_the_run_and_the_next_run_resumes(
     stages[1].fail = False
     runner.run(video, run_id="r1")
     assert calls(stages) == [1, 2, 1]
+
+
+def test_a_terminal_output_stops_the_run_before_the_next_stage(
+    tmp_path: Path, video: Path, stages: tuple[FakeStage, ...]
+) -> None:
+    stages[0].stop = "re-film: too blurry"
+    runner = make_runner(tmp_path, stages)
+    with pytest.raises(RunRejected) as caught:
+        runner.run(video, run_id="r1")
+    assert caught.value.stage == "capture"
+    assert "too blurry" in str(caught.value)
+    assert calls(stages) == [1, 0, 0]
+    on_disk = read_manifest(tmp_path, "r1")
+    assert on_disk.stages["capture"].status == "done"
+    assert on_disk.stages["reconstruction"].status == "pending"
+    assert not (tmp_path / "runs" / "r1" / "reconstruction").exists()
+    # Resuming stops again on the cached output without running anything.
+    with pytest.raises(RunRejected):
+        runner.run(video, run_id="r1")
+    assert calls(stages) == [1, 0, 0]
 
 
 def test_a_killed_stage_leaves_no_finished_folder(

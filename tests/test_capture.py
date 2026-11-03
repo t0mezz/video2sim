@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from video2sim.runner import OUTPUT_FILE, Runner, StageFailed
+from video2sim.runner import OUTPUT_FILE, Runner, RunRejected
 from video2sim.schemas import CaptureResult
 from video2sim.stages.capture import CaptureQualityConfig, CaptureStage, sample_and_check
 from video2sim.stages.reconstruction import ReconstructionStage, reconstruction_stage_config
@@ -172,7 +172,7 @@ def test_capture_stage_runs_in_the_runner_with_run_relative_frame_paths(tmp_path
     assert (run_dir / "capture" / "quality.json").is_file()
 
 
-def test_rejected_capture_is_an_output_and_stops_reconstruction_with_the_reasons(
+def test_rejected_capture_stops_the_run_with_the_reasons(
     tmp_path: Path,
 ) -> None:
     video = _write(tmp_path / "v.avi", lambda i: _blur(_base_frame()))
@@ -184,11 +184,18 @@ def test_rejected_capture_is_an_output_and_stops_reconstruction_with_the_reasons
         ),
     }
     runner = Runner(tmp_path / "runs", [CaptureStage(), ReconstructionStage()], cfg)
-    with pytest.raises(StageFailed) as err:
+    with pytest.raises(RunRejected) as err:
         runner.run(video, run_id="r1")
 
     run_dir = tmp_path / "runs" / "r1"
     out = CaptureResult.model_validate_json((run_dir / "capture" / OUTPUT_FILE).read_text())
     assert not out.accepted and out.reasons
-    assert err.value.stage == "reconstruction"
-    assert out.reasons[0] in (err.value.manifest.stages["reconstruction"].message or "")
+    assert err.value.stage == "capture"
+    assert out.reasons[0] in err.value.reasons
+    assert err.value.manifest.stages["capture"].status == "done"
+    assert err.value.manifest.stages["reconstruction"].status == "pending"
+    assert not (run_dir / "reconstruction").exists()
+    # Resuming the rejected run stops again without starting reconstruction.
+    with pytest.raises(RunRejected):
+        runner.run(video, run_id="r1")
+    assert not (run_dir / "reconstruction").exists()

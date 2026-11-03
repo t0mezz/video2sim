@@ -16,7 +16,7 @@ from pathlib import Path
 
 import yaml
 
-from video2sim.runner import OUTPUT_FILE, Runner, StageFailed
+from video2sim.runner import OUTPUT_FILE, Runner, RunRejected, StageFailed
 from video2sim.schemas import WorldModel
 from video2sim.stages.capture import CaptureStage
 from video2sim.stages.reconstruction import (
@@ -46,7 +46,7 @@ def main() -> None:
         manifest = runner.run(
             args.video, run_id=args.run_id, force_from="capture" if args.force else None
         )
-    except StageFailed as e:
+    except (StageFailed, RunRejected) as e:
         for name, rec in e.manifest.stages.items():
             if rec.status != "pending":
                 print(f"{name}: {rec.status} {rec.message or ''}")

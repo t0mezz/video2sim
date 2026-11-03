@@ -25,7 +25,7 @@ from typing import Any
 
 import yaml
 
-from video2sim.runner import OUTPUT_FILE, Runner, StageFailed, sha256_file
+from video2sim.runner import OUTPUT_FILE, Runner, RunRejected, StageFailed, sha256_file
 from video2sim.schemas import Instances, RunManifest
 from video2sim.stages.capture import CaptureStage
 from video2sim.stages.reconstruction import ReconstructionStage, reconstruction_stage_config
@@ -98,8 +98,8 @@ def main() -> None:
         accept_finished_stages(runner, args.out / run_id, video)
         try:
             manifest = runner.run(video, run_id=run_id)
-        except StageFailed as e:
-            print(run_id, "FAILED", e)
+        except (StageFailed, RunRejected) as e:
+            print(run_id, "REJECTED" if isinstance(e, RunRejected) else "FAILED", e)
             sys.exit(1)
         status = {n: (r.status, round(r.seconds or 0, 1)) for n, r in manifest.stages.items()}
         inst = Instances.model_validate_json(

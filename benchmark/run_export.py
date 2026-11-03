@@ -20,7 +20,7 @@ from run_shape import accept_finished_stages
 
 from video2sim.evaluation.scenes import discover_scenes
 from video2sim.pipeline import build_runner
-from video2sim.runner import OUTPUT_FILE, StageFailed
+from video2sim.runner import OUTPUT_FILE, RunRejected, StageFailed
 
 
 def run_one(job: tuple[Path, str]) -> dict[str, Any]:
@@ -33,7 +33,9 @@ def run_one(job: tuple[Path, str]) -> dict[str, Any]:
     accept_finished_stages(runner, runs / run_id, video, until="export")
     try:
         manifest = runner.run(video, run_id=run_id)
-    except StageFailed as e:
+    except (StageFailed, RunRejected) as e:
+        if isinstance(e, RunRejected):
+            return {"run": run_id, "failed": e.reasons}
         return {"run": run_id, "failed": str(e.manifest.stages["export"].message)}
     report = json.loads((runs / run_id / "export/qa_report.json").read_text())
     return {
