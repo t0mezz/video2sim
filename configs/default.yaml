@@ -142,6 +142,7 @@ segmentation:
                                # walls (room height) still run through it and are dropped by the cap test
     cap_top_m: 0.02            # top band whose occupancy must fall off for a capped column; guesses
     cap_frac: 0.5              # at most this share of the peak layer occupancy in that band; a guess
+    edge_frac: 0.05            # lateral-edge voxels at or above this share of the component fail it; a guess (s25 vase: 0.7% incidental contact)
     margin_m: 0.10             # grid extends this far beyond the track footprints
     max_extent_m: 2            # refuse a grid wider than this (a stray track far from the others)
     max_views: 40              # frames used, spread evenly; cost is voxels x views x tracks

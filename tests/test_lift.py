@@ -227,7 +227,7 @@ def test_config_rejects_bad_values() -> None:
         "min_voxels": 20, "min_points": 8, "table_margin_m": 0.003, "trim_points_per_side": 2,
         "occlusion_aware": False, "small_mask_px": 15000, "small_min_agreement": 0.85,
         "small_min_voxels": 20, "dup_dist_m": 0.02, "tall_height_m": 1.0,
-        "cap_top_m": 0.02, "cap_frac": 0.5,
+        "cap_top_m": 0.02, "cap_frac": 0.5, "edge_frac": 0.05,
     }  # fmt: skip
     assert LiftConfig.from_config({"segmentation": {"lift": base}}).max_views == 10
     for key, value in (
@@ -242,6 +242,7 @@ def test_config_rejects_bad_values() -> None:
         ("tall_height_m", 0.1),
         ("cap_top_m", 0.0),
         ("cap_frac", 0.0),
+        ("edge_frac", 0.0),
     ):
         with pytest.raises(ValueError):
             LiftConfig.from_config({"segmentation": {"lift": {**base, key: value}}})
@@ -331,3 +332,33 @@ def test_lift_points_trims_each_cluster() -> None:
         [Track(4, masks)], world, cloud, LiftConfig(**{**CFG.__dict__, "trim_points_per_side": 2})
     )
     assert len(trimmed[4]) == len(untrimmed[4]) - 12
+
+
+def _sheet(x: int, ys: range, zs: range) -> Any:
+    return np.array([[x, y, z] for z in zs for y in ys], dtype=np.int64)
+
+
+def test_cap_reason_ignores_a_thin_incidental_sheet() -> None:
+    shape = (20, 20, 60)
+    core = _column(20, 20, 60, 40, 4)  # capped, interior: 12 by 12 by 40
+    sheet = _sheet(0, range(5, 10), range(10, 30))  # 100 voxels on the x face
+    cells = np.concatenate([core, sheet])
+    assert len(sheet) / len(cells) < 0.05
+    assert _cap_reason(cells, shape, CFG) is None
+
+
+def test_cap_reason_drops_a_wall_sharing_the_edge() -> None:
+    shape = (20, 20, 60)
+    wall = np.array(
+        [[x, y, z] for z in range(40) for y in range(20) for x in (0, 1)], dtype=np.int64
+    )
+    assert _cap_reason(wall, shape, CFG) == "fills the grid to its edge"
+
+
+def test_cap_reason_edge_bar_is_configurable() -> None:
+    shape = (20, 20, 60)
+    core = _column(20, 20, 60, 40, 4)
+    sheet = _sheet(0, range(5, 10), range(10, 30))
+    cells = np.concatenate([core, sheet])
+    strict = LiftConfig(**{**CFG.__dict__, "edge_frac": 0.01})
+    assert _cap_reason(cells, shape, strict) == "fills the grid to its edge"

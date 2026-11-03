@@ -25,8 +25,9 @@ on another object is dropped.
 * Only the largest connected group of each track is kept, which removes outlier voxels.
 * A track with too few voxels is dropped and listed in the report. A track that reaches the
   top of the first-pass grid is re-voted on a taller grid and kept only when its column
-  shows a cap: occupancy that falls off near the top and a footprint clear of the grid's
-  lateral edges. A column that stays flat through the tall grid, or touches its sides, is
+  shows a cap: occupancy that falls off near the top and only incidental contact with
+  the grid's lateral edges (below ``edge_frac`` of its voxels). A column that stays
+  flat through the tall grid, or substantially touches its sides, is
   background (a wall or person) and is dropped. Hands and arms are not detected as such:
   they move between views, so their
   masks agree on almost no voxels and the track falls out through ``min_voxels``.
@@ -90,6 +91,7 @@ class LiftConfig:
     tall_height_m: float
     cap_top_m: float
     cap_frac: float
+    edge_frac: float = 0.05  # lateral-edge voxels below this share of the component pass
 
     @classmethod
     def from_config(cls, cfg: dict[str, Any]) -> LiftConfig:
@@ -115,6 +117,7 @@ class LiftConfig:
             float(c["tall_height_m"]),
             float(c["cap_top_m"]),
             float(c["cap_frac"]),
+            float(c["edge_frac"]),
         )
         if (
             min(out.voxel_m, out.max_height_m, out.margin_m, out.max_extent_m) <= 0
@@ -127,6 +130,8 @@ class LiftConfig:
             raise ValueError("cap_top_m must be within (0, tall_height_m]")
         if not 0.0 < out.cap_frac <= 1.0:
             raise ValueError("cap_frac must be in (0, 1]")
+        if not 0.0 < out.edge_frac <= 1.0:
+            raise ValueError("edge_frac must be in (0, 1]")
         if (
             min(
                 out.max_views,
@@ -312,9 +317,12 @@ def _vote(
 def _cap_reason(cells: I64, shape: tuple[int, int, int], cfg: LiftConfig) -> str | None:
     """Why a column filling the tall grid is background, or None when it caps.
 
-    A tabletop object is an island: its layer occupancy falls off near its top and its
-    footprint stays clear of the grid's lateral edges. A wall or person stays flat
-    through the top layer, or spans past the tracked feet to the grid's sides.
+    A tabletop object is an island: its layer occupancy falls off near its top and only
+    incidentally touches the grid's lateral edges. A wall or person stays flat through
+    the top layer, or spans past the tracked feet to the grid's sides. The edge test is
+    a share, not any touch: sparse objects (flower gaps) agree on background margin
+    voxels that connect to the core, and whether dying fragments trim that bridge must
+    not decide the object.
     """
     top_layers = max(1, round(cfg.cap_top_m / cfg.voxel_m))
     counts = np.bincount(cells[:, 2], minlength=shape[2])
@@ -322,12 +330,10 @@ def _cap_reason(cells: I64, shape: tuple[int, int, int], cfg: LiftConfig) -> str
     if peak == 0 or float(np.sum(counts[shape[2] - top_layers :])) > cfg.cap_frac * peak:
         return "fills the grid to its top"
     nx, ny = shape[0], shape[1]
-    if (
-        int(np.min(cells[:, 0])) <= 0
-        or int(np.max(cells[:, 0])) >= nx - 1
-        or int(np.min(cells[:, 1])) <= 0
-        or int(np.max(cells[:, 1])) >= ny - 1
-    ):
+    on_edge = (
+        (cells[:, 0] <= 0) | (cells[:, 0] >= nx - 1) | (cells[:, 1] <= 0) | (cells[:, 1] >= ny - 1)
+    )
+    if float(np.sum(on_edge)) >= cfg.edge_frac * len(cells):
         return "fills the grid to its edge"
     return None
 
