@@ -1,4 +1,4 @@
-<h1 align="center">Video2Sim</h1>
+<h1 align="center">Video2Sim · <img src="assets/v2s_logo.svg" height="36" alt="Video2Sim logo" style="vertical-align: middle;"></h1>
 
 <p align="center">
   <b>Film a tabletop. Get a physics-ready USD/URDF scene.</b>
