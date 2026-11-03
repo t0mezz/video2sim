@@ -14,7 +14,7 @@ With ``enabled: false`` nothing here runs and the stage output is byte-identical
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Literal
 
@@ -31,6 +31,7 @@ from video2sim.stages.lift import (
     PointVote,
     lift_points,
     lift_tracks,
+    point_vote,
 )
 from video2sim.stages.marker_filter import (
     MarkerFilterConfig,
@@ -57,7 +58,6 @@ FoundBy = Literal["generic", "noun", "cluster_box"]
 CLUSTER_ID_BASE = 2000  # box-prompt ids: 2000 + cluster index (at most 16 clusters)
 NOUN_ID_BASE = 10000  # noun requests: NOUN_ID_BASE + NOUN_ID_STEP * k; clear of the box ids
 NOUN_ID_STEP = 1000  # per-request stride; a request returns far fewer tracks than this
-BATCH_OFFSET = 90000  # the one batched audit-noun request; clear of box and noun ids
 
 
 @dataclass(frozen=True)
@@ -148,7 +148,6 @@ class GapRequest:
     tracks: tuple[Track, ...]
     found_by: FoundBy
     note: str  # provenance recorded on surviving tracks, e.g. the noun
-    boxes: tuple[tuple[int, int, Box], ...] = ()  # (track_id, frame, prompted box)
 
 
 @dataclass(frozen=True)
@@ -549,36 +548,71 @@ def _overlaps(
     return out
 
 
-def _box_canvas(shape: tuple[int, int], box: Box) -> NDArray[np.bool_]:
-    canvas = np.zeros(shape, dtype=bool)
-    canvas[box[1] : box[3] + 1, box[0] : box[2] + 1] = True
-    return canvas
+def cluster_gate(
+    track: Track, points: F64, world: WorldModel, lift_cfg: LiftConfig, accept_ratio: float
+) -> str | None:
+    """Rejection reason for a box-found track, or None when it passes (step 7).
 
-
-def _box_gates(track: Track, frame: int, box: Box, cfg: GapFillConfig) -> str | None:
-    """Rejection reason for a box-found track, or None when it passes. The prompted-frame
-    mask must overlap the prompted box (IoU), fill enough of it, and not sprawl past it —
-    a box over bare table returns a table patch (9.0 negative control). IoU never exceeds
-    fill, so the fill gate only binds when ``box_mask_min_iou`` is at most
-    ``box_mask_min_fill``."""
-    mask = track.masks.get(frame)
-    if mask is None:
-        return f"no mask on the prompted frame {frame}"
-    canvas = _box_canvas(mask.shape, box)
-    inter = float(np.logical_and(mask, canvas).sum())
-    union = float(np.logical_or(mask, canvas).sum())
-    box_area = float(canvas.sum())
-    mask_area = float(mask.sum())
-    iou = inter / union if union else 0.0
-    fill = inter / box_area if box_area else 0.0
-    over = mask_area / box_area if box_area else float("inf")
-    if iou < cfg.box_mask_min_iou:
-        return f"prompted-box IoU {iou:.2f} below {cfg.box_mask_min_iou}"
-    if fill < cfg.box_mask_min_fill:
-        return f"box fill {fill:.2f} below {cfg.box_mask_min_fill}"
-    if over > cfg.box_mask_max_overfill:
-        return f"box overfill {over:.2f} past {cfg.box_mask_max_overfill}"
+    The track's own masks must contain its cluster's points: the median
+    per-point vote of the cluster under this one track must clear
+    ``accept_ratio``. A table patch (masks elsewhere) and a neighbouring
+    object (masks covering a different cluster) both fail, however well
+    their prompted-frame mask matched the prompted box.
+    """
+    if not len(points):
+        return "no cluster points to gate on"
+    # The gate's ratio is h/s over the views that see each point; the
+    # lift's min_views floor would zero every point of a short clip.
+    vote = point_vote(
+        [track], world, np.asarray(points, dtype=np.float64), replace(lift_cfg, min_views=1)
+    )
+    median = float(np.median(vote.best_ratio))
+    if median < accept_ratio:
+        return f"cluster vote median {median:.2f} below {accept_ratio}"
     return None
+
+
+def box_prompt_for_checks(
+    checks: Sequence[Any],
+    size: tuple[int, int],
+    first_id: int = CLUSTER_ID_BASE,
+) -> tuple[str | None, tuple[int, ...], tuple[int, ...], tuple[int, ...]]:
+    """One object-prompt string for the accepted clusters (step 6).
+
+    Prompt frames are the views chosen in step 4; each id encodes its
+    cluster (``first_id`` + cluster index). At most 16 clusters are prompted
+    (the API limit); the rest come back as ``over_cap`` and must be
+    reported. Accepted clusters with no chosen view are ``unprompted``.
+    Returns (prompt, prompted track ids, unprompted indices, over-cap indices).
+    """
+    from video2sim.stages.cluster_check import ClusterCheck
+
+    accepted = [c for c in checks if isinstance(c, ClusterCheck) and c.verdict.status == "accepted"]
+    prompted, over_cap = accepted[:16], accepted[16:]
+    prompts: dict[int, list[ObjectPrompt]] = {}
+    unprompted: list[int] = []
+    ids: list[int] = []
+    for check in prompted:
+        track_id = first_id + check.index
+        if not check.views:
+            unprompted.append(check.index)
+            continue
+        ids.append(track_id)
+        for view in check.views:
+            prompt = ObjectPrompt(
+                object_id=track_id,
+                box=tuple(float(v) for v in view.box),  # type: ignore[arg-type]
+                positive_points=(view.point,) if view.point is not None else (),
+            )
+            prompts.setdefault(view.pos, []).append(prompt)
+    if not prompts:
+        return None, (), tuple(unprompted), tuple(c.index for c in over_cap)
+    return (
+        build_object_prompt(prompts, size),
+        tuple(ids),
+        tuple(unprompted),
+        tuple(c.index for c in over_cap),
+    )
 
 
 def merge_requests(
@@ -591,8 +625,9 @@ def merge_requests(
     IoU, median containment). The bar is ``merge_iou`` against a generic track and the
     lower ``merge_new_iou`` when E is gap-fill new itself: two prompts of one object
     (a noun and a box) draw different extents, so their masks agree less than two
-    views of one prompt. Box-found tracks also pass the prompted-box gates. Ids that
-    still collide are remapped past the maximum in use."""
+    views of one prompt. Box-found tracks have already passed the geometric
+    cluster gate (step 7) in the caller. Ids that still collide are remapped past
+    the maximum in use."""
     existing = list(generic)
     generic_ids = {t.track_id for t in existing}
     used = set(generic_ids)
@@ -600,9 +635,6 @@ def merge_requests(
     dropped: dict[int, str] = {}
     remapped: list[tuple[int, int]] = []
     for request in requests:
-        gated_boxes: dict[int, tuple[int, Box]] = {
-            tid: (frame, box) for tid, frame, box in request.boxes
-        }
         for track in sorted(request.tracks, key=lambda t: t.track_id):
             orig = track.track_id
             tid = orig
@@ -610,16 +642,6 @@ def merge_requests(
                 tid = max(used) + 1
                 track = Track(tid, dict(track.masks))
                 remapped.append((orig, tid))
-            if request.found_by == "cluster_box":
-                gated = gated_boxes.get(orig)
-                if gated is None:
-                    dropped[tid] = "cluster track without a prompted box"
-                    continue
-                frame, box = gated
-                reason = _box_gates(track, frame, box, cfg)
-                if reason is not None:
-                    dropped[tid] = reason
-                    continue
             same: Track | None = None
             part: Track | None = None
             for other in sorted(existing, key=lambda t: t.track_id):
@@ -725,13 +747,6 @@ class GapPlan:
     audit_prompt: str | None = None  # the batched concepts, None when not sent
 
 
-def batch_prompt(nouns: Sequence[str]) -> str:
-    """One video prompt for the audit nouns: SAM answers per-object ids anyway, so one
-    request covers them all. Multi-concept prompts are new (9.7); the dev eval (9.8)
-    confirms the hosted model honours every noun."""
-    return ", ".join(nouns)
-
-
 def plan_gap_fill(
     world: WorldModel,
     cloud: F64,
@@ -747,7 +762,7 @@ def plan_gap_fill(
     shortfall: int | None = None,
 ) -> GapPlan:
     """Which requests a gap-fill round sends. Box prompts go first (probe-verified,
-    geometry-placed); the audit nouns follow batched into one request; inventory
+    geometry-placed); inventory
     nouns follow one per request, and only on a shortfall (``shortfall`` > 0;
     None means the caller did not count, so they are sent). Past
     ``max_video_requests`` the trailing nouns are dropped. Clusters past the
@@ -775,13 +790,10 @@ def plan_gap_fill(
         )
         box_prompt, box_unprompted = prompt, tuple(unprompted)
         box_gated = tuple((tid, frame, box) for tid, (frame, box) in gated.items())
-    use_batch = bool(audit_nouns) and gcfg.max_video_requests >= 2 + (1 if use_box else 0)
-    budget = gcfg.max_video_requests - 1 - (1 if use_box else 0) - (1 if use_batch else 0)
+    budget = gcfg.max_video_requests - 1 - (1 if use_box else 0)
     keep = min(len(nouns), gcfg.max_noun_requests, max(budget, 0))
-    dropped = list(nouns[keep:])
-    batch: tuple[str, ...] = tuple(audit_nouns) if use_batch else ()
-    if audit_nouns and not use_batch:
-        dropped = [*audit_nouns, *dropped]
+    dropped = [*audit_nouns, *nouns[keep:]]
+    batch: tuple[str, ...] = ()
     return GapPlan(
         nouns=tuple(nouns[:keep]),
         nouns_dropped=tuple(dropped),
@@ -792,9 +804,9 @@ def plan_gap_fill(
         clusters_total=len(clusters),
         view_frames=list(view_frames),
         view_coverage=coverage,
-        video_requests=1 + keep + (1 if use_box else 0) + (1 if use_batch else 0),
+        video_requests=1 + keep + (1 if use_box else 0),
         audit_nouns=batch,
-        audit_prompt=batch_prompt(batch) if use_batch else None,
+        audit_prompt=None,
     )
 
 
@@ -827,10 +839,8 @@ def execute_gap_fill(
     marker filter here, one detection per frame.
     """
     detect_once = cached_tag_detector(marker_cfg.family, detect)
-    # (prompt, offset, found_by, note, boxes, record) per request, in send order.
-    specs: list[
-        tuple[str, int, FoundBy, str, tuple[tuple[int, int, Box], ...], dict[str, Any]]
-    ] = []
+    # (prompt, offset, found_by, note, record) per request, in send order.
+    specs: list[tuple[str, int, FoundBy, str, dict[str, Any]]] = []
     if plan.send_box:
         assert plan.box_prompt is not None
         specs.append(
@@ -839,24 +849,10 @@ def execute_gap_fill(
                 0,
                 "cluster_box",
                 "unexplained point cluster",
-                plan.box_gated,
                 {"kind": "cluster_box"},
             )
         )
     batch_note = ""
-    if plan.audit_nouns:
-        assert plan.audit_prompt is not None
-        batch_note = "audit nouns " + ", ".join(f"'{n}'" for n in plan.audit_nouns)
-        specs.append(
-            (
-                plan.audit_prompt,
-                BATCH_OFFSET,
-                "noun",
-                batch_note,
-                (),
-                {"kind": "audit_batch", "nouns": list(plan.audit_nouns)},
-            )
-        )
     for k, noun in enumerate(plan.nouns):
         specs.append(
             (
@@ -864,19 +860,18 @@ def execute_gap_fill(
                 NOUN_ID_BASE + NOUN_ID_STEP * k,
                 "noun",
                 f"noun '{noun}'",
-                (),
                 {"kind": "noun", "noun": noun},
             )
         )
 
     def run_one(
-        spec: tuple[str, int, FoundBy, str, tuple[tuple[int, int, Box], ...], dict[str, Any]],
+        spec: tuple[str, int, FoundBy, str, dict[str, Any]],
     ) -> tuple[GapRequest, dict[str, Any], int]:
-        prompt, offset, found_by, note, boxes, record = spec
+        prompt, offset, found_by, note, record = spec
         tracks, cached = track_fn(prompt, offset)
         kept_tracks, mrep = filter_marker_tracks(tracks, world, run_dir, marker_cfg, detect_once)
         return (
-            GapRequest(tuple(kept_tracks), found_by, note, boxes),
+            GapRequest(tuple(kept_tracks), found_by, note),
             {**record, "cached": cached, "tracks": len(kept_tracks)},
             len(mrep.dropped),
         )
@@ -971,7 +966,6 @@ def _origin_note(
 
 
 __all__ = [
-    "BATCH_OFFSET",
     "CLUSTER_ID_BASE",
     "NOUN_ID_BASE",
     "NOUN_ID_STEP",
@@ -984,9 +978,10 @@ __all__ = [
     "GapRequest",
     "MergeResult",
     "ResidualParams",
-    "batch_prompt",
     "board_hull",
+    "box_prompt_for_checks",
     "box_request",
+    "cluster_gate",
     "execute_gap_fill",
     "fit_pass",
     "inherit_provenance",

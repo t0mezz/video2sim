@@ -22,7 +22,6 @@ from video2sim.stages.gap_fill import (
     GapRequest,
     ResidualParams,
     board_hull,
-    box_request,
     execute_gap_fill,
     inherit_provenance,
     merge_requests,
@@ -138,56 +137,39 @@ def _box_tuple(
     return tuple((tid, frame, box) for tid, (frame, box) in gated.items())
 
 
-def test_box_gates_reject_table_patches() -> None:
-    cfg = _gcfg()
-    box = _mask(slice(10, 20), slice(10, 20))
-    generic = [_track(0, {0: box})]
-    # Covers the box but sprawls past it: overfill (IoU 0.625 passes first).
-    sprawl = _track(2000, {0: _mask(slice(10, 26), slice(10, 20))})
-    # Barely inside the box: the IoU gate binds before the fill gate.
-    speck = _track(2001, {0: _mask(slice(12, 13), slice(12, 13))})
-    # No mask on the prompted frame at all.
-    missing = _track(2002, {1: box})
-    out = merge_requests(
-        generic,
-        [
-            GapRequest(
-                (sprawl, speck, missing),
-                "cluster_box",
-                "cluster",
-                _box_tuple({i: (0, (10, 10, 19, 19)) for i in (2000, 2001, 2002)}),
-            )
-        ],
-        cfg,
-    )
-    assert [t.track_id for t in out.tracks] == [0]
-    assert "overfill" in out.dropped[2000]
-    assert "IoU" in out.dropped[2001]
-    assert "no mask" in out.dropped[2002]
+def test_cluster_gate_accepts_covering_track_and_rejects_others() -> None:
+    from video2sim.stages.gap_fill import cluster_gate
+    from video2sim.stages.lift import LiftConfig
+
+    world = _world()
+    cfg = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
+    lift_cfg = LiftConfig.from_config(cfg)
+    # 30 points on a line at z=0.05; in frame i they project to u = 50*(x-0.2i)+32.
+    points = np.array([[0.004 * i, 0.0, 0.05] for i in range(30)], dtype=np.float64)
+    full = np.ones(SHAPE, dtype=bool)
+    covering = _track(2000, {i: full for i in range(4)})
+    assert cluster_gate(covering, points, world, lift_cfg, 0.5) is None
+    # A table patch: masks on rows the points never project to (v = -50*0+24 = 24).
+    patch_mask = np.zeros(SHAPE, dtype=bool)
+    patch_mask[40:48, :] = True
+    patch = _track(2001, {i: patch_mask for i in range(4)})
+    reason = cluster_gate(patch, points, world, lift_cfg, 0.5)
+    assert reason is not None and "below" in reason
+    # A neighbouring object covering only the first third of the points in every frame.
+    neighbour_mask = np.zeros(SHAPE, dtype=bool)
+    neighbour_mask[:, :12] = True  # hits the points in only one of the four views
+    neighbour = _track(2002, {i: neighbour_mask for i in range(4)})
+    assert cluster_gate(neighbour, points, world, lift_cfg, 0.5) is not None
 
 
-def test_box_fill_gate_binds_when_iou_is_loose() -> None:
-    # IoU <= fill always, so the fill gate only binds when min_iou <= min_fill.
-    cfg = _gcfg(box_mask_min_iou=0.01)
-    box = _mask(slice(10, 20), slice(10, 20))
-    speck = _track(2000, {0: _mask(slice(12, 13), slice(12, 13))})
-    out = merge_requests(
-        [_track(0, {0: box})],
-        [GapRequest((speck,), "cluster_box", "cluster", _box_tuple({2000: (0, (10, 10, 19, 19))}))],
-        cfg,
-    )
-    assert [t.track_id for t in out.tracks] == [0]
-    assert "fill" in out.dropped[2000]
-
-
-def test_box_passing_track_is_new() -> None:
+def test_box_track_merges_as_new_without_prompted_box() -> None:
     cfg = _gcfg()
     box = _mask(slice(10, 20), slice(10, 20))
     generic = [_track(0, {0: _mask(slice(30, 40), slice(30, 40))})]
     good = _track(2000, {0: box})
     out = merge_requests(
         generic,
-        [GapRequest((good,), "cluster_box", "cluster", _box_tuple({2000: (0, (8, 8, 21, 21))}))],
+        [GapRequest((good,), "cluster_box", "cluster")],
         cfg,
     )
     assert [t.track_id for t in out.tracks] == [0, 2000]
@@ -318,20 +300,25 @@ def test_box_projection_matches_hand_math() -> None:
 
 
 def test_prompt_round_trip_through_a_fake_client() -> None:
-    world = _world(n=2)
-    rng = np.random.default_rng(2)
-    blob = rng.normal([0.05, 0.0, 0.05], 0.004, (30, 3))
-    cfg = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
-    gcfg = GapFillConfig.from_config(cfg)
-    vcfg = _vcfg()
-    from video2sim.stages.view_select import compute_visibility
-
-    visibility, lo, shape = compute_visibility(world, blob, vcfg)
-    prompt, gated, unprompted = box_request(
-        world, visibility, (lo, shape), vcfg.cell_m, [blob], (64, 48), gcfg.cluster
+    from video2sim.stages.cluster_check import (
+        ClusterCheck,
+        ClusterVerdict,
+        ClusterView,
     )
-    assert unprompted == []
-    assert list(gated) == [2000]
+    from video2sim.stages.gap_fill import box_prompt_for_checks
+
+    blob = np.array([[0.05, 0.0, 0.05]] * 3, dtype=np.float64)
+    views = (
+        ClusterView(0, 0, (30, 20, 34, 26), (32.0, 23.0)),
+        ClusterView(1, 1, (30, 20, 34, 26), (32.0, 23.0)),
+    )
+    check = ClusterCheck(
+        0, blob, views, (), ClusterVerdict("accepted", noun="mug", count=1, confidence=0.9)
+    )
+    rejected = ClusterCheck(1, blob, views, (), ClusterVerdict("rejected", reason="not an object"))
+    prompt, ids, unprompted, over_cap = box_prompt_for_checks([check, rejected], (64, 48))
+    assert prompt is not None and ids == (2000,) and unprompted == () and over_cap == ()
+    assert prompt.startswith("<") and "2000<|box;" in prompt
     # The fake client replays a recorded-style answer for the prompted id and frames.
     answer = "\n".join(
         f"<{f}f>2000<|box;x1=30;y1=20;x2=34;y2=26;w=64;h=48|><|mask;x=0;y=0;data=1,1,~x|>"
@@ -339,7 +326,6 @@ def test_prompt_round_trip_through_a_fake_client() -> None:
     )
     records = parse_sam_text(answer)
     assert [(r.object_id, r.frame) for r in records] == [(2000, 0), (2000, 1)]
-    assert prompt.startswith("<") and "2000<|box;" in prompt
 
 
 def test_plan_caps_requests_and_reports_coverage() -> None:
@@ -435,7 +421,7 @@ def _plan(
     )
 
 
-def test_plan_batches_audit_nouns_into_one_request() -> None:
+def test_plan_reports_audit_nouns_dropped_not_batched() -> None:
     world = _world()
     gcfg, vcfg = _gcfg(), _vcfg()
     order = [f.frame_index for f in world.frames]
@@ -450,32 +436,12 @@ def test_plan_batches_audit_nouns_into_one_request() -> None:
         gcfg,
         audit=["laptop", "tape dispenser"],
     )
-    assert plan.audit_nouns == ("laptop", "tape dispenser")
-    assert plan.audit_prompt == "laptop, tape dispenser"
+    # Step 6 removes the batched audit prompt: audit nouns are never sent as
+    # one concept; they are reported dropped instead.
+    assert plan.audit_nouns == () and plan.audit_prompt is None
     assert plan.nouns == ("mug", "cup")
-    assert plan.video_requests == 4  # generic + batch + two nouns, under the cap of 8
-
-
-def test_plan_batch_takes_reserved_budget_first() -> None:
-    world = _world()
-    cfg = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
-    cfg["segmentation"]["tracking"]["gap_fill"]["max_video_requests"] = 2
-    gcfg, vcfg = GapFillConfig.from_config(cfg), _vcfg()
-    order = [f.frame_index for f in world.frames]
-    plan = _plan(
-        world,
-        np.zeros((10, 3)),
-        ["mug"],
-        [],
-        [0, 1],
-        order,
-        vcfg,
-        gcfg,
-        audit=["laptop"],
-    )
-    assert plan.audit_nouns == ("laptop",)
-    assert plan.nouns == () and plan.nouns_dropped == ("mug",)
-    assert plan.video_requests == 2
+    assert plan.nouns_dropped == ("laptop", "tape dispenser")
+    assert plan.video_requests == 3  # generic + two nouns, under the cap of 8
 
 
 def test_merge_new_tracks_use_the_lower_bar() -> None:
@@ -489,12 +455,7 @@ def test_merge_new_tracks_use_the_lower_bar() -> None:
         generic,
         [
             GapRequest((noun,), "noun", "noun 'laptop'"),
-            GapRequest(
-                (box,),
-                "cluster_box",
-                "unexplained point cluster",
-                ((2000, 0, (14, 10, 23, 19)),),
-            ),
+            GapRequest((box,), "cluster_box", "unexplained point cluster"),
         ],
         cfg,
     )
@@ -553,31 +514,25 @@ def test_clusters_far_from_every_kept_track_are_not_unexplained() -> None:
     assert out == []
 
 
-def test_box_request_tries_more_frames_until_a_box_fits(monkeypatch: Any) -> None:
+def test_choose_views_falls_through_until_a_box_fits(monkeypatch: Any) -> None:
+    from video2sim.stages import cluster_check as check_module
+    from video2sim.stages.cluster_check import ClusterCheckConfig, choose_views
+
     world = _world(n=4)
     rng = np.random.default_rng(6)
     blob = rng.normal([0.05, 0.0, 0.05], 0.004, (30, 3))
-    cfg = yaml.safe_load((ROOT / "configs/default.yaml").read_text(encoding="utf-8"))
-    gcfg = GapFillConfig.from_config(cfg)
-    vcfg = _vcfg()
-    from video2sim.stages.cluster_check import frame_box as real_frame_box
-    from video2sim.stages.view_select import compute_visibility
-
-    visibility, lo, shape = compute_visibility(world, blob, vcfg)
+    real = check_module.frame_box
     calls = {"n": 0}
 
     def flaky(*args: Any, **kwargs: Any) -> Any:
         calls["n"] += 1
         if calls["n"] <= 2:
             return None  # the best-ranked frames cannot place the box
-        return real_frame_box(*args, **kwargs)
+        return real(*args, **kwargs)
 
-    monkeypatch.setattr("video2sim.stages.gap_fill._frame_box", flaky)
-    _, gated, unprompted = box_request(
-        world, visibility, (lo, shape), vcfg.cell_m, [blob], (64, 48), gcfg.cluster
-    )
-    assert calls["n"] > 2
-    assert list(gated) == [2000] and unprompted == []
+    monkeypatch.setattr(check_module, "frame_box", flaky)
+    views = choose_views(world, blob, [], ClusterCheckConfig(views_per_cluster=1, box_pad_px=8))
+    assert calls["n"] > 2 and len(views) == 1
 
 
 def test_board_check_detects_tags_once_per_frame_for_all_clusters() -> None:

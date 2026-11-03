@@ -176,6 +176,7 @@ class ClusterView:
     pos: int
     frame_index: int
     box: Box
+    point: tuple[float, float] | None = None  # projected cluster median, a positive point
 
 
 def choose_views(
@@ -192,12 +193,12 @@ def choose_views(
     through to the next frame until ``views_per_cluster`` boxes fit; a frame
     whose box is cut by the border never qualifies.
     """
-    scored: list[tuple[float, int, Box]] = []
+    scored: list[tuple[float, int, Box, tuple[float, float] | None]] = []
     for pos, frame in enumerate(world.frames):
         placed = frame_box(world, pos, points, cfg.box_pad_px)
         if placed is None:
             continue
-        box, _point = placed
+        box, point = placed
         x1, y1, x2, y2 = box
         area = float((x2 - x1 + 1) * (y2 - y1 + 1))
         covered = 0.0
@@ -206,7 +207,7 @@ def choose_views(
             if mask is None:
                 continue
             covered = max(covered, float(mask[y1 : y2 + 1, x1 : x2 + 1].mean()) if area else 0.0)
-        scored.append((covered, pos, box))
+        scored.append((covered, pos, box, point))
     # Rank: least covered first, then largest box; pos breaks ties deterministically.
     ranked = sorted(
         scored,
@@ -218,12 +219,12 @@ def choose_views(
     )
     azimuth = azimuths(world, np.median(points, axis=0))
     picked: list[ClusterView] = []
-    for _covered, pos, box in ranked:
+    for _covered, pos, box, point in ranked:
         if len(picked) >= cfg.views_per_cluster:
             break
         if not _far_enough(pos, [v.pos for v in picked], azimuth, cfg.min_azimuth_gap_deg):
             continue
-        picked.append(ClusterView(pos, world.frames[pos].frame_index, box))
+        picked.append(ClusterView(pos, world.frames[pos].frame_index, box, point))
     return picked
 
 
