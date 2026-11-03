@@ -1,62 +1,31 @@
 # Model interfaces
 
-The project builds on three models, each with a fixed role: a **vision-language model** (VLM) for
-the scene router, the material pass and the mass request, **SAM 3D Objects** for object shape, and
-**SAM 3.1** for video tracking. The role is fixed; the **endpoint** is yours. Point each one at
-your own instance, or at a different model that does the same job, through the config. Copy
-`configs/default.yaml`, edit, and pass `--config my.yaml` to `video2sim run` or `eval`. The config
-is hashed into the run manifest, so a run records which endpoints produced it.
+Three roles with fixed contracts; endpoints are configured per deployment. Copy `configs/default.yaml`, edit, pass `--config my.yaml` to `video2sim run` or `eval`. The config is hashed into the run manifest. `uv run video2sim doctor --config my.yaml` checks that each endpoint builds and answers (`--offline` checks config/keys only; tracking is never called because it bills per frame).
 
-```bash
-uv run video2sim doctor --config my.yaml
-```
+Each role also accepts `python:package.module:factory` (importable directly or via `PYTHONPATH`) for private APIs.
 
-checks that each endpoint builds and answers (`--offline` checks config and keys only; the tracking
-endpoint is never called, since it is billed per frame).
+## VLM (scene router, material pass, mass request)
 
-Every role also accepts `python:package.module:factory`: the named factory is imported and its
-object used. That is the escape hatch for a private API; the contracts it must meet are below.
-The module must be importable (installed, or on `PYTHONPATH`).
-
-## VLM
-
-Contract: `client.ask(prompt: str, images: Sequence[Path]) -> str` and a `client.model: str` that
-goes into the response-cache key. Temperature 0, one user message with the prompt and the images.
+Contract: `client.ask(prompt: str, images: Sequence[Path]) -> str`, plus `client.model: str` in the response-cache key. Temperature 0, one user message with prompt and images.
 
 ```yaml
 vlm:
   protocol: openai_chat         # openai_chat | anthropic_messages | python:package.module:factory
-  base_url: https://inference.baseten.co/v1   # "/chat/completions" or "/v1/messages" is appended
+  base_url: https://inference.baseten.co/v1
   model: meta-models/muse-spark-open-1026
-  api_key_env: BASETEN_API_KEY  # env var or .env entry; null sends no key
-  max_tokens: null              # thinking plus answer; a local reasoning model needs ~4096
-  temperature: 0                # null leaves it to the server
-  extra_body: {}                # merged into every request body (provider options)
+  api_key_env: BASETEN_API_KEY  # null sends no key
+  max_tokens: null
+  temperature: 0
+  extra_body: {}
   extra_headers: {}
-  roles: {}                     # per-role overrides: router, material, mass or verify
+  roles: {}                     # per-role overrides: router, material, mass, verify
 ```
 
-- `openai_chat` works with any server that implements OpenAI chat completions with `image_url`
-  parts: Baseten, llama.cpp `llama-server`, vLLM, Ollama's `/v1`, LM Studio, OpenRouter, ...
-- `anthropic_messages` speaks the Anthropic Messages API (`x-api-key`, base64 image blocks).
-- `python:` factories are called as `factory(settings: VlmConfig, timeout_s, retries)`.
-- Roles: the three questions can use different models, for example a small local model for the
-  router and a stronger one for mass:
-
-```yaml
-vlm:
-  roles:
-    mass: {base_url: http://localhost:8001/v1, model: big-model, api_key_env: null}
-```
-
-Timeouts and retries (HTTP 429 and 5xx, 2/4/8 s backoff) come from each stage's own `timeout_s`
-and `retries`.
+`openai_chat` fits any OpenAI-chat-compatible server with `image_url` parts (Baseten, llama.cpp `llama-server`, vLLM, Ollama `/v1`, LM Studio, OpenRouter). `anthropic_messages` speaks the Anthropic Messages API. Per-role models: e.g. `vlm.roles.mass` points at a stronger endpoint. Timeouts/retries (HTTP 429/5xx, 2/4/8 s backoff) come from each stage's `timeout_s`/`retries`.
 
 ## SAM 3D Objects (shape)
 
-Contract: given one keyframe image, the object's mask and a seed, return a GLB mesh and the pose
-of the model frame in the camera as `rotation_wxyz`, `translation`, `scale` (PyTorch3D
-conventions) plus the `checkpoint` that ran. `models/sam3d.py` documents the conventions.
+Contract: one keyframe image + object mask + seed returns a GLB mesh and the model-frame-in-camera pose (`rotation_wxyz`, `translation`, `scale`, PyTorch3D conventions) plus the `checkpoint`. Conventions: `models/sam3d.py`. Model-predicted scale is never used as metric scale.
 
 ```yaml
 shape:
@@ -66,21 +35,11 @@ shape:
   http: {url: http://localhost:8000, api_key_env: null, timeout_s: 600, retries: 3}
 ```
 
-- `transport: modal` (default) uses the worker of `models/sam3d_modal.py`, deployed under the app
-  and class names above.
-- `transport: http` posts to any server with the wire format in `models/sam3d_http.py`: multipart
-  `POST /sample` in, GLB bytes out with the pose JSON in an `X-Pose-Json` header, `GET /health`.
-  `workers/sam3d_http/` is a reference server and Dockerfile for it.
-- A different image-to-3D model goes in through `backend: python:...`, returning an object with
-  `name` and `sample(object_id, view, seed) -> ShapeSample` (`models/shape_model.py`). Its adapter
-  converts the model's own frame and units; scale is never trusted as is (AGENTS.md).
-- Warm-up (`shape.sam3d.warm_containers`) applies only to transports that can warm, which today
-  is Modal.
+`modal` uses the `models/sam3d_modal.py` worker. `http` posts multipart `POST /sample` (GLB bytes + `X-Pose-Json` pose header, `GET /health`); wire format: `models/sam3d_http.py`, reference server: `workers/sam3d_http/`. Other image-to-3D models enter via `backend: python:...` returning `name` and `sample(object_id, view, seed) -> ShapeSample` (`models/shape_model.py`). `shape.sam3d.warm_containers` applies only to warmable transports (Modal).
 
 ## SAM 3.1 (tracking)
 
-Contract: given a clip, a concept prompt and a direction, return SAM 3.1 special-token text, one
-line per frame (`stages/tracking.py`, `models/hosted.py::parse_sam_text`).
+Contract: clip + concept prompt + direction returns SAM 3.1 special-token text, one line per frame (`stages/tracking.py`, `models/hosted.py::parse_sam_text`).
 
 ```yaml
 segmentation:
@@ -92,15 +51,15 @@ segmentation:
       api_key_env: META_MODEL_API_KEY
 ```
 
-A self-hosted server that imitates the Meta Responses protocol needs only a different `url`. One
-with another protocol uses a `python:` factory returning a `VideoSamClient`.
+Self-hosted Meta-Responses-compatible servers need only a different `url`; other protocols use a `python:` factory returning `VideoSamClient`. A self-hosted tracking server receives the object-prompt grammar from `docs/research/occlusion_robust_discovery_plan.md` section 2 and answers in the existing grammar with the sent ids.
 
 ## Caching
 
-Answers are cached on disk by a hash of the prompt, the images and the model name, so a different
-model never reads another model's cached answer. Existing Baseten caches stay valid.
+Answers cache on disk by hash of prompt, images, and model name; different models never share cache entries. Existing Baseten caches stay valid.
 
-## A local llama.cpp instance (Muse Glimmer 30B, port 9931)
+## Local llama.cpp instance (Muse Glimmer 30B, port 9931)
+
+`llama-server` serving `muse-glimmer-30B` (Q4_K_M, text/image/video) at `localhost:9931` (e.g. via SSH tunnel). Launch: model alias `muse-glimmer-30B`, vision projector (`--mmproj`), 30 GPU layers, 66560-token context over 4 slots (16640 per request), flash attention with 4-bit KV cache, speculative-decoding draft model, model chat template, server sampling defaults `--temp 1.0 --top-p 0.95 --top-k 64`.
 
 ```yaml
 vlm:
@@ -111,65 +70,23 @@ vlm:
   max_tokens: 4096
 ```
 
-The development instance is `llama-server` serving `muse-glimmer-30B` (Q4_K_M, inputs text, image
-and video), reached at `localhost:9931`, for example through an SSH tunnel. Its launch flags,
-without host and file paths:
+Client `temperature: 0` overrides the server default; `top_p`/`top_k` stay server-side. `GET /v1/models` reports per-slot `n_ctx` 16640. Measured 2026-11-01: one 3840x2160 PNG answered in 26 s; three copies in one request (as the router sends) in 47 s; larger requests may not fit. Four slots match `segmentation.material_pass.max_workers: 4` and `physics.parallel_mass_calls`; a fifth request queues. An earlier 8960-token instance dropped connections on full-resolution PNGs (7-9 s at 512-1024 px JPEG).
 
-| Flag | Meaning |
-| --- | --- |
-| `-a muse-glimmer-30B` | model name clients send as `model` |
-| `--mmproj <mmproj GGUF>` | vision projector, needed for image input |
-| `-ngl 30` | 30 layers on the GPU |
-| `-c 66560 -np 4` | 66560 tokens of context split over 4 slots: **16640 tokens per request** |
-| `-fa on -ctk q4_0 -ctv q4_0` | flash attention, KV cache quantized to 4 bit |
-| `-md <draft GGUF> -ngld 99` | draft model for speculative decoding, fully on the GPU |
-| `--jinja` | the model's own chat template |
-| `--temp 1.0 --top-p 0.95 --top-k 64` | server sampling defaults |
+## Local vs hosted quality
 
-What this means for the pipeline:
-
-- **Sampling:** the client sends `temperature: 0`, which overrides the server's `--temp 1.0`.
-  `top_p` and `top_k` stay at the server defaults.
-- **Context:** `GET /v1/models` shows `n_ctx` 16640, the per-slot share. On 2026-11-01 one
-  3840x2160 PNG (2.2 MB) was answered in 26 s, and the same image three times in one request, as
-  the router sends frames, in 47 s. Larger requests or more frames than that may not fit.
-- **Concurrency:** 4 slots, which matches `segmentation.material_pass.max_workers: 4` and
-  `physics.parallel_mass_calls`. A fifth request waits at the server.
-- **History:** an earlier instance had a 8960-token context. A 3840x2160 PNG made it drop the
-  connection and refuse connections for about a minute; 512 px and 1024 px JPEGs answered in 7
-  and 9 s.
-
-## Quality against Muse Spark Open
-
-`benchmark/compare_vlm.py` runs the pipeline's own prompts and parsers on the same dev inputs
-with both models (result: `benchmark/results/vlm_compare.json`, answers cached beside it). Muse
-Spark Open is `meta-models/muse-spark-open-1026` on Baseten; local is `muse-glimmer-30B` on the
-instance above, one run each on 2026-11-01, `max_tokens: 4096`.
+`benchmark/compare_vlm.py` runs pipeline prompts/parsers with both models on identical dev inputs (`benchmark/results/vlm_compare.json`, 2026-11-01, one run each, `max_tokens: 4096`). Spark Open is `meta-models/muse-spark-open-1026` on Baseten; local is `muse-glimmer-30B` above.
 
 | Task (dev inputs) | Spark | Local |
 | --- | --- | --- |
-| Router, 24 scenes: object count equals ground truth | 19 | 19 |
+| Router, 24 scenes: count equals truth | 19 | 19 |
 | Router: count within 1, surface chosen | 24, table | 24, table |
-| Mass, 56 objects: within 30% of weighed mass | 23 (41%) | 23 (41%) |
-| Mass: median ratio to truth, truth inside low-high | 1.02, 28 | 1.10, 30 |
-| Material, 56 objects: answer readable | 56 | 56 |
-| Material: `hollow` answered, correct among answered | 56, 38 | 38, 23 |
-| Same material class / same finish as the other model | 50 / 56, 47 / 56 | |
-| Mean seconds per request (136 each) | 13 | 86 (max 290) |
+| Mass, 56 objects: within 30% | 23 (41%) | 23 (41%) |
+| Mass: median ratio, truth in low-high | 1.02, 28 | 1.10, 30 |
+| Material, 56 objects: readable | 56 | 56 |
+| Material: `hollow` answered / correct | 56 / 38 | 38 / 23 |
+| Same class / finish as other model | 50 / 56, 47 / 56 | |
+| Mean s/request (136 each) | 13 | 86 (max 290) |
 
-Router misses are the same five scenes in both models. Hollow is compared with the ground-truth
-`hollow` flag only; material class and finish have no ground truth here, only the agreement
-between the models. The local model answers `unknown` for `hollow` on 18 objects where Spark
-commits. It is a reasoning model, so a request spends about 800 tokens thinking: that is why
-`max_tokens` is 4096 and why it takes about 6.6 times as long. With `max_tokens: 1024` some answers
-came back empty.
+Router misses are the same five scenes. Hollow is scored against the ground-truth flag; class/finish have no ground truth here, only cross-model agreement. Local answers `unknown` for `hollow` on 18 objects where Spark commits. Local is a reasoning model (~800 thinking tokens/request), hence `max_tokens: 4096` and ~6.6x latency; `max_tokens: 1024` returned some empty answers.
 
-## Smoke test
-
-```bash
-curl -s http://localhost:9931/v1/models
-```
-
-```bash
-uv run pytest tests/test_vlm.py
-```
+Smoke test: `curl -s http://localhost:9931/v1/models`; `uv run pytest tests/test_vlm.py`.

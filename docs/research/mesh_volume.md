@@ -1,202 +1,49 @@
-# Mesh volume: solid or shell? (P4.5)
+# Mesh volume and mass from meshes (P4.5-P4.6)
 
-Written 2026-10-31. Question: can mass be computed from the volume of a registered SAM 3D mesh?
-Evidence file: `benchmark/results/p4_5_mesh_volume.json` (`benchmark/measure_mesh_volume.py`).
-Data: the 56 matched dev objects on 12 scenes in `runs_instances/` (54 SAM 3D, 2 proxy hulls), all
-passing repair. s05 is left out because its ground-truth origin is not established. True volume
-comes from the measured primitive, so the volume ratios cover the 39 box and cylinder objects.
-The 17 others have only a bounding box. Dev split only; the test split was not touched.
+56 matched dev objects on 12 scenes in `runs_instances/` (54 SAM 3D, 2 proxy hulls), all passing repair; s05 excluded (no ground-truth origin). True volume comes from measured primitives, so volume ratios cover the 39 box/cylinder objects; 17 box-less objects enter only the mass rows. Dev only; test untouched. Evidence: `benchmark/results/p4_5_mesh_volume.json` (`benchmark/measure_mesh_volume.py`), `benchmark/results/p4_5_mass.json` (`benchmark/run_mass.py`), `benchmark/results/p4_6_fill_fit.json` + `p4_6_mass.json` (`benchmark/fit_fill_fractions.py`).
 
-## Result
+Signed mesh volume is unusable: almost all meshes are thin shells. Outer-surface volume is correct but table-density × correct volume still misses weighed mass — the residual is density, not geometry.
 
-**The mesh volume cannot be used. Almost all meshes are thin shells.** The volume inside the
-outer surface is right, but table density times the right volume is still far from the weighed
-mass, so the remaining error is density, not geometry.
-
-| Volume | Median ratio to true volume | Within 20% (of 39) |
+| Volume | Median ratio to true | Within 20% (of 39) |
 | --- | --- | --- |
 | Mesh, signed | 0.13 | 0 |
-| Voxel fill of the outer surface | 0.96 | 28 |
+| Voxel fill of outer surface | 0.96 | 28 |
 | Convex hull | 1.03 | 33 |
-| Fill after sealing gaps up to 4% of the longest side | 1.01 | 32 |
+| Fill after sealing gaps ≤4% of longest side | 1.01 | 32 |
 
-43 of 56 meshes have mesh / fill below 0.5, and only 2 are above 0.85.
+43 of 56 meshes have mesh/fill below 0.5; 2 exceed 0.85.
 
-## Cracks and cups look the same to a plain fill
+Cracks vs cups: plain fill floods any gapped mesh, which is wrong for cracked boxes and right for cups with genuinely open cavities. Hull-fallback-below-half-fill scored 34/39 only because cups lack primitive truth, while assigning mugs 635/602 cm³ against ~92/104 cm³ ceramic. Sealing separates them: close gaps up to a radius, fill, erode back, track volume vs radius. Cracks seal early and jump to solid; mouths stay open until radius ≈ half mouth width. Sealed volume as hull share (radius as longest-side share): Rubik's cubes 0.20-0.23 → 0.22-1.01 → 1.0 at 1%/2%/4% (crack); electronics/breakfast-bag packages 0.19/0.31 → ~1.0 by 2% (crack); mugs 0.20 flat to 16% (open); bottle 0.28/0.30/0.31 → 0.96 at 8% (narrow neck); s02 cap 0.13 flat (open); gamepad/plier 0.25-0.61 flat (concave solid). Working radius is 4%: seals all observed cracks, keeps mugs/caps/bottle open; 2% misses two Rubik's cubes, 8% closes the bottle neck. Mouths under 8% of longest side seal as solid. Mug cross-sections show real inner+outer walls with open mouths, unlike closed thin box shells. Sealed-vs-true-material volumes (weighed mass ÷ table density): mugs 126 vs 92 cm³ (1.38×), 118 vs 104 (1.13×); bottle 330 vs 236 (1.40×) — excess at least partly 1 mm-voxel wall thickening on both sides; finer grids untested. Residual 4% misses vs primitives (7/39): caps/brush shapes whose cylinder is not their truth (s02 cap 0.13 is correct: 3 cm³ vs 3 g plastic), s13 proxy hull with 66% size error (1.59×), and shape/size errors (0.75-1.25×).
 
-A plain fill floods the inside of any mesh with a gap, and then returns little more than the wall.
-That is wrong for a cracked box and right for a cup, whose cavity really is open. The first version
-of this note used the hull whenever the fill was below half of it. **That rule is wrong for cups:**
-it scored 34 of 39 only because the cups have no primitive truth, and it gave the mugs 635 and
-602 cm3 against about 92 and 104 cm3 of ceramic.
+Density dominates once volume is fixed (mass = table-density × volume, solid, no hollow correction):
 
-Sealing separates the two. Close gaps up to a radius, fill, take the radius back, and watch the
-volume as the radius grows (`sealed_volumes`). A crack seals early and the volume jumps to the
-solid. A mouth stays open until the radius reaches about half its width.
-
-Sealed volume as a share of the hull, radius as a share of the longest side:
-
-| Object | 1% | 2% | 4% | 8% | 16% | Reading |
-| --- | --- | --- | --- | --- | --- | --- |
-| Rubik's cube smaller, 3 runs | 0.20 to 0.23 | 0.22 to 1.01 | 1.0 | 1.0 | 1.0 | Crack |
-| Package for electronics, s02 | 0.19 | 1.02 | 1.02 | 1.02 | 1.02 | Crack |
-| Package for breakfast bags, s13 | 0.31 | 1.01 | 1.01 | 1.01 | 1.01 | Crack |
-| Mug, 2 objects | 0.20 | 0.20 | 0.20 | 0.21 | 0.24 | Open vessel |
-| Glass water bottle | 0.28 | 0.30 | 0.31 | 0.96 | 0.97 | Open, narrow neck |
-| Deodorant cap, s02 | 0.13 | 0.13 | 0.13 | 0.13 | 0.14 | Open vessel |
-| Gamepad, plier | 0.25 to 0.59 | 0.27 to 0.59 | 0.27 to 0.59 | 0.28 to 0.60 | 0.29 to 0.61 | Concave solid |
-
-4% is the working value. It seals every crack above and keeps every mug, cap and bottle open. 8%
-already closes the bottle neck, so the safe band is narrow: 2% misses two Rubik's cubes and 8% loses
-the bottle. A vessel with a mouth under 8% of its longest side will be sealed as a solid.
-
-A mesh wall is real here. The mug section shows separate inner and outer walls with an open mouth,
-so these meshes hold a real cavity, unlike the closed thin shells of boxes.
-
-| Object | Sealed at 4%, cm3 | True material, cm3 | Mass ratio |
+| Objects | Volume | Median mass ratio | ≤30% |
 | --- | --- | --- | --- |
-| Mug obj_041 | 126 | 92 | 1.38 |
-| Mug obj_046 | 118 | 104 | 1.13 |
-| Glass water bottle | 330 | 236 | 1.40 |
+| Inventory hollow (27) | mesh / sealed-4% | 0.65 / 3.76 | 7 / 2 |
+| Inventory solid (29) | mesh / sealed-4% | 0.39 / 2.43 | 4 / 2 |
 
-True material is weighed mass over table density, so it assumes the table is right. The excess is
-at least partly the voxel: one voxel is about 1 mm on a mug, and a thin wall gains that on each
-side. A finer grid should reduce it; that was not tested.
+The mesh row scores better only by accident (0.1× wall volume cancels excess density) and fails solids. True-vs-nominal densities (model class): `cardboard` hollow 218 vs 929 (13 objs); `plastic_hard` solid 489 (95-1080) vs 1100 (13); `plastic_hard` hollow 171 vs 1100 (2); `foam` hollow 223 vs 60 (3); `metal_steel` solid 182 vs 7850 (5). Gaps: table holds material density while objects are mostly air (boxes, infilled prints, cans) — factors of 2-40; s11 prints 2.3-5.8× heavy (listed solid but infilled, not solid resin); coffee can ~43× heavy (model says steel; actually cardboard + metal bottom, ~80% coffee-filled); paint can 7.7× / hole punch 6.7× (sheet metal over air, listed solid).
 
-Remaining misses at 4% against a primitive (7 of 39):
+P4.5 (`stages/mass.py`, model hollow answer): body is the 4%-sealed fill (no hull fallback — it fills cups); inertia integrates the same voxels. Open vessels (body < 0.5 hull) keep cavity, f = 1. Closed hollow: V_eff = f·V_sealed with global f ∈ {0.024, 0.22, 0.61} (10th/50th/90th percentile need of 31 such objects); solid kept f = 1.
 
-* The s02 deodorant cap (0.13) and s12 cap (0.71): a cap is open, so its cylinder is not its truth.
-  The s02 value is right, 3 cm3 against 3 g of plastic. The two runs disagree with each other.
-* Round hair brush (0.25): the cylinder is not its truth either.
-* Package for electronics, s13 (1.59): a proxy hull with a 66% size error.
-* White 3D print cuboid (0.75), in-ear package (0.79) and breadboard (1.25): shape or size errors.
-
-## Density is now the main error
-
-Mass here is nominal table density times volume, as a solid. **No hollow correction is applied.**
-
-| Objects | Volume used | Median mass ratio | Within 30% |
-| --- | --- | --- | --- |
-| Inventory hollow (27) | Mesh | 0.65 | 7 |
-| Inventory hollow (27) | Sealed at 4% | 3.76 | 2 |
-| Inventory not hollow (29) | Mesh | 0.39 | 4 |
-| Inventory not hollow (29) | Sealed at 4% | 2.43 | 2 |
-
-The mesh line scores better only by accident: a wall a tenth of the volume cancels a density far
-too high. It also fails for the solid objects. It is not a usable result.
-
-True density (weighed mass over true volume) against the table's nominal:
-
-| Class from the model | Inventory | Objects | True density, median | Table nominal |
+| Objects | Median ratio | ≤30% | ≤30% uncorrected | Truth in low-high |
 | --- | --- | --- | --- | --- |
-| `cardboard` | hollow | 13 | 218 | 929 |
-| `plastic_hard` | not hollow | 13 | 489 (95 to 1080) | 1100 |
-| `plastic_hard` | hollow | 2 | 171 | 1100 |
-| `foam` | hollow | 3 | 223 | 60 |
-| `metal_steel` | not hollow | 5 | 182 | 7850 |
-
-Why they differ:
-
-* The table holds the density of the material, while a real object is mostly air: a box, a 3D print
-  with infill, a can. The hollow correction has to close this gap, and it is a factor of 2 to 40.
-* s11 printed shapes come out 2.3 to 5.8 times too heavy. The inventory lists them as not hollow,
-  but a print with infill is not solid resin, which `material_table.yaml` already warns about.
-* The coffee can comes out about 43 times too heavy. The model says steel, and `obj_004` is a
-  cardboard can with a metal bottom, about 80% filled with coffee powder (human check).
-* The small paint can (7.7 times) and the hole punch (6.7 times) show the same for metal: thin
-  sheet over air, listed as not hollow.
-
-## What P4.5 does, and what is left for P4.6
-
-Implemented in `stages/mass.py`, scored in `benchmark/results/p4_5_mass.json`
-(`benchmark/run_mass.py`) on the same 56 objects, using the model's hollow answer:
-
-1. The body is the sealed fill at 4% of the longest side. There is no hull fallback, because it
-   fills cups. Inertia is integrated over the same voxels.
-2. An open vessel keeps its cavity and `f = 1`. A body under 0.5 of its hull counts as open.
-3. A closed hollow object gets `V_eff = f * V_sealed`. In P4.5 `f` was one value for all classes,
-   0.024, 0.22 and 0.61 (10th, 50th and 90th percentile of what each of the 31 such objects needs).
-4. A solid answer kept `f = 1` in P4.5. The table below is that state; P4.6 replaced both.
-
-| Objects | Median mass ratio | Within 30% | Within 30% with no correction | Truth inside low to high |
-| --- | --- | --- | --- | --- |
-| Closed, model says hollow (31) | 1.00 | 11 | 1 | 26 |
-| Open, model says hollow (4) | 1.25 | 2 | 2 | 2 |
-| Model says solid (21) | 2.40 | 1 | 1 | 3 |
+| Closed, model hollow (31) | 1.00 | 11 | 1 | 26 |
+| Open, model hollow (4) | 1.25 | 2 | 2 | 2 |
+| Model solid (21) | 2.40 | 1 | 1 | 3 |
 | All (56) | 1.25 | 14 | 4 | 31 |
 
-**14 of 56 is 25%, against the 70% exit criterion.** The closed row is in sample, since `f` came
-from those objects, so a median of 1.00 is by construction and says nothing about accuracy.
+14/56 = 25% vs the 70% exit criterion; the closed-row median 1.00 is by construction (in-sample f).
 
-## Calibration (P4.6)
+P4.6 fits f per class (≥3 distinct objects) else per-answer global, including solids; open vessels keep f = 1. 56 rows are 35 distinct objects, so scores hold out all runs of each object:
 
-Fit in `benchmark/fit_fill_fractions.py`, result in `benchmark/results/p4_6_fill_fit.json`, pipeline
-rerun in `benchmark/results/p4_6_mass.json`. `f` is now fitted for solid answers too, because the
-solid row above was the largest gap. A class gets its own value from 3 distinct objects, otherwise
-the global value of the answer. An open vessel still keeps `f = 1`.
+| Fill | ≤30% of 56 | Median ratio |
+| --- | --- | --- |
+| None | 4 (7%) | 2.85 |
+| Global per answer, held out | 17 (30%) | 1.11 |
+| Per class, held out | 20 (36%) | 0.97 |
+| Per class, in-sample | 26 (46%) | 0.99 |
 
-The 56 rows are only 35 distinct objects, so an object held out only per scene would still be in
-its own fit. Scores hold out every run of the object:
+Honest figure is 36% vs 70%: density + fill alone do not reach it. Truth in range rises 31 → 42/56 in-sample. Fitted (low/nominal/high): `cardboard` hollow (4 objs) 0.21/0.248/0.302; `metal_steel` hollow (4) 0.028/0.073/0.122; `plastic_hard` hollow (5) 0.415/0.601/0.947; `plastic_hard` solid (12) 0.18/0.357/0.535; global hollow 0.039/0.278/0.681; global solid 0.317/0.441/1.0. In-sample misses (30/56): `plastic_hard` spans solid parts, thin housings, sparse prints (3× range wider than tolerance, 9 misses); coffee can 3× heavy all 4 runs (wrong steel class + invisible filling, pulls the steel fit); model-called-`foam` prints/cap 10-30× light (need >1 unfittable, f ∈ (0,1]); toy basketball 7.5× heavy (single object → global value; inflated ball needs ~0.04); 7 runs carry >20% size error. Real levers are separating sparse from dense objects (class list or model answer) and shape-stage size errors — both outside P4.6.
 
-| Fill fraction | Within 30% of 56 | Share | Median mass ratio |
-| --- | --- | --- | --- |
-| None | 4 | 7% | 2.85 |
-| Global per answer, held out | 17 | 30% | 1.11 |
-| Per class, held out | 20 | 36% | 0.97 |
-| Per class, in sample | 26 | 46% | 0.99 |
-
-**The honest number is 36%, against the 70% exit criterion.** Density and fill alone do not reach it.
-Truth inside low to high went from 31 to 42 of 56, in sample.
-
-| Class and answer | Distinct objects | Low | Nominal | High |
-| --- | --- | --- | --- | --- |
-| `cardboard` hollow | 4 | 0.21 | 0.248 | 0.302 |
-| `metal_steel` hollow | 4 | 0.028 | 0.073 | 0.122 |
-| `plastic_hard` hollow | 5 | 0.415 | 0.601 | 0.947 |
-| `plastic_hard` solid | 12 | 0.18 | 0.357 | 0.535 |
-| Global hollow | | 0.039 | 0.278 | 0.681 |
-| Global solid | | 0.317 | 0.441 | 1.0 |
-
-What still misses, in sample (30 of 56):
-
-* `plastic_hard`, 9 misses: one class covers solid parts, thin housings and sparse prints, and its
-  range of 3 times is wider than the tolerance. A class cannot fix this.
-* Coffee can, 4 runs, 3 times too heavy, and it pulls up the `metal_steel` fit. It is a cardboard can with a
-  metal bottom, about 80% filled, so steel is a model error and the filling cannot be seen.
-* Prints and a cap the model calls `foam`, 3 runs, 10 to 30 times too light. A need above 1 cannot
-  be fitted: `f` stays in (0, 1], and the density is the wrong one.
-* Toy air basketball, 2 runs, 7.5 times too heavy. It has one distinct object, so it takes the
-  global value, and an inflated ball needs about 0.04.
-* Size errors: 7 runs are above 20%, 3 of them within tolerance anyway, and no fill fixes the rest.
-
-Next steps with a real chance of moving this are a class list or a model answer that separates
-sparse from dense objects, and the size errors of the shape stage. Both are outside P4.6.
-
-## Limits of the mass estimate
-
-* `f` dilutes the body evenly. An empty box has its mass in the walls, so its inertia per mass is
-  higher than this gives, by up to 5/3 for a thin spherical shell. There is no measured inertia on
-  the benchmark to size this; only the closed forms are checked.
-* Low and high carry the density and `f` ranges, not the scale error, which counts three times in
-  mass. The range holds the truth on 42 of 56, in sample, and 16 of 21 solid answers.
-* `f` is fitted on the same dev set it is reported on, and has not been run on the test split.
-* The sealed body's center of mass is a median 1.7 mm from the mesh centroid, the object-frame
-  origin. P4.8 has to move the origin to it.
-* The 0.5 hull test also catches concave solids. A hollow answer on one, such as the chocolate
-  santa, gets no correction.
-
-## Limits of the volume test
-
-* The voxel fill reads high by design: +3 to +6% on analytic shapes at 128 voxels along the longest
-  side (`self_check` in the script), worst on thin boxes, and more on thin walls. Bias is not
-  removed from the numbers above.
-* Sealing was tuned on few objects: 2 mugs, 2 caps and 1 bottle are the only open vessels in the
-  matched dev set, and the white round basket and other wide containers were not among them. The
-  4% value has not been run on the test split.
-* `sealed_volumes` has no analytic check on a cup, because the mesh boolean backend is not
-  installed; the mugs and bottle against the weighed masses are the check.
-* True volume is a primitive from caliper sizes, so a real rounded box is slightly less.
-* The 17 objects without primitive truth, including the concave ones where the hull is weakest,
-  have no volume score. They are in the mass rows.
-* 7 of the 56 objects have a size error above 20%, and that error is inside these volumes.
-* Density ratios use the model's class, which agrees with the inventory on 40 of 56.
+Limits: f dilutes evenly, understating thin-shell inertia/mass (up to 5/3 for thin spherical shells; no benchmark inertia truth, only closed-form checks). Low-high carry density+f ranges, not scale error (3× in mass); range holds truth on 42/56 in-sample (16/21 solids). f is dev-fitted, test-unrun. Sealed-body COM sits median 1.7 mm from mesh centroid (object-frame origin); P4.8 moves the origin there. The 0.5-hull test also catches concave solids (e.g. chocolate santa gets no correction on a hollow answer). Volume-test biases: +3-6% voxelfill bias at 128 voxels/side (thin boxes worst) unremoved; sealing tuned on 2 mugs/2 caps/1 bottle (wide containers absent); no analytic cup check (boolean backend missing — mugs/bottle vs weights are the check); primitive truth slightly overstates rounded boxes; 17 box-less objects (incl. concave hull-weak cases) unscored in volume; 7/56 carry >20% size error; density ratios use model classes (40/56 agree with inventory).
