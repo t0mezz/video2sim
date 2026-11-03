@@ -11,6 +11,7 @@ them. Detection runs on the registered frames again, which is cheap next to the 
 
 from __future__ import annotations
 
+import threading
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -62,6 +63,27 @@ class MarkerFilterConfig:
 @dataclass(frozen=True)
 class MarkerFilterReport:
     dropped: Mapping[int, str]  # track id -> reason
+
+
+def cached_tag_detector(family: str, detect: TagDetector | None = None) -> TagDetector:
+    """A tag detector that reads each frame file at most once.
+
+    One stage run checks the same frames in the marker filter, in every
+    gap-fill request's marker filter and in the board check; the frames do
+    not change during a run, so callers share one of these instead of
+    re-detecting (and re-decoding) every frame for every check.
+    """
+    base = detect or (lambda p: _detect_file(p, family))
+    cache: dict[Path, Detections] = {}
+    lock = threading.Lock()
+
+    def detect_once(path: Path) -> Detections:
+        with lock:
+            if path not in cache:
+                cache[path] = base(path)
+            return cache[path]
+
+    return detect_once
 
 
 def tag_mask(corners: Sequence[F64], shape: tuple[int, int], erode_px: int) -> BoolMask:

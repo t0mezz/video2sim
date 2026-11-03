@@ -214,6 +214,28 @@ class WorldModel(Model):
 # ---------------------------------------------------------------------------
 
 
+class DiscoveryCheck(Model):
+    """What the discovery audit of stage 3 found, for the QA report."""
+
+    view_frames: list[int] = Field(description="Frame indices sent to the router")
+    view_coverage: float = Field(
+        ge=0,
+        le=1,
+        description="Share of workspace cells seen unoccluded by the chosen frames",
+    )
+    listed: int = Field(ge=0, description="Objects in the merged router inventory, a lower bound")
+    tracked: int = Field(ge=0, description="Tracks after gap fill")
+    missing_suspected: bool
+    unmatched: list[str] = Field(
+        default_factory=list, description="Inventory nouns left without a track"
+    )
+    unexplained_clusters: int = Field(
+        ge=0, description="Above-table point clusters no track explains"
+    )
+    recovered: int = Field(ge=0, description="Objects added by gap fill")
+    video_requests: int = Field(ge=1, description="SAM video requests made, generic one included")
+
+
 class ObjectInstance(Model):
     object_id: str = Field(min_length=1, description="Stable id such as obj_003")
     label: str
@@ -233,6 +255,9 @@ class ObjectInstance(Model):
     hollow: str | None = Field(default=None, description="solid, hollow or unknown")
     rigidity: str | None = Field(default=None, description="rigid, semi_rigid, deformable, unknown")
     material_confidence: float | None = Field(default=None, ge=0.0, le=1.0)
+    found_by: Literal["generic", "noun", "cluster_box"] = Field(
+        default="generic", description="How the track was found (gap fill provenance)"
+    )
 
 
 class Instances(Model):
@@ -242,6 +267,9 @@ class Instances(Model):
     flags: list[str] = Field(
         default_factory=list,
         description="Scene-level warnings for the QA report, such as fewer objects than expected",
+    )
+    discovery: DiscoveryCheck | None = Field(
+        default=None, description="Discovery audit of stage 3, for the QA report"
     )
 
     @model_validator(mode="after")

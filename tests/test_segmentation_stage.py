@@ -6,6 +6,7 @@ import numpy as np
 
 from video2sim.schemas import Flag, Instances
 from video2sim.stages.depth_flags import Verdict
+from video2sim.stages.gap_fill import FitPass
 from video2sim.stages.keyframes import KeyframeChoice
 from video2sim.stages.material_pass import MaterialAnswer, MaterialDecision
 from video2sim.stages.primitive_fit import FitResult, Primitive
@@ -13,6 +14,7 @@ from video2sim.stages.scene_router import Route
 from video2sim.stages.segmentation_stage import (
     build_object,
     choose_cluster,
+    drop_reasons,
     fit_report,
     flag_live_line,
     object_flags,
@@ -52,6 +54,15 @@ def test_live_lines_name_the_route_and_each_flagged_object() -> None:
     assert flag_live_line("obj_001", "box", ["occluded", "small"]) == (
         "obj_001 (box): occluded, small"
     )
+
+
+def test_drop_reasons_cover_both_passes_but_not_a_kept_track() -> None:
+    first = FitPass([], {}, {}, {}, {1: "only 3 voxels agree", 9: "no point cluster"})
+    final = FitPass([], {}, {}, {}, {2: "duplicate of track 1"})
+    assert drop_reasons(first, final, {9}) == {
+        1: "only 3 voxels agree",
+        2: "duplicate of track 1",
+    }
 
 
 def test_repaired_ids_cover_split_parts_and_the_kept_id_of_a_merge() -> None:

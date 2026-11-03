@@ -23,8 +23,13 @@ on another object is dropped.
   ``dup_dist_m`` the smaller cluster is dropped as a duplicate of the larger, so a
   fractured track can never export the same object twice.
 * Only the largest connected group of each track is kept, which removes outlier voxels.
-* A track with too few voxels, or one that reaches the top of the grid, is dropped and listed
-  in the report. Hands and arms are not detected as such: they move between views, so their
+* A track with too few voxels is dropped and listed in the report. A track that reaches the
+  top of the first-pass grid is re-voted on a taller grid and kept only when its column
+  shows a cap: occupancy that falls off near the top and only incidental contact with
+  the grid's lateral edges (below ``edge_frac`` of its voxels). A column that stays
+  flat through the tall grid, or substantially touches its sides, is
+  background (a wall or person) and is dropped. Hands and arms are not detected as such:
+  they move between views, so their
   masks agree on almost no voxels and the track falls out through ``min_voxels``.
 
 ``lift_points`` is the second, independent lift of the same tracks: the sparse SfM points that
@@ -83,6 +88,10 @@ class LiftConfig:
     small_min_agreement: float
     small_min_voxels: int
     dup_dist_m: float
+    tall_height_m: float
+    cap_top_m: float
+    cap_frac: float
+    edge_frac: float = 0.05  # lateral-edge voxels below this share of the component pass
 
     @classmethod
     def from_config(cls, cfg: dict[str, Any]) -> LiftConfig:
@@ -105,12 +114,24 @@ class LiftConfig:
             float(c["small_min_agreement"]),
             int(c["small_min_voxels"]),
             float(c["dup_dist_m"]),
+            float(c["tall_height_m"]),
+            float(c["cap_top_m"]),
+            float(c["cap_frac"]),
+            float(c["edge_frac"]),
         )
         if (
             min(out.voxel_m, out.max_height_m, out.margin_m, out.max_extent_m) <= 0
             or out.table_margin_m < 0
         ):
             raise ValueError("lift lengths must be positive")
+        if out.tall_height_m < out.max_height_m:
+            raise ValueError("tall_height_m must clear max_height_m")
+        if out.cap_top_m <= 0 or out.cap_top_m > out.tall_height_m:
+            raise ValueError("cap_top_m must be within (0, tall_height_m]")
+        if not 0.0 < out.cap_frac <= 1.0:
+            raise ValueError("cap_frac must be in (0, 1]")
+        if not 0.0 < out.edge_frac <= 1.0:
+            raise ValueError("edge_frac must be in (0, 1]")
         if (
             min(
                 out.max_views,
@@ -145,7 +166,26 @@ class LiftReport:
     dropped: Mapping[int, str]
 
 
-def _grid(centers_xy: F64, plane: Plane, cfg: LiftConfig) -> tuple[F64, tuple[int, int, int]]:
+@dataclass(frozen=True)
+class PointVote:
+    """Per-point best mask agreement over the tracks (step 1 of the residual design).
+
+    ``best_ratio[i]`` is ``max_t h_t(p_i) / s_t(p_i)`` over tracks that saw point
+    ``i`` in at least ``min_views`` views (0 when no track qualifies),
+    ``best_track[i]`` is the winning track id (-1 for none) and ``best_seen[i]``
+    is that track's view count. A point is explained when ``best_ratio`` clears
+    the explain threshold and ``best_seen`` clears ``min_views``; the vote is a
+    by-product of the lift, so it costs nothing extra.
+    """
+
+    best_ratio: F64
+    best_track: I64
+    best_seen: I64
+
+
+def _grid(
+    centers_xy: F64, plane: Plane, cfg: LiftConfig, height_m: float
+) -> tuple[F64, tuple[int, int, int]]:
     """Voxel centres (N, 3) and the grid shape. World +Z is up, the grid starts at the table."""
     lo = centers_xy.min(axis=0) - cfg.margin_m
     hi = centers_xy.max(axis=0) + cfg.margin_m
@@ -157,7 +197,7 @@ def _grid(centers_xy: F64, plane: Plane, cfg: LiftConfig) -> tuple[F64, tuple[in
     shape = (
         int(np.ceil((hi[0] - lo[0]) / cfg.voxel_m)),
         int(np.ceil((hi[1] - lo[1]) / cfg.voxel_m)),
-        int(np.ceil(cfg.max_height_m / cfg.voxel_m)),
+        int(np.ceil(height_m / cfg.voxel_m)),
     )
     origin = np.array([lo[0], lo[1], plane.offset_m], dtype=np.float64)
     idx = np.stack(np.meshgrid(*[np.arange(n) for n in shape], indexing="ij"), axis=-1)
@@ -218,32 +258,22 @@ def _largest_component(cells: I64) -> NDArray[np.bool_]:
     return np.asarray(label == int(np.argmax(counts)), dtype=bool)
 
 
-def lift_tracks(
-    tracks: Sequence[Track], world: WorldModel, cfg: LiftConfig
-) -> tuple[dict[int, F64], LiftReport]:
-    """Point clusters (world frame, metres) by track id, and the report of what was dropped."""
+def _vote(
+    centers: F64,
+    tracks: Sequence[Track],
+    world: WorldModel,
+    cfg: LiftConfig,
+    views: list[int],
+) -> tuple[F64, I64]:
+    """Agreement ratio per track and voxel, and the winning track per voxel.
+
+    A voxel belongs to the track with the highest ratio once that ratio clears the
+    track's agreement threshold; the caller turns ``(ratio, best)`` into members.
+    """
     import cv2  # heavy import, kept out of module import time
 
-    poses: dict[int, SE3] = {f.frame_index: f.T_world_from_camera for f in world.frames}
-    feet = [
-        p
-        for t in tracks
-        for f, m in t.masks.items()
-        if (p := mask_footprint(m, poses[f], world.intrinsics, world.table_plane)) is not None
-    ]
-    if not tracks or not feet:
-        return {}, LiftReport(0, {}, {t.track_id: "no usable mask" for t in tracks})
-    centers, shape = _grid(np.array(feet), world.table_plane, cfg)
-
-    views = _views(world, cfg)
     k = world.intrinsics
     scale = 1.0 / cfg.mask_downscale
-    areas = np.array(
-        [float(np.median([m.sum() for m in t.masks.values()])) if t.masks else 0.0 for t in tracks]
-    )
-    small_track = areas < cfg.small_mask_px
-    agree = np.where(small_track, cfg.small_min_agreement, cfg.min_agreement)
-    minvox = np.where(small_track, cfg.small_min_voxels, cfg.min_voxels)
     seen = np.zeros((len(tracks), len(centers)), dtype=np.int32)
     hits = np.zeros((len(tracks), len(centers)), dtype=np.int32)
     for position in views:
@@ -297,27 +327,113 @@ def lift_tracks(
             hits[row] += use & own
 
     ratio = np.where(seen >= cfg.min_views, hits / np.maximum(seen, 1), 0.0)
-    best = ratio.argmax(axis=0)
+    best: I64 = ratio.argmax(axis=0)
+    return ratio, best
+
+
+def _cap_reason(cells: I64, shape: tuple[int, int, int], cfg: LiftConfig) -> str | None:
+    """Why a column filling the tall grid is background, or None when it caps.
+
+    A tabletop object is an island: its layer occupancy falls off near its top and only
+    incidentally touches the grid's lateral edges. A wall or person stays flat through
+    the top layer, or spans past the tracked feet to the grid's sides. The edge test is
+    a share, not any touch: sparse objects (flower gaps) agree on background margin
+    voxels that connect to the core, and whether dying fragments trim that bridge must
+    not decide the object.
+    """
+    top_layers = max(1, round(cfg.cap_top_m / cfg.voxel_m))
+    counts = np.bincount(cells[:, 2], minlength=shape[2])
+    peak = int(np.max(counts))
+    if peak == 0 or float(np.sum(counts[shape[2] - top_layers :])) > cfg.cap_frac * peak:
+        return "fills the grid to its top"
+    nx, ny = shape[0], shape[1]
+    on_edge = (
+        (cells[:, 0] <= 0) | (cells[:, 0] >= nx - 1) | (cells[:, 1] <= 0) | (cells[:, 1] >= ny - 1)
+    )
+    if float(np.sum(on_edge)) >= cfg.edge_frac * len(cells):
+        return "fills the grid to its edge"
+    return None
+
+
+def lift_tracks(
+    tracks: Sequence[Track], world: WorldModel, cfg: LiftConfig
+) -> tuple[dict[int, F64], LiftReport]:
+    """Point clusters (world frame, metres) by track id, and the report of what was dropped."""
+    poses: dict[int, SE3] = {f.frame_index: f.T_world_from_camera for f in world.frames}
+    feet = [
+        p
+        for t in tracks
+        for f, m in t.masks.items()
+        if (p := mask_footprint(m, poses[f], world.intrinsics, world.table_plane)) is not None
+    ]
+    if not tracks or not feet:
+        return {}, LiftReport(0, {}, {t.track_id: "no usable mask" for t in tracks})
+    xy = np.array(feet)
+    centers, shape = _grid(xy, world.table_plane, cfg, cfg.max_height_m)
+
+    views = _views(world, cfg)
+    areas = np.array(
+        [float(np.median([m.sum() for m in t.masks.values()])) if t.masks else 0.0 for t in tracks]
+    )
+    small_track = areas < cfg.small_mask_px
+    agree = np.where(small_track, cfg.small_min_agreement, cfg.min_agreement)
+    minvox = np.where(small_track, cfg.small_min_voxels, cfg.min_voxels)
+    ratio, best = _vote(centers, tracks, world, cfg, views)
 
     clusters: dict[int, F64] = {}
     dropped: dict[int, str] = {}
     voxels: dict[int, int] = {}
     top_layer = shape[2] - 1
+    tall_rows: list[int] = []
+    tall_low_cells: dict[int, I64] = {}
     for row, track in enumerate(tracks):
         member = np.nonzero((ratio[row] >= agree[row]) & (best == row))[0]
         if member.size == 0:
             dropped[track.track_id] = "no voxel is inside the mask in enough views"
             continue
         cells = np.stack(np.unravel_index(member, shape), axis=1).astype(np.int64)
+        raw_cells = cells
         keep = _largest_component(cells)
         member, cells = member[keep], cells[keep]
         if len(member) < minvox[row]:
             dropped[track.track_id] = f"only {len(member)} voxels agree"
         elif int(np.max(cells[:, 2])) >= top_layer:
-            dropped[track.track_id] = "reaches the top of the grid (not a tabletop object)"
+            tall_rows.append(row)  # decided on the tall grid below
+            tall_low_cells[row] = raw_cells  # reused below; the tall vote covers the rest
         else:
             clusters[track.track_id] = centers[member]
             voxels[track.track_id] = len(member)
+    if tall_rows:
+        # Second pass, paid only when something reaches the first pass. The layers below
+        # the first-pass top reuse that vote; only the layers above it are re-voted, on
+        # the same footprint, so a tall object can show its cap.
+        tall_centers, tall_shape = _grid(xy, world.table_plane, cfg, cfg.tall_height_m)
+        nx, ny, nz = tall_shape
+        low_layers = shape[2]
+        high_centers = tall_centers.reshape(nx, ny, nz, 3)[:, :, low_layers:, :].reshape(-1, 3)
+        tall_ratio, tall_best = _vote(high_centers, tracks, world, cfg, views)
+        tall_top = tall_shape[2] - 1
+        for row in tall_rows:
+            track = tracks[row]
+            pos = np.nonzero((tall_ratio[row] >= agree[row]) & (tall_best == row))[0]
+            hx, hy, hz = np.unravel_index(pos, (nx, ny, nz - low_layers))
+            high_cells = np.stack((hx, hy, hz + low_layers), axis=1).astype(np.int64)
+            cells = np.concatenate((tall_low_cells[row], high_cells))
+            member = (cells[:, 0] * ny + cells[:, 1]) * nz + cells[:, 2]
+            if member.size == 0:
+                dropped[track.track_id] = "no voxel is inside the mask in enough views"
+                continue
+            keep = _largest_component(cells)
+            member, cells = member[keep], cells[keep]
+            if len(member) < minvox[row]:
+                dropped[track.track_id] = f"only {len(member)} voxels agree"
+            elif int(np.max(cells[:, 2])) >= tall_top:
+                dropped[track.track_id] = "reaches the top of the tall grid (not a tabletop object)"
+            elif (reason := _cap_reason(cells, tall_shape, cfg)) is not None:
+                dropped[track.track_id] = f"{reason} (not a tabletop object)"
+            else:
+                clusters[track.track_id] = tall_centers[member]
+                voxels[track.track_id] = len(member)
     if cfg.dup_dist_m > 0.0:
         dups = _duplicate_tracks(clusters, cfg.dup_dist_m)
         for i, reason in dups.items():
@@ -382,17 +498,14 @@ def load_points(path: Path) -> F64:
     return np.asarray(cloud.vertices, dtype=np.float64)
 
 
-def lift_points(
+def point_vote(
     tracks: Sequence[Track], world: WorldModel, points: F64, cfg: LiftConfig
-) -> tuple[dict[int, F64], LiftReport]:
-    """The second lift: sparse SfM points that the masks agree on, per track id.
+) -> PointVote:
+    """Best per-point agreement ratio over ``tracks`` and the winning track id.
 
-    Each point was triangulated from image features, so it lies on a visible surface. It is
-    kept for the track whose mask holds it in at least ``min_agreement`` of the views that
-    see it, with the same view rules as ``lift_tracks``. There is no volume, so the box of a
-    cluster follows the visible faces, but a plain or glossy object may have few points or
-    none, and a point in front of the object's edge can pass the vote (there is no occlusion
-    test). Each cluster goes through ``trim_extremes`` to drop stray points.
+    For each point and track, ``s`` counts the views where the track has a mask
+    and the point projects inside the frame, ``h`` those where the mask also
+    covers it; the ratio is ``h / s`` and is zeroed when ``s < min_views``.
     """
     k = world.intrinsics
     views = _views(world, cfg)
@@ -416,21 +529,52 @@ def lift_points(
             seen[row] += ok
             hits[row] += ok & mask[vi, ui]
     ratio = np.where(seen >= cfg.min_views, hits / np.maximum(seen, 1), 0.0)
-    if len(tracks) == 0:
-        return {}, LiftReport(len(views), {}, {})
+    if len(tracks) == 0 or len(points) == 0:
+        return PointVote(
+            np.zeros(len(points)),
+            np.full(len(points), -1, dtype=np.int64),
+            np.zeros(len(points), dtype=np.int64),
+        )
     best = ratio.argmax(axis=0)
+    rows = np.arange(len(points))
+    return PointVote(
+        best_ratio=np.asarray(ratio[best, rows], dtype=np.float64),
+        best_track=np.array([tracks[int(b)].track_id for b in best], dtype=np.int64),
+        best_seen=np.asarray(seen[best, rows], dtype=np.int64),
+    )
+
+
+def lift_points(
+    tracks: Sequence[Track], world: WorldModel, points: F64, cfg: LiftConfig
+) -> tuple[dict[int, F64], LiftReport, PointVote]:
+    """The second lift: sparse SfM points that the masks agree on, per track id.
+
+    Each point was triangulated from image features, so it lies on a visible surface. It is
+    kept for the track whose mask holds it in at least ``min_agreement`` of the views that
+    see it, with the same view rules as ``lift_tracks``. There is no volume, so the box of a
+    cluster follows the visible faces, but a plain or glossy object may have few points or
+    none, and a point in front of the object's edge can pass the vote (there is no occlusion
+    test). Each cluster goes through ``trim_extremes`` to drop stray points.
+
+    Also returns the per-point vote (best ratio and winning track) that the
+    residual-cluster step uses to decide which points are already explained.
+    """
+    vote = point_vote(tracks, world, points, cfg)
+    views = _views(world, cfg)
+    if len(tracks) == 0:
+        return {}, LiftReport(len(views), {}, {}), vote
     height = points[:, 2] - world.table_plane.offset_m
-    usable = (ratio.max(axis=0) >= cfg.min_agreement) & (height > cfg.table_margin_m)
-    usable &= height < cfg.max_height_m
+    usable = (vote.best_ratio >= cfg.min_agreement) & (height > cfg.table_margin_m)
+    usable &= height < cfg.tall_height_m
     clusters: dict[int, F64] = {}
     dropped: dict[int, str] = {}
     counts: dict[int, int] = {}
-    for row, track in enumerate(tracks):
-        voted = points[usable & (best == row)]
+    for track in tracks:
+        voted = points[usable & (vote.best_track == track.track_id)]
         chosen = trim_extremes(voted, cfg.trim_points_per_side, cfg.min_points)
         if len(chosen) < cfg.min_points:
             dropped[track.track_id] = f"only {len(chosen)} sparse points agree"
         else:
             clusters[track.track_id] = chosen
             counts[track.track_id] = len(chosen)
-    return clusters, LiftReport(len(views), counts, dropped)
+    return clusters, LiftReport(len(views), counts, dropped), vote

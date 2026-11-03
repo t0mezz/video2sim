@@ -8,6 +8,7 @@ import numpy as np
 from video2sim.schemas import SE3, CameraFrame, Intrinsics, Plane, WorldModel
 from video2sim.stages.marker_filter import (
     MarkerFilterConfig,
+    cached_tag_detector,
     filter_marker_tracks,
     overlaps_tag,
     tag_mask,
@@ -60,6 +61,19 @@ def _detect(visible: set[str]) -> Any:
         return ({0: TAG} if path.name in visible else {}), SHAPE
 
     return detect
+
+
+def test_cached_detector_reads_each_frame_once() -> None:
+    calls: list[str] = []
+
+    def detect(path: Path) -> Any:
+        calls.append(path.name)
+        return ({0: TAG} if path.name == "f0.png" else {}), SHAPE
+
+    cached = cached_tag_detector("aruco_4x4_50", detect)
+    assert cached(Path("f0.png"))[0] and cached(Path("f0.png"))[0]
+    assert cached(Path("f1.png"))[0] == {}
+    assert calls == ["f0.png", "f1.png"]
 
 
 def test_tag_mask_is_shrunk_by_the_erosion() -> None:

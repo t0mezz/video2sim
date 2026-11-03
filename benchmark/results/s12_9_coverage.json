@@ -1,0 +1,677 @@
+{
+ "visible_frac": 0.3,
+ "depth_order": "box center distance to the camera; full-box hull projection, self-occlusion ignored, boxes behind the camera project empty",
+ "scenes": [
+  {
+   "run": "s01_b",
+   "scene": "s01",
+   "objects": 5,
+   "policies": {
+    "even-3": {
+     "views": [
+      0,
+      22,
+      45
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 3,
+     "worst_objects": [
+      "obj_003",
+      "obj_004",
+      "obj_007",
+      "obj_021",
+      "obj_029"
+     ]
+    },
+    "even-6": {
+     "views": [
+      0,
+      9,
+      18,
+      27,
+      36,
+      45
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 6,
+     "worst_objects": [
+      "obj_003",
+      "obj_004",
+      "obj_007",
+      "obj_021",
+      "obj_029"
+     ]
+    },
+    "coverage-6": {
+     "views": [
+      1,
+      2,
+      7,
+      8,
+      43,
+      44
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 6,
+     "worst_objects": [
+      "obj_003",
+      "obj_004",
+      "obj_007",
+      "obj_021",
+      "obj_029"
+     ]
+    }
+   }
+  },
+  {
+   "run": "s02_b",
+   "scene": "s02",
+   "objects": 5,
+   "policies": {
+    "even-3": {
+     "views": [
+      0,
+      24,
+      49
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 3,
+     "worst_objects": [
+      "obj_014",
+      "obj_039",
+      "obj_041",
+      "obj_046",
+      "obj_060"
+     ]
+    },
+    "even-6": {
+     "views": [
+      0,
+      10,
+      20,
+      29,
+      39,
+      49
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 6,
+     "worst_objects": [
+      "obj_014",
+      "obj_039",
+      "obj_041",
+      "obj_046",
+      "obj_060"
+     ]
+    },
+    "coverage-6": {
+     "views": [
+      0,
+      4,
+      5,
+      20,
+      48,
+      49
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 6,
+     "worst_objects": [
+      "obj_014",
+      "obj_039",
+      "obj_041",
+      "obj_046",
+      "obj_060"
+     ]
+    }
+   }
+  },
+  {
+   "run": "s03_b",
+   "scene": "s03",
+   "objects": 1,
+   "policies": {
+    "even-3": {
+     "views": [
+      0,
+      37,
+      74
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 3,
+     "worst_objects": [
+      "obj_027"
+     ]
+    },
+    "even-6": {
+     "views": [
+      0,
+      15,
+      30,
+      44,
+      59,
+      74
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 6,
+     "worst_objects": [
+      "obj_027"
+     ]
+    },
+    "coverage-6": {
+     "views": [
+      0,
+      1,
+      7,
+      36,
+      72,
+      73
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 6,
+     "worst_objects": [
+      "obj_027"
+     ]
+    }
+   }
+  },
+  {
+   "run": "s04_b",
+   "scene": "s04",
+   "objects": 5,
+   "policies": {
+    "even-3": {
+     "views": [
+      0,
+      37,
+      74
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 2,
+     "worst_objects": [
+      "obj_003",
+      "obj_014"
+     ]
+    },
+    "even-6": {
+     "views": [
+      0,
+      15,
+      30,
+      44,
+      59,
+      74
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 4,
+     "worst_objects": [
+      "obj_014"
+     ]
+    },
+    "coverage-6": {
+     "views": [
+      0,
+      1,
+      15,
+      16,
+      73,
+      74
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 4,
+     "worst_objects": [
+      "obj_003",
+      "obj_014"
+     ]
+    }
+   }
+  },
+  {
+   "run": "s05_b",
+   "scene": "s05",
+   "unscored": "no board alignment"
+  },
+  {
+   "run": "s06_b",
+   "scene": "s06",
+   "objects": 4,
+   "policies": {
+    "even-3": {
+     "views": [
+      0,
+      58,
+      117
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 2,
+     "worst_objects": [
+      "obj_018",
+      "obj_040"
+     ]
+    },
+    "even-6": {
+     "views": [
+      0,
+      23,
+      47,
+      70,
+      94,
+      117
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 4,
+     "worst_objects": [
+      "obj_018",
+      "obj_040"
+     ]
+    },
+    "coverage-6": {
+     "views": [
+      0,
+      3,
+      22,
+      23,
+      53,
+      55
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 4,
+     "worst_objects": [
+      "obj_040"
+     ]
+    }
+   }
+  },
+  {
+   "run": "s11_b",
+   "scene": "s11",
+   "objects": 7,
+   "policies": {
+    "even-3": {
+     "views": [
+      0,
+      48,
+      97
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 3,
+     "worst_objects": [
+      "obj_040",
+      "obj_047",
+      "obj_048",
+      "obj_049",
+      "obj_050",
+      "obj_052",
+      "obj_056"
+     ]
+    },
+    "even-6": {
+     "views": [
+      0,
+      19,
+      39,
+      58,
+      78,
+      97
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 6,
+     "worst_objects": [
+      "obj_040",
+      "obj_047",
+      "obj_048",
+      "obj_049",
+      "obj_050",
+      "obj_052",
+      "obj_056"
+     ]
+    },
+    "coverage-6": {
+     "views": [
+      0,
+      1,
+      57,
+      58,
+      96,
+      97
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 6,
+     "worst_objects": [
+      "obj_040",
+      "obj_047",
+      "obj_048",
+      "obj_049",
+      "obj_050",
+      "obj_052",
+      "obj_056"
+     ]
+    }
+   }
+  },
+  {
+   "run": "s12_b",
+   "scene": "s12",
+   "objects": 10,
+   "policies": {
+    "even-3": {
+     "views": [
+      0,
+      40,
+      80
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 2,
+     "worst_objects": [
+      "obj_002",
+      "obj_014",
+      "obj_039"
+     ]
+    },
+    "even-6": {
+     "views": [
+      0,
+      16,
+      32,
+      48,
+      64,
+      80
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 4,
+     "worst_objects": [
+      "obj_039"
+     ]
+    },
+    "coverage-6": {
+     "views": [
+      0,
+      22,
+      49,
+      68,
+      76,
+      77
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 4,
+     "worst_objects": [
+      "obj_014"
+     ]
+    }
+   }
+  },
+  {
+   "run": "s13_b",
+   "scene": "s13",
+   "objects": 3,
+   "policies": {
+    "even-3": {
+     "views": [
+      0,
+      44,
+      88
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 3,
+     "worst_objects": [
+      "obj_002",
+      "obj_014",
+      "obj_040"
+     ]
+    },
+    "even-6": {
+     "views": [
+      0,
+      18,
+      35,
+      53,
+      70,
+      88
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 6,
+     "worst_objects": [
+      "obj_002",
+      "obj_014",
+      "obj_040"
+     ]
+    },
+    "coverage-6": {
+     "views": [
+      0,
+      1,
+      10,
+      11,
+      54,
+      55
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 6,
+     "worst_objects": [
+      "obj_002",
+      "obj_014",
+      "obj_040"
+     ]
+    }
+   }
+  },
+  {
+   "run": "s14_b",
+   "scene": "s14",
+   "objects": 5,
+   "policies": {
+    "even-3": {
+     "views": [
+      0,
+      25,
+      50
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 2,
+     "worst_objects": [
+      "obj_006",
+      "obj_036"
+     ]
+    },
+    "even-6": {
+     "views": [
+      0,
+      10,
+      20,
+      30,
+      40,
+      50
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 3,
+     "worst_objects": [
+      "obj_036"
+     ]
+    },
+    "coverage-6": {
+     "views": [
+      0,
+      1,
+      14,
+      15,
+      36,
+      37
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 5,
+     "worst_objects": [
+      "obj_040"
+     ]
+    }
+   }
+  },
+  {
+   "run": "s17_b",
+   "scene": "s17",
+   "objects": 5,
+   "policies": {
+    "even-3": {
+     "views": [
+      0,
+      42,
+      83
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 2,
+     "worst_objects": [
+      "obj_015"
+     ]
+    },
+    "even-6": {
+     "views": [
+      0,
+      17,
+      33,
+      50,
+      66,
+      83
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 3,
+     "worst_objects": [
+      "obj_015"
+     ]
+    },
+    "coverage-6": {
+     "views": [
+      0,
+      1,
+      45,
+      46,
+      82,
+      83
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 4,
+     "worst_objects": [
+      "obj_015",
+      "obj_035"
+     ]
+    }
+   }
+  },
+  {
+   "run": "s18_b",
+   "scene": "s18",
+   "objects": 8,
+   "policies": {
+    "even-3": {
+     "views": [
+      0,
+      42,
+      84
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 3,
+     "worst_objects": [
+      "obj_000",
+      "obj_006",
+      "obj_008",
+      "obj_012",
+      "obj_018",
+      "obj_024",
+      "obj_032",
+      "obj_045"
+     ]
+    },
+    "even-6": {
+     "views": [
+      0,
+      17,
+      34,
+      50,
+      67,
+      84
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 6,
+     "worst_objects": [
+      "obj_000",
+      "obj_006",
+      "obj_008",
+      "obj_012",
+      "obj_018",
+      "obj_024",
+      "obj_032",
+      "obj_045"
+     ]
+    },
+    "coverage-6": {
+     "views": [
+      0,
+      1,
+      6,
+      56,
+      57,
+      84
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 6,
+     "worst_objects": [
+      "obj_000",
+      "obj_006",
+      "obj_008",
+      "obj_012",
+      "obj_018",
+      "obj_024",
+      "obj_032",
+      "obj_045"
+     ]
+    }
+   }
+  },
+  {
+   "run": "s24_b",
+   "scene": "s24",
+   "objects": 1,
+   "policies": {
+    "even-3": {
+     "views": [
+      0,
+      25,
+      50
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 3,
+     "worst_objects": [
+      "obj_040"
+     ]
+    },
+    "even-6": {
+     "views": [
+      0,
+      10,
+      20,
+      30,
+      40,
+      50
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 6,
+     "worst_objects": [
+      "obj_040"
+     ]
+    },
+    "coverage-6": {
+     "views": [
+      25,
+      27,
+      41,
+      42,
+      49,
+      50
+     ],
+     "share_seen": 1.0,
+     "min_views_seen": 6,
+     "worst_objects": [
+      "obj_040"
+     ]
+    }
+   }
+  }
+ ],
+ "decision": "even-3 already shows every ground-truth object in at least one view on every scored dev scene: multi-view routing (9.3, 9.4) is NOT justified by occlusion; build only 9.6 and 9.8 with views.mode even"
+}

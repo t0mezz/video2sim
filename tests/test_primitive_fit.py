@@ -42,6 +42,9 @@ LIFT = LiftConfig(
     small_min_agreement=0.9,
     small_min_voxels=20,
     dup_dist_m=0.02,
+    tall_height_m=0.35,
+    cap_top_m=0.02,
+    cap_frac=0.5,
 )
 CFG = PrimitiveConfig(
     mask_downscale=2,

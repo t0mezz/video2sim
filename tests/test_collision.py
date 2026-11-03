@@ -307,7 +307,9 @@ def test_decimated_copy_feeds_coacd_and_the_toggle_restores_the_full_mesh(
     res = collision_geometry(big, cfg)
     assert res.steps["decomp_decimated"] == 1
     assert res.steps["decomp_input_faces"] <= cfg.decomp_max_faces
-    assert all(c[0] <= 2100 for c in stub.calls)  # decimated vertices, not the full mesh
+    # Decimated to decomp_max_faces faces, so far below the full mesh's vertices.
+    assert all(c[0] <= cfg.decomp_max_faces for c in stub.calls)
+    assert all(c[0] < len(big.vertices) for c in stub.calls)
     assert res.ok and res.steps["decomp_rung_full"] == 1
     full_stub, full_cfg = _stubbed(cfg, monkeypatch, decomp_decimate=False)
     collision_geometry(big, full_cfg)
@@ -355,7 +357,7 @@ def test_a_thin_walled_cup_survives_the_decimated_path(cfg: CollisionConfig) -> 
     pytest.importorskip("coacd")
     pytest.importorskip("fast_simplification")
     profile = [[0, -0.05], [0.04, -0.05], [0.04, 0.05], [0.035, 0.05], [0.035, -0.04], [0, -0.04]]
-    cup = trimesh.creation.revolve(np.array(profile), sections=600)
+    cup = trimesh.creation.revolve(np.array(profile), sections=2000)
     assert cup.is_watertight and len(cup.faces) > cfg.decomp_max_faces
     res = collision_geometry(cup, cfg)
     assert res.steps["decomp_decimated"] == 1

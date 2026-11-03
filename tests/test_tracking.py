@@ -8,11 +8,17 @@ import pytest
 
 from video2sim.evaluation.scenes import GtObject
 from video2sim.evaluation.segmentation import project_box_mask, score_tracks
-from video2sim.models.hosted import SamRecord
-from video2sim.schemas import SE3, Intrinsics, Plane
+from video2sim.models.hosted import ResponseCache, SamRecord
+from video2sim.schemas import SE3, CameraFrame, Intrinsics, Plane, WorldModel
 from video2sim.stages.segmentation import BoolMask
-from video2sim.stages.track_repair import RepairConfig, mask_footprint, repair_tracks
-from video2sim.stages.tracking import Track, TrackingConfig, tracks_from_text
+from video2sim.stages.track_repair import RepairConfig, _groups, mask_footprint, repair_tracks
+from video2sim.stages.tracking import (
+    FakeVideoSamClient,
+    Track,
+    TrackingConfig,
+    track_objects,
+    tracks_from_text,
+)
 
 K = Intrinsics(fx=100, fy=100, cx=50, cy=50, width_px=100, height_px=100)
 # Camera 1 m above the table looking straight down: pixel (u, v) is world ((u-50)/100, -(v-50)/100).
@@ -160,6 +166,52 @@ def test_config_rejects_bad_values() -> None:
         bad = {"segmentation": {"tracking": {**cfg["segmentation"]["tracking"], key: value}}}
         with pytest.raises(ValueError):
             TrackingConfig.from_config(bad)
+
+
+def test_groups_links_only_within_the_link_distance() -> None:
+    points = np.array([[0.0, 0.0], [0.01, 0.0], [0.02, 0.0], [1.0, 1.0], [1.01, 1.0], [5.0, 5.0]])
+    assert _groups(points, 0.03) == [[0, 1, 2], [3, 4], [5]]
+    assert _groups(np.zeros((0, 2)), 0.03) == []
+
+
+def test_the_clip_is_encoded_once_for_several_prompts(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import cv2
+
+    from video2sim.stages import tracking as tracking_module
+
+    frame = tmp_path / "00000.png"
+    cv2.imwrite(str(frame), np.full((8, 8, 3), 128, dtype=np.uint8))
+    world = WorldModel(
+        intrinsics=K,
+        frames=[CameraFrame(frame_index=0, image_path=frame.name, T_world_from_camera=POSE)],
+        scale_factor=1.0,
+        scale_source="marker",
+        table_plane=TABLE,
+        point_cloud_path="points.ply",
+        mean_reprojection_error_px=0.5,
+        registered_fraction=1.0,
+    )
+    encodes: list[Path] = []
+
+    def fake_encode(frames: list[Path], fps: float, out: Path) -> None:
+        encodes.append(out)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_bytes(b"clip")
+
+    monkeypatch.setattr(tracking_module, "encode_clip", fake_encode)
+    client = FakeVideoSamClient("")
+    cache = ResponseCache(tmp_path / "cache")
+    clip = tmp_path / "work" / "clip.mp4"
+    for prompt in ("objects on a table", "mug", "cup"):
+        cfg = TrackingConfig(prompt, 5.0, "both", 60.0)
+        tracks = track_objects(
+            world, tmp_path, client, cache, cfg, tmp_path / "work", clip_path=clip
+        )
+        assert tracks == []
+    assert encodes == [clip]  # one encode; the shared clip serves every prompt
+    assert client.calls == 3
 
 
 def test_answer_frames_map_to_world_frame_indices() -> None:

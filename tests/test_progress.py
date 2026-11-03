@@ -259,7 +259,7 @@ def test_summary_lines_carry_an_arrow_on_utf8_terminals(tmp_path: Path) -> None:
     reporter.close()
     text = out.getvalue()
     # The arrow sits in the spinner/checkmark column, right after the line erase.
-    assert "\r\033[2K⇾ 3 frames at 5.0 fps\n" in text
+    assert "\r\033[2K↳ 3 frames at 5.0 fps\n" in text
 
 
 def test_cached_event_reports_summary_and_missing_output_stays_quiet(tmp_path: Path) -> None:

@@ -1,0 +1,74 @@
+{
+  "experiment": "S12.9 step 11 (9.8 subset): arm A gap_fill off vs arm F residual clusters -> VLM check -> one box request",
+  "scenes": [
+    "s13_b",
+    "s18_b",
+    "s24_b"
+  ],
+  "split": "dev only; no test scenes",
+  "runs_dir": "runs_instances_98 (built 2026-11-03 from runs/s13_b, s18_b, s24_b via run_stages + run_instances; arms share router/tracking/material caches)",
+  "scoring": "video2sim eval --stage segmentation per scene (folders symlinked as s13/s18/s24)",
+  "rows": [
+    {
+      "scene": "s13",
+      "recall_A": 1.0,
+      "recall_F": 1.0,
+      "matched_A": 3,
+      "matched_F": 3,
+      "fp_A": 0,
+      "fp_F": 0,
+      "clusters_F": 1,
+      "vlm_calls_F": 1,
+      "video_requests_A": 1,
+      "video_requests_F": 2,
+      "recovered_F": 0,
+      "seg_seconds_A": 73.2,
+      "seg_seconds_F": 139.8,
+      "note_F": "1 cluster accepted as 'clip' (0.78), box track passed the gate but the second lift dropped it (only 8 voxels); objects unchanged"
+    },
+    {
+      "scene": "s18",
+      "recall_A": 1.0,
+      "recall_F": 1.0,
+      "matched_A": 8,
+      "matched_F": 8,
+      "fp_A": 0,
+      "fp_F": 0,
+      "clusters_F": 2,
+      "vlm_calls_F": 2,
+      "video_requests_A": 1,
+      "video_requests_F": 1,
+      "recovered_F": 0,
+      "seg_seconds_A": 188.2,
+      "seg_seconds_F": 172.1,
+      "note_F": "both clusters rejected by the VLM (not an object, 0.88/0.96); no box request sent"
+    },
+    {
+      "scene": "s24",
+      "recall_A": 1.0,
+      "recall_F": 1.0,
+      "matched_A": 1,
+      "matched_F": 1,
+      "fp_A": 0,
+      "fp_F": 1,
+      "clusters_F": 15,
+      "vlm_calls_F": 11,
+      "video_requests_A": 1,
+      "video_requests_F": 2,
+      "recovered_F": 1,
+      "seg_seconds_A": 51.9,
+      "seg_seconds_F": 83.4,
+      "note_F": "15 residual clusters (two over 1000 points, unchecked: no placeable view); cluster 7 accepted as 'bundle', gate passed, obj_2007 recovered and scored a false positive"
+    }
+  ],
+  "totals": {
+    "sam_frames_billed_estimate": 365,
+    "sam_video_cost_usd_at_0.20_per_1000_frames": 0.073,
+    "vlm_calls": "3 router + 12 material (shared across arms) + 14 cluster checks; VLM unit price not in repo, not priced here"
+  },
+  "verdict": {
+    "recall_on_known_misses": "no worse (1.0 both arms) but vacuous here: in these fresh runs the generic tracker already found the s13 stack members, the s18 pliers and the s24 cube, so none of the 3 known misses was missing in arm A",
+    "false_positives": "WORSE on s24 (0 -> 1 per scene); criterion not met",
+    "wall_time": "not down overall: s13 +66.6s, s24 +31.5s, s18 -16.1s (material cache warm on the F rerun); criterion not met"
+  }
+}

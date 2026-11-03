@@ -15,6 +15,7 @@ import hashlib
 import json
 import os
 import re
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -51,14 +52,26 @@ class ResponseCache:
     def __init__(self, directory: Path) -> None:
         self._dir = directory
 
-    def get_or_call(self, parts: Sequence[str], call: Callable[[], str]) -> str:
+    def get(self, parts: Sequence[str]) -> str | None:
+        """The cached answer for ``parts``, or None. Lets a caller skip work
+        (such as encoding a clip) that only a cache miss needs."""
         key = hashlib.sha256("\x1f".join(parts).encode()).hexdigest()
         path = self._dir / f"{key}.txt"
-        if path.is_file():
-            return path.read_text(encoding="utf-8")
+        return path.read_text(encoding="utf-8") if path.is_file() else None
+
+    def get_or_call(self, parts: Sequence[str], call: Callable[[], str]) -> str:
+        cached = self.get(parts)
+        if cached is not None:
+            return cached
+        key = hashlib.sha256("\x1f".join(parts).encode()).hexdigest()
+        path = self._dir / f"{key}.txt"
         text = call()
         self._dir.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="utf-8")
+        # Atomic publish: parallel callers on the same key (parallel router
+        # views, cluster checks) must never read a half-written answer.
+        tmp = self._dir / f"{key}.{threading.get_ident()}.tmp"
+        tmp.write_text(text, encoding="utf-8")
+        tmp.replace(path)
         return text
 
 
