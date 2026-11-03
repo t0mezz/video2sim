@@ -47,6 +47,7 @@ There are three model endpoints required for this project:
 - a VLM: Muse Spark Open or Muse Glimmer 30b both work well
 - a perception model, used for detection, segmentation and tracking (SAM3.1 default)
 - a capable image to 3D model like SAM 3D
+
 All three model endpoints are configurable: [docs/model_interfaces.md](docs/model_interfaces.md).
 
 ## Make a scene
