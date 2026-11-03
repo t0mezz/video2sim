@@ -1,6 +1,6 @@
 # MVP success targets. Single source of truth for the evaluation harness and the phase gates.
 # docs/overview.md shows the same numbers for humans; if the two disagree, this file wins
-# and the doc is wrong. Targets are provisional: re-set them once the Phase 0 baseline exists.
+# and the doc is wrong.
 # Only a human changes this file (see AGENTS.md).
 
 status: final
