@@ -37,6 +37,7 @@ src/video2sim/
   evaluation/            metrics, baselines and reports against benchmark ground truth
   pipeline.py            all six stages as one runner
   pick_place.py          scripted Panda demo on an exported scene
+  isaac_verify.py        USD side of the Isaac Sim settling verifier (stdlib, NumPy, pxr only)
   cli.py                 the `video2sim` command (`eval` and `run`)
 tests/                   fast tests; no GPU, weights or network needed
 benchmark/               ground-truth format; scene data itself is not in git
@@ -108,6 +109,10 @@ MuJoCo for the nominal, low and high friction and mass (P4.7, D-021), caching ea
 `python benchmark/run_export.py --out FILE.json` runs the export stage on the rigid dev scenes and writes `export/` (`scene.usd`, `urdf/`, `qa_report.html`, `qa_report.json`, `qa/`) in each run, then sums up the QA reports; it makes no hosted call (P5.1 to P5.3).
 
 `scripts/fetch_panda.sh` fetches the Panda model into `data/` at a pinned commit, and `python benchmark/run_pick_place.py --out FILE.json` runs the scripted pick-and-place in MuJoCo on the exported dev scenes across the friction and mass cases, recording `demo/pick_place.mp4` in each run (P5.4, D-029); it makes no hosted call.
+
+`$ISAACLAB/.venv/bin/python benchmark/run_isaac_settling.py RUN_DIR ... --out FILE.json` (with `PYTHONPATH=src` and
+`OMNI_KIT_ACCEPT_EULA=YES`) settles `export/scene.usd` of finished runs in Isaac Sim under PhysX for the same five cases as
+`run_settling.py` and the same gate (D-027, section 12 item 8 of `PLAN.md`); the USD logic is in `src/video2sim/isaac_verify.py`; it makes no hosted call.
 
 `python benchmark/run_sample_counts.py` replays cached SAM 3D draws on the dev scenes with n = 1, 2 and 6 into `runs_samples/` for `benchmark/compare_shape_arms.py`; it makes no hosted call (`docs/research/sample_counts.md`).
 

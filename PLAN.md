@@ -662,7 +662,7 @@ one that supersedes.
 
 | Id | Decision | Status | Due | Notes |
 | --- | --- | --- | --- | --- |
-| D-001 | Target simulator: Isaac Sim and Isaac Lab | Assumed | Week 1 | Changing it changes Phase 5 |
+| D-001 | Target simulator: Isaac Sim and Isaac Lab. Confirmed by the human on 2026-11-01. MuJoCo stays the Phase 5 validation simulator (D-027); the Isaac Sim verifier of section 12 item 8 is the check against this target | Decided | Week 1 | `benchmark/run_isaac_settling.py` |
 | D-002 | 12 weeks, two engineers, start date not set | Assumed | Week 1 | All durations depend on it |
 | D-003 | Compute: no local GPU inference. SAM 3.1 and the language model through the Meta Model API; SAM 3D and TRELLIS.2 checkpoints on a hosted GPU service (Modal or Baseten). Supersedes the single GPU workstation | Assumed | Week 1 | Not yet confirmed that either service can run the checkpoints; see D-015. Not checked: SAM 3D and TRELLIS.2 GPU memory (TRELLIS.2 needs 24 GB or more) |
 | D-004 | SAM 3.1 through the Meta Model API, not self-hosted. Benchmark videos may be sent to hosted APIs (Meta Model API; Modal or Baseten under D-015). Never use the Muse "contributor" modes, which let Meta train on the content | Decided | Week 2 | Retention terms and video length limits still to be read (`docs/licenses.md`). `AGENTS.md` still says to ask before uploading |
@@ -754,6 +754,11 @@ In order:
 8. **Isaac Sim verifier (D-027).** After Phase 5, on the NVIDIA GPU workstation, build a verifier
    that runs alongside the MuJoCo checks: load the exported USD scenes in Isaac Sim and compare
    their behavior under PhysX with the MuJoCo results.
+   Status 2026-11-01: settling part done. `benchmark/run_isaac_settling.py` runs the five cases
+   on `export/scene.usd` (Isaac Sim 6.2, PhysX, 5 s window, 0.02 m limit). Two runs of one scene
+   (`20261101T112852Z_faf46bdc`, `20261101T120448Z_faf46bdc`), all five cases stable, largest drift
+   0.44 mm: `benchmark/results/isaac_settling.json`. Not done: the comparison with the MuJoCo
+   numbers, the other dev scenes (no other exported run exists locally), and pick-and-place.
 
 9. **Occlusion-robust object discovery (from P2.1, P2.5).** Optimisation of stage 3. The router
    sees 3 evenly spaced frames and tracking uses one generic SAM concept, so 3 of 59 dev objects
@@ -834,4 +839,5 @@ In order:
 | 2026-10-31 | P5.4 ticked under D-029: 7 of 7 chosen dev objects pass nominal, 5 pass every case; demo exit criterion ticked |
 | 2026-10-31 | P5.1 to P5.3 ticked: export stage writes USD, URDF and the QA report on 13 rigid dev scenes, 61 objects; `video2sim run` added, P5.5 stays open until a run from a fresh video |
 | 2026-10-31 | D-028: `SceneExport` added to `schemas.py`, `usd-core` 26.8 added, P5.1 uses `displayColor`, container image removed from P5.5 |
+| 2026-11-01 | D-001 confirmed by the human; Isaac Sim settling verifier added (section 12 item 8, first part) |
 | 2026-11-02 | Section 12 item 9 added: occlusion-robust object discovery (multi-view router, gap fill, `DiscoveryCheck`); plan and SAM 3.1 object-prompt research in `docs/research/occlusion_robust_discovery_plan.md`; nothing built yet |

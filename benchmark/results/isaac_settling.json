@@ -1,0 +1,576 @@
+{
+ "summary": {
+  "simulator": "isaac sim / physx (D-027)",
+  "window_s": 5.0,
+  "max_drift_m": 0.02,
+  "runs": 2,
+  "stable_every_case": [
+   "20261101T112852Z_faf46bdc",
+   "20261101T120448Z_faf46bdc"
+  ]
+ },
+ "runs": [
+  {
+   "run": "20261101T112852Z_faf46bdc",
+   "stable_every_case": true,
+   "cases": [
+    {
+     "case": "nominal",
+     "stable": true,
+     "bodies": [
+      {
+       "object_id": "obj_000",
+       "max_drift_m": 0.0003007780429701543,
+       "final_drift_m": 0.0003007780429701543,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_001",
+       "max_drift_m": 8.721094247562124e-05,
+       "final_drift_m": 8.72052857296936e-05,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_002",
+       "max_drift_m": 0.00024492290924988557,
+       "final_drift_m": 0.00024492290924988557,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_003",
+       "max_drift_m": 0.00021171062128310834,
+       "final_drift_m": 0.00021171062128310834,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_004",
+       "max_drift_m": 0.00025932277962022226,
+       "final_drift_m": 0.00025932277962022226,
+       "stable": true,
+       "ignored": true
+      },
+      {
+       "object_id": "obj_005",
+       "max_drift_m": 0.000205067409232763,
+       "final_drift_m": 0.000205067409232763,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_008",
+       "max_drift_m": 2.125460187926987e-05,
+       "final_drift_m": 2.1230563129379877e-05,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_012",
+       "max_drift_m": 0.00016897307427648118,
+       "final_drift_m": 0.00016897307427648118,
+       "stable": true,
+       "ignored": false
+      }
+     ]
+    },
+    {
+     "case": "friction_low",
+     "stable": true,
+     "bodies": [
+      {
+       "object_id": "obj_000",
+       "max_drift_m": 0.00023891689425136367,
+       "final_drift_m": 0.00023886609829891066,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_001",
+       "max_drift_m": 0.00010611289611549704,
+       "final_drift_m": 0.00010608816945352172,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_002",
+       "max_drift_m": 0.00024367018110482065,
+       "final_drift_m": 0.00024366653087065808,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_003",
+       "max_drift_m": 0.00020668426952248913,
+       "final_drift_m": 0.00020668426952248913,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_004",
+       "max_drift_m": 0.00025179070002300094,
+       "final_drift_m": 0.0002517879686680771,
+       "stable": true,
+       "ignored": true
+      },
+      {
+       "object_id": "obj_005",
+       "max_drift_m": 0.00020072087724285427,
+       "final_drift_m": 0.0002006779762493613,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_008",
+       "max_drift_m": 2.1898304106869647e-05,
+       "final_drift_m": 2.1897618027248272e-05,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_012",
+       "max_drift_m": 0.0001700600993777463,
+       "final_drift_m": 0.0001700503360943239,
+       "stable": true,
+       "ignored": false
+      }
+     ]
+    },
+    {
+     "case": "friction_high",
+     "stable": true,
+     "bodies": [
+      {
+       "object_id": "obj_000",
+       "max_drift_m": 0.00032666167947402225,
+       "final_drift_m": 0.0003266083962876277,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_001",
+       "max_drift_m": 0.0001960393016903859,
+       "final_drift_m": 0.00019602933791021518,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_002",
+       "max_drift_m": 0.0002446549222191485,
+       "final_drift_m": 0.00024465128645057347,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_003",
+       "max_drift_m": 0.00021152722804017218,
+       "final_drift_m": 0.00021152722804017218,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_004",
+       "max_drift_m": 0.00026535362559550744,
+       "final_drift_m": 0.0002653039481563901,
+       "stable": true,
+       "ignored": true
+      },
+      {
+       "object_id": "obj_005",
+       "max_drift_m": 0.00020728813709158933,
+       "final_drift_m": 0.00020728813709158933,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_008",
+       "max_drift_m": 2.196700699203942e-05,
+       "final_drift_m": 2.196700699203942e-05,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_012",
+       "max_drift_m": 0.00016903125661007205,
+       "final_drift_m": 0.00016903125661007205,
+       "stable": true,
+       "ignored": false
+      }
+     ]
+    },
+    {
+     "case": "mass_low",
+     "stable": true,
+     "bodies": [
+      {
+       "object_id": "obj_000",
+       "max_drift_m": 0.00030075581130120026,
+       "final_drift_m": 0.00030075581130120026,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_001",
+       "max_drift_m": 8.716786849622467e-05,
+       "final_drift_m": 8.716786849622467e-05,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_002",
+       "max_drift_m": 0.0002448911252887217,
+       "final_drift_m": 0.0002448868069642166,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_003",
+       "max_drift_m": 0.00021167185717353246,
+       "final_drift_m": 0.00021167185717353246,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_004",
+       "max_drift_m": 0.00025917812392259115,
+       "final_drift_m": 0.00025917812392259115,
+       "stable": true,
+       "ignored": true
+      },
+      {
+       "object_id": "obj_005",
+       "max_drift_m": 0.00020622375820701492,
+       "final_drift_m": 0.0002062085594165268,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_008",
+       "max_drift_m": 2.1256723904908403e-05,
+       "final_drift_m": 2.1256723904908403e-05,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_012",
+       "max_drift_m": 0.00016898178267032478,
+       "final_drift_m": 0.00016897789120190218,
+       "stable": true,
+       "ignored": false
+      }
+     ]
+    },
+    {
+     "case": "mass_high",
+     "stable": true,
+     "bodies": [
+      {
+       "object_id": "obj_000",
+       "max_drift_m": 0.0002984852724069534,
+       "final_drift_m": 0.000298413663502109,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_001",
+       "max_drift_m": 8.721094247562124e-05,
+       "final_drift_m": 8.72052857296936e-05,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_002",
+       "max_drift_m": 0.0002448952050384332,
+       "final_drift_m": 0.0002448952050384332,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_003",
+       "max_drift_m": 0.0002116581178676944,
+       "final_drift_m": 0.0002116581178676944,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_004",
+       "max_drift_m": 0.0002595214337596047,
+       "final_drift_m": 0.0002595174589918218,
+       "stable": true,
+       "ignored": true
+      },
+      {
+       "object_id": "obj_005",
+       "max_drift_m": 0.00020508907944446553,
+       "final_drift_m": 0.0002050882238656651,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_008",
+       "max_drift_m": 2.1253187281857707e-05,
+       "final_drift_m": 2.1253187281857707e-05,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_012",
+       "max_drift_m": 0.00016898344064300523,
+       "final_drift_m": 0.00016897365851969802,
+       "stable": true,
+       "ignored": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "run": "20261101T120448Z_faf46bdc",
+   "stable_every_case": true,
+   "cases": [
+    {
+     "case": "nominal",
+     "stable": true,
+     "bodies": [
+      {
+       "object_id": "obj_000",
+       "max_drift_m": 0.00018555230198311117,
+       "final_drift_m": 0.00018555230198311117,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_001",
+       "max_drift_m": 0.0001450792482422658,
+       "final_drift_m": 0.0001450761292487792,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_002",
+       "max_drift_m": 0.0004359437886690761,
+       "final_drift_m": 0.000435917542671071,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_003",
+       "max_drift_m": 0.0002715138063631466,
+       "final_drift_m": 0.0002714409276318816,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_008",
+       "max_drift_m": 0.000322125570705518,
+       "final_drift_m": 0.000322125570705518,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_011",
+       "max_drift_m": 7.67556773436516e-05,
+       "final_drift_m": 7.675475473463136e-05,
+       "stable": true,
+       "ignored": false
+      }
+     ]
+    },
+    {
+     "case": "friction_low",
+     "stable": true,
+     "bodies": [
+      {
+       "object_id": "obj_000",
+       "max_drift_m": 0.00016935895405566017,
+       "final_drift_m": 0.000169263145079427,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_001",
+       "max_drift_m": 0.00012571770009060296,
+       "final_drift_m": 0.00012571117932322056,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_002",
+       "max_drift_m": 0.0004194246112182579,
+       "final_drift_m": 0.0004194246112182579,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_003",
+       "max_drift_m": 0.00018576400542427525,
+       "final_drift_m": 0.00018559242915073244,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_008",
+       "max_drift_m": 0.0003266606027507109,
+       "final_drift_m": 0.0003266606027507109,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_011",
+       "max_drift_m": 7.669993532799407e-05,
+       "final_drift_m": 7.669855031546242e-05,
+       "stable": true,
+       "ignored": false
+      }
+     ]
+    },
+    {
+     "case": "friction_high",
+     "stable": true,
+     "bodies": [
+      {
+       "object_id": "obj_000",
+       "max_drift_m": 0.00019012960147128037,
+       "final_drift_m": 0.00019012915223562033,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_001",
+       "max_drift_m": 0.0002621311000725713,
+       "final_drift_m": 0.0002621311000725713,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_002",
+       "max_drift_m": 0.00044233129790069946,
+       "final_drift_m": 0.00044233129790069946,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_003",
+       "max_drift_m": 0.00027169857977834264,
+       "final_drift_m": 0.00027169857977834264,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_008",
+       "max_drift_m": 0.0003207732213129059,
+       "final_drift_m": 0.0003207732213129059,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_011",
+       "max_drift_m": 7.681159768000712e-05,
+       "final_drift_m": 7.681090623757114e-05,
+       "stable": true,
+       "ignored": false
+      }
+     ]
+    },
+    {
+     "case": "mass_low",
+     "stable": true,
+     "bodies": [
+      {
+       "object_id": "obj_000",
+       "max_drift_m": 0.00018553871860870717,
+       "final_drift_m": 0.0001855318532723459,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_001",
+       "max_drift_m": 0.0001450792482422658,
+       "final_drift_m": 0.0001450761292487792,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_002",
+       "max_drift_m": 0.0004359367897156906,
+       "final_drift_m": 0.0004359367897156906,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_003",
+       "max_drift_m": 0.0002713649505841851,
+       "final_drift_m": 0.0002713649505841851,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_008",
+       "max_drift_m": 0.0003224547076855257,
+       "final_drift_m": 0.0003224547076855257,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_011",
+       "max_drift_m": 7.67498978903445e-05,
+       "final_drift_m": 7.67496672214073e-05,
+       "stable": true,
+       "ignored": false
+      }
+     ]
+    },
+    {
+     "case": "mass_high",
+     "stable": true,
+     "bodies": [
+      {
+       "object_id": "obj_000",
+       "max_drift_m": 0.0001854604453536178,
+       "final_drift_m": 0.0001854604453536178,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_001",
+       "max_drift_m": 0.00014507466774213104,
+       "final_drift_m": 0.00014505666428429794,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_002",
+       "max_drift_m": 0.000435929790777275,
+       "final_drift_m": 0.000435929790777275,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_003",
+       "max_drift_m": 0.0002712548698721906,
+       "final_drift_m": 0.0002712548698721906,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_008",
+       "max_drift_m": 0.00032185267395003366,
+       "final_drift_m": 0.00032185267395003366,
+       "stable": true,
+       "ignored": false
+      },
+      {
+       "object_id": "obj_011",
+       "max_drift_m": 7.675478419274879e-05,
+       "final_drift_m": 7.675409218977262e-05,
+       "stable": true,
+       "ignored": false
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
