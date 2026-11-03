@@ -60,7 +60,12 @@ All three model endpoints are configurable: [docs/model_interfaces.md](docs/mode
 
 ## Acknowledgements
 
-Inference for the project research was supported with free credits from [Meta](https://dev.meta.ai) (SAM 3.1 through the Meta Model API), [Modal](https://modal.com) (GPU hosting for the SAM 3D worker), and [Baseten](https://www.baseten.co) (hosted VLM inference). Thank you for making this project possible!
+Inference for the project research was supported with credits from
+- [Meta](https://dev.meta.ai) (SAM 3.1 through Meta Model API)
+- [Modal](https://modal.com) (GPU hosting for the SAM 3D worker)
+- [Baseten](https://www.baseten.co) (Muse Spark Open VLM inference)
+
+Thank you for making this project possible!
 
 ## Where to read next
 
