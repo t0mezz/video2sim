@@ -57,7 +57,7 @@ class ClusterCheckConfig:
     crop_min_margin_px: int = 16
     crop_max_px: int = 512  # crops are resized to at most this long side
     crop_dim: float = 0.35  # kept-mask pixels are multiplied by this in the crop
-    min_confidence: float = 0.5
+    min_confidence: float = 0.7
     max_workers: int = 4
 
     @classmethod
@@ -78,7 +78,7 @@ class ClusterCheckConfig:
             crop_min_margin_px=int(crop.get("min_margin_px", 16)),
             crop_max_px=int(crop.get("max_px", 512)),
             crop_dim=float(crop.get("dim", 0.35)),
-            min_confidence=float(g.get("min_confidence", 0.5)),
+            min_confidence=float(g.get("min_confidence", 0.7)),
             max_workers=int(g.get("max_workers", 4)),
         )
         if not 0.0 < out.explain_ratio <= 1.0 or not 0.0 < out.accept_ratio <= 1.0:

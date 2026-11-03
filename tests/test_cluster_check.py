@@ -162,8 +162,10 @@ def test_check_config_from_default_yaml() -> None:
 
     root = Path(__file__).resolve().parent.parent
     cfg = yaml.safe_load((root / "configs/default.yaml").read_text(encoding="utf-8"))
-    out = ClusterCheckConfig.from_config(cfg)  # defaults until the yaml block lands (step 9)
+    out = ClusterCheckConfig.from_config(cfg)
     assert out.views_per_cluster >= 1 and out.max_workers >= 1
+    # 0.7, not 0.5: in the 9.8 subset the s24 match bundle was accepted at 0.68.
+    assert out.min_confidence == 0.7
 
 
 if __name__ == "__main__":

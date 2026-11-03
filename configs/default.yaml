@@ -132,7 +132,7 @@ segmentation:
           min_margin_px: 16    # ... and at least this many pixels
           max_px: 512          # crops are resized to at most this long side
           dim: 0.35            # kept-mask pixels are multiplied by this in the crop
-        min_confidence: 0.5    # the VLM verdict must clear this to accept a cluster
+        min_confidence: 0.7    # the VLM verdict must clear this to accept a cluster; 0.68 accepted the s24 match bundle in the 9.8 subset
         max_workers: 4         # cluster checks in flight at once; the result does not depend on it
       merge_iou: 0.5           # median mask IoU that makes a new track a duplicate
       merge_new_iou: 0.35      # lower bar when the other track is gap-fill new too: two prompts of one object draw different extents; a guess until tuned on dev

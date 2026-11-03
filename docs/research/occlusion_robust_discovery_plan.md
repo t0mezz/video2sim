@@ -471,7 +471,7 @@ segmentation:
       box_mask_min_iou: 0.5
       box_mask_min_fill: 0.2
       box_mask_max_overfill: 1.5
-      cluster_check: {explain_ratio: 0.5, accept_ratio: 0.5, min_confidence: 0.5}
+      cluster_check: {explain_ratio: 0.5, accept_ratio: 0.5, min_confidence: 0.7}
 ```
 
 ## 8. Risks and fallbacks
