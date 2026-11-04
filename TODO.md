@@ -65,9 +65,11 @@ makes hosted calls. Items are `N1` to `N20`; use the id in branch names (`n4-cro
 - [ ] **N7 [agent] Cache decoded masks per SAM answer**, for example packed box rasters beside the
   answer in `segmentation.work/`, so replays skip decoding (the 241-frame answer of run
   20261103T090231Z takes 212 s on one core, 46 s on 8 processes).
-- [ ] **N8 [human] Detect tags once.** Capture, reconstruction (`tag_views`) and the marker filter
-  each decode every frame and run ArUco (about 5 s in segmentation alone on the 155-frame run).
-  Handing the detections from one stage to the next is a contract question.
+- [ ] **N8 [agent] Detect tags once (D-036).** Capture, reconstruction (`tag_views`) and the marker
+  filter each decode every frame and run ArUco (about 5 s in segmentation alone on the 155-frame
+  run). Decided: the detections are handed on. Open: which stage detects and the file they travel
+  in; capture's grey frame and the PNG read back as grey may differ, so pick one source and show the
+  stage outputs unchanged.
 - [ ] **N9 [agent] Primitive fit: project the outline into all views at once.** Per-view NumPy
   overhead is now most of the mask cost, since the silhouette is drawn only inside its box.
 
@@ -82,15 +84,27 @@ makes hosted calls. Items are `N1` to `N20`; use the id in branch names (`n4-cro
   `shape/report.json`. Evaluate by replaying cached dev draws (`benchmark/run_sample_counts.py`
   style): size error and proxy rate against draws saved (two draws everywhere cost 0.7 points,
   D-030). Needs a decision row amending D-033.
-- [ ] **N11 [human] Mass prefetch during shape: deferred.** Since 64a86e5 the mass requests overlap
-  physics' CPU work (s02: 9.8 s of requests against about 67 s of CPU), so a prefetch saves at most
-  the requests' wall time on scenes with little CoACD work. Measure first how long physics waits on
-  answers. Design if wanted: `prefetch_model_masses` in `physics_stage.py` with the same crops and
-  cache keys; `ShapeStage(on_start=...)` receives the context, like the D-032 warm-up;
-  `pipeline.py` starts it in a thread when `vlm_mass.enabled`, and `PhysicsStage` waits for it
-  before its own requests, so nothing is sent twice. Alternative: ask for the mass in the material
-  pass request (same two crops, same model), which removes the requests but changes the answers;
-  re-measure D-024 on dev and add a decision row.
+- [ ] **N11 [human] Mass prefetch during shape: measured, decide whether to build.** Physics run
+  twice per scene, with fresh hosted mass requests and with the answers already cached (what a
+  prefetch would leave), CoACD uncached both times, one run per arm
+  (`benchmark/results/n11_mass_wait.json`):
+
+  | Scene | Objects | Fresh | Answers cached | Saved |
+  | --- | --- | --- | --- | --- |
+  | s24 video_b | 1 | 10.9 s | 2.3 s | 8.6 s |
+  | s13 video_b | 3 | 27.6 s | 3.6 s | 23.9 s |
+  | s18 video_b | 8 | 62.1 s | 51.2 s | 10.9 s |
+  | s11 video_b | 8 | 93.0 s | 93.3 s | 0 s |
+  | test_scene.MOV | 4 | 14.5 s | 6.6 s | 7.8 s |
+
+  A request took 6.5 to 27 s. Where CoACD work is short, physics is mostly waiting on them; where
+  it is long, the early waits fall off the critical path (s11). So a prefetch saves 0 to 24 s a
+  scene, a few percent of a run. Design if built: `prefetch_model_masses` in `physics_stage.py`
+  with the same crops and cache keys; `ShapeStage(on_start=...)` receives the context, like the
+  D-032 warm-up; `pipeline.py` starts it in a thread when `vlm_mass.enabled`, and `PhysicsStage`
+  waits for it before its own requests, so nothing is sent twice. Alternative: ask for the mass in
+  the material pass request (same two crops, same model), which removes the requests but changes
+  the answers; re-measure D-024 on dev and add a decision row.
 - [ ] **N12 [agent] Coarse-to-fine voxel lift.** The grid spans the whole tracked area (1.7 x 1.4 m
   on the 155-frame run) while objects fill a fraction of it; vote a coarse grid, then refine only
   candidate cells. Exact only if the coarse test is conservative; otherwise score the cluster boxes.
@@ -118,9 +132,8 @@ makes hosted calls. Items are `N1` to `N20`; use the id in branch names (`n4-cro
 
 - [ ] **N18 [agent] A mesh whose decimation is rejected stays at full size.** Run 20261103T200206Z
   obj_002 kept 604k faces through physics into export. Decimate harder or flag it.
-- [ ] **N19 [human] `depth_flags` reads `reconstruction.work/sparse`** from the segmentation stage,
-  outside `WorldModel`. Add per-point error and track length to the reconstruction output (a schema
-  change) or accept the exception.
+- [x] **N19 [human] `depth_flags` reads `reconstruction.work/sparse`** from the segmentation stage,
+  outside `WorldModel`. Kept as is: decision D-037.
 - [ ] **N20 [human] Image size for SfM.** `reconstruction.sfm.max_image_size: -1` keeps pycolmap's
   default, an effective 3200 px in pycolmap 4.2.1, so 1080p frames are used whole, while D-016 and
   `docs/stages.md` say up to 1280 px. Check which the evidence used and align the config or the docs.
