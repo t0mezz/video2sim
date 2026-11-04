@@ -126,7 +126,9 @@ def build_verify_prompt(tracked: int, listed: Sequence[str]) -> str:
         "them, in the order listed above) and "
         '"confidence" (a number from 0 to 1). A noun that is not visible, is '
         "too small or indistinct to track, or already has an outline, "
-        "is not missing."
+        "is not missing. A noun that only names a covering or fixture of the "
+        "surface (a tablecloth, cloth or mat, a piece or strip of tape stuck on "
+        "the board or table) is not missing either; a tape roll is an object."
     )
 
 

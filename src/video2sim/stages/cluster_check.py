@@ -288,7 +288,10 @@ def build_check_prompt() -> str:
         'for it, or null), "count" (how many such objects the box holds), and '
         '"confidence" (a number from 0 to 1). The board, a sheet of paper, a '
         "shadow, a reflection, a hand or arm, table texture and background are "
-        "not objects: answer is_object false for them."
+        "not objects: answer is_object false for them. So are things that cover "
+        "or are fixed to the surface rather than loose items you could pick up: "
+        "a tablecloth, cloth or mat, a board border, a cable, and a piece or "
+        "strip of tape stuck on the board or table. A tape roll is an object."
     )
 
 

@@ -68,7 +68,8 @@ segmentation:
     timeout_s: 300
     retries: 3
     merge_synonyms: true         # one text-only call merges noun synonyms across views (9.4)
-    noun_denylist: [table, board, marker, sheet, shadow, hand, arm]  # never SAM prompts (9.4)
+    noun_denylist: [table, board, marker, sheet, shadow, hand, arm, tablecloth, table cloth, cloth, mat,
+                    piece of tape, strip of tape, tape strip, piece of masking tape]  # never SAM prompts (9.4); exact whole-noun match, so bare "tape" (a roll) and "tape roll" stay allowed
     views:                       # S12.9: router view selection; mode even keeps n_frames above
       mode: even                 # even or coverage (set cover over the workspace, 9.3)
       count: 6                   # views picked in coverage mode
