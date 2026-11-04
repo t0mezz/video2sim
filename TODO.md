@@ -14,6 +14,13 @@ here.
 
 ## Next
 
+- [ ] **D1 [agent] Dry demo for judges (`video2sim replay`).** Built on branch `dry-demo`: `src/video2sim/replay.py`,
+  `scripts/build_judge_snapshot.py`, `tests/test_replay.py`, `docs/judge_snapshot.md`. Archives for 11 dev scenes
+  (s13 skipped: no segmentation output) built from `runs_dev/` into `data/judge_snapshot/archives/`; lock file
+  `docs/judge_snapshot/index.json` has `url: null`. Open **[human]**: attach the zips to a GitHub Release, rerun the
+  build with `--release-url`, commit the lock file, then run `video2sim replay s01 --out X` from a clean checkout.
+  Open **[agent]**: a network CI job that downloads the release once it exists.
+
 From the pipeline audit of 2026-11-04 on branch `perf-exact-speedups`. Done there, with
 byte-identical outputs: parallel SAM mask decoding and the other exact speedups (64a86e5), the
 chunked voxel vote (48c1e93, peak RSS 5.08 to 2.41 GB on the 155-frame replay), 4 SAM 3D

@@ -50,6 +50,19 @@ There are three model endpoints required for this project:
 
 All three model endpoints are configurable: [docs/model_interfaces.md](docs/model_interfaces.md).
 
+## Try it without any model or key
+
+`replay` shows a recorded run of a benchmark scene. It computes nothing, calls no model and needs
+no `.env`, GPU or Modal account; it only downloads the stored result and checks its hash.
+
+```bash
+uv sync
+uv run video2sim replay                       # list the scenes
+uv run video2sim replay s01 --out scene/      # same progress and package as `video2sim run`
+```
+
+Details and the limits of a replay: [docs/judge_snapshot.md](docs/judge_snapshot.md).
+
 ## Make a scene
 
 1. Film the table per [docs/capture_protocol.md](docs/capture_protocol.md), marker board visible.

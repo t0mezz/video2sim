@@ -176,6 +176,18 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="plain progress with run id and cache keys, and the logs of COLMAP and CoACD",
     )
+    rp = sub.add_parser(
+        "replay",
+        help="show a recorded run of a benchmark scene: no models, keys or GPU needed",
+    )
+    rp.add_argument("scene", nargs="?", help="scene id; leave out to list the scenes")
+    rp.add_argument("--out", type=Path, help="folder for the scene package")
+    rp.add_argument("--video", type=Path, help="pick the scene by the SHA-256 of this video")
+    rp.add_argument("--archive", type=Path, help="use this snapshot zip instead of downloading")
+    rp.add_argument("--index", type=Path, default=None, help="lock file (default: the one in git)")
+    rp.add_argument("--cache", type=Path, default=None, help="where archives and runs are kept")
+    rp.add_argument("--instant", action="store_true", help="do not wait between stages")
+    rp.add_argument("--quiet", action="store_true", help="no progress on stderr")
     doctor = sub.add_parser("doctor", help="check that the configured model endpoints work")
     doctor.add_argument("--config", type=Path, default=Path("configs/default.yaml"))
     doctor.add_argument(
@@ -291,12 +303,49 @@ def run_pipeline(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_replay(args: argparse.Namespace) -> int:
+    from video2sim import replay as rp
+
+    index = args.index or rp.DEFAULT_INDEX
+    cache = args.cache or rp.DEFAULT_CACHE
+    try:
+        entries = rp.load_index(index)
+        if args.scene is None and args.video is None:
+            for entry in entries.values():
+                print(f"{entry.scene_id}  {entry.note}".rstrip())
+            return 0
+        if args.out is None:
+            print("replay needs --out FOLDER", file=sys.stderr)
+            return 2
+        entry = rp.pick_scene(entries, args.scene, args.video)
+        archive = args.archive or rp.fetch_archive(entry, cache, rp.download_url)
+        run_dir = rp.unpack(archive, entry, cache / "runs")
+        reporter = None if args.quiet else ProgressReporter(sys.stderr, runs_root=cache / "runs")
+        if reporter is not None:
+            print(
+                "replay of a recorded run: nothing is computed, no model is called", file=sys.stderr
+            )
+        try:
+            rp.replay(run_dir, reporter or (lambda event: None), instant=args.instant)
+        finally:
+            if reporter is not None:
+                reporter.close()
+        rp.copy_package(run_dir, args.out)
+    except rp.SnapshotError as error:
+        print(str(error), file=sys.stderr)
+        return 1
+    print(f"wrote the recorded scene package of {entry.scene_id} to {args.out}")
+    return 0
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
     if args.command == "eval":
         return run_eval(args)
     if args.command == "run":
         return run_pipeline(args)
+    if args.command == "replay":
+        return run_replay(args)
     if args.command == "doctor":
         return run_doctor_command(args)
     return 2
