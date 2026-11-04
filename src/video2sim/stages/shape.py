@@ -72,9 +72,10 @@ from video2sim.stages.registration import (
     refine_stretch,
     register,
 )
+from video2sim.stages.segmentation import CropMask, MaskLike, as_crop
 
 F64 = NDArray[np.float64]
-Masks = dict[int, NDArray[np.bool_]]
+Masks = Mapping[int, MaskLike]  # an object's masks by frame index; load_masks gives crops (N5)
 MESH_DIR = "meshes"
 
 
@@ -159,15 +160,20 @@ def default_model(cfg: dict[str, Any], work: Path) -> ShapeModel:
     return SHAPE_BACKENDS[backend](cfg, work)
 
 
-def load_masks(run_dir: Path, obj: ObjectInstance) -> Masks:
-    """The object's masks by frame index, from the PNG folder that stage 3 wrote."""
-    masks: Masks = {}
+def load_masks(run_dir: Path, obj: ObjectInstance) -> dict[int, CropMask]:
+    """The object's masks by frame index, from the PNG folder that stage 3 wrote.
+
+    Each is kept as a ``CropMask``: the stage expands only the frames it registers against and
+    the SAM 3D keyframes, so a scene's masks no longer sit in memory as full frames (N5).
+    """
+    masks: dict[int, CropMask] = {}
     for path in sorted((run_dir / obj.mask_dir).glob("*.png")):
         image = cv2.imread(str(path), cv2.IMREAD_GRAYSCALE)
         if image is None:
             raise ValueError(f"cannot read mask {path}")
-        if image.any():
-            masks[int(path.stem)] = image > 0
+        crop = CropMask.from_full(image > 0)
+        if crop.any():
+            masks[int(path.stem)] = crop
     return masks
 
 
@@ -186,9 +192,15 @@ def mask_views(
     poses = {f.frame_index: f.T_world_from_camera for f in world.frames}
     views = []
     for frame in frames:
-        hidden = [m[frame] for m in others if frame in m]
-        occluders = np.any(hidden, axis=0) if hidden else None
-        views.append(MaskView(poses[frame], world.intrinsics, own[frame], occluders))
+        mask = as_crop(own[frame])
+        hidden = [as_crop(m[frame]) for m in others if frame in m]
+        occluders: NDArray[np.bool_] | None = None
+        if hidden:
+            occluders = np.zeros(hidden[0].shape, dtype=bool)
+            for crop in hidden:
+                h, w = crop.data.shape
+                occluders[crop.top : crop.top + h, crop.left : crop.left + w] |= crop.data
+        views.append(MaskView(poses[frame], world.intrinsics, mask.full(), occluders))
     return views
 
 
@@ -309,7 +321,7 @@ def plan_object(
     views = mask_views(world, own, others, view_frames)
     images = {f.frame_index: run_dir / f.image_path for f in world.frames}
     keyframes = [k for k in obj.keyframes if k in own and k in images][: cfg.keyframes_per_object]
-    shape_views = [ShapeView(k, images[k], own[k]) for k in keyframes]
+    shape_views = [ShapeView(k, images[k], as_crop(own[k]).full()) for k in keyframes]
     return ObjectPlan(
         obj,
         target,

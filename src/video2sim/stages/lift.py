@@ -57,6 +57,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from video2sim.schemas import SE3, Intrinsics, Plane, WorldModel
+from video2sim.stages.segmentation import CropMask
 from video2sim.stages.track_repair import mask_footprint
 from video2sim.stages.tracking import Track
 
@@ -306,8 +307,7 @@ class _VoteView:
     R: F64  # R_world_from_camera
     t: F64  # camera centre in the world
     rows: list[int]
-    smalls: dict[int, NDArray[np.bool_]]  # by row: the downscaled mask, flattened
-    shapes: dict[int, tuple[int, int]]  # by row: its (rows, cols)
+    smalls: dict[int, CropMask]  # by row: the downscaled mask
     free: NDArray[np.bool_] | None  # flattened: on no track's mask, when occlusion-aware
 
 
@@ -317,7 +317,6 @@ def _vote_views(
     """The downscaled masks of every view, made once for all voxel chunks."""
     import cv2  # heavy import, kept out of module import time
 
-    scale = 1.0 / cfg.mask_downscale
     out = []
     for position in views:
         frame = world.frames[position]
@@ -325,39 +324,21 @@ def _vote_views(
         if not rows:
             continue  # SAM found nothing here: no evidence either way for any track
         smalls = {
-            r: np.asarray(
-                cv2.resize(
-                    tracks[r].masks[frame.frame_index].astype(np.uint8),
-                    None,
-                    fx=scale,
-                    fy=scale,
-                    interpolation=cv2.INTER_AREA,
-                ),
-                dtype=bool,
-            )
+            r: tracks[r].masks[frame.frame_index].downscaled(cfg.mask_downscale, cv2.INTER_AREA)
             for r in rows
         }
-        shapes = {r: (int(m.shape[0]), int(m.shape[1])) for r, m in smalls.items()}
         free: NDArray[np.bool_] | None = None
         if cfg.occlusion_aware:
-            if len(set(shapes.values())) > 1:
+            if len({m.shape for m in smalls.values()}) > 1:
                 raise ValueError(f"track masks of frame {frame.frame_index} differ in size")
-            combined = np.zeros(shapes[rows[0]], dtype=bool)
+            combined = np.zeros(smalls[rows[0]].shape, dtype=bool)
             for small in smalls.values():
-                combined |= small
+                h, w = small.data.shape
+                combined[small.top : small.top + h, small.left : small.left + w] |= small.data
             # On another track's mask only: hidden, not evidence against this track.
             free = ~combined.ravel()
         pose = frame.T_world_from_camera.to_numpy()
-        out.append(
-            _VoteView(
-                pose[:3, :3],
-                pose[:3, 3],
-                rows,
-                {r: m.ravel() for r, m in smalls.items()},
-                shapes,
-                free,
-            )
-        )
+        out.append(_VoteView(pose[:3, :3], pose[:3, 3], rows, smalls, free))
     return out
 
 
@@ -404,15 +385,18 @@ def _vote(
             inside = np.flatnonzero(ok)
             ui = np.clip((u[inside] * scale).astype(np.int64), 0, None)
             vi = np.clip((v[inside] * scale).astype(np.int64), 0, None)
-            pixels: dict[tuple[int, int], I64] = {}  # flat pixel index per mask shape
-            for h, w in view.shapes.values():
+            pixels: dict[tuple[int, int], tuple[I64, I64]] = {}  # (row, col) per mask shape
+            for small in view.smalls.values():
+                h, w = small.shape
                 if (h, w) not in pixels:
-                    pixels[(h, w)] = np.minimum(vi, h - 1) * w + np.minimum(ui, w - 1)
+                    pixels[(h, w)] = (np.minimum(vi, h - 1), np.minimum(ui, w - 1))
             free = None
             if view.free is not None:
-                free = view.free[next(iter(pixels.values()))]
+                (h, w), (pr, pc) = next(iter(pixels.items()))
+                free = view.free[pr * w + pc]
             for r in view.rows:
-                own = view.smalls[r][pixels[view.shapes[r]]]
+                small = view.smalls[r]
+                own = small.at(*pixels[small.shape])
                 hits[r, inside] += own
                 seen[r, inside] += (own | free) if free is not None else 1
         # The first maximum wins, as argmax over the tracks would pick it.
@@ -479,7 +463,7 @@ def lift_tracks(
 
     views = _views(world, cfg)
     areas = np.array(
-        [float(np.median([m.sum() for m in t.masks.values()])) if t.masks else 0.0 for t in tracks]
+        [float(np.median([m.area for m in t.masks.values()])) if t.masks else 0.0 for t in tracks]
     )
     small_track = areas < cfg.small_mask_px
     agree = np.where(small_track, cfg.small_min_agreement, cfg.min_agreement)
@@ -634,7 +618,7 @@ def point_vote(
             if mask is None:
                 continue
             seen[row] += ok
-            hits[row] += ok & mask[vi, ui]
+            hits[row] += ok & mask.at(vi, ui)
     ratio = np.where(seen >= cfg.min_views, hits / np.maximum(seen, 1), 0.0)
     if len(tracks) == 0 or len(points) == 0:
         return PointVote(

@@ -140,7 +140,10 @@ def main() -> None:
 
 def score(objects: Any, world: WorldModel, board_poses: Any, tracks: list[Track]) -> dict[str, Any]:
     result = score_tracks(
-        objects, world.intrinsics, board_poses, {t.track_id: t.masks for t in tracks}
+        objects,
+        world.intrinsics,
+        board_poses,
+        {t.track_id: {f: m.full() for f, m in t.masks.items()} for t in tracks},
     )
     return {
         "switches": result.switches,

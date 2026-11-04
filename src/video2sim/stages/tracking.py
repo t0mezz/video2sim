@@ -20,21 +20,26 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal, Protocol
 
+import numpy as np
+from numpy.typing import NDArray
+
 from video2sim.models.hosted import (
     META_URL,
     SAM_MODEL,
     MaskDecoder,
     ResponseCache,
+    SamRecord,
+    cached_sam_rasters,
     decode_sam_mask,
-    decode_sam_masks,
     file_digest,
     parse_sam_text,
+    place_sam_raster,
     post_json,
     read_secret,
     sse_deltas,
 )
 from video2sim.schemas import WorldModel
-from video2sim.stages.segmentation import BoolMask
+from video2sim.stages.segmentation import CropMask, MaskLike, as_crop
 
 Direction = Literal["both", "forward", "backward"]
 
@@ -66,12 +71,19 @@ class TrackingConfig:
         raise ValueError(f"unknown propagation direction {direction!r}")
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, init=False)
 class Track:
-    """One tracked object: a full-frame mask per world-model frame index where it is visible."""
+    """One tracked object: its mask per world-model frame index where it is visible.
+
+    Masks are kept as ``CropMask`` (N4); full-frame arrays given here are cut to their box.
+    """
 
     track_id: int
-    masks: Mapping[int, BoolMask]
+    masks: Mapping[int, CropMask]
+
+    def __init__(self, track_id: int, masks: Mapping[int, MaskLike]) -> None:
+        object.__setattr__(self, "track_id", track_id)
+        object.__setattr__(self, "masks", {f: as_crop(m) for f, m in masks.items()})
 
 
 class VideoSamClient(Protocol):
@@ -190,24 +202,48 @@ def encode_clip(frames: list[Path], fps: float, out: Path) -> None:
 
 
 def tracks_from_text(
-    text: str, frame_indices: list[int], decode: MaskDecoder = decode_sam_mask
+    text: str,
+    frame_indices: list[int],
+    decode: MaskDecoder = decode_sam_mask,
+    raster_cache: Path | None = None,
 ) -> list[Track]:
     """Tracks of an answer. ``<Nf>`` is the position in the clip, mapped to a world frame index.
 
     With the default decoder, large answers are decoded in worker processes
-    (``decode_sam_masks``); the tracks are the same either way.
+    (``decode_sam_rasters``) and, given ``raster_cache``, the decoded rasters are stored there
+    by answer, so a rerun reads them back; the tracks are the same either way.
     """
     records = parse_sam_text(text)
     for record in records:
         if not 0 <= record.frame < len(frame_indices):
             raise ValueError(f"answer names frame {record.frame}, clip has {len(frame_indices)}")
-    decoded = (
-        decode_sam_masks(records) if decode is decode_sam_mask else [decode(r) for r in records]
-    )
-    masks: dict[int, dict[int, BoolMask]] = {}
+    decoded: list[MaskLike]
+    if decode is decode_sam_mask:
+        rasters = cached_sam_rasters(text, records, raster_cache)
+        decoded = [sam_crop(r, raster) for r, raster in zip(records, rasters, strict=True)]
+    else:
+        decoded = [decode(r) for r in records]
+    masks: dict[int, dict[int, MaskLike]] = {}
     for record, mask in zip(records, decoded, strict=True):
         masks.setdefault(record.object_id, {})[frame_indices[record.frame]] = mask
     return [Track(i, masks[i]) for i in sorted(masks)]
+
+
+def sam_crop(record: SamRecord, raster: NDArray[np.uint8]) -> CropMask:
+    """``place_sam_raster`` as a crop: the raster stretched to its box, without the frame.
+
+    A box that leaves the frame goes through ``place_sam_raster`` itself, so it fails or
+    clips exactly as the full-frame mask does.
+    """
+    import cv2  # heavy import, kept out of module import time
+
+    left, top = int(record.box[0]), int(record.box[1])
+    right, bottom = int(record.box[2]) + 1, int(record.box[3]) + 1
+    width, height = record.frame_size
+    if not (0 <= left < right <= width and 0 <= top < bottom <= height):
+        return CropMask.from_full(place_sam_raster(record, raster))
+    box = cv2.resize(raster, (right - left, bottom - top), interpolation=cv2.INTER_NEAREST)
+    return CropMask(top, left, np.asarray(box).astype(bool), (height, width))
 
 
 def _cache_parts(paths: list[Path], cfg: TrackingConfig) -> list[str]:
@@ -245,36 +281,33 @@ def track_objects(
     # Key on the frames, not the clip bytes, so a new encoder build does not void the cache.
     parts = _cache_parts(paths, cfg)
     frame_indices = [f.frame_index for f in world.frames]
+    rasters = work_dir / "raster_cache"
     cached = cache.get(parts)
     if cached is not None:
-        return tracks_from_text(cached, frame_indices, decode)
+        return tracks_from_text(cached, frame_indices, decode, rasters)
     work_dir.mkdir(parents=True, exist_ok=True)
     clip = clip_path if clip_path is not None else work_dir / "clip.mp4"
     if clip_path is None or not clip.is_file():
         encode_clip(paths, cfg.fps, clip)
     call: Callable[[], str] = lambda: client.track(clip, cfg.prompt, cfg.direction)  # noqa: E731
     text = cache.get_or_call(parts, call)
-    return tracks_from_text(text, frame_indices, decode)
+    return tracks_from_text(text, frame_indices, decode, rasters)
 
 
 def save_tracks(tracks: list[Track], out_dir: Path) -> None:
-    """One ``track_NNN.npz`` per track with its frame indices and stacked masks."""
-    import numpy as np
-
+    """One ``track_NNN.npz`` per track with its frame indices and stacked full-frame masks."""
     out_dir.mkdir(parents=True, exist_ok=True)
     for track in tracks:
         frames = sorted(track.masks)
         np.savez_compressed(
             out_dir / f"track_{track.track_id:03d}.npz",
             frames=np.array(frames),
-            masks=np.array([track.masks[f] for f in frames], dtype=bool),
+            masks=np.array([track.masks[f].full() for f in frames], dtype=bool),
         )
 
 
 def load_tracks(directory: Path) -> list[Track]:
     """Tracks written by ``save_tracks``, in id order."""
-    import numpy as np
-
     tracks = []
     for path in sorted(directory.glob("track_*.npz")):
         with np.load(path) as data:

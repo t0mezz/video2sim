@@ -33,7 +33,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from video2sim.schemas import SE3, Intrinsics, Plane
-from video2sim.stages.segmentation import BoolMask
+from video2sim.stages.segmentation import MaskLike, as_crop
 from video2sim.stages.tracking import Track
 
 F64 = NDArray[np.float64]
@@ -82,17 +82,17 @@ class RepairReport:
 
 
 def mask_footprint(
-    mask: BoolMask, T_world_from_camera: SE3, intrinsics: Intrinsics, plane: Plane
+    mask: MaskLike, T_world_from_camera: SE3, intrinsics: Intrinsics, plane: Plane
 ) -> F64 | None:
     """World XY where the ray through the mask's lowest pixels meets the table, or None."""
-    occupied = np.flatnonzero(np.any(mask, axis=1))
-    if occupied.size == 0:
+    crop = as_crop(mask)
+    if crop.bounds is None:
         return None
-    top, bottom = int(occupied[0]), int(occupied[-1])
-    # Only the rows at or below the cut hold the pixels of the base; scanning just those
-    # gives the same columns, in the same order, as a scan of the whole mask.
+    top, bottom = crop.bounds[0], crop.bounds[1]
+    # Only the rows at or below the cut hold the pixels of the base; scanning just those, in
+    # the crop, gives the same columns in the same order as a scan of the whole frame.
     first = max(0, math.ceil(bottom - BASE_FRACTION * (bottom - top + 1)))
-    cols = np.nonzero(mask[first : bottom + 1])[1]
+    cols = np.nonzero(crop.data[first - crop.top : bottom + 1 - crop.top])[1] + crop.left
     u, v = float(cols.mean()), float(bottom)
     pose = T_world_from_camera.to_numpy()
     ray = pose[:3, :3] @ np.array(
@@ -154,10 +154,8 @@ def _groups(points: NDArray[np.float64], link_m: float) -> list[list[int]]:
 def _split(track: Track, feet: Mapping[int, F64], cfg: RepairConfig, next_id: int) -> list[Track]:
     """The track itself, or one track per far-apart group of footprints."""
     if cfg.sliver_frac > 0.0 and track.masks:
-        typical = float(np.median([m.sum() for m in track.masks.values()]))
-        feet = {
-            f: p for f, p in feet.items() if int(track.masks[f].sum()) >= cfg.sliver_frac * typical
-        }
+        typical = float(np.median([m.area for m in track.masks.values()]))
+        feet = {f: p for f, p in feet.items() if track.masks[f].area >= cfg.sliver_frac * typical}
     frames = sorted(feet)
     if len(frames) < 2 * cfg.min_frames:
         return [track]
@@ -184,14 +182,16 @@ def _split(track: Track, feet: Mapping[int, F64], cfg: RepairConfig, next_id: in
     return pieces
 
 
-def _mask_iou(a: BoolMask, b: BoolMask) -> float | None:
+def _mask_iou(a: MaskLike, b: MaskLike) -> float | None:
     """Mask overlap, or None when the masks are not comparable."""
-    if a.shape != b.shape:
+    ca, cb = as_crop(a), as_crop(b)
+    if ca.shape != cb.shape:
         return None
-    union = int(np.logical_or(a, b).sum())
+    inter = ca.overlap(cb)
+    union = ca.area + cb.area - inter
     if union == 0:
         return None
-    return float(np.logical_and(a, b).sum() / union)
+    return float(inter / union)
 
 
 def _handover(a: Sequence[Track], b: Sequence[Track], cfg: RepairConfig) -> bool:

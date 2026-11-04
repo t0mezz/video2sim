@@ -22,7 +22,7 @@ from numpy.typing import NDArray
 
 from video2sim.schemas import WorldModel
 from video2sim.stages.marker_detection import detect_tags
-from video2sim.stages.segmentation import BoolMask
+from video2sim.stages.segmentation import BoolMask, MaskLike, as_crop
 from video2sim.stages.tracking import Track
 
 F64 = NDArray[np.float64]
@@ -100,13 +100,16 @@ def tag_mask(corners: Sequence[F64], shape: tuple[int, int], erode_px: int) -> B
     return np.asarray(canvas, dtype=bool)
 
 
-def overlaps_tag(mask: BoolMask, tags: BoolMask, cfg: MarkerFilterConfig) -> bool:
+def overlaps_tag(mask: MaskLike, tags: BoolMask, cfg: MarkerFilterConfig) -> bool:
     """True when the mask covers enough of its own area, or of the tags' area, in the tags."""
-    overlap = int(np.count_nonzero(mask & tags))
+    crop = as_crop(mask)
+    h, w = crop.data.shape
+    under = tags[crop.top : crop.top + h, crop.left : crop.left + w]
+    overlap = int(np.count_nonzero(crop.data & under))
     if overlap == 0:
         return False
     return bool(
-        overlap >= cfg.min_mask_share * np.count_nonzero(mask)
+        overlap >= cfg.min_mask_share * crop.area
         or overlap >= cfg.min_tag_share * np.count_nonzero(tags)
     )
 

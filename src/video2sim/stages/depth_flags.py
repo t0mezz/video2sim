@@ -129,7 +129,7 @@ def _vote(
             h, w = mask.shape
             ui, vi = np.clip(u.astype(int), 0, w - 1), np.clip(v.astype(int), 0, h - 1)
             seen[row] += ok
-            hits[row] += ok & mask[vi, ui]
+            hits[row] += ok & mask.at(vi, ui)
     return np.where(seen >= MIN_SEEN_VIEWS, hits / np.maximum(seen, 1), 0.0)
 
 
@@ -149,10 +149,10 @@ def _hull_iou(world: WorldModel, track: Track, hull: F64, views: Sequence[int]) 
         raw = np.zeros((h, w), np.uint8)
         raw[(v[ok] / IOU_DOWNSCALE).astype(int), (u[ok] / IOU_DOWNSCALE).astype(int)] = 1
         img: Any = cv2.morphologyEx(raw, cv2.MORPH_CLOSE, np.ones((5, 5), np.uint8))
-        small = cv2.resize(mask.astype(np.uint8), (w, h), interpolation=cv2.INTER_NEAREST)
-        union = int(((img > 0) | (small > 0)).sum())
+        small = mask.downscaled(IOU_DOWNSCALE, cv2.INTER_NEAREST, (w, h)).full()
+        union = int(((img > 0) | small).sum())
         if union:
-            scores.append(float(((img > 0) & (small > 0)).sum() / union))
+            scores.append(float(((img > 0) & small).sum() / union))
     return statistics.median(scores) if scores else None
 
 

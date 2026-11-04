@@ -43,6 +43,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from video2sim.schemas import WorldModel
+from video2sim.stages.segmentation import CropMask, MaskLike, as_crop
 from video2sim.stages.tracking import Track
 
 F64 = NDArray[np.float64]
@@ -133,8 +134,8 @@ class KeyframeReport:
 
 def frame_stats(
     frame_index: int,
-    mask: BoolMask,
-    others: BoolMask | Sequence[BoolMask] | None,
+    mask: MaskLike,
+    others: MaskLike | Sequence[MaskLike] | None,
     gray: NDArray[np.uint8] | None,
     cfg: KeyframeConfig,
 ) -> FrameStats | None:
@@ -146,17 +147,16 @@ def frame_stats(
     """
     import cv2
 
-    height, width = mask.shape
-    rows = np.any(mask, axis=1)
-    if not rows.any():
+    own = as_crop(mask)
+    height, width = own.shape
+    if own.bounds is None:
         return None  # area 0, below any min_mask_px
-    y_lo, y_hi = int(np.argmax(rows)), int(height - 1 - np.argmax(rows[::-1]))
-    cols = np.any(mask[y_lo : y_hi + 1], axis=0)
-    x_lo, x_hi = int(np.argmax(cols)), int(width - 1 - np.argmax(cols[::-1]))
+    y_lo, y_hi, x_lo, x_hi = own.bounds
     r = cfg.occluder_ring_px
     y0, y1 = max(0, y_lo - r - 1), min(height, y_hi + r + 2)
     x0, x1 = max(0, x_lo - r - 1), min(width, x_hi + r + 2)
-    window = mask[y0:y1, x0:x1]  # holds every mask pixel
+    rows, cols = slice(y0, y1), slice(x0, x1)
+    window = own.window(rows, cols)  # holds every mask pixel
     area = int(window.sum())
     if area < cfg.min_mask_px:
         return None
@@ -167,11 +167,13 @@ def frame_stats(
     crop = window.astype(np.uint8)
 
     if isinstance(others, np.ndarray):
-        near: BoolMask | None = others[y0:y1, x0:x1]
+        near: BoolMask | None = others[rows, cols]
+    elif isinstance(others, CropMask):
+        near = others.window(rows, cols)
     elif others:
         near = np.zeros(window.shape, dtype=bool)
         for other in others:
-            near |= other[y0:y1, x0:x1]
+            near |= other[rows, cols] if isinstance(other, np.ndarray) else other.window(rows, cols)
     else:
         near = None
     occlusion = 0.0

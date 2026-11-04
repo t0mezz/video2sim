@@ -11,6 +11,7 @@ docs/licenses.md).
 from __future__ import annotations
 
 import base64
+import contextlib
 import hashlib
 import json
 import os
@@ -224,10 +225,10 @@ def _raster_or_none(record: SamRecord) -> NDArray[np.uint8] | None:
         return None
 
 
-def decode_sam_masks(
+def decode_sam_rasters(
     records: Sequence[SamRecord], max_workers: int | None = None
-) -> list[NDArray[np.bool_]]:
-    """``decode_sam_mask`` of every record, in order, with the rasters decoded in parallel.
+) -> list[NDArray[np.uint8]]:
+    """``decode_sam_raster`` of every record, in order, decoded in parallel.
 
     The result is the same as decoding one by one. Small answers and ``max_workers`` 1 are
     decoded here; a record that fails in a worker is decoded again here, so it raises the
@@ -239,7 +240,7 @@ def decode_sam_masks(
         else max_workers
     )
     if workers <= 1 or len(records) < _PARALLEL_DECODE_MIN_MASKS:
-        return [decode_sam_mask(r) for r in records]
+        return [decode_sam_raster(r) for r in records]
     import multiprocessing
     from concurrent.futures import ProcessPoolExecutor
 
@@ -250,9 +251,80 @@ def decode_sam_masks(
     with ProcessPoolExecutor(max_workers=workers, mp_context=context) as pool:
         rasters = list(pool.map(_raster_or_none, records, chunksize=chunk))
     return [
-        decode_sam_mask(r) if raster is None else place_sam_raster(r, raster)
+        decode_sam_raster(r) if raster is None else raster
         for r, raster in zip(records, rasters, strict=True)
     ]
+
+
+# Bump when the stored layout changes; the parser version is part of the key as well.
+_RASTER_CACHE_FORMAT = 1
+
+
+def _raster_cache_key(text: str) -> str:
+    from importlib.metadata import version
+
+    parser = version("meta_sam_parser")
+    return hashlib.sha256(f"{_RASTER_CACHE_FORMAT}\x1f{parser}\x1f{text}".encode()).hexdigest()
+
+
+def _read_rasters(path: Path, records: Sequence[SamRecord]) -> list[NDArray[np.uint8]] | None:
+    """Rasters stored for ``records``, or None when the file is missing or does not fit them."""
+    try:
+        with np.load(path) as data:
+            bits, starts, shapes = data["bits"], data["starts"], data["shapes"]
+    except (OSError, KeyError, ValueError):
+        return None
+    if len(shapes) != len(records) or len(starts) != len(records) + 1:
+        return None
+    out = []
+    for i, record in enumerate(records):
+        rows, cols = (int(v) for v in shapes[i])
+        if (rows, cols) != record.mask_shape:
+            return None
+        packed = bits[int(starts[i]) : int(starts[i + 1])]
+        flat = np.unpackbits(packed, count=rows * cols)
+        out.append(np.ascontiguousarray(flat.reshape(rows, cols), dtype=np.uint8))
+    return out
+
+
+def _write_rasters(path: Path, rasters: Sequence[NDArray[np.uint8]]) -> None:
+    """Store ``rasters`` bit-packed; atomic, so a parallel reader never sees half a file."""
+    packed = [np.packbits(r.ravel() != 0) for r in rasters]
+    starts = np.zeros(len(packed) + 1, dtype=np.int64)
+    starts[1:] = np.cumsum([len(p) for p in packed])
+    shapes = np.array([r.shape for r in rasters], dtype=np.int64).reshape(-1, 2)
+    bits = np.concatenate(packed) if packed else np.zeros(0, dtype=np.uint8)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.parent / f"{path.stem}.{os.getpid()}.{threading.get_ident()}.tmp"
+    with open(tmp, "wb") as f:
+        np.savez(f, bits=bits, starts=starts, shapes=shapes)
+    tmp.replace(path)
+
+
+def cached_sam_rasters(
+    text: str, records: Sequence[SamRecord], cache_dir: Path | None
+) -> list[NDArray[np.uint8]]:
+    """``decode_sam_rasters`` of an answer's records, stored under ``cache_dir`` by the answer
+    text (N7). Decoding is pure Python and was most of a segmentation replay (212 s on one core
+    for the 241-frame answer of run 20261103T090231Z); a stored raster is the same bits."""
+    if cache_dir is None:
+        return decode_sam_rasters(records)
+    path = cache_dir / f"{_raster_cache_key(text)}.npz"
+    stored = _read_rasters(path, records)
+    if stored is not None:
+        return stored
+    rasters = decode_sam_rasters(records)
+    with contextlib.suppress(OSError):  # an unwritten cache only costs the next run the decode
+        _write_rasters(path, rasters)
+    return rasters
+
+
+def decode_sam_masks(
+    records: Sequence[SamRecord], max_workers: int | None = None
+) -> list[NDArray[np.bool_]]:
+    """``decode_sam_mask`` of every record, in order, with the rasters decoded in parallel."""
+    rasters = decode_sam_rasters(records, max_workers)
+    return [place_sam_raster(r, raster) for r, raster in zip(records, rasters, strict=True)]
 
 
 def file_digest(path: Path) -> str:

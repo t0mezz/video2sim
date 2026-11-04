@@ -173,7 +173,11 @@ def _old_vote(
                 continue
             smalls.append(
                 cv2.resize(
-                    mask.astype(np.uint8), None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA
+                    mask.full().astype(np.uint8),
+                    None,
+                    fx=scale,
+                    fy=scale,
+                    interpolation=cv2.INTER_AREA,
                 ).astype(bool)
             )
         combined: BoolMask | None = None
@@ -311,7 +315,7 @@ def test_frame_statistics_are_unchanged() -> None:
     edge_cut[:40, 600:] = True  # in the corner band, so border and ring meet the image edge
     compared = 0
     for frame in world.frames:
-        masks = [t.masks[frame.frame_index] for t in tracks if frame.frame_index in t.masks]
+        masks = [t.masks[frame.frame_index].full() for t in tracks if frame.frame_index in t.masks]
         masks.append(edge_cut)
         for i, mask in enumerate(masks):
             rest = masks[:i] + masks[i + 1 :]
@@ -343,7 +347,7 @@ def _old_footprint_u(mask: BoolMask) -> tuple[float, float] | None:
 def test_mask_footprints_are_unchanged() -> None:
     world, tracks = _scene()
     rng = np.random.default_rng(8)
-    masks = [m for t in tracks for m in t.masks.values()]
+    masks = [m.full() for t in tracks for m in t.masks.values()]
     masks += [rng.random((K.height_px, K.width_px)) < p for p in (0.001, 0.02)]
     for k, mask in enumerate(masks):
         pose = world.frames[k % len(world.frames)].T_world_from_camera

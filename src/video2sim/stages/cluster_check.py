@@ -206,7 +206,8 @@ def choose_views(
             mask = track.masks.get(frame.frame_index)
             if mask is None:
                 continue
-            covered = max(covered, float(mask[y1 : y2 + 1, x1 : x2 + 1].mean()) if area else 0.0)
+            window = mask.window(slice(y1, y2 + 1), slice(x1, x2 + 1))
+            covered = max(covered, float(window.mean()) if area else 0.0)
         scored.append((covered, pos, box, point))
     # Rank: least covered first, then largest box; pos breaks ties deterministically.
     ranked = sorted(
@@ -257,12 +258,14 @@ def make_crop(
         if mask is None:
             continue
         if mask.shape != frame.shape[:2]:
-            mask = cv2.resize(
-                mask.astype("uint8"),
+            full = cv2.resize(
+                mask.full().astype("uint8"),
                 (frame.shape[1], frame.shape[0]),
                 interpolation=cv2.INTER_NEAREST,
             ).astype(bool)
-        region = mask[cy1 : cy2 + 1, cx1 : cx2 + 1]
+            region = full[cy1 : cy2 + 1, cx1 : cx2 + 1]
+        else:
+            region = mask.window(slice(cy1, cy2 + 1), slice(cx1, cx2 + 1))
         crop[region] = (crop[region].astype(np.float64) * cfg.crop_dim).astype(np.uint8)
     cv2.rectangle(crop, (x1 - cx1, y1 - cy1), (x2 - cx1, y2 - cy1), (0, 255, 255), 2)
     long_side = max(crop.shape[:2])

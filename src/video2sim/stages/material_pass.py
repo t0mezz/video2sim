@@ -30,8 +30,6 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Protocol
 
-import numpy as np
-
 from video2sim.models.hosted import ResponseCache, image_data_url
 from video2sim.models.vlm import cache_model
 from video2sim.schemas import Flag, WorldModel
@@ -158,9 +156,11 @@ def crop_for_vlm(
     frame = next(f for f in world.frames if f.frame_index == frame_index)
     image: Any = cv2.imread(str(run_dir / frame.image_path))
     mask = track.masks[frame_index]
-    ys, xs = np.nonzero(mask)
-    y0, y1 = max(0, int(np.min(ys)) - pad_px), min(mask.shape[0], int(np.max(ys)) + pad_px)
-    x0, x1 = max(0, int(np.min(xs)) - pad_px), min(mask.shape[1], int(np.max(xs)) + pad_px)
+    if mask.bounds is None:
+        raise ValueError(f"track {track.track_id} has an empty mask in frame {frame_index}")
+    top, bottom, left, right = mask.bounds
+    y0, y1 = max(0, top - pad_px), min(mask.shape[0], bottom + pad_px)
+    x0, x1 = max(0, left - pad_px), min(mask.shape[1], right + pad_px)
     out.parent.mkdir(parents=True, exist_ok=True)
     cv2.imwrite(str(out), image[y0:y1, x0:x1])
     return out
@@ -172,7 +172,7 @@ def pick_frames(track: Track, keyframes: Sequence[int], count: int) -> list[int]
     if len(chosen) < count:
         rest = sorted(
             (f for f in track.masks if f not in chosen),
-            key=lambda f: int(track.masks[f].sum()),
+            key=lambda f: track.masks[f].area,
             reverse=True,
         )
         chosen += rest[: count - len(chosen)]

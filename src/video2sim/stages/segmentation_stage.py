@@ -219,7 +219,7 @@ def write_object_files(
     mask_dir = out_dir / "masks" / object_id
     mask_dir.mkdir(parents=True, exist_ok=True)
     for frame, mask in sorted(track.masks.items()):
-        cv2.imwrite(str(mask_dir / f"{frame:05d}.png"), mask.astype(np.uint8) * 255)
+        cv2.imwrite(str(mask_dir / f"{frame:05d}.png"), mask.full().astype(np.uint8) * 255)
     cluster_dir = out_dir / "clusters"
     cluster_dir.mkdir(parents=True, exist_ok=True)
     np.save(cluster_dir / f"{object_id}.npy", cluster)
@@ -410,7 +410,8 @@ def render_tracks_video(
                 raise ValueError(f"cannot read {frame.image_path}")
             overlay: NDArray[np.uint8] = np.asarray(image.copy(), dtype=np.uint8)
             present = {
-                t.track_id: t.masks[frame.frame_index] for t in by_frame.get(frame.frame_index, [])
+                t.track_id: t.masks[frame.frame_index].full()
+                for t in by_frame.get(frame.frame_index, [])
             }
             _draw_masks(overlay, present, colors)
             y = 24

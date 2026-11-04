@@ -45,6 +45,7 @@ from video2sim.stages.primitive_fit import (
     drop_duplicate_fits,
     fit_clusters,
 )
+from video2sim.stages.segmentation import MaskLike, as_crop
 from video2sim.stages.track_repair import RepairConfig, RepairReport, _groups, repair_tracks
 from video2sim.stages.tracking import Track
 from video2sim.stages.view_select import ViewConfig, compute_visibility
@@ -325,18 +326,19 @@ def residual_clusters(
 
 
 def _overlaps(
-    a: Mapping[int, NDArray[np.bool_]], b: Mapping[int, NDArray[np.bool_]]
+    a: Mapping[int, MaskLike], b: Mapping[int, MaskLike]
 ) -> list[tuple[int, float, float]]:
     """(frame, IoU, containment of a in b) over shared frames, 0.0 when incomparable."""
     out = []
     for frame in sorted(set(a) & set(b)):
-        ma, mb = a[frame], b[frame]
+        ma, mb = as_crop(a[frame]), as_crop(b[frame])
         if ma.shape != mb.shape:
             out.append((frame, 0.0, 0.0))
             continue
-        inter = float(np.logical_and(ma, mb).sum())
-        union = float(np.logical_or(ma, mb).sum())
-        area = float(ma.sum())
+        shared = ma.overlap(mb)
+        inter = float(shared)
+        union = float(ma.area + mb.area - shared)
+        area = float(ma.area)
         out.append((frame, inter / union if union else 1.0, inter / area if area else 1.0))
     return out
 

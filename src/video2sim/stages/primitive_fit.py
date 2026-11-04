@@ -203,20 +203,13 @@ def _track_views(
     track that sees it as an occluder."""
     import cv2  # heavy import, kept out of module import time
 
-    scale = 1.0 / cfg.mask_downscale
     cache: dict[tuple[int, int], BoolMask] = {} if smalls is None else smalls
 
     def small_of(t: Track, frame_index: int) -> BoolMask:
         key = (t.track_id, frame_index)
         if key not in cache:
-            out = cv2.resize(
-                t.masks[frame_index].astype(np.uint8),
-                None,
-                fx=scale,
-                fy=scale,
-                interpolation=cv2.INTER_NEAREST,
-            )
-            cache[key] = np.asarray(out, dtype=bool)
+            small = t.masks[frame_index].downscaled(cfg.mask_downscale, cv2.INTER_NEAREST)
+            cache[key] = small.full()
         return cache[key]
 
     views: list[_View] = []

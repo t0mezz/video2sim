@@ -44,7 +44,7 @@ def photometric(run_dir: Path, world: WorldModel, track: Any) -> dict[str, float
     import cv2
 
     frames = [f for f in world.frames if f.frame_index in track.masks]
-    sizes = [(int(track.masks[f.frame_index].sum()), f) for f in frames]
+    sizes = [(track.masks[f.frame_index].area, f) for f in frames]
     sizes = [s for s in sizes if s[0] > 400]
     if not sizes:
         return {"sat_frac": None, "grad_med": None}
@@ -52,7 +52,8 @@ def photometric(run_dir: Path, world: WorldModel, track: Any) -> dict[str, float
     sat, grad = [], []
     for _, f in sizes[::step][:PHOTO_VIEWS]:
         gray = cv2.imread(str(run_dir / f.image_path), cv2.IMREAD_GRAYSCALE)
-        inner = cv2.erode(track.masks[f.frame_index].astype(np.uint8), np.ones((5, 5), np.uint8))
+        full = track.masks[f.frame_index].full()
+        inner = cv2.erode(full.astype(np.uint8), np.ones((5, 5), np.uint8))
         if inner.sum() < 100:
             continue
         sel = inner > 0
@@ -100,8 +101,8 @@ def sheet(path: Path, run_dir: Path, run_id: str) -> None:
     paths = {f.frame_index: run_dir / f.image_path for f in world.frames}
     tiles = []
     for tr in load_tracks(run_dir / "segmentation" / "tracks"):
-        index = max(tr.masks, key=lambda i: int(tr.masks[i].sum()))
-        mask = tr.masks[index]
+        index = max(tr.masks, key=lambda i: tr.masks[i].area)
+        mask = tr.masks[index].full()
         ys, xs = np.nonzero(mask)
         if not len(ys):
             continue
