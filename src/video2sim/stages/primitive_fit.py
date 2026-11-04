@@ -231,21 +231,48 @@ def _track_views(
     return views
 
 
+@dataclass(frozen=True)
+class _ViewStack:
+    """The views of one track with their poses stacked, built once per fit (N9)."""
+
+    views: tuple[_View, ...]
+    poses: F64  # (V, 4, 4), T_world_from_camera of each view
+
+
+def _stack(views: Sequence[_View] | _ViewStack) -> _ViewStack:
+    if isinstance(views, _ViewStack):
+        return views
+    poses = np.stack([v.pose for v in views]) if views else np.zeros((0, 4, 4))
+    return _ViewStack(tuple(views), poses)
+
+
 def _cost(
-    kind: Kind, params: F64, views: Sequence[_View], world: WorldModel, cfg: PrimitiveConfig
+    kind: Kind,
+    params: F64,
+    views: Sequence[_View] | _ViewStack,
+    world: WorldModel,
+    cfg: PrimitiveConfig,
 ) -> float:
+    """Mean over the views of the extra and missed silhouette pixels against the mask.
+
+    The outline is projected into every view in one go: the rotation of each view is a
+    (3, 3) block with the strides of the single pose, so the stacked matrix product runs the
+    same product per view, and the rest is elementwise. Only the hull and its pixels are
+    per view.
+    """
     import cv2  # heavy import, kept out of module import time
 
     if float(np.min(params[3:])) < cfg.min_size_m:
         return float("inf")
+    stack = _stack(views)
     outline = _outline(kind, params, world.table_plane.offset_m)
+    cam = np.matmul(outline[None, :, :] - stack.poses[:, None, :3, 3], stack.poses[:, :3, :3])
+    if bool(np.any(cam[:, :, 2] <= MIN_DEPTH_M)):
+        return float("inf")
+    u, v = _pixels(cam[:, :, 0] / cam[:, :, 2], cam[:, :, 1] / cam[:, :, 2], world.intrinsics)
+    uvs = (np.stack([u, v], axis=2) / cfg.mask_downscale).astype(np.float32)
     total = 0.0
-    for view in views:
-        cam = (outline - view.pose[:3, 3]) @ view.pose[:3, :3]
-        if bool(np.any(cam[:, 2] <= MIN_DEPTH_M)):
-            return float("inf")
-        u, v = _pixels(cam[:, 0] / cam[:, 2], cam[:, 1] / cam[:, 2], world.intrinsics)
-        uv = (np.stack([u, v], axis=1) / cfg.mask_downscale).astype(np.float32)
+    for view, uv in zip(stack.views, uvs, strict=True):
         hull: Any = cv2.convexHull(uv).astype(np.int32)
         # The silhouette lies inside the hull's box, so it is drawn only there: outside it
         # nothing is extra, and every mask pixel is missed. Same counts as a full canvas.
@@ -263,7 +290,7 @@ def _cost(
             extra = int(np.count_nonzero(inside & view.free[y0:y1, x0:x1]))
             missed = view.area - int(np.count_nonzero(inside & view.mask[y0:y1, x0:x1]))
         total += (extra + missed) / view.area
-    return total / len(views)
+    return total / len(stack.views)
 
 
 def initial_params(points: F64, table_z: float) -> F64:
@@ -287,16 +314,17 @@ def fit_primitive(
 ) -> Primitive:
     """The best of the three kinds, each found by a seeded random walk from ``start``."""
     best: Primitive | None = None
+    stack = _stack(views)
     for k, kind in enumerate(KINDS):
         rng = np.random.default_rng([cfg.seed, track_id, k])
         params = start.copy()
-        cost = _cost(kind, params, views, world, cfg)
+        cost = _cost(kind, params, stack, world, cfg)
         step = np.array(
             [cfg.step_m, cfg.step_m, np.radians(cfg.step_deg), cfg.step_m, cfg.step_m, cfg.step_m]
         )
         for it in range(cfg.iterations):
             trial = params + rng.normal(0.0, 1.0, 6) * step
-            trial_cost = _cost(kind, trial, views, world, cfg)
+            trial_cost = _cost(kind, trial, stack, world, cfg)
             if trial_cost < cost:
                 params, cost = trial, trial_cost
             if (it + 1) % cfg.shrink_every == 0:
