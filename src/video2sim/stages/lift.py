@@ -586,7 +586,7 @@ def _vote(
                 hits[r, inside] += own
                 seen[r, inside] += (own | free) if free is not None else 1
         # The first maximum wins, as argmax over the tracks would pick it.
-        top = np.zeros(stop - start, dtype=np.float64)
+        top: F64 = np.zeros(stop - start, dtype=np.float64)
         winner = np.zeros(stop - start, dtype=np.int32)
         for r in range(len(tracks)):
             s = seen[r]

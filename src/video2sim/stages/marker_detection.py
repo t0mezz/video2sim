@@ -217,7 +217,7 @@ def read_tag_file(path: Path, family: str) -> dict[str, FrameTags] | None:
     out: dict[str, FrameTags] = {}
     for name, entry in payload.get("frames", {}).items():
         rows, cols = (int(v) for v in entry["shape"])
-        corners = {
+        corners: dict[int, F64] = {
             int(i): np.asarray(c, dtype=np.float64).reshape(4, 2) for i, c in entry["tags"].items()
         }
         out[str(name)] = (corners, (rows, cols))
