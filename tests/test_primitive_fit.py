@@ -64,6 +64,7 @@ CFG = PrimitiveConfig(
     stack_percentile=2.0,
     duplicate_dist_m=0.02,
     duplicate_size_frac=0.15,
+    duplicate_z_overlap=0.5,
 )
 
 
@@ -255,15 +256,28 @@ def test_frame_disjoint_tracks_of_one_box_drop_to_one() -> None:
     assert dropped[next(iter(dropped))].startswith("duplicate of track")
 
 
-def test_cooccurring_tracks_are_kept_despite_matching_fits() -> None:
-    """Identical fits with shared frames stay: stacked identical boxes co-occur, and only
-    a mask-IoU check could tell those apart from concurrent double tracks."""
+def test_cooccurring_tracks_with_one_z_range_are_one_object() -> None:
+    """Identical fits sharing frames and a z-range are one object tracked twice (a gap-fill
+    box and the generic track of one cube); the better-supported one stays."""
     world = _world()
     solid = _solid("box", (0.30, 0.20, 0.10))
     points = _surface_sample(solid)
     both = [Track(0, _masks(world, solid)), Track(1, _masks(world, solid))]
     fits = fit_clusters(both, {0: points, 1: points}, world, LIFT, CFG)
     assert all(f.primitive is not None for f in fits.values())
+    assert len(drop_duplicate_fits(fits, {0: both[0], 1: both[1]}, CFG)) == 1
+
+
+def test_cooccurring_stacked_tracks_are_kept() -> None:
+    """Identical boxes with shared frames stay when one is seated above the other."""
+    world = _world()
+    solid = _solid("box", (0.30, 0.20, 0.10))
+    points = _surface_sample(solid)
+    both = [Track(0, _masks(world, solid)), Track(1, _masks(world, solid))]
+    fits = fit_clusters(both, {0: points, 1: points}, world, LIFT, CFG)
+    top = fits[1].cluster.copy()
+    top[:, 2] += float(np.ptp(top[:, 2]))
+    fits[1] = replace(fits[1], cluster=top)
     assert drop_duplicate_fits(fits, {0: both[0], 1: both[1]}, CFG) == {}
     near = _solid("box", (0.30, 0.20, 0.10)) + np.array([0.40, 0.0, 0.0])
     pair = [Track(2, _masks(world, solid)), Track(3, _masks(world, near))]
@@ -280,6 +294,7 @@ def test_config_rejects_bad_values() -> None:
         ("max_cost", 0.0),
         ("duplicate_dist_m", 0.0),
         ("duplicate_size_frac", 1.0),
+        ("duplicate_z_overlap", 0.0),
     ):
         with pytest.raises(ValueError):
             PrimitiveConfig.from_config({"segmentation": {"primitive_fit": {**base, key: value}}})

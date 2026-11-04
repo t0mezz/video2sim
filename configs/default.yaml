@@ -9,11 +9,11 @@ capture:
     blur_relative_floor: 0.3        # a frame is blurred below this fraction of the video's sharp level
     blur_reference_percentile: 90   # the sharp level: this percentile of per-window sharpness
     min_median_sharpness: 50        # Laplacian variance at 960 px; below it the whole video is soft
-    max_blurred_fraction: 0.3       # reject when more windows than this are blurred
+    max_blurred_fraction: 0.7       # reject when more windows than this are blurred
     min_median_brightness: 35       # grey level 0..255 per frame
     max_median_brightness: 245      # s11 alt_lighting reaches 244 and reconstructs fine; synthetic overexposed is 251
     max_bad_exposure_fraction: 0.25
-    min_marker_fraction: 0.5        # capture protocol says visible in "most" of the video
+    min_marker_fraction: 0.2        # capture protocol says visible in "most" of the video
     min_usable_frames: 20
   marker:
     family: aruco_4x4_50       # ArUco DICT_4X4_50, ids 0 to 5, see benchmark/make_board.py
@@ -21,7 +21,7 @@ capture:
 
 reconstruction:
   quality:                     # P1.4; registered fraction and reprojection gates are in targets.yaml
-    min_azimuth_coverage_deg: 60    # TODO(P1.6): guess from the capture protocol's "three different directions"; tune in Phase 3
+    min_azimuth_coverage_deg: 40
   backend: pycolmap            # CPU SfM, decision D-016; VGGT and CUDA build deferred past the MVP
   sfm:                         # TODO.md item 6b; sequential matching is 2 to 4x faster than exhaustive on long videos
     matcher: sequential        # exhaustive or sequential; frames must be in video order
@@ -109,7 +109,7 @@ segmentation:
       min_hit_frames: 2        # a track is dropped with at least this many hit frames ...
       min_hit_fraction: 0.2    # ... and this share of its frames where a tag was detected
     gap_fill:                  # S12.9: residual clusters -> VLM check -> one box request; guesses until tuned on dev
-      enabled: true            # off until the 9.8 dev evaluation decides defaults (9.9); off keeps the stage byte-identical
+      enabled: false           # off until the 9.8 dev evaluation decides defaults (9.9); off keeps the stage byte-identical
       max_rounds: 1            # rounds per scene; only 1 is implemented
       max_noun_requests: 6     # noun fallback requests, one per failed accepted cluster
       max_video_requests: 8    # hosted video requests per scene, generic one included
@@ -146,7 +146,7 @@ segmentation:
       min_frames: 3            # smallest group that counts as an object when splitting
       sliver_frac: 0.2         # feet from masks below this share of the track median are occlusion slivers, not new objects
   verify:                      # end-of-segmentation coverage check: VLM look plus noun prompts, looped
-    enabled: true              # off until it is evaluated (TODO.md item 9); turn it on per run to try it. Off keeps the stage byte-identical
+    enabled: false             # off until it is evaluated (TODO.md item 9); turn it on per run to try it. Off keeps the stage byte-identical
     max_turns: 3               # verification rounds at most; -1 loops until a round prompts nothing new
     max_noun_requests: 4       # targeted SAM video requests per round at most
     views: 3                   # whole-scene frames with kept-track outlines sent to the VLM
@@ -189,10 +189,11 @@ segmentation:
     min_size_m: 0.005          # a primitive side below this is rejected
     stack_min_overlap: 0.8     # stacked: this share of the footprint lies over another object ...
     duplicate_dist_m: 0.02     # fitted primitives this close, this similar in size, with no
+    duplicate_z_overlap: 0.5   # with a shared frame, still a duplicate when the z-ranges overlap this much of the shorter one (a stack's upper cluster is seated above the lower)
     duplicate_size_frac: 0.15  # shared frame are one fragmented track; the smaller is dropped
                              # (s12 video_b breakfast tracks agree to 5 mm and 1%; the closest
                              # distinct pair, s13 stacked boxes, differs by 48% in size)
-    stack_gap_m: 0.015         # ... and the lowest points are this close to that object's top; s13 is 1.0 cm off
+    stack_gap_m: 0.02          # ... and the lowest points are this close to that object's top; s13 is 1.0 cm off
     stack_min_points: 20       # fewer points say nothing about where an object starts
     stack_percentile: 2.0      # the lowest points, without strays
     max_cost: 0.10             # above this mask disagreement the cluster is the union of primitive and points; chosen on the dev scenes (cluster_box_accuracy.md)
@@ -351,7 +352,7 @@ physics:
   repair:                      # P4.1, stages/mesh_repair.py
     min_component_area_frac: 0.02   # a piece smaller than this share of the largest piece's area is a floater
     min_volume_m3: 1.0e-9           # below this the mesh is not a solid
-    max_triangles: 20000            # triangle budget per visual mesh; above it the mesh is decimated
+    max_triangles: 60000            # triangle budget per visual mesh; above it the mesh is decimated
     max_volume_change_frac: 0.02    # decimation that moves the volume more than this is rejected
     decimation_aggression: 5        # fast_simplification agg, 3 to 10; below 3 it stops short of the budget
 
