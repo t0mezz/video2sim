@@ -139,9 +139,9 @@ def test_the_tall_pass_only_votes_above_the_first_pass(monkeypatch: Any) -> None
     voted: list[np.ndarray[Any, Any]] = []
     real_vote = lift_module._vote
 
-    def spy(grid: Any, tracks: Any, w: Any, cfg: Any, views: Any) -> Any:
+    def spy(grid: Any, tracks: Any, w: Any, cfg: Any, views: Any, **kw: Any) -> Any:
         voted.append(grid.centers(np.arange(grid.size)))
-        return real_vote(grid, tracks, w, cfg, views)
+        return real_vote(grid, tracks, w, cfg, views, **kw)
 
     monkeypatch.setattr(lift_module, "_vote", spy)
     size = (0.08, 0.06, 0.5)

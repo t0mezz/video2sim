@@ -13,6 +13,9 @@ on another object is dropped.
   budget. A voxel hidden behind another object
   projects onto the occluder's mask in those views and still counts as in view.
 * A voxel claimed by two tracks goes to the one with the higher agreement.
+* Cells of 4 x 4 x 4 voxels are bounded first (``_candidates``): where no track can reach its
+  threshold anywhere in a cell, its voxels are not voted. The bound is conservative, so the
+  members are those of voting every voxel. On the local runs it votes 0.6 to 12% of them.
 * With ``occlusion_aware`` a voxel that lands on another track's mask but not its own
   excuses that view (like a missing mask), instead of counting seen-but-not-hit.
   Without it, an object hidden in more than ``1 - min_agreement`` of views can never pass.
@@ -342,6 +345,181 @@ def _vote_views(
     return out
 
 
+# Coarse pass of the vote (N12): fine voxels per side of a cell, and the slack in pixels kept
+# around a cell's projected bounds, far above float rounding. Neither changes a result.
+_CELL = 4
+_CELL_CHUNK = 1 << 14
+_PIXEL_SLACK = 1e-3
+_DEPTH_SLACK_M = 1e-9
+
+Interval = tuple[F64, F64]
+
+
+def _imul(a: Interval, b: Interval) -> Interval:
+    p = (a[0] * b[0], a[0] * b[1], a[1] * b[0], a[1] * b[1])
+    lo: F64 = np.minimum(np.minimum(p[0], p[1]), np.minimum(p[2], p[3]))
+    hi: F64 = np.maximum(np.maximum(p[0], p[1]), np.maximum(p[2], p[3]))
+    return lo, hi
+
+
+def _iscale(c: float, a: Interval) -> Interval:
+    return (c * a[0], c * a[1]) if c >= 0 else (c * a[1], c * a[0])
+
+
+def _iadd(a: Interval, b: Interval) -> Interval:
+    return a[0] + b[0], a[1] + b[1]
+
+
+def _ishift(a: Interval, c: float) -> Interval:
+    return a[0] + c, a[1] + c
+
+
+def _isquare(a: Interval) -> Interval:
+    lo2, hi2 = a[0] * a[0], a[1] * a[1]
+    lo: F64 = np.where((a[0] <= 0) & (a[1] >= 0), 0.0, np.minimum(lo2, hi2))
+    return lo, np.maximum(lo2, hi2)
+
+
+def _pixel_bounds(x: Interval, y: Interval, k: Intrinsics) -> tuple[Interval, Interval]:
+    """Enclosures of ``_pixels`` (u and v) over boxes of normalized coordinates, by interval
+    arithmetic on the same lens model. They may be loose, never too tight (up to rounding)."""
+    k1, k2, p1, p2, k3 = (float(d) for d in (list(k.distortion) + [0.0] * 5)[:5])
+    x2, y2, xy = _isquare(x), _isquare(y), _imul(x, y)
+    r2 = _iadd(x2, y2)
+    radial = _ishift(_imul(r2, _ishift(_imul(r2, _ishift(_iscale(k3, r2), k2)), k1)), 1.0)
+    xd = _iadd(
+        _iadd(_imul(x, radial), _iscale(2.0 * p1, xy)),
+        _iscale(p2, _iadd(r2, _iscale(2.0, x2))),
+    )
+    yd = _iadd(
+        _iadd(_imul(y, radial), _iscale(p1, _iadd(r2, _iscale(2.0, y2)))),
+        _iscale(2.0 * p2, xy),
+    )
+    return _ishift(_iscale(k.fx, xd), k.cx), _ishift(_iscale(k.fy, yd), k.cy)
+
+
+def _window_any(
+    table: NDArray[np.int64], small: CropMask, r0: I64, r1: I64, c0: I64, c1: I64
+) -> NDArray[np.bool_]:
+    """Whether ``small`` has a pixel in each window of rows ``r0..r1`` and columns ``c0..c1``
+    (inclusive, frame coordinates); ``table`` is the summed-area table of ``small.data``."""
+    h, w = small.data.shape
+    if h == 0 or w == 0:
+        return np.zeros(len(r0), dtype=bool)
+    a0 = np.maximum(r0, small.top) - small.top
+    a1 = np.minimum(r1, small.top + h - 1) - small.top
+    b0 = np.maximum(c0, small.left) - small.left
+    b1 = np.minimum(c1, small.left + w - 1) - small.left
+    empty = (a0 > a1) | (b0 > b1)
+    a0, a1 = np.clip(a0, 0, h - 1), np.clip(a1, 0, h - 1)
+    b0, b1 = np.clip(b0, 0, w - 1), np.clip(b1, 0, w - 1)
+    total = table[a1 + 1, b1 + 1] - table[a0, b1 + 1] - table[a1 + 1, b0] + table[a0, b0]
+    return np.asarray(~empty & (total > 0), dtype=bool)
+
+
+def _cell_ends(grid: _VoxelGrid, axis: int) -> tuple[F64, F64]:
+    """World coordinate of the first and last fine voxel centre of each cell along ``axis``,
+    computed as ``_VoxelGrid.centers`` computes them."""
+    n = grid.shape[axis]
+    first = np.arange(0, n, _CELL, dtype=np.int64)
+    last = np.minimum(first + _CELL, n) - 1
+    offset = grid.z0 if axis == 2 else 0
+    lo: F64 = grid.origin[axis] + (first + offset + 0.5) * grid.voxel_m
+    hi: F64 = grid.origin[axis] + (last + offset + 0.5) * grid.voxel_m
+    return lo, hi
+
+
+def _candidates(
+    grid: _VoxelGrid,
+    n_tracks: int,
+    prepared: Sequence[_VoteView],
+    world: WorldModel,
+    cfg: LiftConfig,
+    agree: F64,
+    chunk: int = _CELL_CHUNK,
+) -> I64:
+    """The fine voxels that can belong to a track, found on cells of ``_CELL`` voxels a side.
+
+    For a cell and a view, the centres of the cell's voxels lie in the box spanned by its
+    corner centres; their camera depth and normalized image coordinates take their extremes
+    at the corners, and interval arithmetic bounds the lens model, so every voxel lands in a
+    known pixel window. Per track that gives an upper bound on its hits (views where its mask
+    reaches the window, ``A``) and a lower bound on the views that see a voxel and miss
+    (``B``: every voxel is in the image and, occlusion-aware, no mask at all reaches the
+    window). A voxel's ratio is at most ``A / (A + B)`` and it needs ``min_views`` views, so
+    a cell where no track can clear its threshold ``agree`` holds no member, and is skipped.
+    Cells are bounded ``chunk`` at a time.
+    """
+    k = world.intrinsics
+    scale = 1.0 / cfg.mask_downscale
+    ends = [_cell_ends(grid, a) for a in range(3)]
+    cells = (len(ends[0][0]), len(ends[1][0]), len(ends[2][0]))
+    n_cells = cells[0] * cells[1] * cells[2]
+    tables = [{r: _summed_area(view.smalls[r]) for r in view.rows} for view in prepared]
+    slack = _PIXEL_SLACK
+    keep = np.zeros(n_cells, dtype=bool)
+    for start in range(0, n_cells, chunk):
+        stop = min(start + chunk, n_cells)
+        index = np.unravel_index(np.arange(start, stop, dtype=np.int64), cells)
+        pick = [np.stack([lo[i], hi[i]], axis=1) for (lo, hi), i in zip(ends, index, strict=True)]
+        corners = np.stack(
+            np.broadcast_arrays(
+                pick[0][:, :, None, None], pick[1][:, None, :, None], pick[2][:, None, None, :]
+            ),
+            axis=-1,
+        ).reshape(-1, 3)
+        n = stop - start
+        hit_views = np.zeros((n_tracks, n), dtype=np.int32)  # A
+        miss_views = np.zeros((n_tracks, n), dtype=np.int32)  # B
+        seen_views = np.zeros((n_tracks, n), dtype=np.int32)  # most views that can see one
+        for view, table in zip(prepared, tables, strict=True):
+            cam = ((corners - view.t) @ view.R).reshape(n, 8, 3)
+            z = cam[:, :, 2]
+            bounded = z.min(axis=1) > MIN_DEPTH_M + _DEPTH_SLACK_M
+            safe = np.where(bounded[:, None], z, 1.0)
+            nx_, ny_ = cam[:, :, 0] / safe, cam[:, :, 1] / safe
+            (u0, u1), (v0, v1) = _pixel_bounds(
+                (nx_.min(axis=1), nx_.max(axis=1)), (ny_.min(axis=1), ny_.max(axis=1)), k
+            )
+            outside = (u1 < -slack) | (u0 >= k.width_px + slack) | (v1 < -slack)
+            outside |= v0 >= k.height_px + slack
+            reach = ~((z.max(axis=1) <= MIN_DEPTH_M - _DEPTH_SLACK_M) | (bounded & outside))
+            all_in = bounded & (u0 >= slack) & (u1 < k.width_px - slack)
+            all_in &= (v0 >= slack) & (v1 < k.height_px - slack)
+            whole = np.iinfo(np.int32).max  # an unbounded cell may land anywhere
+            c0 = np.where(bounded, np.floor(np.maximum(u0, 0.0) * scale) - 1, 0).astype(np.int64)
+            c1 = np.where(bounded, np.floor(np.minimum(u1, k.width_px) * scale) + 1, whole)
+            r0 = np.where(bounded, np.floor(np.maximum(v0, 0.0) * scale) - 1, 0).astype(np.int64)
+            r1 = np.where(bounded, np.floor(np.minimum(v1, k.height_px) * scale) + 1, whole)
+            c1, r1 = c1.astype(np.int64), r1.astype(np.int64)
+            any_mask = np.zeros(n, dtype=bool)
+            own: dict[int, NDArray[np.bool_]] = {}
+            for r in view.rows:
+                own[r] = _window_any(table[r], view.smalls[r], r0, r1, c0, c1)
+                any_mask |= own[r]
+                hit_views[r] += own[r] & reach
+                seen_views[r] += reach
+            for r in view.rows:
+                # A sure miss: every voxel is in view, off this track's mask and, occlusion-
+                # aware, off every mask (on another one it would be excused, not missed).
+                clear = any_mask if view.free is not None else own[r]
+                miss_views[r] += all_in & ~clear
+        total = (hit_views + miss_views).astype(np.float64)
+        bound = np.where(hit_views > 0, hit_views / np.maximum(total, 1.0), 0.0)
+        possible = (seen_views >= cfg.min_views) & (hit_views > 0) & (bound >= agree[:, None])
+        keep[start:stop] = possible.any(axis=0)
+    fine = keep.reshape(cells).repeat(_CELL, 0).repeat(_CELL, 1).repeat(_CELL, 2)
+    fine = fine[: grid.shape[0], : grid.shape[1], : grid.shape[2]]
+    return np.flatnonzero(fine).astype(np.int64)
+
+
+def _summed_area(small: CropMask) -> NDArray[np.int64]:
+    """Summed-area table of a crop's pixels, one row and column of zeros in front."""
+    table = np.zeros((small.data.shape[0] + 1, small.data.shape[1] + 1), dtype=np.int64)
+    table[1:, 1:] = np.cumsum(np.cumsum(small.data, axis=0), axis=1)
+    return table
+
+
 def _vote(
     grid: _VoxelGrid,
     tracks: Sequence[Track],
@@ -349,8 +527,13 @@ def _vote(
     cfg: LiftConfig,
     views: list[int],
     chunk: int = _VOTE_CHUNK,
+    agree: F64 | None = None,
 ) -> tuple[F64, NDArray[np.int32]]:
     """The best agreement ratio per voxel of ``grid`` and the track (row) that has it.
+
+    Given the tracks' thresholds ``agree``, only the voxels of ``_candidates`` are voted and the
+    rest keep ratio 0: none of them could clear its track's threshold, so the members
+    (``ratio >= agree[best]``) are those of the full vote.
 
     A track's ratio is hits over seen views, 0 below ``min_views`` seen views. A voxel belongs
     to its best track once that ratio clears the track's agreement threshold; ties go to the
@@ -369,9 +552,12 @@ def _vote(
     counts = _count_dtype(len(views))
     best_ratio = np.zeros(grid.size, dtype=np.float64)
     best = np.zeros(grid.size, dtype=np.int32)
-    for start in range(0, grid.size, chunk):
-        stop = min(start + chunk, grid.size)
-        centers = grid.centers(np.arange(start, stop, dtype=np.int64))
+    voted = None if agree is None else _candidates(grid, len(tracks), prepared, world, cfg, agree)
+    n_voted = grid.size if voted is None else len(voted)
+    for start in range(0, n_voted, chunk):
+        stop = min(start + chunk, n_voted)
+        index = np.arange(start, stop, dtype=np.int64) if voted is None else voted[start:stop]
+        centers = grid.centers(index)
         seen = np.zeros((len(tracks), stop - start), dtype=counts)
         hits = np.zeros((len(tracks), stop - start), dtype=counts)
         for view in prepared:
@@ -415,8 +601,8 @@ def _vote(
             better = ratio > top
             top = np.where(better, ratio, top)
             winner[better] = r
-        best_ratio[start:stop] = top
-        best[start:stop] = winner
+        best_ratio[index] = top
+        best[index] = winner
     return best_ratio, best
 
 
@@ -468,7 +654,7 @@ def lift_tracks(
     small_track = areas < cfg.small_mask_px
     agree = np.where(small_track, cfg.small_min_agreement, cfg.min_agreement)
     minvox = np.where(small_track, cfg.small_min_voxels, cfg.min_voxels)
-    ratio, best = _vote(grid, tracks, world, cfg, views)  # best ratio per voxel, its track
+    ratio, best = _vote(grid, tracks, world, cfg, views, agree=agree)  # best ratio, its track
 
     clusters: dict[int, F64] = {}
     dropped: dict[int, str] = {}
@@ -502,7 +688,7 @@ def lift_tracks(
         nx, ny, nz = tall_shape
         low_layers = shape[2]
         high = replace(tall_grid, shape=(nx, ny, nz - low_layers), z0=low_layers)
-        tall_ratio, tall_best = _vote(high, tracks, world, cfg, views)
+        tall_ratio, tall_best = _vote(high, tracks, world, cfg, views, agree=agree)
         tall_top = tall_shape[2] - 1
         for row in tall_rows:
             track = tracks[row]

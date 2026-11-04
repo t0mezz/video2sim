@@ -70,7 +70,10 @@ world frame, keyframes, flags and a material answer.
    track when its mask holds it in 90% of the views that see it (40 views), and views where another
    track's mask excuses the occlusion do not count against it. The two outermost points per side of
    the resting box are trimmed, then an upright box, cylinder or sphere is fitted to the masks. That
-   fitted cluster is `point_cluster_path`. The visual hull is kept only for the shape flags.
+   fitted cluster is `point_cluster_path`. The visual hull is kept only for the shape flags. Its
+   vote first bounds cells of 4 x 4 x 4 voxels (projected windows with the lens model bounded by
+   interval arithmetic) and votes only cells where some track can reach its threshold, which gives
+   the members of the full vote (N12).
 5. **Keyframes** (`keyframes.py`). Per object, up to 5 frames scored by mask area, border contact,
    overlap with other tracks and sharpness, with a penalty for frames from similar camera poses.
 6. **Flags and material pass** (`shape_flags.py`, `material_pass.py`, D-017). Geometry flags `small`,

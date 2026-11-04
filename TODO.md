@@ -144,9 +144,18 @@ makes hosted calls. Items are `N1` to `N21`; use the id in branch names (`n4-cro
   waits for it before its own requests, so nothing is sent twice. Alternative: ask for the mass in
   the material pass request (same two crops, same model), which removes the requests but changes
   the answers; re-measure D-024 on dev and add a decision row.
-- [ ] **N12 [agent] Coarse-to-fine voxel lift.** The grid spans the whole tracked area (1.7 x 1.4 m
+- [x] **N12 [agent] Coarse-to-fine voxel lift.** The grid spans the whole tracked area (1.7 x 1.4 m
   on the 155-frame run) while objects fill a fraction of it; vote a coarse grid, then refine only
   candidate cells. Exact only if the coarse test is conservative; otherwise score the cluster boxes.
+  Done, conservative, so it changes no result and needs no dev evaluation: `lift._candidates`
+  bounds cells of 4 x 4 x 4 voxels (corner projections, the lens model by interval arithmetic,
+  summed-area tables of the shrunk masks) and votes only cells where some track can clear its
+  threshold. It votes 2.6% and 0.6% of the voxels of the two passes on the 155-frame run and 3 to
+  12% on two others; the vote there takes 2.6 s instead of 11.9 s and the segmentation replay 25.0 s
+  instead of 33.2 s, with the traced peak unchanged at 0.41 GB. Members equal the full vote's in
+  `tests/test_coarse_vote.py` (lens distortion, both occlusion rules, three thresholds, the tall
+  grid offset); segmentation replays against ce926a0 are byte-identical on six runs
+  (`benchmark/results/n12_coarse_vote.json`).
 
 **Quality experiments** (dev only; tune nothing on test)
 
