@@ -326,3 +326,100 @@ def test_a_failed_draw_stays_with_its_object(tmp_path: Path) -> None:
     assert len(out[1][1]["failed_samples"]) == 1
     assert len(out[0][1]["samples"]) == 2
     assert len(out[1][1]["samples"]) == 1
+
+
+# --- N10: early stop of the SAM 3D draws -------------------------------------------------
+
+
+class _Varied(FakeModel):
+    """``FakeModel`` with another mesh for some keyframes."""
+
+    def __init__(self, cameras: dict[int, SE3], other: dict[int, trimesh.Trimesh]) -> None:
+        super().__init__(cameras, MODEL, 0.0)
+        self.other = other
+
+    def sample(self, object_id: str, view: ShapeView, seed: int) -> ShapeSample:
+        out = super().sample(object_id, view, seed)
+        mesh = self.other.get(view.frame_index)
+        if mesh is None:
+            return out
+        vertices = np.asarray(mesh.vertices, dtype=float)
+        faces = np.asarray(mesh.faces, dtype=np.int64)
+        return out.__class__(**{**out.__dict__, "vertices_model": vertices, "faces": faces})
+
+
+def _early(min_fit_score: float = 0.5, **early: object) -> dict[str, Any]:
+    stop = {"enabled": True, "min_draws": 2, "size_tolerance": 0.1, **early}
+    return _shape_config(keyframes_per_object=3, early_stop=stop, min_fit_score=min_fit_score)
+
+
+def test_early_stop_is_off_by_default_and_leaves_the_report_alone(tmp_path: Path) -> None:
+    cfg = ShapeStageConfig.from_config({"shape": _shape_config()})
+    assert cfg.early_stop.enabled is False
+    run, cameras = _make_run(tmp_path)
+    model = FakeModel(cameras, MODEL, 0.0)
+    _run_stage(run, model, _shape_config(keyframes_per_object=3))
+    assert [f for f, _ in model.calls] == [2, 3, 0]  # every draw
+    assert "early_stop" not in (run / "shape" / "report.json").read_text()
+
+
+def test_agreeing_first_draws_skip_the_rest(tmp_path: Path) -> None:
+    run, cameras = _make_run(tmp_path)
+    model = FakeModel(cameras, MODEL, 0.0)
+    result, _ = _run_stage(run, model, _early())
+    assert [f for f, _ in model.calls] == [2, 3]  # keyframe 0 is never drawn
+    import json
+
+    entry = json.loads((run / "shape" / "report.json").read_text())["obj_000"]
+    assert entry["early_stop"]["drawn"] == 2 and entry["early_stop"]["skipped"] == 1
+    assert "agree" in entry["early_stop"]["reason"]
+    assert len(entry["samples"]) == 2
+    assert result.objects[0].geometry_source == "sam3d"
+
+
+@pytest.mark.parametrize(
+    ("other", "fit", "word"),
+    [
+        (trimesh.creation.icosphere(subdivisions=2, radius=0.6), 0.5, "fits"),  # below the bar
+        (trimesh.creation.box(extents=[0.8, 0.5, 2.0]), 0.2, "differ"),  # a taller box that fits
+    ],
+)
+def test_disagreeing_first_draws_draw_the_rest(
+    tmp_path: Path, other: trimesh.Trimesh, fit: float, word: str
+) -> None:
+    run, cameras = _make_run(tmp_path)
+    model = _Varied(cameras, {3: other})
+    _run_stage(run, model, _early(min_fit_score=fit))
+    assert [f for f, _ in model.calls] == [2, 3, 0]
+    import json
+
+    entry = json.loads((run / "shape" / "report.json").read_text())["obj_000"]
+    assert entry["early_stop"]["skipped"] == 0 and entry["early_stop"]["drawn"] == 3
+    assert word in entry["early_stop"]["reason"]
+
+
+def test_early_stop_in_a_scene_matches_the_sequential_path(tmp_path: Path) -> None:
+    run, cameras = _make_run(tmp_path)
+    world, objects, masks = _two_objects(run)
+    stop = {"enabled": True, "min_draws": 2, "size_tolerance": 0.1}
+    cfg = _stage_config(keyframes_per_object=3, parallel_samples=4, early_stop=stop)
+    (run / "shape").mkdir()
+    other = {0: trimesh.creation.box(extents=[0.8, 0.5, 2.0])}
+    together = shape_scene(
+        objects, world, run, run / "shape", masks, _Varied(cameras, other), cfg, 7
+    )
+    alone = [
+        shape_object(o, world, run, run / "shape", masks, _Varied(cameras, other), cfg, 7)
+        for o in objects
+    ]
+    for (a, a_report, _), (b, b_report, _) in zip(together, alone, strict=True):
+        assert a == b
+        assert a_report == b_report
+        assert a_report["early_stop"]["skipped"] == 1
+
+
+def test_early_stop_settings_are_checked() -> None:
+    with pytest.raises(ValueError, match="min_draws"):
+        ShapeStageConfig.from_config({"shape": _early(min_draws=0)})
+    with pytest.raises(ValueError, match="size_tolerance"):
+        ShapeStageConfig.from_config({"shape": _early(size_tolerance=0.0)})

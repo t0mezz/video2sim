@@ -80,6 +80,30 @@ MESH_DIR = "meshes"
 
 
 @dataclass(frozen=True)
+class EarlyStopConfig:
+    """``shape.early_stop`` (N10): draw ``min_draws`` per object first and skip the rest when
+    those agree. Off by default; off, the stage draws everything at once as before."""
+
+    enabled: bool = False
+    min_draws: int = 2
+    size_tolerance: float = 0.1
+
+    @classmethod
+    def from_config(cls, section: Mapping[str, Any] | None) -> EarlyStopConfig:
+        c = dict(section or {})
+        out = cls(
+            bool(c.get("enabled", False)),
+            int(c.get("min_draws", 2)),
+            float(c.get("size_tolerance", 0.1)),
+        )
+        if out.min_draws < 1:
+            raise ValueError("shape.early_stop.min_draws must be at least 1")
+        if out.size_tolerance <= 0:
+            raise ValueError("shape.early_stop.size_tolerance must be positive")
+        return out
+
+
+@dataclass(frozen=True)
 class ShapeStageConfig:
     """Values from ``shape`` in ``configs/default.yaml``."""
 
@@ -93,6 +117,7 @@ class ShapeStageConfig:
     parallel_samples: int
     parallel_registrations: int
     registration: RegistrationConfig
+    early_stop: EarlyStopConfig = EarlyStopConfig()
 
     @classmethod
     def from_config(cls, cfg: dict[str, Any]) -> ShapeStageConfig:
@@ -108,6 +133,7 @@ class ShapeStageConfig:
             int(c["parallel_samples"]),
             int(c["parallel_registrations"]),
             RegistrationConfig.from_config(cfg),
+            EarlyStopConfig.from_config(c.get("early_stop")),
         )
         counts = (
             out.keyframes_per_object,
@@ -332,6 +358,106 @@ def plan_object(
     )
 
 
+def registered_size(candidate: Candidate, support_z: float | None) -> tuple[float, float, float]:
+    """Length, width and height of the placed draw's resting box: the sides of the minimum-area
+    rectangle around its footprint, long side first, and its vertical extent."""
+    from video2sim.stages.lift import footprint_axes
+
+    world_vertices, _ = place(candidate, support_z)
+    u, n = footprint_axes(world_vertices)
+    a = float(np.ptp(world_vertices[:, :2] @ u))
+    b = float(np.ptp(world_vertices[:, :2] @ n))
+    return max(a, b), min(a, b), float(np.ptp(world_vertices[:, 2]))
+
+
+def draws_agree(
+    plan: ObjectPlan, candidates: Sequence[Candidate], failed: int, cfg: ShapeStageConfig
+) -> tuple[bool, str]:
+    """Whether an object's first draws settle it (N10), and why.
+
+    They agree when all ``min_draws`` landed, each fits at or above ``min_fit_score`` and
+    their resting boxes differ by at most ``size_tolerance`` of the larger one on every axis.
+    Draws are taken in draw order, so the verdict does not depend on which finished first.
+    """
+    stop = cfg.early_stop
+    if failed:
+        return False, f"{failed} of the first {stop.min_draws} draws failed"
+    if len(candidates) < stop.min_draws:
+        return False, f"only {len(candidates)} draws for this object"
+    low = min(c.registration.fit_score for c in candidates)
+    if low < cfg.min_fit_score:
+        return False, f"a first draw fits {low:.2f}, below {cfg.min_fit_score}"
+    sizes = np.array([registered_size(c, plan.support_z) for c in candidates])
+    spread = float(np.max((sizes.max(axis=0) - sizes.min(axis=0)) / sizes.max(axis=0)))
+    if spread > stop.size_tolerance:
+        return False, f"the first draws differ by {spread:.1%} in size"
+    reason = f"the first {len(candidates)} draws agree: fit {low:.2f} or more"
+    return True, f"{reason}, size within {spread:.1%}"
+
+
+def _early_stop_note(drawn: int, skipped: int, reason: str) -> dict[str, Any]:
+    return {"drawn": drawn, "skipped": skipped, "reason": reason}
+
+
+def _sample_jobs(
+    model: ShapeModel,
+    object_id: str,
+    jobs: Sequence[tuple[ShapeView, int]],
+    workers: int,
+) -> tuple[list[ShapeSample], list[str]]:
+    """``draw_samples`` for a given list of jobs: samples in job order and failed draws."""
+
+    def run(job: tuple[ShapeView, int]) -> ShapeSample | str:
+        view, draw_seed = job
+        try:
+            return model.sample(object_id, view, draw_seed)
+        except SampleFailed as e:
+            return f"frame {view.frame_index} seed {draw_seed}: {e}"
+
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        results = list(pool.map(run, jobs))
+    return (
+        [r for r in results if not isinstance(r, str)],
+        [r for r in results if isinstance(r, str)],
+    )
+
+
+def _shape_object_early(
+    plan: ObjectPlan,
+    world: WorldModel,
+    out_dir: Path,
+    model: ShapeModel,
+    cfg: ShapeStageConfig,
+    seed: int,
+) -> tuple[RegisteredObject, dict[str, Any], str | None]:
+    """``shape_object`` with ``early_stop`` on: the first draws, then the rest only if needed."""
+    obj = plan.obj
+    jobs = draw_jobs(obj.object_id, plan.shape_views, cfg.samples_per_keyframe, seed)
+    first, rest = jobs[: cfg.early_stop.min_draws], jobs[cfg.early_stop.min_draws :]
+
+    def register_all(samples: list[ShapeSample]) -> list[Candidate]:
+        return [
+            Candidate(
+                sample,
+                register_sample(
+                    sample, world, plan.target, plan.views, cfg.registration, seed, plan.support_z
+                ),
+            )
+            for sample in samples
+        ]
+
+    samples, failures = _sample_jobs(model, obj.object_id, first, cfg.parallel_samples)
+    candidates = register_all(samples)
+    agree, reason = draws_agree(plan, candidates, len(failures), cfg)
+    skipped = len(rest) if agree else 0
+    if rest and not agree:
+        more, more_failed = _sample_jobs(model, obj.object_id, rest, cfg.parallel_samples)
+        candidates += register_all(more)
+        failures += more_failed
+    note = _early_stop_note(len(jobs) - skipped, skipped, reason)
+    return finish_object(plan, candidates, failures, out_dir, cfg, seed, note)
+
+
 def shape_object(
     obj: ObjectInstance,
     world: WorldModel,
@@ -344,6 +470,8 @@ def shape_object(
 ) -> tuple[RegisteredObject, dict[str, Any], str | None]:
     """One object from start to end, with nothing shared with the others: the sequential path."""
     plan = plan_object(obj, world, run_dir, masks, cfg)
+    if cfg.early_stop.enabled:
+        return _shape_object_early(plan, world, out_dir, model, cfg, seed)
     failures: list[str] = []
     samples = draw_samples(
         model,
@@ -391,6 +519,8 @@ def shape_scene(
     outcome is that of ``shape_object`` whatever finishes first.
     """
     plans = [plan_object(obj, world, run_dir, masks, cfg) for obj in objects]
+    if cfg.early_stop.enabled:
+        return _shape_scene_early(plans, world, out_dir, model, cfg, seed, on_object)
     jobs = [
         (index, view, draw_seed)
         for index, plan in enumerate(plans)
@@ -438,6 +568,82 @@ def shape_scene(
         return list(fits.map(finish, range(len(plans))))
 
 
+def _shape_scene_early(
+    plans: Sequence[ObjectPlan],
+    world: WorldModel,
+    out_dir: Path,
+    model: ShapeModel,
+    cfg: ShapeStageConfig,
+    seed: int,
+    on_object: Callable[[RegisteredObject, dict[str, Any]], None] | None,
+) -> list[tuple[RegisteredObject, dict[str, Any], str | None]]:
+    """``shape_scene`` with ``early_stop`` on (N10).
+
+    Every object's first ``min_draws`` go into the shared draw pool at once. As soon as an
+    object's first draws are registered, its verdict is taken in draw order, and only an
+    object whose first draws disagree queues the rest. The outcome is that of
+    ``shape_object`` with the same setting, whatever finishes first.
+    """
+    min_draws = cfg.early_stop.min_draws
+    with (
+        ThreadPoolExecutor(max_workers=cfg.parallel_samples) as draws,
+        ThreadPoolExecutor(max_workers=cfg.parallel_registrations) as fits,
+        ThreadPoolExecutor(max_workers=max(1, len(plans))) as deciders,
+    ):
+
+        def fit(index: int, sample: ShapeSample) -> Candidate:
+            p = plans[index]
+            reg = register_sample(
+                sample, world, p.target, p.views, cfg.registration, seed, p.support_z
+            )
+            return Candidate(sample, reg)
+
+        def draw(index: int, view: ShapeView, draw_seed: int) -> Future[Candidate] | str:
+            try:
+                sample = model.sample(plans[index].obj.object_id, view, draw_seed)
+            except SampleFailed as e:
+                return f"frame {view.frame_index} seed {draw_seed}: {e}"
+            return fits.submit(fit, index, sample)
+
+        def collect(
+            index: int, jobs: Sequence[tuple[ShapeView, int]]
+        ) -> tuple[list[Candidate], list[str]]:
+            pending = [draws.submit(draw, index, view, s) for view, s in jobs]
+            found: list[Candidate] = []
+            failed: list[str] = []
+            for future in pending:  # in draw order
+                result = future.result()
+                if isinstance(result, str):
+                    failed.append(result)
+                else:
+                    found.append(result.result())
+            return found, failed
+
+        def decide(index: int) -> tuple[list[Candidate], list[str], dict[str, Any]]:
+            plan = plans[index]
+            jobs = draw_jobs(plan.obj.object_id, plan.shape_views, cfg.samples_per_keyframe, seed)
+            first, rest = jobs[:min_draws], jobs[min_draws:]
+            found, failed = collect(index, first)
+            agree, reason = draws_agree(plan, found, len(failed), cfg)
+            skipped = len(rest) if agree else 0
+            if rest and not agree:
+                more, more_failed = collect(index, rest)
+                found += more
+                failed += more_failed
+            return found, failed, _early_stop_note(len(jobs) - skipped, skipped, reason)
+
+        outcomes = list(deciders.map(decide, range(len(plans))))
+
+        def finish(index: int) -> tuple[RegisteredObject, dict[str, Any], str | None]:
+            found, failed, note = outcomes[index]
+            result = finish_object(plans[index], found, failed, out_dir, cfg, seed, note)
+            if on_object is not None:
+                on_object(result[0], result[1])
+            return result
+
+        return list(fits.map(finish, range(len(plans))))
+
+
 def finish_object(
     plan: ObjectPlan,
     candidates: list[Candidate],
@@ -445,6 +651,7 @@ def finish_object(
     out_dir: Path,
     cfg: ShapeStageConfig,
     seed: int,
+    early_stop: dict[str, Any] | None = None,
 ) -> tuple[RegisteredObject, dict[str, Any], str | None]:
     """Keep the best draw and write the object's ``RegisteredObject``, report entry and checkpoint
     used, if any."""
@@ -471,6 +678,8 @@ def finish_object(
         "samples": [sample_record(c) for c in candidates],
         "failed_samples": failures,
     }
+    if early_stop is not None:  # only with shape.early_stop on, so the off report is unchanged
+        report["early_stop"] = early_stop
     mesh_rel = f"shape/{MESH_DIR}/{obj.object_id}.ply"
 
     if best is None or best.registration.fit_score < cfg.min_fit_score:
