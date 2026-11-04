@@ -330,3 +330,10 @@ def test_reduce_vote_and_max_reduce_are_deterministic(cfg: RouterConfig) -> None
     ]
     assert parse_view_answer("no json here", cfg) is None
     assert parse_view_answer(view_answer(surface="moon"), cfg) is None
+
+
+def test_surface_covering_nouns_are_denied_but_tape_roll_is_not(cfg: RouterConfig) -> None:
+    for noun in ("tablecloth", "Table Cloth", "piece of tape", "strip of tape"):
+        assert sanitise_noun(noun, cfg.noun_denylist) is None
+    for noun in ("tape", "tape roll", "roll of tape"):
+        assert sanitise_noun(noun, cfg.noun_denylist) == noun.lower()

@@ -76,6 +76,7 @@ class PrimitiveConfig:
     stack_percentile: float
     duplicate_dist_m: float
     duplicate_size_frac: float
+    duplicate_z_overlap: float
 
     @classmethod
     def from_config(cls, cfg: dict[str, Any]) -> PrimitiveConfig:
@@ -98,6 +99,7 @@ class PrimitiveConfig:
             float(c["stack_percentile"]),
             float(c["duplicate_dist_m"]),
             float(c["duplicate_size_frac"]),
+            float(c["duplicate_z_overlap"]),
         )
         if min(out.mask_downscale, out.min_views, out.iterations, out.shrink_every) < 1:
             raise ValueError("primitive_fit counts must be at least 1")
@@ -107,6 +109,8 @@ class PrimitiveConfig:
             raise ValueError("primitive_fit steps, sizes and max_cost must be positive")
         if out.duplicate_dist_m <= 0 or not 0.0 < out.duplicate_size_frac < 1.0:
             raise ValueError("duplicate_dist_m must be positive and duplicate_size_frac in (0, 1)")
+        if not 0.0 < out.duplicate_z_overlap <= 1.0:
+            raise ValueError("duplicate_z_overlap must be in (0, 1]")
         return out
 
 
@@ -355,6 +359,14 @@ def _footprint_overlap(a: F64, b: F64) -> float:
     return float(np.prod(np.clip(sides, 0.0, None)) / np.prod(high - low))
 
 
+def _z_overlap(a: F64, b: F64) -> float:
+    """The share of the shorter cluster's height that the other cluster's z-range covers."""
+    lo = max(float(np.min(a[:, 2])), float(np.min(b[:, 2])))
+    hi = min(float(np.max(a[:, 2])), float(np.max(b[:, 2])))
+    shorter = min(float(np.ptp(a[:, 2])), float(np.ptp(b[:, 2])))
+    return max(hi - lo, 0.0) / shorter if shorter > 0 else 0.0
+
+
 def seat_stacked(
     fits: Mapping[int, FitResult],
     points: Mapping[int, F64],
@@ -444,7 +456,10 @@ def drop_duplicate_fits(
     agreed to 5 mm and 1% with no shared frame, while the closest distinct pair anywhere
     (s13 stacked boxes) differs by 48% in size. Shared frames veto the drop: stacked
     identical boxes co-occur, and only a mask-IoU check could tell those apart from
-    concurrent double tracks (not implemented).
+    concurrent double tracks (not implemented). Shared frames veto only when the two
+    clusters differ in height: a pair whose z-ranges overlap by ``duplicate_z_overlap`` of
+    the shorter one is one object tracked twice (a gap-fill box and the generic track of the
+    same cube), because a real stack has the upper cluster seated on the lower one.
     """
     prims = {i: f.primitive for i, f in fits.items() if f.primitive is not None}
     dropped: dict[int, str] = {}
@@ -464,7 +479,9 @@ def drop_duplicate_fits(
             rel = np.abs(sizes[0] - sizes[1]).max() / max(sizes[0].max(), sizes[1].max())
             if float(rel) >= cfg.duplicate_size_frac:
                 continue
-            if set(tracks[a].masks) & set(tracks[b].masks):
+            if set(tracks[a].masks) & set(tracks[b].masks) and (
+                _z_overlap(fits[a].cluster, fits[b].cluster) < cfg.duplicate_z_overlap
+            ):
                 continue
             better = (pa.views, -pa.cost) >= (pb.views, -pb.cost)
             keep, drop = (a, b) if better else (b, a)
