@@ -14,9 +14,10 @@ here.
 
 ## Next
 
-- [ ] **D1 [agent] Dry demo for judges (`video2sim replay`).** Built on branch `dry-demo`: `src/video2sim/replay.py`,
-  `scripts/build_judge_snapshot.py`, `tests/test_replay.py`, `docs/judge_snapshot.md`. Archives for 11 dev scenes
-  (s13 skipped: no segmentation output) built from `runs_dev/` into `data/judge_snapshot/archives/`; lock file
+- [ ] **D1 [agent] Dry demo for judges (`video2sim replay`).** Built on branch `dry`: `src/video2sim/replay.py`,
+  `scripts/build_judge_snapshot.py`, `tests/test_replay.py`, `docs/judge_snapshot.md`. Archives for 12 dev scenes
+  built from `runs_dev/` (s13 first failed in segmentation, `lift.max_extent_m` 2 m < its 2.22 m track span, and was
+  rerun with 3 m in a config copy; its settling shows two unstable objects) into `data/judge_snapshot/archives/`; lock file
   `docs/judge_snapshot/index.json` has `url: null`. Open **[human]**: attach the zips to a GitHub Release, rerun the
   build with `--release-url`, commit the lock file, then run `video2sim replay s01 --out X` from a clean checkout.
   Open **[agent]**: a network CI job that downloads the release once it exists.
