@@ -108,7 +108,7 @@ segmentation:
       min_hit_frames: 2        # a track is dropped with at least this many hit frames ...
       min_hit_fraction: 0.2    # ... and this share of its frames where a tag was detected
     gap_fill:                  # S12.9: residual clusters -> VLM check -> one box request; guesses until tuned on dev
-      enabled: false           # off until the 9.8 dev evaluation decides defaults (9.9); off keeps the stage byte-identical
+      enabled: true            # off until the 9.8 dev evaluation decides defaults (9.9); off keeps the stage byte-identical
       max_rounds: 1            # rounds per scene; only 1 is implemented
       max_noun_requests: 6     # noun fallback requests, one per failed accepted cluster
       max_video_requests: 8    # hosted video requests per scene, generic one included
@@ -145,7 +145,7 @@ segmentation:
       min_frames: 3            # smallest group that counts as an object when splitting
       sliver_frac: 0.2         # feet from masks below this share of the track median are occlusion slivers, not new objects
   verify:                      # end-of-segmentation coverage check: VLM look plus noun prompts, looped
-    enabled: false             # off until it is evaluated (TODO.md item 9); turn it on per run to try it. Off keeps the stage byte-identical
+    enabled: true              # off until it is evaluated (TODO.md item 9); turn it on per run to try it. Off keeps the stage byte-identical
     max_turns: 3               # verification rounds at most; -1 loops until a round prompts nothing new
     max_noun_requests: 4       # targeted SAM video requests per round at most
     views: 3                   # whole-scene frames with kept-track outlines sent to the VLM
@@ -278,7 +278,7 @@ shape:
   parallel_registrations: 3    # meshes registered at once; the result does not depend on it
   stretch_samples: 1           # best samples per object that get the per-axis refinement
   early_stop:                  # N10, D-040: draw min_draws per object first, the rest only when those disagree
-    enabled: false             # off until a dev replay of cached draws weighs size error against draws saved
+    enabled: true              # off until a dev replay of cached draws weighs size error against draws saved
     min_draws: 2               # first draws, in draw order (best keyframes first)
     size_tolerance: 0.1        # they agree when every resting-box side differs by at most this share and each fits >= min_fit_score
   registration:                # P3.2, stages/registration.py; first guesses, tune in P3.3
