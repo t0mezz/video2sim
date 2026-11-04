@@ -261,3 +261,65 @@ def test_sfm_options_from_config() -> None:
         SfmOptions.from_config({"matcher": "vocab"})
     with pytest.raises(ValueError, match="mapper"):
         SfmOptions.from_config({"mapper": "glomap"})
+
+
+def test_the_stage_hands_its_tag_detections_on(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """D-039: every registered frame's detections land in ``reconstruction/tags.json``, keyed by
+    the image path the world model gives that frame."""
+    import cv2
+    import yaml
+
+    from video2sim.runner import OUTPUT_FILE, StageContext
+    from video2sim.schemas import CaptureResult, WorldModel
+    from video2sim.stages import reconstruction
+    from video2sim.stages.marker_detection import TAG_FILE, read_tag_file
+
+    views, points = _scene(3.0)
+    run = tmp_path / "run"
+    frames = run / "capture" / "frames"
+    frames.mkdir(parents=True)
+    paths = [f"capture/frames/{i:05d}.png" for i in range(len(views))]
+    for p in paths:
+        cv2.imwrite(str(run / p), np.zeros((1080, 1920, 3), np.uint8))
+    capture = CaptureResult(input_video_sha256="0" * 64, accepted=True, frame_paths=paths, fps=3.0)
+    (run / "capture" / OUTPUT_FILE).write_text(capture.model_dump_json())
+    images = [
+        SfmImage(Path(p).name, v.K, v.distortion, v.T_world_from_camera)
+        for p, v in zip(paths, views, strict=True)
+    ]
+    detections = {
+        img.name: (v.corners_px, (1080, 1920)) for img, v in zip(images, views, strict=True)
+    }
+    monkeypatch.setattr(
+        reconstruction,
+        "run_sfm",
+        lambda *a, **k: SfmModel(images, points, 0.4, len(images), [len(images)]),
+    )
+    monkeypatch.setattr(reconstruction, "detect_file", lambda path, family: detections[path.name])
+    monkeypatch.setattr(reconstruction, "check_reconstruction", lambda *a: [])
+    root = Path(__file__).resolve().parents[1]
+    cfg = yaml.safe_load((root / "configs/default.yaml").read_text(encoding="utf-8"))
+    targets = yaml.safe_load((root / "configs/targets.yaml").read_text(encoding="utf-8"))
+    out = run / "reconstruction.tmp"
+    out.mkdir()
+    ctx = StageContext(
+        stage="reconstruction",
+        run_dir=run,
+        video=run / "video.mp4",
+        out_dir=out,
+        config=reconstruction.reconstruction_stage_config(cfg, targets),
+        seed=0,
+        dependencies=("capture",),
+        output_types={"capture": CaptureResult},
+    )
+    world = reconstruction.ReconstructionStage().run(ctx)
+    assert isinstance(world, WorldModel)
+    table = read_tag_file(out / TAG_FILE, cfg["capture"]["marker"]["family"])
+    assert table is not None
+    assert sorted(table) == sorted(f.image_path for f in world.frames)
+    for name, (corners, shape) in detections.items():
+        got, got_shape = table[f"capture/frames/{name}"]
+        assert got_shape == shape and list(got) == list(corners)
+        assert all(np.array_equal(got[i], corners[i]) for i in corners)

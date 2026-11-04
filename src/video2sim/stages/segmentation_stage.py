@@ -67,6 +67,7 @@ from video2sim.stages.marker_filter import (
     MarkerFilterConfig,
     cached_tag_detector,
     filter_marker_tracks,
+    handed_tag_detector,
 )
 from video2sim.stages.material_pass import (
     MaterialClient,
@@ -485,7 +486,9 @@ class SegmentationStage:
             work / "tracking_work",
         )
         all_tracks = list(raw)
-        tag_detect = cached_tag_detector(marker_cfg.family)
+        tag_detect = cached_tag_detector(
+            marker_cfg.family, handed_tag_detector(ctx.run_dir, marker_cfg.family)
+        )
         raw, marker_report = filter_marker_tracks(raw, world, ctx.run_dir, marker_cfg, tag_detect)
         for track_id, reason in marker_report.dropped.items():
             scene_flags.append(f"track {track_id} dropped as a marker: {reason}")

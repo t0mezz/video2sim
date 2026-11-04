@@ -169,3 +169,65 @@ def test_single_tag_gives_scale_without_any_board_layout() -> None:
     assert list(tri.corners) == [3]
     est = estimate_scale(tri.corners, tag_edge_m=TAG_MM / 1000, max_spread=0.03)
     assert abs(est.scale * wrong_scale - 1.0) < 0.02
+
+
+# --- D-039: detections handed from reconstruction to segmentation -------------------------
+
+
+def _frames(tmp_path: Path) -> dict[str, Path]:
+    tex = _board_texture()
+    frames_dir = tmp_path / "capture" / "frames"
+    frames_dir.mkdir(parents=True)
+    out = {}
+    for i, pose in enumerate(POSES):
+        path = frames_dir / f"{i:05d}.png"
+        grey = _render(tex, pose)
+        cv2.imwrite(str(path), cv2.cvtColor(grey, cv2.COLOR_GRAY2BGR))  # stored as colour
+        out[f"capture/frames/{i:05d}.png"] = path
+    blank = frames_dir / "00009.png"
+    cv2.imwrite(str(blank), np.full((40, 60, 3), 200, np.uint8))
+    out["capture/frames/00009.png"] = blank
+    return out
+
+
+def test_handed_detections_are_the_ones_each_stage_would_make(tmp_path: Path) -> None:
+    from video2sim.stages.marker_detection import (
+        TAG_FILE,
+        detect_file,
+        read_tag_file,
+        write_tag_file,
+    )
+    from video2sim.stages.marker_filter import _detect_file, handed_tag_detector
+
+    frames = _frames(tmp_path)
+    found = {rel: detect_file(path, "aruco_4x4_50") for rel, path in frames.items()}
+    assert sum(bool(c) for c, _ in found.values()) == len(POSES)
+    write_tag_file(tmp_path / "reconstruction" / TAG_FILE, "aruco_4x4_50", found)
+    table = read_tag_file(tmp_path / "reconstruction" / TAG_FILE, "aruco_4x4_50")
+    assert table is not None and list(table) == list(found)
+    detect = handed_tag_detector(tmp_path, "aruco_4x4_50")
+    assert detect is not None
+    for rel, path in frames.items():
+        fresh, shape = _detect_file(path, "aruco_4x4_50")
+        handed, handed_shape = detect(tmp_path / rel)
+        assert handed_shape == shape
+        assert list(handed) == list(fresh)  # same ids in the same order
+        for tag_id, corners in fresh.items():
+            assert handed[tag_id].dtype == corners.dtype
+            assert np.array_equal(handed[tag_id], corners)  # every bit survives the JSON
+
+
+def test_a_frame_the_file_misses_is_detected_from_its_image(tmp_path: Path) -> None:
+    from video2sim.stages.marker_detection import TAG_FILE, write_tag_file
+    from video2sim.stages.marker_filter import _detect_file, handed_tag_detector
+
+    frames = _frames(tmp_path)
+    write_tag_file(tmp_path / "reconstruction" / TAG_FILE, "aruco_4x4_50", {})
+    detect = handed_tag_detector(tmp_path, "aruco_4x4_50")
+    assert detect is not None
+    path = frames["capture/frames/00001.png"]
+    corners, shape = detect(path)
+    fresh, fresh_shape = _detect_file(path, "aruco_4x4_50")
+    assert shape == fresh_shape and corners.keys() == fresh.keys()
+    assert handed_tag_detector(tmp_path, "aruco_5x5_100") is None  # another family
+    assert handed_tag_detector(tmp_path / "missing", "aruco_4x4_50") is None

@@ -21,7 +21,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from video2sim.schemas import WorldModel
-from video2sim.stages.marker_detection import detect_tags
+from video2sim.stages.marker_detection import TAG_FILE, detect_file, read_tag_file
 from video2sim.stages.segmentation import BoolMask, MaskLike, as_crop
 from video2sim.stages.tracking import Track
 
@@ -166,9 +166,21 @@ def filter_marker_tracks(
 
 
 def _detect_file(path: Path, family: str) -> Detections:
-    import cv2
+    return detect_file(path, family)
 
-    gray: Any = cv2.imread(str(path), cv2.IMREAD_GRAYSCALE)
-    if gray is None:
-        raise FileNotFoundError(path)
-    return detect_tags(gray, family), (int(gray.shape[0]), int(gray.shape[1]))
+
+def handed_tag_detector(run_dir: Path, family: str) -> TagDetector | None:
+    """A detector that answers from the reconstruction stage's ``tags.json`` (D-039), or None
+    when that file is missing or for another family. A frame the file does not list is
+    detected from its image, as without the file."""
+    table = read_tag_file(run_dir / "reconstruction" / TAG_FILE, family)
+    if table is None:
+        return None
+
+    def detect(path: Path) -> Detections:
+        # Callers pass ``run_dir / frame.image_path``; the key is that image path.
+        key = path.relative_to(run_dir).as_posix() if path.is_relative_to(run_dir) else ""
+        found = table.get(key)
+        return found if found is not None else _detect_file(path, family)
+
+    return detect
