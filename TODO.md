@@ -24,16 +24,17 @@ makes hosted calls. Items are `N1` to `N20`; use the id in branch names (`n4-cro
 
 **Follow up D-034 and D-035**
 
-- [ ] **N1 [human] Deploy the 4-container SAM 3D worker.** D-034 takes effect only after
-  `uv run modal deploy src/video2sim/models/sam3d_modal.py`; until then the warm-up sends 4 calls to
-  2 containers.
-- [ ] **N2 [agent, hosted] Measure D-034.** `benchmark/profile_stages.py RUN_ID --arm pipelined
-  --warm 4` against `--warm 2` on a dev run: shape wall time, containers Modal starts, GPU seconds.
-  Record the result in `docs/research/sam3d_cold_start.md` and in the D-034 row.
-- [ ] **N3 [agent, hosted] Evaluate D-035 on dev.** The capture gate (`benchmark/eval_capture_gate.py`;
-  windows are now 1/3 s), the reconstruction gates (`benchmark/eval_world_frame.py`), then full runs
-  of the rigid dev scenes scored with `video2sim eval` and `--stage segmentation`: recall, identity
-  switches, size, mass, settling, wall time and SAM 3.1 frames billed, against the 5 fps runs.
+- [x] **N1 [human] Deploy the 4-container SAM 3D worker.** Deployed by the human on 2026-11-04
+  (`uv run modal deploy src/video2sim/models/sam3d_modal.py`; reported, not checked from here).
+- [ ] **N2 [agent, hosted] Measure D-034.** Deferred by the human on 2026-11-04.
+  `benchmark/profile_stages.py RUN_ID --arm pipelined --warm 4` against `--warm 2` on a dev run:
+  shape wall time, containers Modal starts, GPU seconds. Record the result in
+  `docs/research/sam3d_cold_start.md` and in the D-034 row.
+- [ ] **N3 [agent, hosted] Evaluate D-035 on dev.** Deferred by the human on 2026-11-04. The capture
+  gate (`benchmark/eval_capture_gate.py`; windows are now 1/3 s), the reconstruction gates
+  (`benchmark/eval_world_frame.py`), then full runs of the rigid dev scenes scored with
+  `video2sim eval` and `--stage segmentation`: recall, identity switches, size, mass, settling, wall
+  time and SAM 3.1 frames billed, against the 5 fps runs.
 
 **Memory, output-identical** (plan step 1a is 48c1e93)
 
@@ -134,9 +135,8 @@ makes hosted calls. Items are `N1` to `N20`; use the id in branch names (`n4-cro
   obj_002 kept 604k faces through physics into export. Decimate harder or flag it.
 - [x] **N19 [human] `depth_flags` reads `reconstruction.work/sparse`** from the segmentation stage,
   outside `WorldModel`. Kept as is: decision D-037.
-- [ ] **N20 [human] Image size for SfM.** `reconstruction.sfm.max_image_size: -1` keeps pycolmap's
-  default, an effective 3200 px in pycolmap 4.2.1, so 1080p frames are used whole, while D-016 and
-  `docs/stages.md` say up to 1280 px. Check which the evidence used and align the config or the docs.
+- [x] **N20 [human] Image size for SfM.** Kept whole frames (1920 px; pycolmap's 3200 px cap) and
+  corrected `docs/stages.md` and the config comment: decision D-038. 1280 px stays unmeasured.
 
 ## Open exit criteria
 

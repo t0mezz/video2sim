@@ -22,7 +22,8 @@ exposure, marker visibility, frame count. How to film: [capture_protocol.md](cap
 Camera poses, a sparse point cloud, metric scale and a gravity-aligned world frame. Everything later
 depends on it.
 
-* **Back end.** pycolmap on CPU (D-016), at 3 fps and up to 1280 px, with sequential matching and
+* **Back end.** pycolmap on CPU (D-016), at 3 fps on whole frames (1920 px wide for the benchmark
+  videos; `max_image_size: -1` keeps pycolmap's 3200 px cap, D-038), with sequential matching and
   the incremental mapper. Exhaustive matching was 59 to 80% of the time on every video over 28
   frames. Sequential matching gives 3.5x on s16 `video_a` (709 s to 205 s) and 1.3x to 4.2x on five
   videos, with quality inside the limits. Fewer frames (2 fps) or a smaller image (960 px) lost the

@@ -28,7 +28,7 @@ reconstruction:
     sequential_overlap: 10
     loop_stride: 0             # sequential only: also match every n-th frame with all others
     mapper: incremental        # incremental or global
-    max_image_size: -1         # -1 keeps pycolmap's default
+    max_image_size: -1         # -1 keeps pycolmap's default, an effective 3200 px, so 1080p frames are used whole, as in the SfM evidence (D-038)
     max_num_features: 8192
     ba_global_frames_ratio: 1.1
     ba_local_max_iterations: -1
