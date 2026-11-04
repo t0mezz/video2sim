@@ -1,0 +1,610 @@
+{
+ "items": "TODO.md N4 to N9 (N8: D-039)",
+ "date": "2026-11-04",
+ "machine": "Apple M4, 10 cores",
+ "old_code": "a14ab3f (perf-exact-speedups)",
+ "new_code": "working tree on perf-exact-speedups after a14ab3f",
+ "method": "Each stage of a finished run replayed from its caches with both code trees and every hosted client raising on a call (scratchpad replay_stage.py), then every file the stage wrote compared byte for byte. Segmentation with the new code reads reconstruction/tags.json made by the new reconstruction functions (N8). 'committed config' is configs/default.yaml at a14ab3f; 'working config' is the local configs/default.yaml with gap fill on. peak_rss_gb is the replay process's maximum resident size; wall_s the stage alone.",
+ "segmentation": [
+  {
+   "run": "20261103T021624Z_d9b886aa",
+   "stage": "segmentation",
+   "config": "committed config",
+   "base_wall_s": 39.3,
+   "base_peak_rss_gb": 2.42,
+   "new_wall_s": 34.7,
+   "new_peak_rss_gb": 0.86,
+   "files": 445,
+   "differ": 0,
+   "finished": true
+  },
+  {
+   "run": "20261104T114100Z_c14bb675",
+   "stage": "segmentation",
+   "config": "committed config",
+   "base_wall_s": 29.9,
+   "base_peak_rss_gb": 2.38,
+   "new_wall_s": 22.8,
+   "new_peak_rss_gb": 0.47,
+   "files": 878,
+   "differ": 0,
+   "finished": true
+  },
+  {
+   "run": "20261104T111412Z_533eb320",
+   "stage": "segmentation",
+   "config": "committed config",
+   "base_wall_s": 14.4,
+   "base_peak_rss_gb": 1.66,
+   "new_wall_s": 9.9,
+   "new_peak_rss_gb": 0.66,
+   "files": 115,
+   "differ": 0,
+   "finished": true
+  },
+  {
+   "run": "20261103T090231Z_49051ee3",
+   "config": "committed config",
+   "files": 0,
+   "differ": 0,
+   "finished": false,
+   "note": "not replayable: its tracking answer is not cached for the current request (both codes)"
+  },
+  {
+   "run": "20261103T200206Z_5ce4cde1",
+   "stage": "segmentation",
+   "config": "working config (gap fill on)",
+   "base_wall_s": 14.6,
+   "base_peak_rss_gb": 0.94,
+   "new_wall_s": 11.5,
+   "new_peak_rss_gb": 0.43,
+   "files": 223,
+   "differ": 1,
+   "finished": true,
+   "note": "only route.json differs, by the absolute replay folder it records (TODO.md N21)"
+  },
+  {
+   "run": "20261103T162930Z_95e58ffe",
+   "stage": "segmentation",
+   "config": "working config (gap fill on)",
+   "base_wall_s": 27.0,
+   "base_peak_rss_gb": 2.11,
+   "new_wall_s": 20.5,
+   "new_peak_rss_gb": 0.5,
+   "files": 709,
+   "differ": 1,
+   "finished": true,
+   "note": "only route.json differs, by the absolute replay folder it records (TODO.md N21)"
+  },
+  {
+   "run": "20261103T190914Z_ef96ce0c",
+   "stage": "segmentation",
+   "config": "working config (gap fill on)",
+   "base_wall_s": 4.2,
+   "base_peak_rss_gb": 0.32,
+   "new_wall_s": 2.5,
+   "new_peak_rss_gb": 0.32,
+   "files": 3,
+   "differ": 1,
+   "finished": false,
+   "note": "both codes stop at the same uncached cluster-check request; partial outputs and crops identical"
+  },
+  {
+   "run": "20261103T142021Z_c6885930",
+   "stage": "segmentation",
+   "config": "working config (gap fill on)",
+   "base_wall_s": 8.8,
+   "base_peak_rss_gb": 0.43,
+   "new_wall_s": 6.3,
+   "new_peak_rss_gb": 0.42,
+   "files": 3,
+   "differ": 1,
+   "finished": false,
+   "note": "both codes stop at the same uncached cluster-check request; partial outputs and crops identical"
+  },
+  {
+   "run": "20261103T115556Z_73bfed16",
+   "stage": "segmentation",
+   "config": "working config (gap fill on)",
+   "base_wall_s": 34.7,
+   "base_peak_rss_gb": 2.24,
+   "new_wall_s": 28.1,
+   "new_peak_rss_gb": 0.68,
+   "files": 708,
+   "differ": 1,
+   "finished": true,
+   "note": "only route.json differs, by the absolute replay folder it records (TODO.md N21)"
+  }
+ ],
+ "shape_and_physics": [
+  {
+   "run": "20261104T111412Z_533eb320",
+   "stage": "shape",
+   "config": "committed config",
+   "base_wall_s": 26.4,
+   "base_peak_rss_gb": 4.52,
+   "new_wall_s": 27.3,
+   "new_peak_rss_gb": 5.14,
+   "files": 6,
+   "differ": 0
+  },
+  {
+   "run": "20261103T120951Z_7beade70",
+   "stage": "shape",
+   "config": "committed config",
+   "base_wall_s": 6.5,
+   "base_peak_rss_gb": 1.93,
+   "new_wall_s": 6.3,
+   "new_peak_rss_gb": 1.88,
+   "files": 3,
+   "differ": 0
+  },
+  {
+   "run": "20261103T021624Z_d9b886aa",
+   "stage": "shape",
+   "config": "committed config",
+   "base_wall_s": 36.4,
+   "base_peak_rss_gb": 4.88,
+   "new_wall_s": 68.2,
+   "new_peak_rss_gb": 4.16,
+   "files": 8,
+   "differ": 0,
+   "note": "new_wall_s ran beside three segmentation replays; not a timing comparison"
+  },
+  {
+   "run": "20261104T111412Z_533eb320",
+   "stage": "physics",
+   "config": "committed config",
+   "base_wall_s": 25.4,
+   "base_peak_rss_gb": 3.25,
+   "new_wall_s": 22.9,
+   "new_peak_rss_gb": 2.69,
+   "files": 27,
+   "differ": 0
+  },
+  {
+   "run": "20261103T120951Z_7beade70",
+   "stage": "physics",
+   "config": "committed config",
+   "base_wall_s": 2.4,
+   "base_peak_rss_gb": 2.08,
+   "new_wall_s": 2.3,
+   "new_peak_rss_gb": 1.76,
+   "files": 5,
+   "differ": 0
+  },
+  {
+   "run": "20261103T194036Z_5ce4cde1",
+   "stage": "physics",
+   "config": "committed config",
+   "base_wall_s": 9.1,
+   "base_peak_rss_gb": 2.46,
+   "new_wall_s": 8.0,
+   "new_peak_rss_gb": 2.35,
+   "files": 26,
+   "differ": 0
+  }
+ ],
+ "shape_mask_bytes": [
+  {
+   "run": "20261103T021624Z_d9b886aa",
+   "objects": 6,
+   "masks": 568,
+   "full_frame_gb": 1.178,
+   "crops_gb": 0.084
+  },
+  {
+   "run": "20261104T114100Z_c14bb675",
+   "objects": 10,
+   "masks": 845,
+   "full_frame_gb": 1.752,
+   "crops_gb": 0.036
+  },
+  {
+   "run": "20261103T090231Z_49051ee3",
+   "objects": 5,
+   "masks": 1012,
+   "full_frame_gb": 2.098,
+   "crops_gb": 0.04
+  }
+ ],
+ "three_segmentation_replays_at_once_peak_rss_gb": {
+  "new": [
+   0.84,
+   0.44,
+   0.66
+  ],
+  "old_alone": [
+   2.42,
+   2.38,
+   2.24
+  ]
+ },
+ "n6_plane_distance": {
+  "part_sets": 65,
+  "parts": 335,
+  "points_per_set": 20000,
+  "max_abs_diff_m": 1.3964523981613297e-16,
+  "coverage_flips": 0,
+  "what": "old einsum against the matrix product, on every cached CoACD part set of the local runs; flips at fit_cover_tolerance x diagonal"
+ },
+ "n7_raster_cache": [
+  {
+   "run": "20261103T090231Z_49051ee3",
+   "masks": 1060,
+   "cold_s": 10.65,
+   "stored_s": 0.02,
+   "cache_mb": 5.24
+  },
+  {
+   "run": "20261103T021624Z_d9b886aa",
+   "masks": 754,
+   "cold_s": 16.69,
+   "stored_s": 0.03,
+   "cache_mb": 8.17
+  }
+ ],
+ "n9_cost_us": {
+  "views": 10,
+  "a14ab3f": 286.8,
+  "new": 180.3,
+  "bit_identical": "1200 of 1200"
+ },
+ "n7_raster_cache_note": "largest cached SAM answer of the run: decoded on 8 processes, then read back from the raster cache",
+ "tracemalloc_155_frame_run_gb": {
+  "run": "20261103T021624Z_d9b886aa",
+  "config": "committed config",
+  "tracks_held_after_tracking": {
+   "a14ab3f": 1.6,
+   "new": 0.1
+  },
+  "stage_traced_peak": {
+   "new": 0.42,
+   "where": "lift._vote"
+  }
+ },
+ "n10_early_stop_local": {
+  "method": "shape replayed from cached SAM 3D draws with the new code, shape.early_stop off and on (min_draws 2, size_tolerance 0.1, min_fit_score 0.5); local runs, no ground truth, so no size error",
+  "totals": {
+   "objects": 59,
+   "draws_made": 235,
+   "draws_skipped": 60,
+   "same_kept_mesh": 49,
+   "proxy_off": 4,
+   "proxy_on": 4
+  },
+  "runs": [
+   {
+    "run": "20261104T111412Z_533eb320",
+    "objects": 4,
+    "draws_made": 11,
+    "draws_skipped": 9,
+    "same_kept_mesh": 3,
+    "proxy_off": 0,
+    "proxy_on": 0,
+    "fit_off": [
+     0.9202083333333333,
+     0.9675,
+     0.8421296296296296,
+     0.976875
+    ],
+    "fit_on": [
+     0.9202083333333333,
+     0.9675,
+     0.8468342151675484,
+     0.976875
+    ],
+    "reasons": [
+     "the first 2 draws agree",
+     "the first draws differ by 19.1% in size"
+    ]
+   },
+   {
+    "run": "20261103T120951Z_7beade70",
+    "objects": 1,
+    "draws_made": 2,
+    "draws_skipped": 3,
+    "same_kept_mesh": 0,
+    "proxy_off": 0,
+    "proxy_on": 0,
+    "fit_off": [
+     0.99375
+    ],
+    "fit_on": [
+     0.9916666666666667
+    ],
+    "reasons": [
+     "the first 2 draws agree"
+    ]
+   },
+   {
+    "run": "20261103T021624Z_d9b886aa",
+    "objects": 6,
+    "draws_made": 27,
+    "draws_skipped": 3,
+    "same_kept_mesh": 6,
+    "proxy_off": 2,
+    "proxy_on": 2,
+    "fit_off": [
+     null,
+     0.517862125382069,
+     0.9145971216343103,
+     0.973019218741838,
+     null,
+     0.9534579136690647
+    ],
+    "fit_on": [
+     null,
+     0.517862125382069,
+     0.9145971216343103,
+     0.973019218741838,
+     null,
+     0.9534579136690647
+    ],
+    "reasons": [
+     "a first draw fits 0.10, below 0.5",
+     "a first draw fits 0.37, below 0.5",
+     "a first draw fits 0.38, below 0.5",
+     "the first 2 draws agree",
+     "the first draws differ by 18.4% in size",
+     "the first draws differ by 40.8% in size"
+    ]
+   },
+   {
+    "run": "20261104T114100Z_c14bb675",
+    "objects": 10,
+    "draws_made": 38,
+    "draws_skipped": 12,
+    "same_kept_mesh": 9,
+    "proxy_off": 0,
+    "proxy_on": 0,
+    "fit_off": [
+     0.9880900822867043,
+     0.9860416666666667,
+     0.9652863881401618,
+     0.9903055848261327,
+     0.8191737288135593,
+     0.9696057601510859,
+     0.9493444909344491,
+     0.9990067047429848,
+     0.973568281938326,
+     0.9639583333333334
+    ],
+    "fit_on": [
+     0.9880900822867043,
+     0.9860416666666667,
+     0.9652863881401618,
+     0.9903055848261327,
+     0.8191737288135593,
+     0.958314447592068,
+     0.9493444909344491,
+     0.9990067047429848,
+     0.973568281938326,
+     0.9639583333333334
+    ],
+    "reasons": [
+     "the first 2 draws agree",
+     "the first draws differ by 10.8% in size",
+     "the first draws differ by 17.5% in size",
+     "the first draws differ by 20.1% in size",
+     "the first draws differ by 20.3% in size",
+     "the first draws differ by 20.5% in size",
+     "the first draws differ by 26.6% in size"
+    ]
+   },
+   {
+    "run": "20261103T115556Z_73bfed16",
+    "objects": 8,
+    "draws_made": 28,
+    "draws_skipped": 12,
+    "same_kept_mesh": 6,
+    "proxy_off": 0,
+    "proxy_on": 0,
+    "fit_off": [
+     0.9792004086181278,
+     0.9487344487344488,
+     0.9727472089314194,
+     0.8557176998841252,
+     0.9274353250915751,
+     0.9669637345679013,
+     0.986875,
+     0.9458325
+    ],
+    "fit_on": [
+     0.9792004086181278,
+     0.9487344487344488,
+     0.9766163277511962,
+     0.8142221900347625,
+     0.9274353250915751,
+     0.9669637345679013,
+     0.986875,
+     0.9458325
+    ],
+    "reasons": [
+     "the first 2 draws agree",
+     "the first draws differ by 10.1% in size",
+     "the first draws differ by 11.4% in size",
+     "the first draws differ by 16.2% in size",
+     "the first draws differ by 17.3% in size"
+    ]
+   },
+   {
+    "run": "20261103T162930Z_95e58ffe",
+    "objects": 8,
+    "draws_made": 31,
+    "draws_skipped": 9,
+    "same_kept_mesh": 5,
+    "proxy_off": 0,
+    "proxy_on": 0,
+    "fit_off": [
+     0.9897916666666666,
+     0.9862875,
+     0.9952083333333334,
+     0.9822916666666667,
+     0.9952083333333334,
+     0.9879166666666667,
+     0.9941666666666666,
+     0.7162406742069818
+    ],
+    "fit_on": [
+     0.9897916666666666,
+     0.9862875,
+     0.9922916666666667,
+     0.9741666666666666,
+     0.989375,
+     0.9879166666666667,
+     0.9941666666666666,
+     0.7162406742069818
+    ],
+    "reasons": [
+     "the first 2 draws agree",
+     "the first draws differ by 17.2% in size",
+     "the first draws differ by 19.3% in size",
+     "the first draws differ by 20.0% in size",
+     "the first draws differ by 33.9% in size",
+     "the first draws differ by 94.6% in size"
+    ]
+   },
+   {
+    "run": "20261103T194036Z_5ce4cde1",
+    "objects": 4,
+    "draws_made": 17,
+    "draws_skipped": 3,
+    "same_kept_mesh": 3,
+    "proxy_off": 0,
+    "proxy_on": 0,
+    "fit_off": [
+     0.9489145183175033,
+     0.9531494052236875,
+     0.7857990674014413,
+     0.8577377001129339
+    ],
+    "fit_on": [
+     0.9499013455450023,
+     0.9531494052236875,
+     0.7857990674014413,
+     0.8577377001129339
+    ],
+    "reasons": [
+     "the first 2 draws agree",
+     "the first draws differ by 13.5% in size",
+     "the first draws differ by 14.0% in size",
+     "the first draws differ by 47.8% in size"
+    ]
+   },
+   {
+    "run": "20261104T105228Z_2d4be33e",
+    "objects": 5,
+    "draws_made": 22,
+    "draws_skipped": 3,
+    "same_kept_mesh": 5,
+    "proxy_off": 1,
+    "proxy_on": 1,
+    "fit_off": [
+     0.6425258048660605,
+     0.9552086557482943,
+     null,
+     0.8307193830570903,
+     0.95
+    ],
+    "fit_on": [
+     0.6425258048660605,
+     0.9552086557482943,
+     null,
+     0.8307193830570903,
+     0.95
+    ],
+    "reasons": [
+     "a first draw fits 0.49, below 0.5",
+     "the first 2 draws agree",
+     "the first draws differ by 10.4% in size",
+     "the first draws differ by 12.9% in size",
+     "the first draws differ by 13.8% in size"
+    ]
+   },
+   {
+    "run": "20261103T142021Z_c6885930",
+    "objects": 3,
+    "draws_made": 15,
+    "draws_skipped": 0,
+    "same_kept_mesh": 3,
+    "proxy_off": 0,
+    "proxy_on": 0,
+    "fit_off": [
+     0.8035416666666667,
+     0.7467200854700855,
+     0.731875
+    ],
+    "fit_on": [
+     0.8035416666666667,
+     0.7467200854700855,
+     0.731875
+    ],
+    "reasons": [
+     "a first draw fits 0.19, below 0.5",
+     "the first draws differ by 12.6% in size",
+     "the first draws differ by 58.1% in size"
+    ]
+   },
+   {
+    "run": "20261103T005859Z_d9b886aa",
+    "objects": 5,
+    "draws_made": 25,
+    "draws_skipped": 0,
+    "same_kept_mesh": 5,
+    "proxy_off": 1,
+    "proxy_on": 1,
+    "fit_off": [
+     0.786699713845753,
+     0.9193618330001537,
+     0.9658629744569109,
+     null,
+     0.9469323091694671
+    ],
+    "fit_on": [
+     0.786699713845753,
+     0.9193618330001537,
+     0.9658629744569109,
+     null,
+     0.9469323091694671
+    ],
+    "reasons": [
+     "a first draw fits 0.39, below 0.5",
+     "the first draws differ by 10.0% in size",
+     "the first draws differ by 14.0% in size",
+     "the first draws differ by 19.0% in size",
+     "the first draws differ by 33.7% in size"
+    ]
+   },
+   {
+    "run": "20261103T090231Z_49051ee3",
+    "objects": 5,
+    "draws_made": 19,
+    "draws_skipped": 6,
+    "same_kept_mesh": 4,
+    "proxy_off": 0,
+    "proxy_on": 0,
+    "fit_off": [
+     0.9925,
+     0.8022293676312969,
+     0.988125,
+     0.9927996611605252,
+     0.6112887596899226
+    ],
+    "fit_on": [
+     0.9925,
+     0.8022293676312969,
+     0.988125,
+     0.9911355002110596,
+     0.6112887596899226
+    ],
+    "reasons": [
+     "a first draw fits 0.34, below 0.5",
+     "the first 2 draws agree",
+     "the first draws differ by 37.2% in size",
+     "the first draws differ by 71.7% in size"
+    ]
+   }
+  ]
+ }
+}

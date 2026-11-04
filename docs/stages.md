@@ -29,6 +29,11 @@ depends on it.
   videos, with quality inside the limits. Fewer frames (2 fps) or a smaller image (960 px) lost the
   tag-distance gate, and the global mapper was left off. Evidence:
   [history/reconstruction_experiments.md](history/reconstruction_experiments.md).
+* **Tag detections** of every registered frame, made on the frame PNG read back as grey, are written
+  to `reconstruction/tags.json`. Segmentation's marker filter and board check read them instead of
+  detecting again (D-036, D-039). Capture keeps its own detection: its grey comes from the decoded
+  video frame and differs by one level in about 45% of pixels, which changed whether a tag was seen
+  in 10 of 2,702 local frames.
 * **Metric scale** comes from the printed tag edge, 100.26 mm (five caliper readings), so one or two
   tags anywhere in view are enough. The known grid spacing is only a check on grid scenes. Scale is
   within 0.5% of the board on dev. Model-predicted scale is never used as metric scale.
@@ -74,6 +79,13 @@ world frame, keyframes, flags and a material answer.
    `non_rigid`. The flag means reflectiveness is likely to break a later stage, not that the object
    is shiny.
 
+Masks are held as `CropMask` (`segmentation.py`): the box that holds the mask pixels, placed in the
+frame, instead of a 2 MB full frame at 1080p. SAM answers are decoded straight into crops, and every
+step that reads a mask (lookups, windows, overlaps, downscaling for the vote and the primitive fit)
+gives what the full frame gives, bit for bit. Only the PNG writer and the overlays expand a mask.
+Decoded SAM rasters are stored per answer in `segmentation.work/tracking_work/raster_cache/`, so a
+rerun skips the pure-Python decoder.
+
 Numbers:
 
 | Cluster box error, dev easy tier (19 objects) | Median |
@@ -111,6 +123,13 @@ Gives each object a closed mesh in the metric world frame.
 * **Draws.** The model runs on an object's best keyframes, one seed each: the default is one draw on
   each of up to 5 keyframes (D-033, which dropped D-030's 2 draws; a dev replay put 2 draws at 5.7%
   size error against 5.0% with 6). The kept draw is the one with the best fit score.
+  `shape.early_stop` (off by default, D-040) draws `min_draws` per object first and skips the rest
+  when each of those fits at or above `min_fit_score` and their resting boxes agree within
+  `size_tolerance` per side. The report records draws made, draws skipped and the reason. Not yet
+  evaluated on dev.
+* **Masks** are read from the segmentation PNGs as crops (N5); only the registration views and the
+  keyframes sent to SAM 3D are expanded to full frames, so the PNG bytes SAM 3D receives and its
+  cache keys are unchanged.
 * **Registration.** SAM 3D's rotation is the start pose, with four yaw starts. Its translation and
   scale are in its own depth units, so scale and center start from the observed cluster. A
   Levenberg-Marquardt fit in NumPy minimises, over scale `s`, rotation `R` and translation `t`:
