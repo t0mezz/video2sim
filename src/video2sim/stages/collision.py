@@ -156,6 +156,7 @@ class CollisionResult:
     checks: dict[str, bool]
     primitive_score: float | None = None
     steps: dict[str, int] = field(default_factory=dict)
+    body: SealedBody | None = None  # the sealed body the checks used, so mass need not redo it
 
     @property
     def ok(self) -> bool:
@@ -454,8 +455,9 @@ def _decompose(
     steps: dict[str, int],
     body: SealedBody,
     cache_dir: Path | None = None,
-) -> list[trimesh.Trimesh]:
-    """Convex parts for ``mesh`` via the hull-cheap-full ladder, each rung checked.
+) -> tuple[list[trimesh.Trimesh], dict[str, bool] | None]:
+    """Convex parts for ``mesh`` via the hull-cheap-full ladder, each rung checked, and the
+    checks of the parts returned, or None where none ran (a cache hit, no CoACD).
 
     Every rung is judged by the same checks against the full ``mesh``, so a cheap rung can only
     win when it fits as well as the full search would have to. Without ``adaptive_escalation``
@@ -465,14 +467,15 @@ def _decompose(
         import coacd  # noqa: F401  # type: ignore[import-untyped,import-not-found,unused-ignore]  # heavy import
     except ImportError:
         steps["coacd_unavailable"] = 1
-        return [_limit_vertices(cast(trimesh.Trimesh, mesh.convex_hull), cfg.max_part_vertices)]
+        hull = _limit_vertices(cast(trimesh.Trimesh, mesh.convex_hull), cfg.max_part_vertices)
+        return [hull], None
     cache = cache_dir if cfg.decomp_cache and cache_dir is not None else None
     key = _cache_key(mesh, cfg) if cache is not None else None
     if cache is not None and key is not None:
         cached = _read_cache(cache, key)
         if cached is not None:
             steps["decomp_cache_hit"] = 1
-            return cached
+            return cached, None
     entry = _decimate_input(mesh, cfg, steps)
     if cfg.adaptive_escalation:
         rungs: list[tuple[str, float, int] | None] = [
@@ -483,6 +486,7 @@ def _decompose(
     else:
         rungs = [("full", cfg.coacd_threshold, cfg.max_convex_parts)]
     parts: list[trimesh.Trimesh] = []
+    checks: dict[str, bool] | None = None
     for rung in rungs:
         if rung is None:
             parts = [
@@ -492,7 +496,8 @@ def _decompose(
         else:
             name, threshold, max_hull = rung
             parts = _run_coacd(entry, threshold, max_hull, cfg)
-        if all(check_parts(parts, mesh, cfg, body=body).values()):
+        checks = check_parts(parts, mesh, cfg, body=body)
+        if all(checks.values()):
             steps[f"decomp_rung_{name}"] = 1
             break
         steps[f"decomp_rung_{name}_failed"] = 1
@@ -500,7 +505,7 @@ def _decompose(
         steps["decomp_all_rungs_failed"] = 1
     if cache is not None and key is not None:
         _write_cache(cache, key, parts)
-    return parts
+    return parts, checks
 
 
 def collision_geometry(
@@ -514,15 +519,17 @@ def collision_geometry(
         kind, part, score = prim
         checks = check_parts([part], mesh, cfg, body=body)
         if all(checks.values()):
-            return CollisionResult([part], kind, checks, score, steps)
+            return CollisionResult([part], kind, checks, score, steps, body)
         steps["primitive_rejected"] = 1
-    parts = _decompose(mesh, cfg, steps, body, cache_dir)
+    parts, checked = _decompose(mesh, cfg, steps, body, cache_dir)
     kind = (
         "convex_hull"
         if steps.get("coacd_unavailable") or len(parts) == 1
         else "convex_decomposition"
     )
-    return CollisionResult(parts, kind, check_parts(parts, mesh, cfg, body=body), None, steps)
+    # The ladder already checked the parts it returns, with these same arguments.
+    final = check_parts(parts, mesh, cfg, body=body) if checked is None else checked
+    return CollisionResult(parts, kind, final, None, steps, body)
 
 
 def write_collision(result: CollisionResult, out_dir: Path, stem: str) -> list[Path]:

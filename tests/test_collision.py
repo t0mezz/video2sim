@@ -391,3 +391,38 @@ def test_coacd_runs_in_two_threads_after_setup() -> None:
     with ThreadPoolExecutor(2) as pool:
         counts = list(pool.map(run, range(2)))
     assert counts[0] == counts[1] >= 1
+
+
+def test_the_ladder_checks_each_rung_once_and_returns_its_body(
+    cfg: CollisionConfig, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from video2sim.stages import collision as collision_module
+    from video2sim.stages.mass import sealed_body
+
+    _stub, cfg = _stubbed(cfg, monkeypatch)
+    real = collision_module.check_parts
+    calls: list[int] = []
+
+    def counted(*args: Any, **kwargs: Any) -> dict[str, bool]:
+        calls.append(len(args[0]))
+        return real(*args, **kwargs)
+
+    monkeypatch.setattr(collision_module, "check_parts", counted)
+    mesh = lshape()
+    res = collision_geometry(mesh, cfg)
+    assert res.steps["decomp_rung_full"] == 1
+    # the hull, cheap and full rungs, and no fourth check of the full rung's parts
+    assert calls == [1, 1, 2]
+    assert res.checks == real(res.parts, mesh, cfg, body=res.body)
+    assert res.body is not None
+    assert np.array_equal(res.body.voxels, sealed_body(mesh, cfg.sealing).voxels)
+
+
+def test_a_cached_decomposition_is_still_checked(
+    cfg: CollisionConfig, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _stub, cfg = _stubbed(cfg, monkeypatch)
+    first = collision_geometry(lshape(), cfg, cache_dir=tmp_path)
+    second = collision_geometry(lshape(), cfg, cache_dir=tmp_path)
+    assert second.steps.get("decomp_cache_hit") == 1
+    assert second.checks == first.checks and second.ok

@@ -269,6 +269,12 @@ def _vote(
 
     A voxel belongs to the track with the highest ratio once that ratio clears the
     track's agreement threshold; the caller turns ``(ratio, best)`` into members.
+
+    Only voxels in front of the camera and inside the image (``ok``) take part in a view.
+    Occlusion-aware, a view counts for a track where the voxel is on its own mask or on no
+    mask (``ok & (~combined | own)``), and a hit where it is on its own mask (``ok & own``).
+    Because a track's own mask is part of ``combined``, the shared term ``~combined`` is
+    looked up once per view and the own mask once per track.
     """
     import cv2  # heavy import, kept out of module import time
 
@@ -278,6 +284,22 @@ def _vote(
     hits = np.zeros((len(tracks), len(centers)), dtype=np.int32)
     for position in views:
         frame = world.frames[position]
+        rows = [r for r, t in enumerate(tracks) if frame.frame_index in t.masks]
+        if not rows:
+            continue  # SAM found nothing here: no evidence either way for any track
+        smalls = {
+            r: np.asarray(
+                cv2.resize(
+                    tracks[r].masks[frame.frame_index].astype(np.uint8),
+                    None,
+                    fx=scale,
+                    fy=scale,
+                    interpolation=cv2.INTER_AREA,
+                ),
+                dtype=bool,
+            )
+            for r in rows
+        }
         pose = frame.T_world_from_camera.to_numpy()
         cam = (centers - pose[:3, 3]) @ pose[:3, :3]  # R^T (x - t), camera frame
         z = cam[:, 2]
@@ -288,43 +310,26 @@ def _vote(
         ok &= (u >= 0) & (u < k.width_px) & (v >= 0) & (v < k.height_px)
         ui = np.clip((u * scale).astype(np.int64), 0, None)
         vi = np.clip((v * scale).astype(np.int64), 0, None)
-        smalls: list[NDArray[np.bool_] | None] = []
-        for track in tracks:
-            mask = track.masks.get(frame.frame_index)
-            if mask is None:
-                smalls.append(None)
-                continue  # SAM found nothing here: no evidence either way for this track
-            smalls.append(
-                cv2.resize(
-                    mask.astype(np.uint8),
-                    None,
-                    fx=scale,
-                    fy=scale,
-                    interpolation=cv2.INTER_AREA,
-                ).astype(bool)
-            )
-        combined: NDArray[np.bool_] | None = None
+        inside = np.flatnonzero(ok)
+        vi, ui = vi[inside], ui[inside]
+        pixels: dict[tuple[int, int], I64] = {}  # flat pixel index per mask shape
+        for small in smalls.values():
+            h, w = small.shape
+            if (h, w) not in pixels:
+                pixels[(h, w)] = np.minimum(vi, h - 1) * w + np.minimum(ui, w - 1)
+        free: NDArray[np.bool_] | None = None
         if cfg.occlusion_aware:
-            present = [s for s in smalls if s is not None]
-            if present:
-                # asarray pins the dtype: .any() stubs disagree across numpy versions.
-                combined = np.asarray(np.stack(present).any(axis=0), dtype=bool)
-        for row, small in enumerate(smalls):
-            if small is None:
-                continue
-            own = small[np.minimum(vi, small.shape[0] - 1), np.minimum(ui, small.shape[1] - 1)]
-            use = ok
-            if combined is not None:
-                occluded = (
-                    combined[
-                        np.minimum(vi, combined.shape[0] - 1), np.minimum(ui, combined.shape[1] - 1)
-                    ]
-                    & ~own
-                )
-                # On another track's mask only: hidden, not evidence against this track.
-                use = ok & ~occluded
-            seen[row] += use
-            hits[row] += use & own
+            if len(pixels) > 1:
+                raise ValueError(f"track masks of frame {frame.frame_index} differ in size")
+            combined = np.zeros(next(iter(smalls.values())).shape, dtype=bool)
+            for small in smalls.values():
+                combined |= small
+            # On another track's mask only: hidden, not evidence against this track.
+            free = ~combined.ravel()[next(iter(pixels.values()))]
+        for r in rows:
+            own = smalls[r].ravel()[pixels[smalls[r].shape]]
+            hits[r, inside] += own
+            seen[r, inside] += (own | free) if free is not None else 1
 
     ratio = np.where(seen >= cfg.min_views, hits / np.maximum(seen, 1), 0.0)
     best: I64 = ratio.argmax(axis=0)

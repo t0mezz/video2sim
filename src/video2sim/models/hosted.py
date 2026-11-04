@@ -170,15 +170,17 @@ def parse_sam_text(text: str) -> list[SamRecord]:
 
 MaskDecoder = Callable[[SamRecord], NDArray[np.bool_]]
 
+# The raster decoder of meta_sam_parser is pure Python: 72 ms a mask on the s05-sized answer of
+# run 20261103T200206Z and 329 ms on the 241-frame one of 20261103T090231Z (Apple M4), most of
+# a segmentation replay. Answers with at least this many masks are decoded in worker processes,
+# which decoded those answers 4.2x and 4.6x faster with 8 workers and identical masks. Fewer
+# masks do not repay starting the workers. Neither number changes a result.
+_PARALLEL_DECODE_MIN_MASKS = 16
+_PARALLEL_DECODE_MAX_WORKERS = 8
 
-def decode_sam_mask(record: SamRecord) -> NDArray[np.bool_]:
-    """Full-frame boolean mask of a record.
 
-    The wire raster is box-local and smaller than the box: it covers the half-open bounds
-    ``[x1, x2 + 1) x [y1, y2 + 1)`` (the box corners are inclusive). It is decoded by
-    ``meta_sam_parser`` and stretched to the box with nearest-neighbour sampling.
-    """
-    import cv2  # heavy import, kept out of module import time
+def decode_sam_raster(record: SamRecord) -> NDArray[np.uint8]:
+    """The record's wire raster, 0 or 1 per pixel, (rows, cols), before it is fitted to the box."""
     from meta_sam_parser import SegmentationMask, decode_mask_to_raster
 
     rows, cols = record.mask_shape
@@ -187,7 +189,18 @@ def decode_sam_mask(record: SamRecord) -> NDArray[np.bool_]:
         "lossless" if payload.startswith("~") else "one_bit", payload, cols, rows
     )
     raster = decode_mask_to_raster(mask)
-    local = np.frombuffer(raster, dtype=np.uint8).reshape(rows, cols)
+    return np.frombuffer(raster, dtype=np.uint8).reshape(rows, cols)
+
+
+def place_sam_raster(record: SamRecord, local: NDArray[np.uint8]) -> NDArray[np.bool_]:
+    """Full-frame boolean mask of a record from its decoded wire raster.
+
+    The wire raster is box-local and smaller than the box: it covers the half-open bounds
+    ``[x1, x2 + 1) x [y1, y2 + 1)`` (the box corners are inclusive). It is stretched to the box
+    with nearest-neighbour sampling.
+    """
+    import cv2  # heavy import, kept out of module import time
+
     left, top = int(record.box[0]), int(record.box[1])
     right, bottom = int(record.box[2]) + 1, int(record.box[3]) + 1
     width, height = record.frame_size
@@ -195,6 +208,51 @@ def decode_sam_mask(record: SamRecord) -> NDArray[np.bool_]:
     full = np.zeros((height, width), dtype=bool)
     full[top:bottom, left:right] = box_mask.astype(bool)
     return full
+
+
+def decode_sam_mask(record: SamRecord) -> NDArray[np.bool_]:
+    """Full-frame boolean mask of a record, decoded by ``meta_sam_parser``."""
+    return place_sam_raster(record, decode_sam_raster(record))
+
+
+def _raster_or_none(record: SamRecord) -> NDArray[np.uint8] | None:
+    """Worker side of ``decode_sam_masks``. A failure comes back as None, because the parser's
+    exceptions take keyword arguments and do not survive the trip between processes."""
+    try:
+        return decode_sam_raster(record)
+    except Exception:
+        return None
+
+
+def decode_sam_masks(
+    records: Sequence[SamRecord], max_workers: int | None = None
+) -> list[NDArray[np.bool_]]:
+    """``decode_sam_mask`` of every record, in order, with the rasters decoded in parallel.
+
+    The result is the same as decoding one by one. Small answers and ``max_workers`` 1 are
+    decoded here; a record that fails in a worker is decoded again here, so it raises the
+    parser's own error.
+    """
+    workers = (
+        min(_PARALLEL_DECODE_MAX_WORKERS, os.cpu_count() or 1)
+        if max_workers is None
+        else max_workers
+    )
+    if workers <= 1 or len(records) < _PARALLEL_DECODE_MIN_MASKS:
+        return [decode_sam_mask(r) for r in records]
+    import multiprocessing
+    from concurrent.futures import ProcessPoolExecutor
+
+    # spawn on every OS: the stage may call this from worker threads (gap fill), and forking a
+    # process that runs threads can deadlock.
+    context = multiprocessing.get_context("spawn")
+    chunk = max(1, len(records) // (8 * workers))
+    with ProcessPoolExecutor(max_workers=workers, mp_context=context) as pool:
+        rasters = list(pool.map(_raster_or_none, records, chunksize=chunk))
+    return [
+        decode_sam_mask(r) if raster is None else place_sam_raster(r, raster)
+        for r, raster in zip(records, rasters, strict=True)
+    ]
 
 
 def file_digest(path: Path) -> str:

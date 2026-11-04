@@ -24,6 +24,7 @@ radius between views. The thresholds in ``configs/default.yaml`` are guesses to 
 
 from __future__ import annotations
 
+import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
@@ -84,12 +85,15 @@ def mask_footprint(
     mask: BoolMask, T_world_from_camera: SE3, intrinsics: Intrinsics, plane: Plane
 ) -> F64 | None:
     """World XY where the ray through the mask's lowest pixels meets the table, or None."""
-    rows, cols = np.nonzero(mask)
-    if rows.size == 0:
+    occupied = np.flatnonzero(np.any(mask, axis=1))
+    if occupied.size == 0:
         return None
-    bottom = int(np.max(rows))
-    near = rows >= bottom - BASE_FRACTION * (bottom - int(np.min(rows)) + 1)
-    u, v = float(cols[near].mean()), float(bottom)
+    top, bottom = int(occupied[0]), int(occupied[-1])
+    # Only the rows at or below the cut hold the pixels of the base; scanning just those
+    # gives the same columns, in the same order, as a scan of the whole mask.
+    first = max(0, math.ceil(bottom - BASE_FRACTION * (bottom - top + 1)))
+    cols = np.nonzero(mask[first : bottom + 1])[1]
+    u, v = float(cols.mean()), float(bottom)
     pose = T_world_from_camera.to_numpy()
     ray = pose[:3, :3] @ np.array(
         [(u - intrinsics.cx) / intrinsics.fx, (v - intrinsics.cy) / intrinsics.fy, 1.0]
@@ -278,12 +282,17 @@ def repair_tracks(
     next_id = max((t.track_id for t in tracks), default=-1) + 1
     pieces: list[Track] = []
     splits: list[tuple[int, tuple[int, ...]]] = []
+    feet: dict[int, dict[int, F64]] = {}
     for track in tracks:
-        parts = _split(track, _footprints(track, poses, intrinsics, plane), cfg, next_id)
+        track_feet = _footprints(track, poses, intrinsics, plane)
+        parts = _split(track, track_feet, cfg, next_id)
         next_id += len(parts) - 1
         if len(parts) > 1:
             splits.append((track.track_id, tuple(p.track_id for p in parts)))
         pieces.extend(parts)
-    feet = {t.track_id: _footprints(t, poses, intrinsics, plane) for t in pieces}
+        # A piece holds some of the track's own masks, so its footprints are the track's
+        # for those frames, in the piece's frame order, as _footprints would give them.
+        for p in parts:
+            feet[p.track_id] = {f: track_feet[f] for f in p.masks if f in track_feet}
     merged, merges = _merge(pieces, feet, cfg)
     return merged, RepairReport(tuple(splits), tuple(merges))

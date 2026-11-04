@@ -137,11 +137,15 @@ def filter_marker_tracks(
         corners, (height, width) = detect(path)
         if not corners:
             continue
+        by_shape: dict[tuple[int, int], BoolMask] = {}  # the tag mask is the same for every track
         for track in users:
             mask = track.masks[frame.frame_index]
-            sy, sx = mask.shape[0] / height, mask.shape[1] / width
-            quads = [c * np.array([sx, sy]) for c in corners.values()]
-            tags = tag_mask(quads, (mask.shape[0], mask.shape[1]), cfg.erode_px)
+            shape = (int(mask.shape[0]), int(mask.shape[1]))
+            if shape not in by_shape:
+                sy, sx = shape[0] / height, shape[1] / width
+                quads = [c * np.array([sx, sy]) for c in corners.values()]
+                by_shape[shape] = tag_mask(quads, shape, cfg.erode_px)
+            tags = by_shape[shape]
             detected[track.track_id] += 1
             hits[track.track_id] += int(overlaps_tag(mask, tags, cfg))
 

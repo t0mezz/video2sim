@@ -26,6 +26,7 @@ from video2sim.models.hosted import (
     MaskDecoder,
     ResponseCache,
     decode_sam_mask,
+    decode_sam_masks,
     file_digest,
     parse_sam_text,
     post_json,
@@ -191,12 +192,21 @@ def encode_clip(frames: list[Path], fps: float, out: Path) -> None:
 def tracks_from_text(
     text: str, frame_indices: list[int], decode: MaskDecoder = decode_sam_mask
 ) -> list[Track]:
-    """Tracks of an answer. ``<Nf>`` is the position in the clip, mapped to a world frame index."""
-    masks: dict[int, dict[int, BoolMask]] = {}
-    for record in parse_sam_text(text):
+    """Tracks of an answer. ``<Nf>`` is the position in the clip, mapped to a world frame index.
+
+    With the default decoder, large answers are decoded in worker processes
+    (``decode_sam_masks``); the tracks are the same either way.
+    """
+    records = parse_sam_text(text)
+    for record in records:
         if not 0 <= record.frame < len(frame_indices):
             raise ValueError(f"answer names frame {record.frame}, clip has {len(frame_indices)}")
-        masks.setdefault(record.object_id, {})[frame_indices[record.frame]] = decode(record)
+    decoded = (
+        decode_sam_masks(records) if decode is decode_sam_mask else [decode(r) for r in records]
+    )
+    masks: dict[int, dict[int, BoolMask]] = {}
+    for record, mask in zip(records, decoded, strict=True):
+        masks.setdefault(record.object_id, {})[frame_indices[record.frame]] = mask
     return [Track(i, masks[i]) for i in sorted(masks)]
 
 

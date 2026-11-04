@@ -147,9 +147,13 @@ def estimate_mass(
     mesh: trimesh.Trimesh,
     material: ObjectMaterial,
     cfg: MassConfig,
+    body: SealedBody | None = None,
 ) -> MassEstimate:
-    """``m = rho * V_eff`` and the inertia of the sealed body at that density (AGENTS.md)."""
-    body = sealed_body(mesh, cfg)
+    """``m = rho * V_eff`` and the inertia of the sealed body at that density (AGENTS.md).
+
+    ``body`` is ``sealed_body(mesh, cfg)`` when the caller already has it, as collision does.
+    """
+    body = sealed_body(mesh, cfg) if body is None else body
     volume = body.volume_m3
     hull_ratio = volume / float(mesh.convex_hull.volume)
     is_open = hull_ratio < cfg.open_vessel_hull_ratio
