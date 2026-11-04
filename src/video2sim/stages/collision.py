@@ -217,9 +217,11 @@ def _plane_distance(part: trimesh.Trimesh, points: F64) -> F64:
     Zero or negative inside. Exact when the nearest feature is a face and a lower bound near
     edges and corners, which is enough for a coverage test at a tolerance of a percent.
     """
-    tri = part.triangles[:, 0, :]
-    d = np.einsum("pfk,fk->pf", points[:, None, :] - tri[None, :, :], part.face_normals)
-    return cast(F64, d.max(axis=1))
+    normals = np.asarray(part.face_normals, dtype=np.float64)
+    # n . (p - a) as n . p - n . a: one matrix product instead of a (points x faces x 3)
+    # temporary. The two differ in the last bits (about 1e-17 m), far below the tolerance.
+    offsets = np.einsum("fk,fk->f", part.triangles[:, 0, :], normals)
+    return cast(F64, (points @ normals.T - offsets).max(axis=1))
 
 
 def surface_fit(
