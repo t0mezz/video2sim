@@ -49,7 +49,7 @@ error from 18.7% to 8.9%, ``docs/research/cluster_box_accuracy.md``).
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -183,10 +183,44 @@ class PointVote:
     best_seen: I64
 
 
-def _grid(
-    centers_xy: F64, plane: Plane, cfg: LiftConfig, height_m: float
-) -> tuple[F64, tuple[int, int, int]]:
-    """Voxel centres (N, 3) and the grid shape. World +Z is up, the grid starts at the table."""
+# Voxels voted at a time. The (tracks x voxels) counts and the projection temporaries exist only
+# for one chunk, so memory no longer grows with the grid: on the 155-frame run
+# 20261103T021624Z the tall pass (13 M voxels) took the stage from 1.6 GB of masks to a 5.7 GB
+# peak. The result does not depend on it.
+_VOTE_CHUNK = 1 << 18
+
+
+@dataclass(frozen=True)
+class _VoxelGrid:
+    """A voxel grid on the table, described instead of stored.
+
+    ``shape`` cells of ``voxel_m`` from ``origin``, in C order; ``z0`` skips that many bottom
+    layers (the upper block that the tall pass votes). Voxel ``i`` is cell
+    ``unravel_index(i, shape)`` raised by ``z0``, its centre ``origin + (cell + 0.5) * voxel_m``.
+    """
+
+    origin: F64
+    shape: tuple[int, int, int]
+    voxel_m: float
+    z0: int = 0
+
+    @property
+    def size(self) -> int:
+        return self.shape[0] * self.shape[1] * self.shape[2]
+
+    def cells(self, flat: I64) -> I64:
+        """Integer cells (N, 3) of voxels ``flat``, with ``z0`` added."""
+        x, y, z = np.unravel_index(flat, self.shape)
+        return np.stack((x, y, z + self.z0), axis=1).astype(np.int64)
+
+    def centers(self, flat: I64) -> F64:
+        """World centres (N, 3) of voxels ``flat``."""
+        out: F64 = self.origin + (self.cells(flat) + 0.5) * self.voxel_m
+        return out
+
+
+def _grid(centers_xy: F64, plane: Plane, cfg: LiftConfig, height_m: float) -> _VoxelGrid:
+    """The voxel grid over the footprints. World +Z is up, the grid starts at the table."""
     lo = centers_xy.min(axis=0) - cfg.margin_m
     hi = centers_xy.max(axis=0) + cfg.margin_m
     if float(np.max(hi - lo)) > cfg.max_extent_m:
@@ -200,9 +234,7 @@ def _grid(
         int(np.ceil(height_m / cfg.voxel_m)),
     )
     origin = np.array([lo[0], lo[1], plane.offset_m], dtype=np.float64)
-    idx = np.stack(np.meshgrid(*[np.arange(n) for n in shape], indexing="ij"), axis=-1)
-    centers = origin + (idx.reshape(-1, 3) + 0.5) * cfg.voxel_m
-    return centers.astype(np.float64), shape
+    return _VoxelGrid(origin, shape, cfg.voxel_m)
 
 
 def _pixels(x: F64, y: F64, k: Intrinsics) -> tuple[F64, F64]:
@@ -258,30 +290,35 @@ def _largest_component(cells: I64) -> NDArray[np.bool_]:
     return np.asarray(label == int(np.argmax(counts)), dtype=bool)
 
 
-def _vote(
-    centers: F64,
-    tracks: Sequence[Track],
-    world: WorldModel,
-    cfg: LiftConfig,
-    views: list[int],
-) -> tuple[F64, I64]:
-    """Agreement ratio per track and voxel, and the winning track per voxel.
+def _count_dtype(views: int) -> type[np.unsignedinteger[Any]]:
+    """The smallest unsigned type that holds a count of ``views``."""
+    if views <= np.iinfo(np.uint8).max:
+        return np.uint8
+    if views <= np.iinfo(np.uint16).max:
+        return np.uint16
+    return np.uint32
 
-    A voxel belongs to the track with the highest ratio once that ratio clears the
-    track's agreement threshold; the caller turns ``(ratio, best)`` into members.
 
-    Only voxels in front of the camera and inside the image (``ok``) take part in a view.
-    Occlusion-aware, a view counts for a track where the voxel is on its own mask or on no
-    mask (``ok & (~combined | own)``), and a hit where it is on its own mask (``ok & own``).
-    Because a track's own mask is part of ``combined``, the shared term ``~combined`` is
-    looked up once per view and the own mask once per track.
-    """
+@dataclass(frozen=True)
+class _VoteView:
+    """One frame of the vote: its pose, the tracks with a mask there and those masks shrunk."""
+
+    R: F64  # R_world_from_camera
+    t: F64  # camera centre in the world
+    rows: list[int]
+    smalls: dict[int, NDArray[np.bool_]]  # by row: the downscaled mask, flattened
+    shapes: dict[int, tuple[int, int]]  # by row: its (rows, cols)
+    free: NDArray[np.bool_] | None  # flattened: on no track's mask, when occlusion-aware
+
+
+def _vote_views(
+    tracks: Sequence[Track], world: WorldModel, cfg: LiftConfig, views: list[int]
+) -> list[_VoteView]:
+    """The downscaled masks of every view, made once for all voxel chunks."""
     import cv2  # heavy import, kept out of module import time
 
-    k = world.intrinsics
     scale = 1.0 / cfg.mask_downscale
-    seen = np.zeros((len(tracks), len(centers)), dtype=np.int32)
-    hits = np.zeros((len(tracks), len(centers)), dtype=np.int32)
+    out = []
     for position in views:
         frame = world.frames[position]
         rows = [r for r, t in enumerate(tracks) if frame.frame_index in t.masks]
@@ -300,40 +337,103 @@ def _vote(
             )
             for r in rows
         }
-        pose = frame.T_world_from_camera.to_numpy()
-        cam = (centers - pose[:3, 3]) @ pose[:3, :3]  # R^T (x - t), camera frame
-        z = cam[:, 2]
-        ok = z > MIN_DEPTH_M
-        safe = np.where(ok, z, 1.0)
-        u, v = _pixels(cam[:, 0] / safe, cam[:, 1] / safe, k)
-        u, v = np.where(ok, u, -1.0), np.where(ok, v, -1.0)
-        ok &= (u >= 0) & (u < k.width_px) & (v >= 0) & (v < k.height_px)
-        ui = np.clip((u * scale).astype(np.int64), 0, None)
-        vi = np.clip((v * scale).astype(np.int64), 0, None)
-        inside = np.flatnonzero(ok)
-        vi, ui = vi[inside], ui[inside]
-        pixels: dict[tuple[int, int], I64] = {}  # flat pixel index per mask shape
-        for small in smalls.values():
-            h, w = small.shape
-            if (h, w) not in pixels:
-                pixels[(h, w)] = np.minimum(vi, h - 1) * w + np.minimum(ui, w - 1)
+        shapes = {r: (int(m.shape[0]), int(m.shape[1])) for r, m in smalls.items()}
         free: NDArray[np.bool_] | None = None
         if cfg.occlusion_aware:
-            if len(pixels) > 1:
+            if len(set(shapes.values())) > 1:
                 raise ValueError(f"track masks of frame {frame.frame_index} differ in size")
-            combined = np.zeros(next(iter(smalls.values())).shape, dtype=bool)
+            combined = np.zeros(shapes[rows[0]], dtype=bool)
             for small in smalls.values():
                 combined |= small
             # On another track's mask only: hidden, not evidence against this track.
-            free = ~combined.ravel()[next(iter(pixels.values()))]
-        for r in rows:
-            own = smalls[r].ravel()[pixels[smalls[r].shape]]
-            hits[r, inside] += own
-            seen[r, inside] += (own | free) if free is not None else 1
+            free = ~combined.ravel()
+        pose = frame.T_world_from_camera.to_numpy()
+        out.append(
+            _VoteView(
+                pose[:3, :3],
+                pose[:3, 3],
+                rows,
+                {r: m.ravel() for r, m in smalls.items()},
+                shapes,
+                free,
+            )
+        )
+    return out
 
-    ratio = np.where(seen >= cfg.min_views, hits / np.maximum(seen, 1), 0.0)
-    best: I64 = ratio.argmax(axis=0)
-    return ratio, best
+
+def _vote(
+    grid: _VoxelGrid,
+    tracks: Sequence[Track],
+    world: WorldModel,
+    cfg: LiftConfig,
+    views: list[int],
+    chunk: int = _VOTE_CHUNK,
+) -> tuple[F64, NDArray[np.int32]]:
+    """The best agreement ratio per voxel of ``grid`` and the track (row) that has it.
+
+    A track's ratio is hits over seen views, 0 below ``min_views`` seen views. A voxel belongs
+    to its best track once that ratio clears the track's agreement threshold; ties go to the
+    lower row. The caller turns ``(ratio, best)`` into members.
+
+    Only voxels in front of the camera and inside the image (``ok``) take part in a view.
+    Occlusion-aware, a view counts for a track where the voxel is on its own mask or on no
+    mask (``ok & (~combined | own)``), and a hit where it is on its own mask (``ok & own``).
+    Because a track's own mask is part of ``combined``, the shared term ``~combined`` is
+    looked up once per view and the own mask once per track. Voxels are voted ``chunk`` at a
+    time, so the counts of all tracks exist only for one chunk.
+    """
+    k = world.intrinsics
+    scale = 1.0 / cfg.mask_downscale
+    prepared = _vote_views(tracks, world, cfg, views)
+    counts = _count_dtype(len(views))
+    best_ratio = np.zeros(grid.size, dtype=np.float64)
+    best = np.zeros(grid.size, dtype=np.int32)
+    for start in range(0, grid.size, chunk):
+        stop = min(start + chunk, grid.size)
+        centers = grid.centers(np.arange(start, stop, dtype=np.int64))
+        seen = np.zeros((len(tracks), stop - start), dtype=counts)
+        hits = np.zeros((len(tracks), stop - start), dtype=counts)
+        for view in prepared:
+            cam = (centers - view.t) @ view.R  # R^T (x - t), camera frame
+            z = cam[:, 2]
+            ok = z > MIN_DEPTH_M
+            safe = np.where(ok, z, 1.0)
+            u, v = _pixels(cam[:, 0] / safe, cam[:, 1] / safe, k)
+            u, v = np.where(ok, u, -1.0), np.where(ok, v, -1.0)
+            ok &= (u >= 0) & (u < k.width_px) & (v >= 0) & (v < k.height_px)
+            inside = np.flatnonzero(ok)
+            ui = np.clip((u[inside] * scale).astype(np.int64), 0, None)
+            vi = np.clip((v[inside] * scale).astype(np.int64), 0, None)
+            pixels: dict[tuple[int, int], I64] = {}  # flat pixel index per mask shape
+            for h, w in view.shapes.values():
+                if (h, w) not in pixels:
+                    pixels[(h, w)] = np.minimum(vi, h - 1) * w + np.minimum(ui, w - 1)
+            free = None
+            if view.free is not None:
+                free = view.free[next(iter(pixels.values()))]
+            for r in view.rows:
+                own = view.smalls[r][pixels[view.shapes[r]]]
+                hits[r, inside] += own
+                seen[r, inside] += (own | free) if free is not None else 1
+        # The first maximum wins, as argmax over the tracks would pick it.
+        top = np.zeros(stop - start, dtype=np.float64)
+        winner = np.zeros(stop - start, dtype=np.int32)
+        for r in range(len(tracks)):
+            s = seen[r]
+            ratio = np.where(
+                s >= cfg.min_views,
+                hits[r].astype(np.float64) / np.maximum(s, 1).astype(np.float64),
+                0.0,
+            )
+            if r == 0:
+                top = ratio
+                continue
+            better = ratio > top
+            top = np.where(better, ratio, top)
+            winner[better] = r
+        best_ratio[start:stop] = top
+        best[start:stop] = winner
+    return best_ratio, best
 
 
 def _cap_reason(cells: I64, shape: tuple[int, int, int], cfg: LiftConfig) -> str | None:
@@ -374,7 +474,8 @@ def lift_tracks(
     if not tracks or not feet:
         return {}, LiftReport(0, {}, {t.track_id: "no usable mask" for t in tracks})
     xy = np.array(feet)
-    centers, shape = _grid(xy, world.table_plane, cfg, cfg.max_height_m)
+    grid = _grid(xy, world.table_plane, cfg, cfg.max_height_m)
+    shape = grid.shape
 
     views = _views(world, cfg)
     areas = np.array(
@@ -383,7 +484,7 @@ def lift_tracks(
     small_track = areas < cfg.small_mask_px
     agree = np.where(small_track, cfg.small_min_agreement, cfg.min_agreement)
     minvox = np.where(small_track, cfg.small_min_voxels, cfg.min_voxels)
-    ratio, best = _vote(centers, tracks, world, cfg, views)
+    ratio, best = _vote(grid, tracks, world, cfg, views)  # best ratio per voxel, its track
 
     clusters: dict[int, F64] = {}
     dropped: dict[int, str] = {}
@@ -392,7 +493,7 @@ def lift_tracks(
     tall_rows: list[int] = []
     tall_low_cells: dict[int, I64] = {}
     for row, track in enumerate(tracks):
-        member = np.nonzero((ratio[row] >= agree[row]) & (best == row))[0]
+        member = np.nonzero((ratio >= agree[row]) & (best == row))[0]
         if member.size == 0:
             dropped[track.track_id] = "no voxel is inside the mask in enough views"
             continue
@@ -406,21 +507,22 @@ def lift_tracks(
             tall_rows.append(row)  # decided on the tall grid below
             tall_low_cells[row] = raw_cells  # reused below; the tall vote covers the rest
         else:
-            clusters[track.track_id] = centers[member]
+            clusters[track.track_id] = grid.centers(member)
             voxels[track.track_id] = len(member)
     if tall_rows:
         # Second pass, paid only when something reaches the first pass. The layers below
         # the first-pass top reuse that vote; only the layers above it are re-voted, on
         # the same footprint, so a tall object can show its cap.
-        tall_centers, tall_shape = _grid(xy, world.table_plane, cfg, cfg.tall_height_m)
+        tall_grid = _grid(xy, world.table_plane, cfg, cfg.tall_height_m)
+        tall_shape = tall_grid.shape
         nx, ny, nz = tall_shape
         low_layers = shape[2]
-        high_centers = tall_centers.reshape(nx, ny, nz, 3)[:, :, low_layers:, :].reshape(-1, 3)
-        tall_ratio, tall_best = _vote(high_centers, tracks, world, cfg, views)
+        high = replace(tall_grid, shape=(nx, ny, nz - low_layers), z0=low_layers)
+        tall_ratio, tall_best = _vote(high, tracks, world, cfg, views)
         tall_top = tall_shape[2] - 1
         for row in tall_rows:
             track = tracks[row]
-            pos = np.nonzero((tall_ratio[row] >= agree[row]) & (tall_best == row))[0]
+            pos = np.nonzero((tall_ratio >= agree[row]) & (tall_best == row))[0]
             hx, hy, hz = np.unravel_index(pos, (nx, ny, nz - low_layers))
             high_cells = np.stack((hx, hy, hz + low_layers), axis=1).astype(np.int64)
             cells = np.concatenate((tall_low_cells[row], high_cells))
@@ -437,7 +539,7 @@ def lift_tracks(
             elif (reason := _cap_reason(cells, tall_shape, cfg)) is not None:
                 dropped[track.track_id] = f"{reason} (not a tabletop object)"
             else:
-                clusters[track.track_id] = tall_centers[member]
+                clusters[track.track_id] = tall_grid.centers(member)
                 voxels[track.track_id] = len(member)
     if cfg.dup_dist_m > 0.0:
         dups = _duplicate_tracks(clusters, cfg.dup_dist_m)

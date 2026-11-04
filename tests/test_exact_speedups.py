@@ -21,7 +21,7 @@ from video2sim.models.hosted import SamRecord, decode_sam_mask, decode_sam_masks
 from video2sim.schemas import SE3, CameraFrame, Intrinsics, Plane, WorldModel
 from video2sim.stages import lift, primitive_fit
 from video2sim.stages.keyframes import FrameStats, KeyframeConfig, frame_stats
-from video2sim.stages.lift import MIN_DEPTH_M, LiftConfig, _grid, _pixels, _views
+from video2sim.stages.lift import MIN_DEPTH_M, LiftConfig, _count_dtype, _grid, _pixels, _views
 from video2sim.stages.mesh_repair import _edge_use
 from video2sim.stages.primitive_fit import PrimitiveConfig, _cost, _track_views, initial_params
 from video2sim.stages.track_repair import BASE_FRACTION, mask_footprint
@@ -200,19 +200,61 @@ def _old_vote(
     return ratio, ratio.argmax(axis=0)
 
 
+def _old_grid(
+    centers_xy: NDArray[np.float64], plane: Plane, cfg: LiftConfig, height_m: float
+) -> tuple[NDArray[np.float64], tuple[int, int, int]]:
+    lo = centers_xy.min(axis=0) - cfg.margin_m
+    hi = centers_xy.max(axis=0) + cfg.margin_m
+    shape = (
+        int(np.ceil((hi[0] - lo[0]) / cfg.voxel_m)),
+        int(np.ceil((hi[1] - lo[1]) / cfg.voxel_m)),
+        int(np.ceil(height_m / cfg.voxel_m)),
+    )
+    origin = np.array([lo[0], lo[1], plane.offset_m], dtype=np.float64)
+    idx = np.stack(np.meshgrid(*[np.arange(n) for n in shape], indexing="ij"), axis=-1)
+    centers = origin + (idx.reshape(-1, 3) + 0.5) * cfg.voxel_m
+    return centers.astype(np.float64), shape
+
+
+def test_the_described_grid_has_the_old_centres() -> None:
+    world = _world()
+    cfg = replace(LiftConfig.from_config(CONFIG), margin_m=0.05)
+    feet = np.array([[-0.2, -0.2], [0.2, 0.1]])
+    grid = _grid(feet, world.table_plane, cfg, cfg.max_height_m)
+    old, shape = _old_grid(feet, world.table_plane, cfg, cfg.max_height_m)
+    assert grid.shape == shape
+    assert np.array_equal(grid.centers(np.arange(grid.size)), old)
+    # the upper block the tall pass votes: the old code sliced it out of the full tall grid
+    tall, tall_shape = _old_grid(feet, world.table_plane, cfg, 0.6)
+    nx, ny, nz = tall_shape
+    low = shape[2]
+    sliced = tall.reshape(nx, ny, nz, 3)[:, :, low:, :].reshape(-1, 3)
+    upper = replace(_grid(feet, world.table_plane, cfg, 0.6), shape=(nx, ny, nz - low), z0=low)
+    assert np.array_equal(upper.centers(np.arange(upper.size)), sliced)
+
+
 @pytest.mark.parametrize("occlusion_aware", [True, False])
-def test_the_voxel_vote_is_unchanged(occlusion_aware: bool) -> None:
+@pytest.mark.parametrize("chunk", [1 << 18, 9973])  # one chunk, and chunks that do not divide it
+def test_the_voxel_vote_is_unchanged(occlusion_aware: bool, chunk: int) -> None:
     world, tracks = _scene()
     cfg = replace(
         LiftConfig.from_config(CONFIG), occlusion_aware=occlusion_aware, min_views=3, margin_m=0.05
     )
     feet = np.array([[-0.2, -0.2], [0.2, 0.1]])
-    centers, _ = _grid(feet, world.table_plane, cfg, cfg.max_height_m)
+    grid = _grid(feet, world.table_plane, cfg, cfg.max_height_m)
     views = _views(world, cfg)
+    centers = grid.centers(np.arange(grid.size))
     old_ratio, old_best = _old_vote(centers, tracks, world, cfg, views)
-    new_ratio, new_best = lift._vote(centers, tracks, world, cfg, views)
+    new_ratio, new_best = lift._vote(grid, tracks, world, cfg, views, chunk=chunk)
     assert old_ratio.any()  # the scene exercises the vote
-    assert np.array_equal(old_ratio, new_ratio) and np.array_equal(old_best, new_best)
+    assert np.array_equal(old_best, new_best)
+    # only the winning track's ratio is kept; membership reads nothing else
+    assert np.array_equal(old_ratio[old_best, np.arange(grid.size)], new_ratio)
+
+
+def test_view_counts_use_the_smallest_type_that_holds_them() -> None:
+    assert _count_dtype(40) is np.uint8 and _count_dtype(255) is np.uint8
+    assert _count_dtype(256) is np.uint16 and _count_dtype(70000) is np.uint32
 
 
 # --- keyframes and shape flags: per-frame mask statistics -----------------------------------
