@@ -43,6 +43,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from video2sim.schemas import WorldModel
+from video2sim.stages.segmentation import CropMask, MaskLike, as_crop
 from video2sim.stages.tracking import Track
 
 F64 = NDArray[np.float64]
@@ -133,39 +134,56 @@ class KeyframeReport:
 
 def frame_stats(
     frame_index: int,
-    mask: BoolMask,
-    others: BoolMask | None,
+    mask: MaskLike,
+    others: MaskLike | Sequence[MaskLike] | None,
     gray: NDArray[np.uint8] | None,
     cfg: KeyframeConfig,
 ) -> FrameStats | None:
-    """Measure one mask. ``None`` when the mask is smaller than ``min_mask_px``."""
+    """Measure one mask. ``None`` when the mask is smaller than ``min_mask_px``.
+
+    ``others`` is the union of the other tracks' masks in the frame, or those masks as a list
+    (an empty list is no other track). Everything is measured on a crop around the mask, so a
+    list is only combined there: one full-frame union per track and frame was most of the cost.
+    """
     import cv2
 
-    area = int(mask.sum())
-    if area < cfg.min_mask_px:
-        return None
-    height, width = mask.shape
-    band = max(1, round(cfg.border_band_frac * min(height, width)))
-    edge = np.zeros_like(mask)
-    edge[:band], edge[-band:], edge[:, :band], edge[:, -band:] = True, True, True, True
-    border = float((mask & edge).sum()) / area
-
-    rows, cols = np.any(mask, axis=1), np.any(mask, axis=0)
-    y_lo, y_hi = int(np.argmax(rows)), int(height - 1 - np.argmax(rows[::-1]))
-    x_lo, x_hi = int(np.argmax(cols)), int(width - 1 - np.argmax(cols[::-1]))
+    own = as_crop(mask)
+    height, width = own.shape
+    if own.bounds is None:
+        return None  # area 0, below any min_mask_px
+    y_lo, y_hi, x_lo, x_hi = own.bounds
     r = cfg.occluder_ring_px
     y0, y1 = max(0, y_lo - r - 1), min(height, y_hi + r + 2)
     x0, x1 = max(0, x_lo - r - 1), min(width, x_hi + r + 2)
-    crop = mask[y0:y1, x0:x1].astype(np.uint8)
+    rows, cols = slice(y0, y1), slice(x0, x1)
+    window = own.window(rows, cols)  # holds every mask pixel
+    area = int(window.sum())
+    if area < cfg.min_mask_px:
+        return None
+    band = max(1, round(cfg.border_band_frac * min(height, width)))
+    ys, xs = np.arange(y0, y1), np.arange(x0, x1)
+    edge = ((ys < band) | (ys >= height - band))[:, None] | ((xs < band) | (xs >= width - band))
+    border = float((window & edge).sum()) / area
+    crop = window.astype(np.uint8)
 
+    if isinstance(others, np.ndarray):
+        near: BoolMask | None = others[rows, cols]
+    elif isinstance(others, CropMask):
+        near = others.window(rows, cols)
+    elif others:
+        near = np.zeros(window.shape, dtype=bool)
+        for other in others:
+            near |= other[rows, cols] if isinstance(other, np.ndarray) else other.window(rows, cols)
+    else:
+        near = None
     occlusion = 0.0
-    if others is not None:
+    if near is not None:
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * r + 1, 2 * r + 1))
         ring = (cv2.dilate(crop, kernel) > 0) & (crop == 0)
-        ring &= ~edge[y0:y1, x0:x1]  # outside the image there is nothing to occlude with
+        ring &= ~edge  # outside the image there is nothing to occlude with
         ring_px = int(ring.sum())
         if ring_px:
-            occlusion = float((ring & others[y0:y1, x0:x1]).sum()) / ring_px
+            occlusion = float((ring & near).sum()) / ring_px
 
     sharpness = 0.0
     if gray is not None:
@@ -297,8 +315,7 @@ def keyframes_for_tracks(
             if mask is None:
                 continue
             rest = [m for i, m in masks.items() if i != t.track_id]
-            others = np.any(np.stack(rest), axis=0) if rest else None
-            s = frame_stats(frame, mask, others, gray, cfg)
+            s = frame_stats(frame, mask, rest, gray, cfg)
             if s is not None:
                 stats[t.track_id].append(s)
 

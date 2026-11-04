@@ -84,7 +84,7 @@ def preview(
     tiles = []
     for p in picks:
         image = cv2.imread(str(paths[p.frame_index]))
-        mask = track.masks[p.frame_index]
+        mask = track.masks[p.frame_index].full()
         ys, xs = np.nonzero(mask)
         pad = 30
         y0, y1 = max(0, ys.min() - pad), min(mask.shape[0], ys.max() + pad)

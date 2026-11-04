@@ -191,25 +191,33 @@ class _View:
 
 
 def _track_views(
-    track: Track, tracks: Sequence[Track], world: WorldModel, lift: LiftConfig, cfg: PrimitiveConfig
+    track: Track,
+    tracks: Sequence[Track],
+    world: WorldModel,
+    lift: LiftConfig,
+    cfg: PrimitiveConfig,
+    smalls: dict[tuple[int, int], BoolMask] | None = None,
 ) -> list[_View]:
+    """The usable views of ``track``. ``smalls`` caches downscaled masks by (track id, frame
+    index), so a caller fitting every track of a scene shrinks each mask once, not once per
+    track that sees it as an occluder."""
     import cv2  # heavy import, kept out of module import time
 
-    scale = 1.0 / cfg.mask_downscale
+    cache: dict[tuple[int, int], BoolMask] = {} if smalls is None else smalls
 
-    def small(mask: BoolMask) -> BoolMask:
-        out = cv2.resize(
-            mask.astype(np.uint8), None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST
-        )
-        return np.asarray(out, dtype=bool)
+    def small_of(t: Track, frame_index: int) -> BoolMask:
+        key = (t.track_id, frame_index)
+        if key not in cache:
+            small = t.masks[frame_index].downscaled(cfg.mask_downscale, cv2.INTER_NEAREST)
+            cache[key] = small.full()
+        return cache[key]
 
     views: list[_View] = []
     for position in _views(world, lift):
         frame = world.frames[position]
-        mask = track.masks.get(frame.frame_index)
-        if mask is None:
+        if frame.frame_index not in track.masks:
             continue
-        m = small(mask)
+        m = small_of(track, frame.frame_index)
         area = int(m.sum())
         if area < cfg.min_mask_px:
             continue
@@ -217,36 +225,72 @@ def _track_views(
             continue  # cut off by the image edge: the outline there is not the object's
         others = np.zeros_like(m)
         for t in tracks:
-            other = t.masks.get(frame.frame_index)
-            if t.track_id != track.track_id and other is not None:
-                others |= small(other)
+            if t.track_id != track.track_id and frame.frame_index in t.masks:
+                others |= small_of(t, frame.frame_index)
         views.append(_View(frame.T_world_from_camera.to_numpy(), m, ~m & ~others, area))
     return views
 
 
+@dataclass(frozen=True)
+class _ViewStack:
+    """The views of one track with their poses stacked, built once per fit (N9)."""
+
+    views: tuple[_View, ...]
+    poses: F64  # (V, 4, 4), T_world_from_camera of each view
+
+
+def _stack(views: Sequence[_View] | _ViewStack) -> _ViewStack:
+    if isinstance(views, _ViewStack):
+        return views
+    poses = np.stack([v.pose for v in views]) if views else np.zeros((0, 4, 4))
+    return _ViewStack(tuple(views), poses)
+
+
 def _cost(
-    kind: Kind, params: F64, views: Sequence[_View], world: WorldModel, cfg: PrimitiveConfig
+    kind: Kind,
+    params: F64,
+    views: Sequence[_View] | _ViewStack,
+    world: WorldModel,
+    cfg: PrimitiveConfig,
 ) -> float:
+    """Mean over the views of the extra and missed silhouette pixels against the mask.
+
+    The outline is projected into every view in one go: the rotation of each view is a
+    (3, 3) block with the strides of the single pose, so the stacked matrix product runs the
+    same product per view, and the rest is elementwise. Only the hull and its pixels are
+    per view.
+    """
     import cv2  # heavy import, kept out of module import time
 
     if float(np.min(params[3:])) < cfg.min_size_m:
         return float("inf")
+    stack = _stack(views)
     outline = _outline(kind, params, world.table_plane.offset_m)
+    cam = np.matmul(outline[None, :, :] - stack.poses[:, None, :3, 3], stack.poses[:, :3, :3])
+    if bool(np.any(cam[:, :, 2] <= MIN_DEPTH_M)):
+        return float("inf")
+    u, v = _pixels(cam[:, :, 0] / cam[:, :, 2], cam[:, :, 1] / cam[:, :, 2], world.intrinsics)
+    uvs = (np.stack([u, v], axis=2) / cfg.mask_downscale).astype(np.float32)
     total = 0.0
-    for view in views:
-        cam = (outline - view.pose[:3, 3]) @ view.pose[:3, :3]
-        if bool(np.any(cam[:, 2] <= MIN_DEPTH_M)):
-            return float("inf")
-        u, v = _pixels(cam[:, 0] / cam[:, 2], cam[:, 1] / cam[:, 2], world.intrinsics)
-        uv = (np.stack([u, v], axis=1) / cfg.mask_downscale).astype(np.float32)
+    for view, uv in zip(stack.views, uvs, strict=True):
         hull: Any = cv2.convexHull(uv).astype(np.int32)
-        sil = np.zeros(view.mask.shape, dtype=np.uint8)
-        cv2.fillConvexPoly(sil, hull, 1)
-        inside = sil.astype(bool)
-        extra = int(np.count_nonzero(inside & view.free))
-        missed = int(np.count_nonzero(view.mask & ~inside))
+        # The silhouette lies inside the hull's box, so it is drawn only there: outside it
+        # nothing is extra, and every mask pixel is missed. Same counts as a full canvas.
+        corners = hull.reshape(-1, 2)
+        height, width = view.mask.shape
+        x0, y0 = max(int(corners[:, 0].min()), 0), max(int(corners[:, 1].min()), 0)
+        x1 = min(int(corners[:, 0].max()) + 1, width)
+        y1 = min(int(corners[:, 1].max()) + 1, height)
+        if x1 <= x0 or y1 <= y0:
+            extra, missed = 0, view.area
+        else:
+            sil = np.zeros((y1 - y0, x1 - x0), dtype=np.uint8)
+            cv2.fillConvexPoly(sil, hull - np.array([x0, y0], dtype=np.int32), 1)
+            inside = sil.astype(bool)
+            extra = int(np.count_nonzero(inside & view.free[y0:y1, x0:x1]))
+            missed = view.area - int(np.count_nonzero(inside & view.mask[y0:y1, x0:x1]))
         total += (extra + missed) / view.area
-    return total / len(views)
+    return total / len(stack.views)
 
 
 def initial_params(points: F64, table_z: float) -> F64:
@@ -270,16 +314,17 @@ def fit_primitive(
 ) -> Primitive:
     """The best of the three kinds, each found by a seeded random walk from ``start``."""
     best: Primitive | None = None
+    stack = _stack(views)
     for k, kind in enumerate(KINDS):
         rng = np.random.default_rng([cfg.seed, track_id, k])
         params = start.copy()
-        cost = _cost(kind, params, views, world, cfg)
+        cost = _cost(kind, params, stack, world, cfg)
         step = np.array(
             [cfg.step_m, cfg.step_m, np.radians(cfg.step_deg), cfg.step_m, cfg.step_m, cfg.step_m]
         )
         for it in range(cfg.iterations):
             trial = params + rng.normal(0.0, 1.0, 6) * step
-            trial_cost = _cost(kind, trial, views, world, cfg)
+            trial_cost = _cost(kind, trial, stack, world, cfg)
             if trial_cost < cost:
                 params, cost = trial, trial_cost
             if (it + 1) % cfg.shrink_every == 0:
@@ -354,11 +399,12 @@ def fit_clusters(
     """The fitted cluster per track id that has voted points; see the module docstring."""
     out: dict[int, FitResult] = {}
     table_z = world.table_plane.offset_m
+    smalls: dict[tuple[int, int], BoolMask] = {}
     for track in tracks:
         cloud = points.get(track.track_id)
         if cloud is None or len(cloud) == 0:
             continue
-        views = _track_views(track, tracks, world, lift, cfg)
+        views = _track_views(track, tracks, world, lift, cfg, smalls)
         if len(views) < cfg.min_views:
             out[track.track_id] = FitResult(
                 cloud, None, "points", f"only {len(views)} whole masks: the points are the cluster"

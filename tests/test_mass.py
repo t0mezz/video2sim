@@ -193,3 +193,12 @@ def test_solid_answer_uses_its_fill_fraction(cfg: MassConfig) -> None:
     diluted = estimate_mass(box, _material(False, FILL), cfg)
     assert diluted.mass_kg.nominal == pytest.approx(0.2 * full.mass_kg.nominal)
     assert diluted.fill_fraction == FILL
+
+
+def test_a_body_from_the_caller_gives_the_same_estimate(cfg: MassConfig) -> None:
+    cup = trimesh.creation.cylinder(0.04, 0.1, sections=48)
+    own = estimate_mass(cup, _material(True, FILL), cfg)
+    shared = estimate_mass(cup, _material(True, FILL), cfg, sealed_body(cup, cfg))
+    assert own.mass_kg == shared.mass_kg and own.reasons == shared.reasons
+    assert np.array_equal(own.inertia_kg_m2, shared.inertia_kg_m2)
+    assert np.array_equal(own.center_of_mass_m, shared.center_of_mass_m)

@@ -7,7 +7,7 @@ How each stage works, with the numbers that justify the design. Settings live in
 ## 1. Capture (`stages/capture.py`)
 
 Decides whether the video is usable and picks the frames. The gate runs before reconstruction and
-reports every failed check at once, one message each: blur (sharpest frame of each 1/5 s window),
+reports every failed check at once, one message each: blur (sharpest frame of each 1/3 s window, `capture.target_fps: 3`, D-035),
 exposure, marker visibility, frame count. How to film: [capture_protocol.md](capture_protocol.md).
 
 * 5 of 5 deliberately degraded copies of s01 `video_a` are rejected with the matching message, and
@@ -22,12 +22,18 @@ exposure, marker visibility, frame count. How to film: [capture_protocol.md](cap
 Camera poses, a sparse point cloud, metric scale and a gravity-aligned world frame. Everything later
 depends on it.
 
-* **Back end.** pycolmap on CPU (D-016), at 3 fps and up to 1280 px, with sequential matching and
+* **Back end.** pycolmap on CPU (D-016), at 3 fps on whole frames (1920 px wide for the benchmark
+  videos; `max_image_size: -1` keeps pycolmap's 3200 px cap, D-038), with sequential matching and
   the incremental mapper. Exhaustive matching was 59 to 80% of the time on every video over 28
   frames. Sequential matching gives 3.5x on s16 `video_a` (709 s to 205 s) and 1.3x to 4.2x on five
   videos, with quality inside the limits. Fewer frames (2 fps) or a smaller image (960 px) lost the
   tag-distance gate, and the global mapper was left off. Evidence:
   [history/reconstruction_experiments.md](history/reconstruction_experiments.md).
+* **Tag detections** of every registered frame, made on the frame PNG read back as grey, are written
+  to `reconstruction/tags.json`. Segmentation's marker filter and board check read them instead of
+  detecting again (D-036, D-039). Capture keeps its own detection: its grey comes from the decoded
+  video frame and differs by one level in about 45% of pixels, which changed whether a tag was seen
+  in 10 of 2,702 local frames.
 * **Metric scale** comes from the printed tag edge, 100.26 mm (five caliper readings), so one or two
   tags anywhere in view are enough. The known grid spacing is only a check on grid scenes. Scale is
   within 0.5% of the board on dev. Model-predicted scale is never used as metric scale.
@@ -64,7 +70,10 @@ world frame, keyframes, flags and a material answer.
    track when its mask holds it in 90% of the views that see it (40 views), and views where another
    track's mask excuses the occlusion do not count against it. The two outermost points per side of
    the resting box are trimmed, then an upright box, cylinder or sphere is fitted to the masks. That
-   fitted cluster is `point_cluster_path`. The visual hull is kept only for the shape flags.
+   fitted cluster is `point_cluster_path`. The visual hull is kept only for the shape flags. Its
+   vote first bounds cells of 4 x 4 x 4 voxels (projected windows with the lens model bounded by
+   interval arithmetic) and votes only cells where some track can reach its threshold, which gives
+   the members of the full vote (N12).
 5. **Keyframes** (`keyframes.py`). Per object, up to 5 frames scored by mask area, border contact,
    overlap with other tracks and sharpness, with a penalty for frames from similar camera poses.
 6. **Flags and material pass** (`shape_flags.py`, `material_pass.py`, D-017). Geometry flags `small`,
@@ -72,6 +81,13 @@ world frame, keyframes, flags and a material answer.
    class, finish, hollow or solid, and confidence, and it raises `transparent_or_reflective` and
    `non_rigid`. The flag means reflectiveness is likely to break a later stage, not that the object
    is shiny.
+
+Masks are held as `CropMask` (`segmentation.py`): the box that holds the mask pixels, placed in the
+frame, instead of a 2 MB full frame at 1080p. SAM answers are decoded straight into crops, and every
+step that reads a mask (lookups, windows, overlaps, downscaling for the vote and the primitive fit)
+gives what the full frame gives, bit for bit. Only the PNG writer and the overlays expand a mask.
+Decoded SAM rasters are stored per answer in `segmentation.work/tracking_work/raster_cache/`, so a
+rerun skips the pure-Python decoder.
 
 Numbers:
 
@@ -101,14 +117,22 @@ Design notes: [research/occlusion_robust_discovery_plan.md](research/occlusion_r
 
 Gives each object a closed mesh in the metric world frame.
 
-* **Model.** SAM 3D Objects only (D-018), served by a Modal worker on A100-40GB with at most 2
-  containers, 2 of them warmed when segmentation starts (D-032). In the probes a call took 110 s cold
+* **Model.** SAM 3D Objects only (D-018), served by a Modal worker on A100-40GB with at most 4
+  containers, all 4 warmed when segmentation starts (D-034, raising D-032's 2; the shape wall time is
+  about draws x 13 to 14 s / containers, and 4 containers are not yet measured). In the probes a call took 110 s cold
   and 16 to 18 s warm on 80 GB, and 92 s and 13 to 14 s on the 40 GB card in use
   ([research/sam3d_cold_start.md](research/sam3d_cold_start.md)). Contract and conventions: [model_interfaces.md](model_interfaces.md),
   [research/sam3d.md](research/sam3d.md).
 * **Draws.** The model runs on an object's best keyframes, one seed each: the default is one draw on
   each of up to 5 keyframes (D-033, which dropped D-030's 2 draws; a dev replay put 2 draws at 5.7%
   size error against 5.0% with 6). The kept draw is the one with the best fit score.
+  `shape.early_stop` (off by default, D-040) draws `min_draws` per object first and skips the rest
+  when each of those fits at or above `min_fit_score` and their resting boxes agree within
+  `size_tolerance` per side. The report records draws made, draws skipped and the reason. Not yet
+  evaluated on dev.
+* **Masks** are read from the segmentation PNGs as crops (N5); only the registration views and the
+  keyframes sent to SAM 3D are expanded to full frames, so the PNG bytes SAM 3D receives and its
+  cache keys are unchanged.
 * **Registration.** SAM 3D's rotation is the start pose, with four yaw starts. Its translation and
   scale are in its own depth units, so scale and center start from the observed cluster. A
   Levenberg-Marquardt fit in NumPy minimises, over scale `s`, rotation `R` and translation `t`:

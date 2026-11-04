@@ -19,6 +19,7 @@ Built so far (P1.1 back end, P1.2 scale, P1.3 world frame, P1.5 ``WorldModel``):
 from __future__ import annotations
 
 import shutil
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -37,9 +38,12 @@ from video2sim.schemas import (
     WorldModel,
 )
 from video2sim.stages.marker_detection import (
+    TAG_FILE,
+    FrameTags,
     TagView,
-    detect_tags,
+    detect_file,
     triangulate_tag_corners,
+    write_tag_file,
 )
 from video2sim.stages.world_frame import (
     PlaneFit,
@@ -263,20 +267,30 @@ def run_sfm(
     )
 
 
-def tag_views(model: SfmModel, frames_dir: Path, family: str) -> list[TagView]:
-    """Detect tags in every registered frame and pair each with its camera."""
-    import cv2
-
-    views = []
+def detect_frames(model: SfmModel, frames_dir: Path, family: str) -> dict[str, FrameTags]:
+    """Tags of every registered frame, by image name, read once."""
+    out: dict[str, FrameTags] = {}
     for im in model.images:
-        read = cv2.imread(str(frames_dir / im.name), cv2.IMREAD_GRAYSCALE)
-        if read is None:
-            raise ValueError(f"cannot read frame {frames_dir / im.name}")
-        gray = np.asarray(read, dtype=np.uint8)
-        views.append(
-            TagView(im.K, im.distortion, im.T_world_from_camera, detect_tags(gray, family))
-        )
-    return views
+        try:
+            out[im.name] = detect_file(frames_dir / im.name, family)
+        except FileNotFoundError:
+            raise ValueError(f"cannot read frame {frames_dir / im.name}") from None
+    return out
+
+
+def tag_views(
+    model: SfmModel,
+    frames_dir: Path,
+    family: str,
+    detections: Mapping[str, FrameTags] | None = None,
+) -> list[TagView]:
+    """Pair the tags of every registered frame with its camera. ``detections`` are those of
+    ``detect_frames``; without them the frames are read here."""
+    found = detect_frames(model, frames_dir, family) if detections is None else detections
+    return [
+        TagView(im.K, im.distortion, im.T_world_from_camera, found[im.name][0])
+        for im in model.images
+    ]
 
 
 @dataclass(frozen=True)
@@ -610,7 +624,9 @@ class ReconstructionStage:
         shutil.rmtree(work, ignore_errors=True)
 
         sfm = run_sfm(frames_dir, work, options=SfmOptions.from_config(sec.get("sfm")))
-        views = tag_views(sfm, frames_dir, sec["marker"]["family"])
+        family = sec["marker"]["family"]
+        detections = detect_frames(sfm, frames_dir, family)
+        views = tag_views(sfm, frames_dir, family, detections)
         try:
             world: WorldFrameResult | None = solve_world_frame(views, sfm.points_xyz, world_cfg)
         except ValueError:  # no marker in 3D; the gate words it
@@ -624,7 +640,7 @@ class ReconstructionStage:
         first = cv2.imread(str(frames_dir / sfm.images[0].name))
         if first is None:
             raise ValueError(f"cannot read frame {sfm.images[0].name}")
-        return build_world_model(
+        model = build_world_model(
             sfm,
             world,
             capture.frame_paths,
@@ -633,3 +649,12 @@ class ReconstructionStage:
             f"{self.name}/points.ply",
             world.flags + (["sfm_fragmented"] if sfm.fragmented else []),
         )
+        # Handed to segmentation so its marker filter and board check detect nothing again
+        # (D-036, D-039). Keys are the image paths of the world model's frames.
+        by_name = {Path(p).name: p for p in capture.frame_paths}
+        write_tag_file(
+            ctx.out_dir / TAG_FILE,
+            family,
+            {by_name[name]: tags for name, tags in detections.items()},
+        )
+        return model

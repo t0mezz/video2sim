@@ -16,8 +16,8 @@ object that fails a check is written with ``Flag.FAILED_VALIDATION``, and export
 from __future__ import annotations
 
 import json
-from collections.abc import Mapping
-from concurrent.futures import ThreadPoolExecutor
+from collections.abc import Callable, Mapping
+from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from typing import Any, cast
@@ -128,12 +128,16 @@ def prepare_object(
     registered: RegisteredObject,
     instance: ObjectInstance,
     table: MaterialTable,
-    model_mass: Estimate | None,
+    model_answer: Callable[[], Estimate | None],
     run_dir: Path,
     out_dir: Path,
     cfg: PhysicsConfig,
 ) -> tuple[PreparedObject, dict[str, Any]]:
-    """One object's files and asset, and its entry in ``physics/report.json``."""
+    """One object's files and asset, and its entry in ``physics/report.json``.
+
+    ``model_answer`` gives the hosted model's mass, or None. It is called only once repair,
+    collision and the geometry mass are done, so the request can run meanwhile.
+    """
     mesh = cast(
         trimesh.Trimesh, trimesh.load(run_dir / registered.mesh_path, force="mesh", process=False)
     )
@@ -142,7 +146,10 @@ def prepare_object(
         repaired.mesh, cfg.collision, cache_dir=run_dir / "physics.work" / "decomp_cache"
     )
     material = object_material(instance, table, cfg.min_confidence)
-    mass = estimate_mass(repaired.mesh, material, cfg.mass)
+    # collision sealed the same mesh already; the body is reused when it used this config
+    body = collision.body if cfg.collision.sealing == cfg.mass else None
+    mass = estimate_mass(repaired.mesh, material, cfg.mass, body)
+    model_mass = model_answer()
     final_mass, mass_source = combine(mass.mass_kg, model_mass, cfg.vlm_mass.enabled)
     inertia = mass.inertia_kg_m2 * final_mass.nominal / mass.mass_kg.nominal  # same body
 
@@ -332,21 +339,23 @@ class PhysicsStage:
             )
 
         def prepare(
-            job: tuple[RegisteredObject, Estimate | None],
+            job: tuple[RegisteredObject, Future[Estimate | None]],
         ) -> tuple[PreparedObject, Any]:
             obj, answer = job
             prepared, entry = prepare_object(
-                obj, instances[obj.object_id], table, answer, ctx.run_dir, ctx.out_dir, cfg
+                obj, instances[obj.object_id], table, answer.result, ctx.run_dir, ctx.out_dir, cfg
             )
             ctx.report(mass_live_line(obj.object_id, entry))
             return prepared, entry
 
+        # The mass requests run while objects are repaired and decomposed: each object waits
+        # for its answer only after its own geometry work. The result does not depend on it.
         with ThreadPoolExecutor(max_workers=cfg.parallel_mass_calls) as calls:
-            answers = list(calls.map(ask, registered.objects))
-        # CoACD runs in a compiled library that releases the GIL, so threads share the cores.
-        prepare_coacd()
-        with ThreadPoolExecutor(max_workers=cfg.parallel_objects) as workers:
-            done = list(workers.map(prepare, zip(registered.objects, answers, strict=True)))
+            answers = [calls.submit(ask, obj) for obj in registered.objects]
+            # CoACD runs in a compiled library that releases the GIL, so threads share the cores.
+            prepare_coacd()
+            with ThreadPoolExecutor(max_workers=cfg.parallel_objects) as workers:
+                done = list(workers.map(prepare, zip(registered.objects, answers, strict=True)))
         items = [item for item, _ in done]
         report = {
             o.object_id: entry for o, (_, entry) in zip(registered.objects, done, strict=True)

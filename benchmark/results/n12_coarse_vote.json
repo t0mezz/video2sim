@@ -1,0 +1,114 @@
+{
+ "item": "TODO.md N12",
+ "date": "2026-11-04",
+ "machine": "Apple M4, 10 cores",
+ "old_code": "ce926a0",
+ "new_code": "working tree after ce926a0 (lift._candidates)",
+ "method": "Segmentation replayed from caches with both code trees, every hosted client raising, every stage file compared byte for byte (wall times overlap other work on the machine; the vote timings below are from separate replays).",
+ "segmentation_replays": [
+  {
+   "run": "20261103T021624Z_d9b886aa",
+   "stage": "segmentation",
+   "config": "committed config",
+   "base_wall_s": 46.9,
+   "base_peak_rss_gb": 0.88,
+   "new_wall_s": 32.7,
+   "new_peak_rss_gb": 0.88,
+   "files": 445,
+   "differ": 0
+  },
+  {
+   "run": "20261104T114100Z_c14bb675",
+   "stage": "segmentation",
+   "config": "committed config",
+   "base_wall_s": 28.1,
+   "base_peak_rss_gb": 0.46,
+   "new_wall_s": 21.5,
+   "new_peak_rss_gb": 0.46,
+   "files": 878,
+   "differ": 0
+  },
+  {
+   "run": "20261104T111412Z_533eb320",
+   "stage": "segmentation",
+   "config": "committed config",
+   "base_wall_s": 13.4,
+   "base_peak_rss_gb": 0.64,
+   "new_wall_s": 9.0,
+   "new_peak_rss_gb": 0.64,
+   "files": 115,
+   "differ": 0
+  },
+  {
+   "run": "20261103T200206Z_5ce4cde1",
+   "stage": "segmentation",
+   "config": "working config (gap fill on)",
+   "base_wall_s": 14.6,
+   "base_peak_rss_gb": 0.45,
+   "new_wall_s": 11.9,
+   "new_peak_rss_gb": 0.43,
+   "files": 223,
+   "differ": 1,
+   "note": "only route.json differs, by the absolute replay folder it records (TODO.md N21)"
+  },
+  {
+   "run": "20261103T162930Z_95e58ffe",
+   "stage": "segmentation",
+   "config": "working config (gap fill on)",
+   "base_wall_s": 25.2,
+   "base_peak_rss_gb": 0.49,
+   "new_wall_s": 20.3,
+   "new_peak_rss_gb": 0.47,
+   "files": 709,
+   "differ": 1,
+   "note": "only route.json differs, by the absolute replay folder it records (TODO.md N21)"
+  },
+  {
+   "run": "20261103T115556Z_73bfed16",
+   "stage": "segmentation",
+   "config": "working config (gap fill on)",
+   "base_wall_s": 30.3,
+   "base_peak_rss_gb": 0.69,
+   "new_wall_s": 26.0,
+   "new_peak_rss_gb": 0.65,
+   "files": 708,
+   "differ": 1,
+   "note": "only route.json differs, by the absolute replay folder it records (TODO.md N21)"
+  }
+ ],
+ "vote_155_frame_run": {
+  "run": "20261103T021624Z_d9b886aa",
+  "first_pass": {
+   "voxels": 6689550,
+   "voted": 173840,
+   "s_before": 4.88,
+   "s_after": 0.99
+  },
+  "tall_pass": {
+   "voxels": 12423450,
+   "voted": 71856,
+   "s_before": 7.03,
+   "s_after": 1.56
+  },
+  "segmentation_replay_s": {
+   "before": 33.2,
+   "after": 25.0
+  },
+  "traced_peak_gb": {
+   "before": 0.41,
+   "after": 0.41
+  }
+ },
+ "voted_share_other_runs": [
+  {
+   "run": "20261104T114100Z_c14bb675",
+   "voxels": 1788150,
+   "voted": 211024
+  },
+  {
+   "run": "20261104T111412Z_533eb320",
+   "voxels": 1964410,
+   "voted": 62464
+  }
+ ]
+}

@@ -113,8 +113,7 @@ def shape_signals(
         masks = {t.track_id: t.masks[frame] for t in tracks if frame in t.masks}
         for track_id, mask in masks.items():
             rest = [m for i, m in masks.items() if i != track_id]
-            others = np.any(np.stack(rest), axis=0) if rest else None
-            s = frame_stats(frame, mask, others, None, cfg.keyframes)
+            s = frame_stats(frame, mask, rest, None, cfg.keyframes)
             if s is not None:
                 seen[track_id].append(s.occlusion_frac)
     out = []

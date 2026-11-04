@@ -34,6 +34,7 @@ from typing import Any
 
 import numpy as np
 import trimesh
+from numpy.typing import NDArray
 
 # Fractions of the budget that decimation aims for, in turn, until one result passes the checks.
 DECIMATION_TARGET_MARGINS = (0.98, 0.95, 0.9)
@@ -138,6 +139,23 @@ def _orient(m: trimesh.Trimesh) -> None:
         pass
 
 
+def _edge_use(m: trimesh.Trimesh) -> NDArray[np.int64]:
+    """For every face edge, in ``edges_sorted`` order, how many face edges share its vertices.
+
+    Each sorted edge (a, b) is one integer, a * n + b, so a 1-D unique replaces the row-wise
+    ``np.unique(axis=0)``. The keys sort in the same order as the rows, so the counts are the
+    same; the row-wise sort was most of the repair time on dense meshes.
+    """
+    edges = np.asarray(m.edges_sorted, dtype=np.int64)
+    if len(edges) == 0:
+        return np.zeros(0, dtype=np.int64)
+    n = int(edges.max()) + 1
+    _, inverse, counts = np.unique(
+        edges[:, 0] * n + edges[:, 1], return_inverse=True, return_counts=True
+    )
+    return np.asarray(counts[inverse.reshape(-1)], dtype=np.int64)
+
+
 def _close_holes(m: trimesh.Trimesh, steps: dict[str, int]) -> trimesh.Trimesh:
     """Orient the faces consistently, close every boundary loop with a fan, orient outward.
 
@@ -145,18 +163,18 @@ def _close_holes(m: trimesh.Trimesh, steps: dict[str, int]) -> trimesh.Trimesh:
     them in turn, so each loop it finds is closed.
     """
     _orient(m)
-    _, inverse, counts = np.unique(m.edges_sorted, axis=0, return_inverse=True, return_counts=True)
-    boundary_edges = np.flatnonzero(counts[inverse.reshape(-1)] == 1)
+    boundary_edges = np.flatnonzero(_edge_use(m) == 1)
     nxt: dict[int, list[int]] = {}
     for e in boundary_edges:
         f, k = divmod(int(e), 3)
         nxt.setdefault(int(m.faces[f][k]), []).append(int(m.faces[f][(k + 1) % 3]))
     new_faces: list[list[int]] = []
-    verts = [np.asarray(v) for v in m.vertices]
+    base = np.asarray(m.vertices)
+    centres: list[NDArray[np.float64]] = []  # fan centres, appended after the mesh's vertices
 
     def fan(loop: list[int]) -> None:
-        c = len(verts)
-        verts.append(np.mean([verts[i] for i in loop], axis=0))
+        c = len(base) + len(centres)
+        centres.append(np.mean([base[i] for i in loop], axis=0))
         # the boundary runs a->b in an existing face, so the patch runs b->a
         new_faces.extend([loop[(i + 1) % len(loop)], loop[i], c] for i in range(len(loop)))
 
@@ -186,15 +204,15 @@ def _close_holes(m: trimesh.Trimesh, steps: dict[str, int]) -> trimesh.Trimesh:
                 fan(path)
     steps["faces_added"] = len(new_faces)
     if new_faces:
-        m = trimesh.Trimesh(np.asarray(verts), np.vstack([m.faces, new_faces]), process=False)
+        verts = np.vstack([base, np.asarray(centres)])
+        m = trimesh.Trimesh(verts, np.vstack([m.faces, new_faces]), process=False)
         _orient(m)
     return m
 
 
 def _drop_nonmanifold_faces(m: trimesh.Trimesh) -> trimesh.Trimesh:
     """Remove every face on an edge shared by more than two faces; the hole is closed later."""
-    _, inverse, counts = np.unique(m.edges_sorted, axis=0, return_inverse=True, return_counts=True)
-    bad_edge = counts[inverse.reshape(-1)] > 2
+    bad_edge = _edge_use(m) > 2
     if not bad_edge.any():
         return m
     bad_face = np.zeros(len(m.faces), dtype=bool)

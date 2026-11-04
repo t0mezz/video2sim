@@ -67,6 +67,7 @@ from video2sim.stages.marker_filter import (
     MarkerFilterConfig,
     cached_tag_detector,
     filter_marker_tracks,
+    handed_tag_detector,
 )
 from video2sim.stages.material_pass import (
     MaterialClient,
@@ -219,7 +220,7 @@ def write_object_files(
     mask_dir = out_dir / "masks" / object_id
     mask_dir.mkdir(parents=True, exist_ok=True)
     for frame, mask in sorted(track.masks.items()):
-        cv2.imwrite(str(mask_dir / f"{frame:05d}.png"), mask.astype(np.uint8) * 255)
+        cv2.imwrite(str(mask_dir / f"{frame:05d}.png"), mask.full().astype(np.uint8) * 255)
     cluster_dir = out_dir / "clusters"
     cluster_dir.mkdir(parents=True, exist_ok=True)
     np.save(cluster_dir / f"{object_id}.npy", cluster)
@@ -410,7 +411,8 @@ def render_tracks_video(
                 raise ValueError(f"cannot read {frame.image_path}")
             overlay: NDArray[np.uint8] = np.asarray(image.copy(), dtype=np.uint8)
             present = {
-                t.track_id: t.masks[frame.frame_index] for t in by_frame.get(frame.frame_index, [])
+                t.track_id: t.masks[frame.frame_index].full()
+                for t in by_frame.get(frame.frame_index, [])
             }
             _draw_masks(overlay, present, colors)
             y = 24
@@ -484,7 +486,9 @@ class SegmentationStage:
             work / "tracking_work",
         )
         all_tracks = list(raw)
-        tag_detect = cached_tag_detector(marker_cfg.family)
+        tag_detect = cached_tag_detector(
+            marker_cfg.family, handed_tag_detector(ctx.run_dir, marker_cfg.family)
+        )
         raw, marker_report = filter_marker_tracks(raw, world, ctx.run_dir, marker_cfg, tag_detect)
         for track_id, reason in marker_report.dropped.items():
             scene_flags.append(f"track {track_id} dropped as a marker: {reason}")

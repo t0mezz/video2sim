@@ -40,7 +40,7 @@ def views(run_dir: Path) -> list[ShapeView]:
     for obj in instances.objects:
         masks = load_masks(run_dir, obj)
         frame = next(k for k in obj.keyframes if k in masks and k in images)
-        found.append(ShapeView(frame, images[frame], masks[frame]))
+        found.append(ShapeView(frame, images[frame], masks[frame].full()))
     return found
 
 

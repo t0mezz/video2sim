@@ -11,7 +11,10 @@ bottom-left, so ``detect_tags`` reverses it.
 
 from __future__ import annotations
 
+import json
+from collections.abc import Mapping
 from dataclasses import dataclass
+from pathlib import Path
 
 import numpy as np
 from numpy.typing import NDArray
@@ -161,3 +164,61 @@ def _robust_corner(
             point, err = _dlt(obs[:drop] + obs[drop + 1 :])
         del obs[drop]
     return point, err, [k for _, _, _, k in obs]
+
+
+# Detections of one frame: tag id -> (4, 2) pixel corners, and the frame's (rows, cols).
+FrameTags = tuple[dict[int, F64], tuple[int, int]]
+
+# Written by the reconstruction stage into its output folder, read by segmentation (D-039).
+TAG_FILE = "tags.json"
+
+
+def detect_file(path: Path, family: str) -> FrameTags:
+    """Tags of the frame file at ``path``, read as grey by OpenCV, and its size.
+
+    Every stage after capture detects on this grey, so a detection handed from one stage to
+    the next is the one that stage would make itself. Capture detects on the grey of the
+    decoded video frame, which differs by one level in many pixels (D-039).
+    """
+    import cv2
+
+    gray = cv2.imread(str(path), cv2.IMREAD_GRAYSCALE)
+    if gray is None:
+        raise FileNotFoundError(path)
+    image = np.asarray(gray, dtype=np.uint8)
+    return detect_tags(image, family), (int(image.shape[0]), int(image.shape[1]))
+
+
+def write_tag_file(path: Path, family: str, frames: Mapping[str, FrameTags]) -> None:
+    """``frames`` (keyed by run-relative image path) as JSON. Floats keep every bit."""
+    payload = {
+        "family": family,
+        "frames": {
+            name: {
+                "shape": list(shape),
+                "tags": {str(i): c.tolist() for i, c in corners.items()},
+            }
+            for name, (corners, shape) in frames.items()
+        },
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, sort_keys=False) + "\n", encoding="utf-8")
+
+
+def read_tag_file(path: Path, family: str) -> dict[str, FrameTags] | None:
+    """The detections in ``path`` by run-relative image path; None when the file is missing,
+    unreadable or for another tag family."""
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    if not isinstance(payload, dict) or payload.get("family") != family:
+        return None
+    out: dict[str, FrameTags] = {}
+    for name, entry in payload.get("frames", {}).items():
+        rows, cols = (int(v) for v in entry["shape"])
+        corners: dict[int, F64] = {
+            int(i): np.asarray(c, dtype=np.float64).reshape(4, 2) for i, c in entry["tags"].items()
+        }
+        out[str(name)] = (corners, (rows, cols))
+    return out

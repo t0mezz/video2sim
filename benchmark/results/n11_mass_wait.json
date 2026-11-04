@@ -1,0 +1,420 @@
+{
+ "item": "TODO.md N11",
+ "date": "2026-11-04",
+ "code": "perf-exact-speedups at f1e96d8 (64a86e5 overlaps mass requests with physics CPU work)",
+ "machine": "Apple M4, 10 cores",
+ "method": "Physics stage of each finished run, twice. fresh: empty physics.work, so every mass request is a real hosted call (vlm role mass, Baseten) and CoACD runs with no decomposition cache. answers_cached: the same folder with the fresh run's mass answers kept and the decomposition cache removed, which is what a prefetch during shape would leave. saved_s = fresh - answers_cached is the most a prefetch can save. waits_s is how long each object blocked on its answer after its own repair, collision and geometry mass. One run per arm; hosted latency and CoACD time vary between runs.",
+ "results": [
+  {
+   "run": "20261103T200206Z_5ce4cde1",
+   "scene": "test_scene.MOV (not a benchmark scene)",
+   "objects": 4,
+   "physics_fresh_s": 14.47,
+   "physics_answers_cached_s": 6.64,
+   "saved_s": 7.83,
+   "mass_request_s": [
+    6.54,
+    9.31,
+    10.03,
+    10.66
+   ],
+   "mass_requests_span_s": 10.66,
+   "waits_s": [
+    0.0,
+    0.0,
+    7.27,
+    8.09
+   ],
+   "fresh_events": [
+    {
+     "kind": "request",
+     "object": "obj_003",
+     "start": 0.01,
+     "end": 6.55
+    },
+    {
+     "kind": "request",
+     "object": "obj_001",
+     "start": 0.01,
+     "end": 9.32
+    },
+    {
+     "kind": "request",
+     "object": "obj_002",
+     "start": 0.01,
+     "end": 10.04
+    },
+    {
+     "kind": "request",
+     "object": "obj_000",
+     "start": 0.01,
+     "end": 10.67
+    },
+    {
+     "kind": "wait",
+     "object": "obj_001",
+     "start": 2.05,
+     "end": 9.32
+    },
+    {
+     "kind": "wait",
+     "object": "obj_000",
+     "start": 2.58,
+     "end": 10.67
+    },
+    {
+     "kind": "wait",
+     "object": "obj_002",
+     "start": 11.88,
+     "end": 11.88
+    },
+    {
+     "kind": "wait",
+     "object": "obj_003",
+     "start": 13.73,
+     "end": 13.73
+    }
+   ]
+  },
+  {
+   "run": "20261103T120951Z_7beade70",
+   "scene": "s24 video_b (dev, hard)",
+   "objects": 1,
+   "physics_fresh_s": 10.88,
+   "physics_answers_cached_s": 2.31,
+   "saved_s": 8.57,
+   "mass_request_s": [
+    10.59
+   ],
+   "mass_requests_span_s": 10.59,
+   "waits_s": [
+    8.54
+   ],
+   "fresh_events": [
+    {
+     "kind": "request",
+     "object": "obj_000",
+     "start": 0.01,
+     "end": 10.6
+    },
+    {
+     "kind": "wait",
+     "object": "obj_000",
+     "start": 2.06,
+     "end": 10.6
+    }
+   ]
+  },
+  {
+   "run": "20261103T114644Z_e654a200",
+   "scene": "s13 video_b (dev, medium)",
+   "objects": 3,
+   "physics_fresh_s": 27.57,
+   "physics_answers_cached_s": 3.64,
+   "saved_s": 23.93,
+   "mass_request_s": [
+    18.19,
+    23.19,
+    26.96
+   ],
+   "mass_requests_span_s": 26.96,
+   "waits_s": [
+    6.84,
+    17.29,
+    21.2
+   ],
+   "fresh_events": [
+    {
+     "kind": "request",
+     "object": "obj_000",
+     "start": 0.01,
+     "end": 18.2
+    },
+    {
+     "kind": "request",
+     "object": "obj_001",
+     "start": 0.01,
+     "end": 23.2
+    },
+    {
+     "kind": "request",
+     "object": "obj_002",
+     "start": 0.01,
+     "end": 26.97
+    },
+    {
+     "kind": "wait",
+     "object": "obj_000",
+     "start": 0.91,
+     "end": 18.2
+    },
+    {
+     "kind": "wait",
+     "object": "obj_001",
+     "start": 2.0,
+     "end": 23.2
+    },
+    {
+     "kind": "wait",
+     "object": "obj_002",
+     "start": 20.13,
+     "end": 26.97
+    }
+   ]
+  },
+  {
+   "run": "20261103T115556Z_73bfed16",
+   "scene": "s18 video_b (dev, hard)",
+   "objects": 8,
+   "physics_fresh_s": 62.15,
+   "physics_answers_cached_s": 51.21,
+   "saved_s": 10.94,
+   "mass_request_s": [
+    10.42,
+    10.71,
+    11.7,
+    12.3,
+    12.89,
+    13.45,
+    13.45,
+    17.51
+   ],
+   "mass_requests_span_s": 24.0,
+   "waits_s": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    4.3,
+    6.41,
+    12.71
+   ],
+   "fresh_events": [
+    {
+     "kind": "request",
+     "object": "obj_004",
+     "start": 0.01,
+     "end": 10.72
+    },
+    {
+     "kind": "request",
+     "object": "obj_001",
+     "start": 0.01,
+     "end": 12.31
+    },
+    {
+     "kind": "request",
+     "object": "obj_005",
+     "start": 0.01,
+     "end": 12.9
+    },
+    {
+     "kind": "request",
+     "object": "obj_000",
+     "start": 0.01,
+     "end": 13.46
+    },
+    {
+     "kind": "request",
+     "object": "obj_003",
+     "start": 0.01,
+     "end": 13.46
+    },
+    {
+     "kind": "request",
+     "object": "obj_002",
+     "start": 0.01,
+     "end": 17.52
+    },
+    {
+     "kind": "wait",
+     "object": "obj_000",
+     "start": 0.75,
+     "end": 13.46
+    },
+    {
+     "kind": "wait",
+     "object": "obj_001",
+     "start": 5.9,
+     "end": 12.31
+    },
+    {
+     "kind": "request",
+     "object": "obj_006",
+     "start": 10.72,
+     "end": 21.14
+    },
+    {
+     "kind": "request",
+     "object": "obj_007",
+     "start": 12.31,
+     "end": 24.01
+    },
+    {
+     "kind": "wait",
+     "object": "obj_002",
+     "start": 13.22,
+     "end": 17.52
+    },
+    {
+     "kind": "wait",
+     "object": "obj_004",
+     "start": 19.95,
+     "end": 19.95
+    },
+    {
+     "kind": "wait",
+     "object": "obj_005",
+     "start": 21.14,
+     "end": 21.14
+    },
+    {
+     "kind": "wait",
+     "object": "obj_006",
+     "start": 24.02,
+     "end": 24.02
+    },
+    {
+     "kind": "wait",
+     "object": "obj_007",
+     "start": 36.08,
+     "end": 36.08
+    },
+    {
+     "kind": "wait",
+     "object": "obj_003",
+     "start": 60.45,
+     "end": 60.45
+    }
+   ]
+  },
+  {
+   "run": "20261103T162930Z_95e58ffe",
+   "scene": "s11 video_b (dev, medium)",
+   "objects": 8,
+   "physics_fresh_s": 92.95,
+   "physics_answers_cached_s": 93.34,
+   "saved_s": -0.39,
+   "mass_request_s": [
+    9.53,
+    12.23,
+    15.59,
+    16.61,
+    16.96,
+    17.53,
+    17.64,
+    26.47
+   ],
+   "mass_requests_span_s": 33.23,
+   "waits_s": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    3.94,
+    13.14
+   ],
+   "fresh_events": [
+    {
+     "kind": "request",
+     "object": "obj_003",
+     "start": 0.01,
+     "end": 12.24
+    },
+    {
+     "kind": "request",
+     "object": "obj_005",
+     "start": 0.01,
+     "end": 15.6
+    },
+    {
+     "kind": "request",
+     "object": "obj_002",
+     "start": 0.01,
+     "end": 16.62
+    },
+    {
+     "kind": "request",
+     "object": "obj_004",
+     "start": 0.01,
+     "end": 16.97
+    },
+    {
+     "kind": "request",
+     "object": "obj_000",
+     "start": 0.01,
+     "end": 17.54
+    },
+    {
+     "kind": "request",
+     "object": "obj_001",
+     "start": 0.01,
+     "end": 26.48
+    },
+    {
+     "kind": "wait",
+     "object": "obj_000",
+     "start": 4.4,
+     "end": 17.54
+    },
+    {
+     "kind": "request",
+     "object": "obj_006",
+     "start": 12.24,
+     "end": 21.77
+    },
+    {
+     "kind": "request",
+     "object": "obj_2002",
+     "start": 15.6,
+     "end": 33.24
+    },
+    {
+     "kind": "wait",
+     "object": "obj_002",
+     "start": 18.81,
+     "end": 18.81
+    },
+    {
+     "kind": "wait",
+     "object": "obj_003",
+     "start": 21.19,
+     "end": 21.19
+    },
+    {
+     "kind": "wait",
+     "object": "obj_004",
+     "start": 23.2,
+     "end": 23.2
+    },
+    {
+     "kind": "wait",
+     "object": "obj_005",
+     "start": 25.26,
+     "end": 25.26
+    },
+    {
+     "kind": "wait",
+     "object": "obj_006",
+     "start": 28.41,
+     "end": 28.41
+    },
+    {
+     "kind": "wait",
+     "object": "obj_2002",
+     "start": 29.3,
+     "end": 33.24
+    },
+    {
+     "kind": "wait",
+     "object": "obj_001",
+     "start": 90.93,
+     "end": 90.93
+    }
+   ]
+  }
+ ]
+}

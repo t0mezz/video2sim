@@ -21,8 +21,8 @@ import numpy as np
 from numpy.typing import NDArray
 
 from video2sim.schemas import WorldModel
-from video2sim.stages.marker_detection import detect_tags
-from video2sim.stages.segmentation import BoolMask
+from video2sim.stages.marker_detection import TAG_FILE, detect_file, read_tag_file
+from video2sim.stages.segmentation import BoolMask, MaskLike, as_crop
 from video2sim.stages.tracking import Track
 
 F64 = NDArray[np.float64]
@@ -100,13 +100,16 @@ def tag_mask(corners: Sequence[F64], shape: tuple[int, int], erode_px: int) -> B
     return np.asarray(canvas, dtype=bool)
 
 
-def overlaps_tag(mask: BoolMask, tags: BoolMask, cfg: MarkerFilterConfig) -> bool:
+def overlaps_tag(mask: MaskLike, tags: BoolMask, cfg: MarkerFilterConfig) -> bool:
     """True when the mask covers enough of its own area, or of the tags' area, in the tags."""
-    overlap = int(np.count_nonzero(mask & tags))
+    crop = as_crop(mask)
+    h, w = crop.data.shape
+    under = tags[crop.top : crop.top + h, crop.left : crop.left + w]
+    overlap = int(np.count_nonzero(crop.data & under))
     if overlap == 0:
         return False
     return bool(
-        overlap >= cfg.min_mask_share * np.count_nonzero(mask)
+        overlap >= cfg.min_mask_share * crop.area
         or overlap >= cfg.min_tag_share * np.count_nonzero(tags)
     )
 
@@ -137,11 +140,15 @@ def filter_marker_tracks(
         corners, (height, width) = detect(path)
         if not corners:
             continue
+        by_shape: dict[tuple[int, int], BoolMask] = {}  # the tag mask is the same for every track
         for track in users:
             mask = track.masks[frame.frame_index]
-            sy, sx = mask.shape[0] / height, mask.shape[1] / width
-            quads = [c * np.array([sx, sy]) for c in corners.values()]
-            tags = tag_mask(quads, (mask.shape[0], mask.shape[1]), cfg.erode_px)
+            shape = (int(mask.shape[0]), int(mask.shape[1]))
+            if shape not in by_shape:
+                sy, sx = shape[0] / height, shape[1] / width
+                quads = [c * np.array([sx, sy]) for c in corners.values()]
+                by_shape[shape] = tag_mask(quads, shape, cfg.erode_px)
+            tags = by_shape[shape]
             detected[track.track_id] += 1
             hits[track.track_id] += int(overlaps_tag(mask, tags, cfg))
 
@@ -159,9 +166,21 @@ def filter_marker_tracks(
 
 
 def _detect_file(path: Path, family: str) -> Detections:
-    import cv2
+    return detect_file(path, family)
 
-    gray: Any = cv2.imread(str(path), cv2.IMREAD_GRAYSCALE)
-    if gray is None:
-        raise FileNotFoundError(path)
-    return detect_tags(gray, family), (int(gray.shape[0]), int(gray.shape[1]))
+
+def handed_tag_detector(run_dir: Path, family: str) -> TagDetector | None:
+    """A detector that answers from the reconstruction stage's ``tags.json`` (D-039), or None
+    when that file is missing or for another family. A frame the file does not list is
+    detected from its image, as without the file."""
+    table = read_tag_file(run_dir / "reconstruction" / TAG_FILE, family)
+    if table is None:
+        return None
+
+    def detect(path: Path) -> Detections:
+        # Callers pass ``run_dir / frame.image_path``; the key is that image path.
+        key = path.relative_to(run_dir).as_posix() if path.is_relative_to(run_dir) else ""
+        found = table.get(key)
+        return found if found is not None else _detect_file(path, family)
+
+    return detect

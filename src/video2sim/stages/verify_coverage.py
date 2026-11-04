@@ -186,9 +186,10 @@ def make_overlays(
             raise ValueError(f"cannot read {frame.image_path}")
         overlay = image.copy()
         for track in sorted(kept, key=lambda t: t.track_id):
-            mask = track.masks.get(frame.frame_index)
-            if mask is None or not mask.any():
+            crop = track.masks.get(frame.frame_index)
+            if crop is None or not crop.any():
                 continue
+            mask = crop.full()
             if mask.shape != overlay.shape[:2]:
                 mask = cv2.resize(
                     mask.astype("uint8"),
