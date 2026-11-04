@@ -372,4 +372,4 @@ def test_no_warm_up_starts_no_thread() -> None:
 
 def test_config_reads_warm_containers() -> None:
     cfg = yaml.safe_load(CONFIG.read_text())
-    assert Sam3dConfig.from_config(cfg).warm_containers == 2
+    assert Sam3dConfig.from_config(cfg).warm_containers == 4

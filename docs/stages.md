@@ -7,7 +7,7 @@ How each stage works, with the numbers that justify the design. Settings live in
 ## 1. Capture (`stages/capture.py`)
 
 Decides whether the video is usable and picks the frames. The gate runs before reconstruction and
-reports every failed check at once, one message each: blur (sharpest frame of each 1/5 s window),
+reports every failed check at once, one message each: blur (sharpest frame of each 1/3 s window, `capture.target_fps: 3`, D-035),
 exposure, marker visibility, frame count. How to film: [capture_protocol.md](capture_protocol.md).
 
 * 5 of 5 deliberately degraded copies of s01 `video_a` are rejected with the matching message, and
@@ -101,8 +101,9 @@ Design notes: [research/occlusion_robust_discovery_plan.md](research/occlusion_r
 
 Gives each object a closed mesh in the metric world frame.
 
-* **Model.** SAM 3D Objects only (D-018), served by a Modal worker on A100-40GB with at most 2
-  containers, 2 of them warmed when segmentation starts (D-032). In the probes a call took 110 s cold
+* **Model.** SAM 3D Objects only (D-018), served by a Modal worker on A100-40GB with at most 4
+  containers, all 4 warmed when segmentation starts (D-034, raising D-032's 2; the shape wall time is
+  about draws x 13 to 14 s / containers, and 4 containers are not yet measured). In the probes a call took 110 s cold
   and 16 to 18 s warm on 80 GB, and 92 s and 13 to 14 s on the 40 GB card in use
   ([research/sam3d_cold_start.md](research/sam3d_cold_start.md)). Contract and conventions: [model_interfaces.md](model_interfaces.md),
   [research/sam3d.md](research/sam3d.md).

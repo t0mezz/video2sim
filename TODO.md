@@ -12,6 +12,119 @@ target changes, test split runs). The backlog items keep the numbers they had in
 the old `PLAN.md`, because decisions, docs and code comments cite "section 12 item N"; it is item N
 here.
 
+## Next
+
+From the pipeline audit of 2026-11-04 on branch `perf-exact-speedups`. Done there, with
+byte-identical outputs: parallel SAM mask decoding and the other exact speedups (64a86e5), the
+chunked voxel vote (48c1e93, peak RSS 5.08 to 2.41 GB on the 155-frame replay), 4 SAM 3D
+containers (D-034) and 3 fps sampling (D-035). Figures are replays of cached runs on an Apple M4
+with no hosted calls. Of the local dev runs, s11_b and s18_b still replay segmentation from cache;
+s13_b and s24_b no longer do (their router answers miss with current code), so a replay of them
+makes hosted calls. Items are `N1` to `N20`; use the id in branch names (`n4-crop-masks`).
+
+**Follow up D-034 and D-035**
+
+- [ ] **N1 [human] Deploy the 4-container SAM 3D worker.** D-034 takes effect only after
+  `uv run modal deploy src/video2sim/models/sam3d_modal.py`; until then the warm-up sends 4 calls to
+  2 containers.
+- [ ] **N2 [agent, hosted] Measure D-034.** `benchmark/profile_stages.py RUN_ID --arm pipelined
+  --warm 4` against `--warm 2` on a dev run: shape wall time, containers Modal starts, GPU seconds.
+  Record the result in `docs/research/sam3d_cold_start.md` and in the D-034 row.
+- [ ] **N3 [agent, hosted] Evaluate D-035 on dev.** The capture gate (`benchmark/eval_capture_gate.py`;
+  windows are now 1/3 s), the reconstruction gates (`benchmark/eval_world_frame.py`), then full runs
+  of the rigid dev scenes scored with `video2sim eval` and `--stage segmentation`: recall, identity
+  switches, size, mass, settling, wall time and SAM 3.1 frames billed, against the 5 fps runs.
+
+**Memory, output-identical** (plan step 1a is 48c1e93)
+
+- [ ] **N4 [agent] Keep track masks as crops.** A full-frame mask is 2 MB at 1080p; masks hold 1.6
+  GB of the 2.41 GB segmentation peak on the 155-frame run (`tracemalloc`). Design: a `CropMask`
+  (offset, tight-box array, frame shape; `area`, `bounds`, `window`, `at`, `downscaled`, `full`) in
+  `stages/segmentation.py`; `Track` converts full masks when built; SAM decoding builds crops from
+  the box rasters, so no full frame is made. Consumers by operation: point lookups (`lift.point_vote`,
+  `depth_flags`), downscaling (lift vote /2, primitive fit and hull overlap /4; a block-aligned
+  window resizes exactly like the full frame when the frame divides by the factor, else full-frame
+  fallback), windows (keyframes, cluster check, marker filter), pairwise overlap (track repair, gap
+  fill), box and area (footprints, material crops), full frame on demand (PNG writing, overlays,
+  preview video). Typing `Track.masks` as `Mapping[int, CropMask]` lets mypy find every array use.
+  Unchanged: `schemas.py`, the PNG masks, `Instances`, hosted cache keys. Expected 1.6 GB to about
+  0.05 to 0.2 GB (boxes are 3 to 12% of the frame). Check: old/new replay diffs, peak RSS, and three
+  segmentation replays at once for the "three full videos crashed the Mac" gap below (COLMAP's own
+  memory is not covered).
+- [ ] **N5 [agent] Shape and physics load masks as crops.** Shape's `load_masks` holds every object's
+  masks full-frame (about 1.5 GB on the 155-frame run); expand only the 12 registration views and
+  the SAM 3D keyframes, so mask PNG bytes and SAM 3D cache keys stay the same. Physics' `model_mass`
+  loads every mask of an object to crop two frames, six objects at once.
+
+**Speed, output-identical**
+
+- [ ] **N6 [agent] Plane distances as one matrix product.** `collision._plane_distance` builds a
+  (20000 x faces x 3) temporary per part and took 2.5 s against CoACD's 1.9 s on a 4-object run;
+  `points @ normals.T - offsets` is 13x faster. It differs by about 4e-17, so it is not bitwise:
+  confirm the checks and chosen rungs are unchanged on every local mesh.
+- [ ] **N7 [agent] Cache decoded masks per SAM answer**, for example packed box rasters beside the
+  answer in `segmentation.work/`, so replays skip decoding (the 241-frame answer of run
+  20261103T090231Z takes 212 s on one core, 46 s on 8 processes).
+- [ ] **N8 [human] Detect tags once.** Capture, reconstruction (`tag_views`) and the marker filter
+  each decode every frame and run ArUco (about 5 s in segmentation alone on the 155-frame run).
+  Handing the detections from one stage to the next is a contract question.
+- [ ] **N9 [agent] Primitive fit: project the outline into all views at once.** Per-view NumPy
+  overhead is now most of the mask cost, since the silhouette is drawn only inside its box.
+
+**Speed, changes results** (dev evaluation first; ship off by default)
+
+- [ ] **N10 [agent] Stop SAM 3D draws early when the first ones agree.** `shape_scene` queues every
+  draw at once (`draws.map`); it needs rounds: `min_draws` per object, a verdict from those draws in
+  draw order (not finish order), the remaining draws only where they disagree. Agreement: registered
+  size within a tolerance per axis and every fit score at or above `min_fit_score`, optionally
+  against the segmentation primitive. `shape.early_stop: {enabled, min_draws, size_tolerance}`, off
+  by default with the off path pinned by a test; skipped draws and the reason in
+  `shape/report.json`. Evaluate by replaying cached dev draws (`benchmark/run_sample_counts.py`
+  style): size error and proxy rate against draws saved (two draws everywhere cost 0.7 points,
+  D-030). Needs a decision row amending D-033.
+- [ ] **N11 [human] Mass prefetch during shape: deferred.** Since 64a86e5 the mass requests overlap
+  physics' CPU work (s02: 9.8 s of requests against about 67 s of CPU), so a prefetch saves at most
+  the requests' wall time on scenes with little CoACD work. Measure first how long physics waits on
+  answers. Design if wanted: `prefetch_model_masses` in `physics_stage.py` with the same crops and
+  cache keys; `ShapeStage(on_start=...)` receives the context, like the D-032 warm-up;
+  `pipeline.py` starts it in a thread when `vlm_mass.enabled`, and `PhysicsStage` waits for it
+  before its own requests, so nothing is sent twice. Alternative: ask for the mass in the material
+  pass request (same two crops, same model), which removes the requests but changes the answers;
+  re-measure D-024 on dev and add a decision row.
+- [ ] **N12 [agent] Coarse-to-fine voxel lift.** The grid spans the whole tracked area (1.7 x 1.4 m
+  on the 155-frame run) while objects fill a fraction of it; vote a coarse grid, then refine only
+  candidate cells. Exact only if the coarse test is conservative; otherwise score the cluster boxes.
+
+**Quality experiments** (dev only; tune nothing on test)
+
+- [ ] **N13 [agent] Occlusion-aware point vote.** `lift.point_vote`'s docstring says it uses the voxel
+  vote's view rules, but it excuses no view where another object hides the point. Partly hidden
+  objects then fall back to the hull, about 35% too large; the final benchmark's occluded size misses
+  (s15 obj_038 33%, obj_040 30%, s16 obj_004 27%, test split) look like this. Score the change on dev
+  with `video2sim eval --stage segmentation` and on shape.
+- [ ] **N14 [agent] Choose the draw better.** The fit score picks the best draw for 17 of 42 objects;
+  perfect selection gains at most 1.4 points. Try the draw that agrees best with the segmentation
+  primitive (4.3% box error on the easy tier) or the median draw by registered size, replaying
+  cached draws.
+- [ ] **N15 [agent] Proportions.** Stretch more than one draw (`shape.stretch_samples`), sweep
+  `shape.registration.stretch_sigma`, and add a prior from the primitive's size when its mask cost is
+  low.
+- [ ] **N16 [agent] Primitive search.** Spend the faster mask cost on restarts or an adaptive step in
+  `primitive_fit.py`; score the easy-tier box error.
+- [ ] **N17 [agent] Filter SfM points before lifting**: drop points by track length and below the
+  table (also the "stray points below the table" gap), and compare with `trim_points_per_side`.
+
+**Smaller findings**
+
+- [ ] **N18 [agent] A mesh whose decimation is rejected stays at full size.** Run 20261103T200206Z
+  obj_002 kept 604k faces through physics into export. Decimate harder or flag it.
+- [ ] **N19 [human] `depth_flags` reads `reconstruction.work/sparse`** from the segmentation stage,
+  outside `WorldModel`. Add per-point error and track length to the reconstruction output (a schema
+  change) or accept the exception.
+- [ ] **N20 [human] Image size for SfM.** `reconstruction.sfm.max_image_size: -1` keeps pycolmap's
+  default, an effective 3200 px in pycolmap 4.2.1, so 1080p frames are used whole, while D-016 and
+  `docs/stages.md` say up to 1280 px. Check which the evidence used and align the config or the docs.
+
 ## Open exit criteria
 
 The Phase 5 gate stays Open (confirmed 2026-11-03).

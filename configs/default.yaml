@@ -4,7 +4,7 @@
 seed: 0
 
 capture:
-  target_fps: 5                # frame sampling rate: one frame, the sharpest, per 1/target_fps window
+  target_fps: 3                # frame sampling rate: one frame, the sharpest, per 1/target_fps window; 3 is the rate of the reconstruction evidence (D-016, D-035)
   quality:                     # P1.4 capture gate. All guesses tuned on dev videos; see docs/stages.md
     blur_relative_floor: 0.3        # a frame is blurred below this fraction of the video's sharp level
     blur_reference_percentile: 90   # the sharp level: this percentile of per-window sharpness
@@ -272,7 +272,7 @@ shape:
     # Off until the P3.3 A/B: the paper reports shape barely depends on it, and P3.2 sets
     # pose and scale from the metric cloud (docs/research/sam3d.md, section 5)
     use_pointmap: false
-    warm_containers: 2         # started when segmentation starts; 0 is off (D-032)
+    warm_containers: 4         # started when segmentation starts; 0 is off (D-032, D-034: one per container)
     warm_hold_s: 30            # each stays busy this long, or both calls land on one container
   parallel_samples: 6          # hosted draws in flight at once; the result does not depend on it
   parallel_registrations: 3    # meshes registered at once; the result does not depend on it
