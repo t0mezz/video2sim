@@ -353,12 +353,14 @@ def _early(min_fit_score: float = 0.5, **early: object) -> dict[str, Any]:
     return _shape_config(keyframes_per_object=3, early_stop=stop, min_fit_score=min_fit_score)
 
 
-def test_early_stop_is_off_by_default_and_leaves_the_report_alone(tmp_path: Path) -> None:
-    cfg = ShapeStageConfig.from_config({"shape": _shape_config()})
+def test_early_stop_off_draws_everything_and_leaves_the_report_alone(tmp_path: Path) -> None:
+    """Pinned off here, so the test does not follow the shipped default in the config."""
+    off = {"enabled": False, "min_draws": 2, "size_tolerance": 0.1}
+    cfg = ShapeStageConfig.from_config({"shape": _shape_config(early_stop=off)})
     assert cfg.early_stop.enabled is False
     run, cameras = _make_run(tmp_path)
     model = FakeModel(cameras, MODEL, 0.0)
-    _run_stage(run, model, _shape_config(keyframes_per_object=3))
+    _run_stage(run, model, _shape_config(keyframes_per_object=3, early_stop=off))
     assert [f for f, _ in model.calls] == [2, 3, 0]  # every draw
     assert "early_stop" not in (run / "shape" / "report.json").read_text()
 
