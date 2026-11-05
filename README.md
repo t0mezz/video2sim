@@ -51,7 +51,7 @@ uv run video2sim replay s01 --out scene/      # same progress and package as `vi
 ```
 view a finished run:
 - RUN/qa_report.html
-- `uv run python scripts/view_orbit.py RUN`
+- `uv run python scripts/view_orbit.py RUN` does not work on replay runs
 
 Details and the limits of a replay: [docs/judge_snapshot.md](docs/judge_snapshot.md).
 
