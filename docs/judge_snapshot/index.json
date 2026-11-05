@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "scenes": {
+    "s01": {
+      "video_sha256": "43ac9263378f5ac608748865ba4bf5bbab9543e09cba4f613c86f6d6d6742aa1",
+      "archive": "s01.zip",
+      "archive_sha256": "ebff8f2df588f2354e910186bba34c32b46faf305090ce69a1323e5f96ea56aa",
+      "export_sha256": "6c4860f311dcd4e8733e456cbfe7bb243c1088f9b588c220fa3905a50fb87ae5",
+      "url": "https://github.com/t0mezz/video2sim/releases/download/judge-snapshot-v1/s01.zip",
+      "note": ""
+    },
+    "s02": {
+      "video_sha256": "a386d2d74fda6ec7dfabc87526b4d5773c56f5c4e06cb9689bcb0e9c8d9ab14a",
+      "archive": "s02.zip",
+      "archive_sha256": "f835445cbdce298f441522040e67ea0e4768f106fdbcc238df3b716c07086962",
+      "export_sha256": "3e62638c93e9db278254e939d67497c08dc0b5efa400037ed0920ec895ebf607",
+      "url": "https://github.com/t0mezz/video2sim/releases/download/judge-snapshot-v1/s02.zip",
+      "note": ""
+    },
+    "s03": {
+      "video_sha256": "58f61087c8262659f2a90ae7c5d818e845402423972384172564e3d5a087ee95",
+      "archive": "s03.zip",
+      "archive_sha256": "01403fdd2539268176e610293f5dd91d5e92bc524351d8c39ccdf2c75cca230c",
+      "export_sha256": "27830c7fd67f92a0961df3f0dd6ad9c6c4e8b338d88be5f9e5a61bb0dadff0cb",
+      "url": "https://github.com/t0mezz/video2sim/releases/download/judge-snapshot-v1/s03.zip",
+      "note": ""
+    },
+    "s04": {
+      "video_sha256": "71248cfe66802fa4ecdee1b6ca05e23c7a2292d0b166d6bd77cea480e45d9532",
+      "archive": "s04.zip",
+      "archive_sha256": "02661fe0fca649e7cbecb3f8949fc25b3fce526bdf2407d5a2d2eec849f22bd9",
+      "export_sha256": "0235e25f558f9ab5ea5c4ed4c001762a660d6c31453b0c88095bb5a858eeaebf",
+      "url": "https://github.com/t0mezz/video2sim/releases/download/judge-snapshot-v1/s04.zip",
+      "note": ""
+    },
+    "s05": {
+      "video_sha256": "faf46bdc902a9cf53dd48f8f5b3601042aa16dcadd70b71ebb9a8f05d58a45e3",
+      "archive": "s05.zip",
+      "archive_sha256": "9624ac1d9c5b2f972c356d14fa7c3710fe1a09ccfb6a84ccfa1120097314c6ff",
+      "export_sha256": "9ba149708353c3cc0382315e7600d07b4f004156919faaa99b72b8ca86e0db5a",
+      "url": "https://github.com/t0mezz/video2sim/releases/download/judge-snapshot-v1/s05.zip",
+      "note": ""
+    },
+    "s11": {
+      "video_sha256": "1a5ca71ded1fd967b65fd7185e1c7b0e5a2432761320d4ff163e965fa7d9f3a9",
+      "archive": "s11.zip",
+      "archive_sha256": "0d8f6a1df80d796412aee6853426f3967f8385dbb64a6b720224443b1463ce29",
+      "export_sha256": "7b576ed89795c7ae0efe478d120315444722af3f54d254e42387176f45aaf1f5",
+      "url": "https://github.com/t0mezz/video2sim/releases/download/judge-snapshot-v1/s11.zip",
+      "note": ""
+    },
+    "s12": {
+      "video_sha256": "444c1fa8f2aa79c8a569d621af9b0727ba20e7ede06fcae5be4594feaf131a58",
+      "archive": "s12.zip",
+      "archive_sha256": "d38a6a8e13c880e3a370e84ae879d2fa88a0e0b93ef3c1e1c0c5c0efc556a00a",
+      "export_sha256": "ea1117b5a9cd3ce28109ee193cb7e3df7eb0cb2a00a7c9b7e158f65cf735c693",
+      "url": "https://github.com/t0mezz/video2sim/releases/download/judge-snapshot-v1/s12.zip",
+      "note": ""
+    },
+    "s13": {
+      "video_sha256": "88ee14a7c67a73f377446b56f7de18cd5f903ccf2222bf215f6e4f202706ad4e",
+      "archive": "s13.zip",
+      "archive_sha256": "aff8f1327f51f2bcef746228eebea46ef8b762b9fd8bf02cff347619a2fbe220",
+      "export_sha256": "6089839d2f80e3cce4006a0c209666d221ecb2fb6aaba8e461ced07a574168e8",
+      "url": "https://github.com/t0mezz/video2sim/releases/download/judge-snapshot-v1/s13.zip",
+      "note": ""
+    },
+    "s17": {
+      "video_sha256": "807e63bf1d264ada57a2cb0b19152cc4b1694af4ed30c4e8f5395c997991a202",
+      "archive": "s17.zip",
+      "archive_sha256": "521c6136144760f5380feba2661f376d84e55947aef8136c9945043c5ade88d7",
+      "export_sha256": "5b4145b3331a60667a19b5ac91d6db5fdc1418c934792f59e2f1d76eef84ae03",
+      "url": "https://github.com/t0mezz/video2sim/releases/download/judge-snapshot-v1/s17.zip",
+      "note": ""
+    },
+    "s18": {
+      "video_sha256": "9ad39ce851028e3fd75fe8222d316d0b972a842b47c6384ba0df4b3ac761d45b",
+      "archive": "s18.zip",
+      "archive_sha256": "6dcd5e3d3b16e5d1c6a682ad3c6bb684e227296860e418de2dd45e32a7605b8a",
+      "export_sha256": "0e0c571084df4f210c84932ea3fda5143814083564b525d8b9e37618032e12b0",
+      "url": "https://github.com/t0mezz/video2sim/releases/download/judge-snapshot-v1/s18.zip",
+      "note": ""
+    },
+    "s21": {
+      "video_sha256": "c5db1aefd7546f5d8796521a992911499cd9250ed90e69c923c353eed38eee53",
+      "archive": "s21.zip",
+      "archive_sha256": "605deee539bd78f1879dd4b121065a335342681df4b89ebd49d96409c312fe05",
+      "export_sha256": "617785c9093719e335884e24d712a2a65f85ddfb64c14a2c6f294ebb4afdd9f8",
+      "url": "https://github.com/t0mezz/video2sim/releases/download/judge-snapshot-v1/s21.zip",
+      "note": ""
+    },
+    "s22": {
+      "video_sha256": "c7adbc4884cf38f64dbf2bd5daf7563fa3d439a69b879076033342e4c3e36601",
+      "archive": "s22.zip",
+      "archive_sha256": "5d9a88917a6d267b1f7725ba7e74f485f7ad5aa0a4378dbcc3008ccddf4da1ef",
+      "export_sha256": "a636afc3a99802a845b285b7c66bfc32675775b5bf269b7efec7cc3f986d829a",
+      "url": "https://github.com/t0mezz/video2sim/releases/download/judge-snapshot-v1/s22.zip",
+      "note": ""
+    }
+  }
+}

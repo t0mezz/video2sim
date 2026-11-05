@@ -1,0 +1,52 @@
+name: Judge snapshot
+
+# Downloads the real release assets and replays every scene, so a broken lock file, a missing
+# upload or a replay change shows up here. Needs the network (the release), no key or model.
+on:
+  push:
+    paths:
+      - "src/**"
+      - "docs/judge_snapshot/**"
+      - ".github/workflows/judge-snapshot.yml"
+  pull_request:
+    paths:
+      - "src/**"
+      - "docs/judge_snapshot/**"
+      - ".github/workflows/judge-snapshot.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: judge-snapshot-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  replay:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --locked --python 3.12
+      - name: Replay every scene from the release
+        run: |
+          scenes=$(uv run video2sim replay | tr -d '\r' | cut -d' ' -f1)
+          test -n "$scenes"
+          for scene in $scenes; do
+            out="$RUNNER_TEMP/out_$scene"
+            uv run video2sim replay "$scene" --out "$out" --instant --quiet
+            for f in scene.usd manifest.json qa_report.html qa_report.json urdf; do
+              test -e "$out/$f" || { echo "$scene: $f missing"; exit 1; }
+            done
+          done
+          echo "replayed: $scenes"

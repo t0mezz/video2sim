@@ -14,6 +14,15 @@ here.
 
 ## Next
 
+- [ ] **D1 [agent] Dry demo for judges (`video2sim replay`).** Built on branch `dry`: `src/video2sim/replay.py`,
+  `scripts/build_judge_snapshot.py`, `tests/test_replay.py`, `docs/judge_snapshot.md`. Archives for 12 dev scenes
+  built from `runs_dev/` (s13 first failed in segmentation, `lift.max_extent_m` 2 m < its 2.22 m track span, and was
+  rerun with 3 m in a config copy; its settling shows two unstable objects) into `data/judge_snapshot/archives/`; lock file
+  `docs/judge_snapshot/index.json` points at the release `judge-snapshot-v1` (uploaded; all 12 scenes replayed from a
+  clean Linux clone on 2026-11-05).
+  Network CI: `.github/workflows/judge-snapshot.yml` replays every scene from the release on ubuntu, macOS and
+  Windows (on `src/**` and lock-file changes); first green run still to be checked.
+
 From the pipeline audit of 2026-11-04 on branch `perf-exact-speedups`. Done there, with
 byte-identical outputs: parallel SAM mask decoding and the other exact speedups (64a86e5), the
 chunked voxel vote (48c1e93, peak RSS 5.08 to 2.41 GB on the 155-frame replay), 4 SAM 3D

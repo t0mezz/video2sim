@@ -124,6 +124,8 @@ MuJoCo for the nominal, low and high friction and mass (P4.7, D-021), caching ea
 `python benchmark/probe_sam3d.py RUN_ID --out FILE.json` makes ten hosted SAM 3D calls to measure cold and warm draw times and GPU memory (`docs/research/sam3d_cold_start.md`).
 
 `video2sim run VIDEO --out FOLDER` runs all six stages through `src/video2sim/pipeline.py` and copies the scene package and the manifest to `FOLDER` (P5.5). It uploads video frames and crops to the hosted models and needs their keys in `.env`.
+
+`video2sim replay [SCENE] --out FOLDER [--video FILE] [--archive ZIP] [--instant]` shows a recorded run of a dev scene from the judge snapshot (`docs/judge_snapshot/index.json`, `src/video2sim/replay.py`): it checks the archive and `export/` hashes, reports the six stages with their recorded times and copies the scene package; it runs no stage, builds no client and reads no key. `python scripts/build_judge_snapshot.py RUNS_DIR SCENE ...` packs finished runs into `data/judge_snapshot/archives/` and updates the lock file; it makes no hosted call and uploads nothing (`docs/judge_snapshot.md`).
 Never document a command that does not exist. When you add one, add it here in the same
 change.
 

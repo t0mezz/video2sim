@@ -24,7 +24,12 @@
 </p>
 
 ---
+### This section is primarily intended for the judges, 
+### so you can dry run the project of of replays, without using the API's.
+Thank you for taking the time to review this project! <3
 
+
+---
 A smartphone video goes in. SAM 3.1 segments and tracks the objects, SAM 3D completes their
 shapes, a reconstruction stage gives them a metric position in the world, and a physics stage adds
 collision geometry, mass, inertia and friction ranges. The result loads in Isaac Sim and is meant
@@ -33,6 +38,19 @@ as a starting point for reinforcement learning and robot training.
 ```text
 capture -> reconstruction -> segmentation -> shape -> physics -> export
 ```
+
+## Try it without any model or key
+
+`replay` shows a recorded run of a benchmark scene. It computes nothing, calls no model and needs
+no `.env`, GPU or Modal account; it only downloads the stored result and checks its hash.
+
+```bash
+uv sync
+uv run video2sim replay                       # list the scenes
+uv run video2sim replay s01 --out scene/      # same progress and package as `video2sim run`
+```
+
+Details and the limits of a replay: [docs/judge_snapshot.md](docs/judge_snapshot.md).
 
 ## Quick start
 
