@@ -24,12 +24,7 @@
 </p>
 
 ---
-### This section is primarily intended for the judges, 
-### so you can dry run the project of of replays, without using the API's.
-Thank you for taking the time to review this project! <3
 
-
----
 A smartphone video goes in. SAM 3.1 segments and tracks the objects, SAM 3D completes their
 shapes, a reconstruction stage gives them a metric position in the world, and a physics stage adds
 collision geometry, mass, inertia and friction ranges. The result loads in Isaac Sim and is meant
