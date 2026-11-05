@@ -24,7 +24,7 @@
 </p>
 
 ---
-### This section is primarily intended for the judges, 
+### This branch is primarily intended for the judges, 
 ### so you can dry run the project of of replays, without using the API's.
 Thank you for taking the time to review this project! <3
 
@@ -49,6 +49,9 @@ uv sync
 uv run video2sim replay                       # list the scenes
 uv run video2sim replay s01 --out scene/      # same progress and package as `video2sim run`
 ```
+view a finished run:
+- RUN/qa_report.html
+- `uv run python scripts/view_orbit.py RUN`
 
 Details and the limits of a replay: [docs/judge_snapshot.md](docs/judge_snapshot.md).
 
