@@ -25,7 +25,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
-from video2sim.models.hosted import read_secret
+from video2sim.models.hosted import explain_http_error, read_secret
 from video2sim.models.sam3d import Sam3dAnswer, Sam3dCall
 
 POSE_HEADER = "X-Pose-Json"
@@ -109,12 +109,15 @@ class HttpTransport:
                 return Sam3dAnswer(glb=glb, pose_json=pose)
             except urllib.error.HTTPError as e:
                 if e.code not in _RETRY_CODES or attempt == self._config.retries - 1:
-                    raise
+                    raise explain_http_error(e) from e
             time.sleep(2.0 * 2**attempt)
         raise AssertionError("unreachable")
 
     def health(self) -> None:
         """Raises if the server does not answer ``GET /health`` with 200."""
         request = urllib.request.Request(f"{self._config.url}/health")
-        with urllib.request.urlopen(request, timeout=min(self._config.timeout_s, 30)) as response:
-            response.read()
+        try:
+            with urllib.request.urlopen(request, timeout=min(self._config.timeout_s, 30)) as resp:
+                resp.read()
+        except urllib.error.HTTPError as e:
+            raise explain_http_error(e) from e

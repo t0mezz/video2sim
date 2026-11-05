@@ -1,0 +1,331 @@
+"""Tokens, usage counters and the kill switch, in a key-value store.
+
+On Modal the store is a ``modal.Dict`` and the gateway runs in one container
+(``max_containers=1`` in ``modal_app.py``), so the lock here is enough to make a reservation
+atomic. Tokens are stored only as their SHA-256; revoking one deletes its row.
+
+Keys: ``token:<sha256>`` holds a ``TokenRecord`` as a dict, ``used:<sha256>:<route>`` the calls a
+token has made on a route, ``day:<YYYY-MM-DD>:<route>`` the calls of all tokens on a UTC day,
+``total:<route>`` the calls of all tokens ever, ``gpu_seconds`` the SAM 3D container time used,
+``container:<id>`` when a worker container last finished a draw, and ``kill`` is true while the
+gateway is switched off.
+"""
+
+from __future__ import annotations
+
+import asyncio
+import hashlib
+import re
+import secrets
+from collections.abc import Callable, MutableMapping
+from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
+from typing import Any, Literal, Protocol
+
+from v2s_gateway.policy import ROUTES, Route
+
+STATE_DICT = "video2sim-gateway-state"  # the modal.Dict that holds all of this on Modal
+TOKEN_PREFIX = "v2s_"
+KILL_KEY = "kill"
+
+
+def hash_token(token: str) -> str:
+    return hashlib.sha256(token.encode()).hexdigest()
+
+
+def new_token() -> str:
+    return TOKEN_PREFIX + secrets.token_urlsafe(32)
+
+
+def token_key(token_hash: str) -> str:
+    return f"token:{token_hash}"
+
+
+def used_key(token_hash: str, route: Route) -> str:
+    return f"used:{token_hash}:{route}"
+
+
+def day_key(day: str, route: Route) -> str:
+    return f"day:{day}:{route}"
+
+
+def total_key(route: Route) -> str:
+    return f"total:{route}"
+
+
+GPU_KEY = "gpu_seconds"
+
+
+def utc_now() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+@dataclass(frozen=True)
+class TokenRecord:
+    """One judge token. ``scenes`` overrides the policy's ``scenes_per_token``."""
+
+    label: str
+    expires_utc: datetime
+    scenes: int | None = None
+
+    def to_json(self) -> dict[str, Any]:
+        return {
+            "label": self.label,
+            "expires_utc": self.expires_utc.isoformat(),
+            "scenes": self.scenes,
+        }
+
+    @classmethod
+    def from_json(cls, data: dict[str, Any]) -> TokenRecord:
+        expires = datetime.fromisoformat(str(data["expires_utc"]))
+        if expires.tzinfo is None:
+            raise ValueError("token expiry must carry a time zone")
+        scenes = data.get("scenes")
+        return cls(str(data["label"]), expires, None if scenes is None else int(scenes))
+
+
+class Kv(Protocol):
+    """Async key-value store. ``get`` answers None for a missing key."""
+
+    async def get(self, key: str) -> Any: ...
+
+    async def put(self, key: str, value: Any) -> None: ...
+
+    async def delete(self, key: str) -> None: ...
+
+    async def keys(self) -> list[str]: ...
+
+
+class MemoryKv:
+    """``Kv`` over a plain dict, for tests and local runs."""
+
+    def __init__(self, data: MutableMapping[str, Any] | None = None) -> None:
+        self.data: MutableMapping[str, Any] = {} if data is None else data
+
+    async def get(self, key: str) -> Any:
+        return self.data.get(key)
+
+    async def put(self, key: str, value: Any) -> None:
+        self.data[key] = value
+
+    async def delete(self, key: str) -> None:
+        self.data.pop(key, None)
+
+    async def keys(self) -> list[str]:
+        return [str(k) for k in self.data]
+
+
+class ModalDictKv:
+    """``Kv`` over a ``modal.Dict`` through its async interface."""
+
+    def __init__(self, store: Any) -> None:
+        self._store = store
+
+    async def get(self, key: str) -> Any:
+        return await self._store.get.aio(key)
+
+    async def put(self, key: str, value: Any) -> None:
+        await self._store.put.aio(key, value)
+
+    async def delete(self, key: str) -> None:
+        if await self._store.contains.aio(key):
+            await self._store.pop.aio(key)
+
+    async def keys(self) -> list[str]:
+        return [str(k) async for k in self._store.keys.aio()]
+
+
+class Refused(Exception):
+    """A reservation was refused: the token's quota, the daily cap, the total budget or the GPU
+    budget (``limit`` in hours) is used up."""
+
+    def __init__(
+        self, reason: Literal["quota", "daily", "total", "gpu"], route: Route, limit: float
+    ) -> None:
+        super().__init__(f"{reason} limit {limit} reached on {route}")
+        self.reason, self.route, self.limit = reason, route, limit
+
+
+class MintRefused(Exception):
+    """A token was not minted. ``status`` is the HTTP answer; the message is safe to show."""
+
+    def __init__(self, status: int, message: str) -> None:
+        super().__init__(message)
+        self.status = status
+
+
+LABEL = re.compile(r"[a-z0-9][a-z0-9._-]{0,63}")
+
+
+@dataclass(frozen=True)
+class Reservation:
+    token_hash: str
+    route: Route
+    day: str
+
+
+class Ledger:
+    def __init__(self, kv: Kv, clock: Callable[[], datetime] = utc_now) -> None:
+        self._kv = kv
+        self._clock = clock
+        self._lock = asyncio.Lock()
+
+    def now(self) -> datetime:
+        return self._clock()
+
+    async def token(self, token: str) -> tuple[str, TokenRecord] | None:
+        """The hash and record of ``token``, or None when it is unknown or revoked."""
+        token_hash = hash_token(token)
+        data = await self._kv.get(token_key(token_hash))
+        return None if data is None else (token_hash, TokenRecord.from_json(data))
+
+    async def killed(self) -> bool:
+        return bool(await self._kv.get(KILL_KEY))
+
+    async def reserve(
+        self, token_hash: str, route: Route, quota: int, daily_cap: int, total_cap: int
+    ) -> Reservation:
+        """Count one call, or raise ``Refused`` without counting it."""
+        day = self.now().date().isoformat()
+        async with self._lock:
+            used = int(await self._kv.get(used_key(token_hash, route)) or 0)
+            if used >= quota:
+                raise Refused("quota", route, quota)
+            total = int(await self._kv.get(total_key(route)) or 0)
+            if total >= total_cap:
+                raise Refused("total", route, total_cap)
+            today = int(await self._kv.get(day_key(day, route)) or 0)
+            if today >= daily_cap:
+                raise Refused("daily", route, daily_cap)
+            await self._kv.put(used_key(token_hash, route), used + 1)
+            await self._kv.put(total_key(route), total + 1)
+            await self._kv.put(day_key(day, route), today + 1)
+        return Reservation(token_hash, route, day)
+
+    async def gpu_seconds(self) -> float:
+        return float(await self._kv.get(GPU_KEY) or 0.0)
+
+    async def add_gpu_seconds(self, seconds: float) -> None:
+        """Count GPU time measured without the worker's timings (a failed draw's wall time)."""
+        async with self._lock:
+            await self._kv.put(GPU_KEY, await self.gpu_seconds() + max(0.0, seconds))
+
+    async def add_gpu_draw(
+        self, container: str, start_s: float, end_s: float, tail_s: float
+    ) -> float:
+        """Count the container time one draw adds, and return it. Times are the worker's clock.
+
+        A container is billed from its start to ``tail_s`` after its last draw, and runs one draw
+        at a time. So its first draw adds ``end_s - start_s`` plus the tail it will idle at the
+        end; each later draw adds the time since that container's previous draw ended, idle gap
+        included. Summed, that is the container's whole billed time."""
+        key = f"container:{container}"
+        async with self._lock:
+            last = await self._kv.get(key)
+            if last is None:
+                added = max(0.0, end_s - start_s) + tail_s
+            else:
+                added = max(0.0, end_s - float(last))
+            await self._kv.put(key, max(end_s, float(last or 0.0)))
+            await self._kv.put(GPU_KEY, await self.gpu_seconds() + added)
+        return added
+
+    async def totals(self) -> dict[Route, int]:
+        return {r: int(await self._kv.get(total_key(r)) or 0) for r in ROUTES}
+
+    async def today(self) -> dict[Route, int]:
+        day = self.now().date().isoformat()
+        return {r: int(await self._kv.get(day_key(day, r)) or 0) for r in ROUTES}
+
+    async def refund(self, reservation: Reservation) -> None:
+        """Give back a call the upstream did not serve."""
+        r = reservation
+        async with self._lock:
+            keys = (used_key(r.token_hash, r.route), day_key(r.day, r.route), total_key(r.route))
+            for key in keys:
+                value = int(await self._kv.get(key) or 0)
+                await self._kv.put(key, max(0, value - 1))
+
+    async def used(self, token_hash: str) -> dict[Route, int]:
+        return {r: int(await self._kv.get(used_key(token_hash, r)) or 0) for r in ROUTES}
+
+    async def tokens(self) -> list[tuple[str, TokenRecord]]:
+        """Hash and record of every token, expired ones included, by label."""
+        rows = []
+        for key in await self._kv.keys():
+            if key.startswith("token:"):
+                data = await self._kv.get(key)
+                if data is not None:
+                    rows.append((key.removeprefix("token:"), TokenRecord.from_json(data)))
+        return sorted(rows, key=lambda row: row[1].label)
+
+    async def mint(
+        self, label: str, days: float, scenes: int | None = None, max_tokens: int | None = None
+    ) -> tuple[str, TokenRecord]:
+        """A new token for ``label``, valid for ``days``. Labels show up in logs, so they are
+        short pseudonyms (lower-case letters, digits, ``.``, ``_``, ``-``), never an email.
+        ``max_tokens`` caps the unexpired tokens, so a leaked admin key cannot mint without end."""
+        if not LABEL.fullmatch(label):
+            raise MintRefused(
+                400, "a label is 1 to 64 of a-z, 0-9, '.', '_', '-', starting alphanumeric"
+            )
+        if not days > 0:
+            raise MintRefused(400, "days must be positive")
+        async with self._lock:
+            now = self.now()
+            rows = await self.tokens()
+            if any(record.label == label for _, record in rows):
+                raise MintRefused(409, f"the label {label!r} is already in use")
+            live = sum(record.expires_utc > now for _, record in rows)
+            if max_tokens is not None and live >= max_tokens:
+                raise MintRefused(403, f"{max_tokens} unexpired tokens exist; revoke some first")
+            token = new_token()
+            record = TokenRecord(label, now + timedelta(days=days), scenes)
+            await self._kv.put(token_key(hash_token(token)), record.to_json())
+        return token, record
+
+    async def revoke(self, label: str) -> int:
+        """Delete the tokens with ``label``; their usage counts stay for the record."""
+        async with self._lock:
+            hashes = [h for h, record in await self.tokens() if record.label == label]
+            for token_hash in hashes:
+                await self._kv.delete(token_key(token_hash))
+        return len(hashes)
+
+    async def set_killed(self, killed: bool) -> None:
+        await self._kv.put(KILL_KEY, killed)
+
+
+class Busy(Exception):
+    """No concurrency slot became free in time."""
+
+
+class ConcurrencyGate:
+    """At most ``limit`` requests in flight per key (a token and a route)."""
+
+    def __init__(self) -> None:
+        self._active: dict[tuple[str, str], int] = {}
+        self._changed = asyncio.Condition()
+
+    def active(self, key: tuple[str, str]) -> int:
+        return self._active.get(key, 0)
+
+    async def acquire(self, key: tuple[str, str], limit: int, wait_s: float) -> None:
+        async with self._changed:
+            if self.active(key) >= limit:
+                try:
+                    await asyncio.wait_for(
+                        self._changed.wait_for(lambda: self.active(key) < limit), wait_s
+                    )
+                except asyncio.TimeoutError:
+                    raise Busy(f"{limit} requests already in flight") from None
+            self._active[key] = self.active(key) + 1
+
+    async def release(self, key: tuple[str, str]) -> None:
+        async with self._changed:
+            left = self.active(key) - 1
+            if left > 0:
+                self._active[key] = left
+            else:
+                self._active.pop(key, None)
+            self._changed.notify_all()

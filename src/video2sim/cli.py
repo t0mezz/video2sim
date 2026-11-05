@@ -169,6 +169,11 @@ def _build_parser() -> argparse.ArgumentParser:
     run.add_argument("--run-id", help="resume this run; default: a new id from time and video")
     run.add_argument("--config", type=Path, default=Path("configs/default.yaml"))
     run.add_argument("--targets", type=Path, default=Path("configs/targets.yaml"))
+    run.add_argument(
+        "--gateway",
+        metavar="URL",
+        help="send every model call to the judge gateway at URL with the token in V2S_JUDGE_TOKEN",
+    )
     noise = run.add_mutually_exclusive_group()
     noise.add_argument("--quiet", action="store_true", help="no progress on stderr")
     noise.add_argument(
@@ -193,14 +198,36 @@ def _build_parser() -> argparse.ArgumentParser:
     doctor.add_argument(
         "--offline", action="store_true", help="check the config and keys only; call nothing"
     )
+    doctor.add_argument(
+        "--gateway",
+        metavar="URL",
+        help="check the judge gateway at URL with the token in V2S_JUDGE_TOKEN",
+    )
     return parser
+
+
+def _load_config(path: Path, gateway: str | None) -> dict[str, Any] | None:
+    """The config at ``path``, pointed at the judge gateway when one is given. None, with the
+    reason on stderr, when the config cannot use the gateway."""
+    cfg: dict[str, Any] = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if gateway is None:
+        return cfg
+    from video2sim.gateway_profile import apply_gateway
+
+    try:
+        return apply_gateway(cfg, gateway)
+    except ValueError as error:
+        print(f"--gateway: {error}", file=sys.stderr)
+        return None
 
 
 def run_doctor_command(args: argparse.Namespace) -> int:
     from video2sim.doctor import run_doctor
 
-    cfg: dict[str, Any] = yaml.safe_load(args.config.read_text(encoding="utf-8"))
-    checks = run_doctor(cfg, offline=args.offline)
+    cfg = _load_config(args.config, args.gateway)
+    if cfg is None:
+        return 2
+    checks = run_doctor(cfg, offline=args.offline, gateway=args.gateway)
     for check in checks:
         print(f"{'ok  ' if check.ok else 'FAIL'} {check.name}: {check.detail}")
     return 0 if all(c.ok for c in checks) else 1
@@ -278,7 +305,9 @@ def run_pipeline(args: argparse.Namespace) -> int:
         return 2
     from video2sim.pipeline import build_runner  # heavy imports, not needed for eval
 
-    cfg: dict[str, Any] = yaml.safe_load(args.config.read_text(encoding="utf-8"))
+    cfg = _load_config(args.config, args.gateway)
+    if cfg is None:
+        return 2
     targets: dict[str, Any] = yaml.safe_load(args.targets.read_text(encoding="utf-8"))
     if args.verbose:
         os.environ[VERBOSE_ENV] = "1"
