@@ -43,8 +43,12 @@ here.
 - [ ] **G4 [agent, hosted] Calibration.** Run the smallest dev scene through the gateway and set `calls_per_scene` in
   `policy.yaml` from `admin.py list`. The values there now are the largest cached-answer counts per dev scene (31 VLM,
   4 tracking, 48 SAM 3D, rounded up), so upper bounds. Uploads data and spends credit: needs the go-ahead.
-- [ ] **G5 [human] Tokens and docs.** Done: README section, runbook (kill switch, key rotation, teardown), `admin.py`.
-  Open: mint the tokens and send them through the submission form; put the gateway URL into the README.
+- [ ] **G5 [human] Tokens and docs.** Done: README section, runbook (kill switch, key rotation, teardown), `admin.py`,
+  and `/admin/tokens` on the gateway for the request page (D-042). The request page is built as
+  `workers/token_page/` (invite code, pseudonymous labels, one-time token link, rate limit; `tests/test_token_page.py`,
+  18 tests against the gateway app). Open: run it on the home server behind `vts.kortec.me/judges` and link it from the
+  site; `V2S_GATEWAY_ADMIN_KEY` in the Modal secret and on the home server; the invite code in the judging
+  instructions; the gateway URL in the README.
 - [ ] **G6 [human] Dress rehearsal.** On a clean machine with only a token, follow the README: sync, doctor, run a
   sample video, time it, check that usage counts down and that a revoked token fails.
 - [ ] **G7 [agent] Known gaps.** Over HTTP the pipeline does not warm SAM 3D containers, so a judge's first draws start

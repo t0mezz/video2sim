@@ -13,10 +13,11 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import re
 import secrets
-from collections.abc import Callable, Iterator, MutableMapping
+from collections.abc import Callable, MutableMapping
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any, Literal, Protocol
 
 from v2s_gateway.policy import ROUTES, Route
@@ -83,6 +84,8 @@ class Kv(Protocol):
 
     async def delete(self, key: str) -> None: ...
 
+    async def keys(self) -> list[str]: ...
+
 
 class MemoryKv:
     """``Kv`` over a plain dict, for tests and local runs."""
@@ -98,6 +101,9 @@ class MemoryKv:
 
     async def delete(self, key: str) -> None:
         self.data.pop(key, None)
+
+    async def keys(self) -> list[str]:
+        return [str(k) for k in self.data]
 
 
 class ModalDictKv:
@@ -116,6 +122,9 @@ class ModalDictKv:
         if await self._store.contains.aio(key):
             await self._store.pop.aio(key)
 
+    async def keys(self) -> list[str]:
+        return [str(k) async for k in self._store.keys.aio()]
+
 
 class Refused(Exception):
     """A reservation was refused: the token's quota or the gateway's daily cap is used up."""
@@ -123,6 +132,17 @@ class Refused(Exception):
     def __init__(self, reason: Literal["quota", "daily"], route: Route, limit: int) -> None:
         super().__init__(f"{reason} limit {limit} reached on {route}")
         self.reason, self.route, self.limit = reason, route, limit
+
+
+class MintRefused(Exception):
+    """A token was not minted. ``status`` is the HTTP answer; the message is safe to show."""
+
+    def __init__(self, status: int, message: str) -> None:
+        super().__init__(message)
+        self.status = status
+
+
+LABEL = re.compile(r"[a-z0-9][a-z0-9._-]{0,63}")
 
 
 @dataclass(frozen=True)
@@ -177,6 +197,52 @@ class Ledger:
     async def used(self, token_hash: str) -> dict[Route, int]:
         return {r: int(await self._kv.get(used_key(token_hash, r)) or 0) for r in ROUTES}
 
+    async def tokens(self) -> list[tuple[str, TokenRecord]]:
+        """Hash and record of every token, expired ones included, by label."""
+        rows = []
+        for key in await self._kv.keys():
+            if key.startswith("token:"):
+                data = await self._kv.get(key)
+                if data is not None:
+                    rows.append((key.removeprefix("token:"), TokenRecord.from_json(data)))
+        return sorted(rows, key=lambda row: row[1].label)
+
+    async def mint(
+        self, label: str, days: float, scenes: int | None = None, max_tokens: int | None = None
+    ) -> tuple[str, TokenRecord]:
+        """A new token for ``label``, valid for ``days``. Labels show up in logs, so they are
+        short pseudonyms (lower-case letters, digits, ``.``, ``_``, ``-``), never an email.
+        ``max_tokens`` caps the unexpired tokens, so a leaked admin key cannot mint without end."""
+        if not LABEL.fullmatch(label):
+            raise MintRefused(
+                400, "a label is 1 to 64 of a-z, 0-9, '.', '_', '-', starting alphanumeric"
+            )
+        if not days > 0:
+            raise MintRefused(400, "days must be positive")
+        async with self._lock:
+            now = self.now()
+            rows = await self.tokens()
+            if any(record.label == label for _, record in rows):
+                raise MintRefused(409, f"the label {label!r} is already in use")
+            live = sum(record.expires_utc > now for _, record in rows)
+            if max_tokens is not None and live >= max_tokens:
+                raise MintRefused(403, f"{max_tokens} unexpired tokens exist; revoke some first")
+            token = new_token()
+            record = TokenRecord(label, now + timedelta(days=days), scenes)
+            await self._kv.put(token_key(hash_token(token)), record.to_json())
+        return token, record
+
+    async def revoke(self, label: str) -> int:
+        """Delete the tokens with ``label``; their usage counts stay for the record."""
+        async with self._lock:
+            hashes = [h for h, record in await self.tokens() if record.label == label]
+            for token_hash in hashes:
+                await self._kv.delete(token_key(token_hash))
+        return len(hashes)
+
+    async def set_killed(self, killed: bool) -> None:
+        await self._kv.put(KILL_KEY, killed)
+
 
 class Busy(Exception):
     """No concurrency slot became free in time."""
@@ -211,10 +277,3 @@ class ConcurrencyGate:
             else:
                 self._active.pop(key, None)
             self._changed.notify_all()
-
-
-def token_rows(data: MutableMapping[str, Any]) -> Iterator[tuple[str, TokenRecord]]:
-    """Hash and record of every token in a synchronous mapping (for ``admin.py``)."""
-    for key, value in list(data.items()):
-        if str(key).startswith("token:"):
-            yield str(key).removeprefix("token:"), TokenRecord.from_json(value)

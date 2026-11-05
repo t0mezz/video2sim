@@ -48,6 +48,14 @@ class Sam3dPolicy(RouteLimits):
     max_pointmap_mb: float = Field(gt=0)
 
 
+class AdminPolicy(_Strict):
+    """Bounds on ``POST /admin/tokens``, so a leaked admin key can do limited harm."""
+
+    max_tokens: int = Field(ge=1)
+    max_days: float = Field(gt=0)
+    max_scenes: int = Field(ge=1)
+
+
 class Policy(_Strict):
     scenes_per_token: int = Field(ge=1)
     safety_factor: float = Field(gt=0)
@@ -58,6 +66,7 @@ class Policy(_Strict):
     vlm: VlmPolicy
     tracking: TrackingPolicy
     sam3d: Sam3dPolicy
+    admin: AdminPolicy
 
     def limits(self, route: Route) -> RouteLimits:
         limits: RouteLimits = getattr(self, route)

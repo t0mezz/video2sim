@@ -37,7 +37,7 @@ import admin
 import modal_app
 from v2s_gateway.app import GATEWAY_HEADER, create_app
 from v2s_gateway.checks import Sam3dRequest
-from v2s_gateway.ledger import KILL_KEY, Busy, ConcurrencyGate, Ledger, MemoryKv
+from v2s_gateway.ledger import KILL_KEY, Busy, ConcurrencyGate, Ledger, MemoryKv, MintRefused
 from v2s_gateway.policy import POLICY_FILE, Policy, load_policy
 from v2s_gateway.upstreams import HttpUpstreams, UpstreamFailed, Upstreams
 from video2sim.doctor import _one_pixel_png
@@ -51,6 +51,7 @@ NOW = datetime(2026, 11, 20, 12, 0, tzinfo=timezone.utc)
 GATEWAY = "https://gw.test"
 BASETEN_KEY = "bt-real-key-0123456789"
 META_KEY = "meta-real-key-9876543210"
+ADMIN_KEY = "admin-key-for-the-request-page"
 UPSTREAM_HEADER = "X-Upstream-Account"
 DELTAS = ["<0f>1<|box;x1=1;y1=2;x2=3;y2=4;w=8;h=8|>", "\n<1f>"]
 
@@ -200,6 +201,12 @@ class Bridge:
         return _Answer(response)
 
 
+def mint_token(data: dict[str, Any], label: str, days: float = 7, scenes: int | None = None) -> str:
+    """A token minted the way ``admin.py`` mints, into the gateway's store."""
+    ledger = Ledger(MemoryKv(data), clock=lambda: NOW)
+    return asyncio.run(admin.mint(ledger, [label], days, scenes))[0][1]
+
+
 @dataclass
 class Harness:
     client: TestClient
@@ -226,7 +233,7 @@ def make_harness() -> Iterator[Any]:
         policy = policy or load_policy()
         data: dict[str, Any] = {}
         clock = [NOW]
-        [(_, token)] = admin.mint(data, ["judge-a"], days=7, now=NOW)
+        token = mint_token(data, "judge-a")
         provider, sam3d = FakeProvider(), FakeSam3d()
         http = HttpUpstreams(
             httpx.AsyncClient(transport=httpx.ASGITransport(app=provider.app())),
@@ -234,7 +241,7 @@ def make_harness() -> Iterator[Any]:
             META_KEY,
         )
         ledger = Ledger(MemoryKv(data), clock=lambda: clock[0])
-        app = create_app(policy, ledger, Upstreams(http, http, sam3d))
+        app = create_app(policy, ledger, Upstreams(http, http, sam3d), ADMIN_KEY)
         client = TestClient(app, base_url=GATEWAY)
         clients.append(client)
         return Harness(client, data, provider, sam3d, token, policy, clock)
@@ -357,7 +364,8 @@ def test_missing_unknown_expired_and_revoked_tokens_get_401(harness: Harness) ->
     assert "expired on 2026-11-27" in refusal(response, 401, "expired_token")
 
     harness.clock[0] = NOW
-    assert admin.revoke(harness.data, "judge-a") == 1
+    revoke = Ledger(MemoryKv(harness.data)).revoke("judge-a")
+    assert asyncio.run(revoke) == 1
     response = harness.client.post("/v1/chat/completions", json=body, headers=harness.headers())
     refusal(response, 401, "unknown_token")
     assert harness.provider.calls == []
@@ -370,11 +378,13 @@ def test_tokens_are_stored_only_as_hashes(harness: Harness) -> None:
 
 def test_mint_refuses_a_label_in_use() -> None:
     data: dict[str, Any] = {}
-    admin.mint(data, ["judge-a"], days=1, now=NOW)
-    with pytest.raises(ValueError, match="judge-a"):
-        admin.mint(data, ["judge-a"], days=1, now=NOW)
+    mint_token(data, "judge-a")
+    with pytest.raises(MintRefused, match="judge-a"):
+        mint_token(data, "judge-a")
+    with pytest.raises(MintRefused, match="a-z"):
+        mint_token(data, "judge@example.com")  # labels reach logs, so never an email
     with pytest.raises(ValueError, match="distinct"):
-        admin.mint(data, ["judge-b", "judge-b"], days=1, now=NOW)
+        asyncio.run(admin.mint(Ledger(MemoryKv(data)), ["judge-b", "judge-b"], 1))
 
 
 # --- VLM route -----------------------------------------------------------------------------
@@ -653,7 +663,7 @@ def test_daily_budget_covers_all_tokens(make_harness: Any) -> None:
     h: Harness = make_harness(
         make_policy(daily_scenes=1, safety_factor=1, vlm={"calls_per_scene": 1})
     )
-    [(_, second)] = admin.mint(h.data, ["judge-b"], days=7, now=NOW)
+    second = mint_token(h.data, "judge-b")
     ok = h.client.post("/v1/chat/completions", json=chat_body(), headers=h.headers())
     assert ok.status_code == 200
     response = h.client.post("/v1/chat/completions", json=chat_body(), headers=h.headers(second))
@@ -764,7 +774,100 @@ def test_logs_hold_metadata_only(
 def test_admin_report_lists_usage_against_quota(harness: Harness) -> None:
     harness.client.post("/v1/chat/completions", json=chat_body(), headers=harness.headers())
     out = io.StringIO()
-    admin.report(harness.data, harness.policy, out)
+    asyncio.run(admin.report(Ledger(MemoryKv(harness.data)), harness.policy, out))
     text = out.getvalue()
     assert text.startswith("gateway on")
     assert f"judge-a: expires 2026-11-27 12:00 UTC; vlm 1/{harness.policy.quota('vlm')}" in text
+
+
+# --- admin endpoint for the token request page ----------------------------------------------
+
+
+def admin_headers(key: str = ADMIN_KEY) -> dict[str, str]:
+    return {"Authorization": f"Bearer {key}"}
+
+
+def test_admin_endpoint_mints_a_working_token_once(harness: Harness) -> None:
+    response = harness.client.post(
+        "/admin/tokens", json={"label": "j-7f3a", "days": 14, "scenes": 2}, headers=admin_headers()
+    )
+    assert response.status_code == 201, response.text
+    minted = response.json()
+    assert minted["label"] == "j-7f3a" and minted["token"].startswith("v2s_")
+    assert minted["expires_utc"].startswith("2026-12-04T12:00")
+    assert minted["quota"]["vlm"] == harness.policy.quota("vlm", scenes=2)
+    assert minted["token"] not in json.dumps(harness.data)
+    ok = harness.client.post(
+        "/v1/chat/completions", json=chat_body(), headers=harness.headers(minted["token"])
+    )
+    assert ok.status_code == 200
+    again = harness.client.post(
+        "/admin/tokens", json={"label": "j-7f3a", "days": 14}, headers=admin_headers()
+    )
+    refusal(again, 409, "not_minted")
+
+
+def test_admin_endpoint_needs_the_admin_key(harness: Harness) -> None:
+    body = {"label": "j-1", "days": 1}
+    for headers in ({}, admin_headers("wrong"), harness.headers()):
+        refusal(harness.client.post("/admin/tokens", json=body, headers=headers), 401, "not_admin")
+        refusal(harness.client.get("/admin/tokens", headers=headers), 401, "not_admin")
+        response = harness.client.delete("/admin/tokens/judge-a", headers=headers)
+        refusal(response, 401, "not_admin")
+    assert harness.usage()["label"] == "judge-a"  # nothing was revoked
+
+
+def test_admin_routes_are_absent_without_an_admin_key() -> None:
+    policy = load_policy()
+    http = HttpUpstreams(httpx.AsyncClient(), BASETEN_KEY, META_KEY)
+    app = create_app(policy, Ledger(MemoryKv()), Upstreams(http, http, FakeSam3d()))
+    with TestClient(app, base_url=GATEWAY) as client:
+        response = client.post("/admin/tokens", json={"label": "j", "days": 1})
+        refusal(response, 404, "not_found")
+
+
+@pytest.mark.parametrize(
+    ("body", "fragment"),
+    [
+        ({"label": "j-1", "days": 400}, "at most 2"),
+        ({"label": "j-1", "days": 0}, "above 0"),
+        ({"label": "j-1", "days": 1, "scenes": 99}, "scenes"),
+        ({"label": "j-1", "days": 1, "quota": 10**6}, "{label, days, scenes}"),
+        ({"label": "Judge Name", "days": 1}, "a-z"),
+    ],
+)
+def test_admin_mint_bounds(make_harness: Any, body: dict[str, Any], fragment: str) -> None:
+    h: Harness = make_harness(make_policy(admin={"max_days": 21, "max_scenes": 3, "max_tokens": 5}))
+    response = h.client.post("/admin/tokens", json=body, headers=admin_headers())
+    assert response.status_code == 400, response.text
+    assert fragment in response.json()["message"]
+
+
+def test_admin_mint_stops_at_the_token_cap_and_expired_tokens_free_room(
+    make_harness: Any,
+) -> None:
+    h: Harness = make_harness(make_policy(admin={"max_tokens": 2}))  # judge-a is one
+    first = h.client.post(
+        "/admin/tokens", json={"label": "j-1", "days": 1}, headers=admin_headers()
+    )
+    assert first.status_code == 201
+    full = h.client.post("/admin/tokens", json={"label": "j-2", "days": 1}, headers=admin_headers())
+    assert "revoke some first" in refusal(full, 403, "not_minted")
+    h.clock[0] = NOW + timedelta(days=2)  # j-1 has expired
+    later = h.client.post(
+        "/admin/tokens", json={"label": "j-2", "days": 1}, headers=admin_headers()
+    )
+    assert later.status_code == 201
+
+
+def test_admin_list_and_revoke(harness: Harness) -> None:
+    harness.client.post("/v1/chat/completions", json=chat_body(), headers=harness.headers())
+    listing = harness.client.get("/admin/tokens", headers=admin_headers()).json()
+    [row] = listing["tokens"]
+    assert row["label"] == "judge-a" and row["used"]["vlm"] == 1
+    assert "token" not in row
+    response = harness.client.delete("/admin/tokens/judge-a", headers=admin_headers())
+    assert response.json() == {"revoked": 1}
+    refusal(harness.client.get("/v1/usage", headers=harness.headers()), 401, "unknown_token")
+    gone = harness.client.delete("/admin/tokens/judge-a", headers=admin_headers())
+    refusal(gone, 404, "not_found")

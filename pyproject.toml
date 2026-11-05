@@ -56,7 +56,7 @@ packages = ["src/video2sim"]
 [tool.ruff]
 line-length = 100
 target-version = "py310"
-src = ["src", "tests", "workers/gateway"]
+src = ["src", "tests", "workers/gateway", "workers/token_page"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "NPY", "RUF"]
@@ -65,8 +65,8 @@ select = ["E", "F", "I", "UP", "B", "SIM", "NPY", "RUF"]
 python_version = "3.10"
 strict = true
 plugins = ["pydantic.mypy"]
-mypy_path = "workers/gateway"
-files = ["src", "tests", "workers/gateway"]
+mypy_path = ["workers/gateway", "workers/token_page"]
+files = ["src", "tests", "workers/gateway", "workers/token_page"]
 
 # Installed only inside the SAM 3D worker image on Modal (models/sam3d_modal.py), never here.
 [[tool.mypy.overrides]]
@@ -87,7 +87,7 @@ follow_imports = "skip"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["workers/gateway"]
+pythonpath = ["workers/gateway", "workers/token_page"]
 addopts = "-ra"
 markers = [
     "gpu: needs a CUDA GPU (skipped on machines without one)",

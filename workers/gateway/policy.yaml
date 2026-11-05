@@ -40,3 +40,8 @@ sam3d:                        # POST /sam3d/sample, forwarded to the Modal worke
   max_image_mb: 16            # dev keyframes are about 2.3 MB
   max_mask_mb: 4
   max_pointmap_mb: 64         # float32 HxWx3; 1080p is 24.9 MB. Off by default (shape.sam3d.use_pointmap)
+
+admin:                        # /admin/tokens, called by the token request page on the home server
+  max_tokens: 30              # unexpired tokens at most; minting more is refused, so a leaked admin key cannot drain credit without end
+  max_days: 30                # longest validity of a minted token
+  max_scenes: 5               # largest per-token scene allowance

@@ -55,7 +55,8 @@ Details and the limits of a replay: [docs/judge_snapshot.md](docs/judge_snapshot
 ## Live inference for judges (optional)
 
 If the gateway is up, you can run the whole pipeline on your own video without any model keys.
-You get a personal token; it has a small usage quota and expires after judging.
+Request a personal token at [vts.kortec.me/judges](https://vts.kortec.me/judges/) with the invite code from the
+judging instructions. It has a small usage quota and expires after judging.
 
 ```bash
 uv sync

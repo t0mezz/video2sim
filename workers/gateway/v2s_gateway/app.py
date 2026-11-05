@@ -8,6 +8,7 @@ POST /v1/responses         ``stages/tracking.py``          Meta Model API, strea
 POST /sam3d/sample         ``models/sam3d_http.py``        the Modal SAM 3D worker
 GET  /sam3d/health         ``video2sim doctor``            none
 GET  /v1/usage             ``video2sim doctor``            none
+/admin/tokens              token request page (admin key)  none: mint, list, revoke
 =========================  ==============================  ===========================
 
 Status codes follow the clients' retry rule (``post_json`` and ``HttpTransport`` retry 429 and
@@ -20,6 +21,7 @@ milliseconds, never a body, a header or a token.
 
 from __future__ import annotations
 
+import hmac
 import logging
 import time
 from collections.abc import AsyncIterator
@@ -39,7 +41,15 @@ from v2s_gateway.checks import (
     check_sam3d,
     parse_json,
 )
-from v2s_gateway.ledger import Busy, ConcurrencyGate, Ledger, Refused, Reservation
+from v2s_gateway.ledger import (
+    Busy,
+    ConcurrencyGate,
+    Ledger,
+    MintRefused,
+    Refused,
+    Reservation,
+    TokenRecord,
+)
 from v2s_gateway.policy import MB, ROUTES, Policy, Route, Sam3dPolicy
 from v2s_gateway.upstreams import UpstreamFailed, Upstreams
 
@@ -183,7 +193,11 @@ async def read_sam3d_form(scope: Scope, raw: bytes, policy: Sam3dPolicy) -> Sam3
     return check_sam3d(image, mask, seed, options, pointmap, policy)
 
 
-def create_app(policy: Policy, ledger: Ledger, upstreams: Upstreams) -> FastAPI:
+def create_app(
+    policy: Policy, ledger: Ledger, upstreams: Upstreams, admin_key: str | None = None
+) -> FastAPI:
+    """The gateway. ``admin_key`` enables ``/admin/tokens`` for the token request page; without
+    it those routes answer 404."""
     app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
     app.add_middleware(AccessLog)
     gate = ConcurrencyGate()
@@ -356,5 +370,69 @@ def create_app(policy: Policy, ledger: Ledger, upstreams: Upstreams) -> FastAPI:
         finally:
             await gate.release(key)
         return Response(glb, media_type="model/gltf-binary", headers={POSE_HEADER: pose})
+
+    def require_admin(request: Request) -> None:
+        if not admin_key:
+            raise GatewayError(404, "not_found", "Not found.")
+        scheme, _, given = request.headers.get("authorization", "").partition(" ")
+        if scheme.lower() != "bearer" or not hmac.compare_digest(
+            given.strip().encode(), admin_key.encode()
+        ):
+            raise GatewayError(401, "not_admin", "This route needs the gateway's admin key.")
+        request.state.label = "admin"
+
+    def describe(record: TokenRecord) -> dict[str, Any]:
+        return {
+            "label": record.label,
+            "expires_utc": record.expires_utc.isoformat(),
+            "scenes": record.scenes,
+            "quota": {r: policy.quota(r, record.scenes) for r in ROUTES},
+        }
+
+    @app.post("/admin/tokens")
+    async def admin_mint(request: Request) -> JSONResponse:
+        require_admin(request)
+        bounds = policy.admin
+        try:
+            body = parse_json(await read_body(request, 4096))
+            if not isinstance(body, dict) or set(body) - {"label", "days", "scenes"}:
+                raise Invalid("the body is {label, days, scenes}")
+            label, days, scenes = body.get("label"), body.get("days"), body.get("scenes")
+            if not isinstance(label, str):
+                raise Invalid("label must be text")
+            if isinstance(days, bool) or not isinstance(days, (int, float)):
+                raise Invalid("days must be a number")
+            if not 0 < days <= bounds.max_days:
+                raise Invalid(f"days must be above 0 and at most {bounds.max_days}")
+            if scenes is not None and (
+                isinstance(scenes, bool)
+                or not isinstance(scenes, int)
+                or not 1 <= scenes <= bounds.max_scenes
+            ):
+                raise Invalid(f"scenes must be null or from 1 to {bounds.max_scenes}")
+        except Invalid as error:
+            raise invalid(error) from None
+        try:
+            token, record = await ledger.mint(label, float(days), scenes, bounds.max_tokens)
+        except MintRefused as refused:
+            raise GatewayError(refused.status, "not_minted", str(refused)) from None
+        return JSONResponse({**describe(record), "token": token}, status_code=201)
+
+    @app.get("/admin/tokens")
+    async def admin_list(request: Request) -> JSONResponse:
+        require_admin(request)
+        rows = [
+            {**describe(record), "used": await ledger.used(token_hash)}
+            for token_hash, record in await ledger.tokens()
+        ]
+        return JSONResponse({"switched_off": await ledger.killed(), "tokens": rows})
+
+    @app.delete("/admin/tokens/{label}")
+    async def admin_revoke(request: Request, label: str) -> JSONResponse:
+        require_admin(request)
+        revoked = await ledger.revoke(label)
+        if not revoked:
+            raise GatewayError(404, "not_found", f"No token is labelled {label!r}.")
+        return JSONResponse({"revoked": revoked})
 
     return app

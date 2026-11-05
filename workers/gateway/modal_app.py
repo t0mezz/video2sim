@@ -3,7 +3,8 @@
 One container (``max_containers=1``), so the in-process lock and concurrency counts hold for
 every request; usage, tokens and the kill switch live in the ``modal.Dict`` named below, so they
 survive restarts. The upstream keys come from the Modal secret ``video2sim-gateway``
-(``BASETEN_API_KEY``, ``META_MODEL_API_KEY``), created by a human. The SAM 3D worker is called
+(``BASETEN_API_KEY``, ``META_MODEL_API_KEY``, and ``V2S_GATEWAY_ADMIN_KEY`` for the token
+request page), created by a human. The SAM 3D worker is called
 inside the workspace, so no Modal token leaves it.
 
 Commands (each needs a human go-ahead, see workers/gateway/README.md):
@@ -75,4 +76,6 @@ def web() -> Any:
     )
     http = HttpUpstreams(client, os.environ["BASETEN_API_KEY"], os.environ["META_MODEL_API_KEY"])
     upstreams = Upstreams(http, http, ModalSam3d(policy.sam3d.app, policy.sam3d.cls))
-    return create_app(policy, Ledger(ModalDictKv(state)), upstreams)
+    # Optional: enables /admin/tokens for the token request page on the home server.
+    admin_key = os.environ.get("V2S_GATEWAY_ADMIN_KEY")
+    return create_app(policy, Ledger(ModalDictKv(state)), upstreams, admin_key)

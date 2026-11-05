@@ -43,10 +43,12 @@ runs. Task G4 replaces them with a measured run.
 
 1. Create dedicated hackathon keys at Baseten and Meta, with spend limits set in each dashboard,
    and set a workspace spend limit at Modal. Rotate or revoke them after judging.
-2. Store them in the Modal secret the gateway reads:
+2. Make an admin key for the token request page (`python -c "import secrets;
+   print(secrets.token_urlsafe(32))"`) and store it with the provider keys in the Modal secret
+   the gateway reads. Without `V2S_GATEWAY_ADMIN_KEY` the `/admin/tokens` routes answer 404.
 
    ```bash
-   uv run modal secret create video2sim-gateway BASETEN_API_KEY=... META_MODEL_API_KEY=...
+   uv run modal secret create video2sim-gateway BASETEN_API_KEY=... META_MODEL_API_KEY=... V2S_GATEWAY_ADMIN_KEY=...
    ```
 
 3. The SAM 3D worker must be deployed in the same Modal workspace
@@ -57,12 +59,40 @@ runs. Task G4 replaces them with a measured run.
    uv run modal deploy workers/gateway/modal_app.py
    ```
 
-5. Mint one token per judge. Each is printed once; only its hash is stored. Send tokens through
-   the submission form, never through the repository or a public channel.
+5. Judges get tokens from the request page at `https://vts.kortec.me` (next section). To mint one
+   by hand instead (each is printed once; only its hash is stored):
 
    ```bash
    uv run python workers/gateway/admin.py mint judge-a judge-b judge-c --days 21
    ```
+
+## Token request page (vts.kortec.me)
+
+The page is `workers/token_page/` (its `README.md` covers the home server set-up). A judge enters basic details and the invite
+code; a correct code mints a token at once. The home server holds the admin key, never a provider
+key or a Modal token, and calls the gateway server to server:
+
+| Call | Body | Answer |
+| --- | --- | --- |
+| `POST /admin/tokens` | `{"label": "j-7f3a", "days": 14, "scenes": null}` | 201 `{label, token, expires_utc, scenes, quota}`; 409 label in use; 403 token cap reached; 400 out of bounds |
+| `GET /admin/tokens` | | 200 `{switched_off, tokens: [{label, expires_utc, scenes, quota, used}]}` |
+| `DELETE /admin/tokens/{label}` | | 200 `{revoked: n}`; 404 no such label |
+
+Each call sends `Authorization: Bearer <V2S_GATEWAY_ADMIN_KEY>`. The gateway bounds what the key
+can do (`admin` in `policy.yaml`): at most 30 unexpired tokens, 30 days, 5 scenes per token. So a
+leaked admin key can mint a few more quotas' worth but cannot drain credit without end; rotate it
+in the Modal secret and on the home server if it leaks.
+
+What the page itself must do, since the gateway cannot:
+
+* Check the invite code with a constant-time compare against a hash, limit tokens per code and
+  per email, and rate-limit the form per IP address.
+* Use a pseudonym as the label (`j-` plus random hex) and keep the email-to-label mapping on the
+  home server only. Labels show up in gateway logs, and the gateway refuses labels with `@`.
+* Show the token once on an unguessable status link (`/token/<random id>`), then mark it shown;
+  a judge who lost it gets a revoke and a new token.
+* Tell judges, next to the form, what is sent to Baseten, Meta and Modal and that the providers'
+  retention terms are not yet checked (`README.md` has the wording).
 
 ## Operate
 
