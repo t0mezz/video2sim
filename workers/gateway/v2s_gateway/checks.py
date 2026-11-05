@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import re
+import struct
 from dataclasses import dataclass
 from typing import Any
 
@@ -176,6 +177,39 @@ class Sam3dRequest:
     options: dict[str, Any]
 
 
+_JPEG_SOF = frozenset(
+    {0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF}
+)
+
+
+def image_size(data: bytes) -> tuple[int, int]:
+    """(width, height) from a PNG or JPEG header, without decoding the pixels, so a small file
+    that claims a huge size (a decompression bomb) is caught before it reaches the GPU."""
+    if data.startswith(PNG_MAGIC):
+        if len(data) < 24 or data[12:16] != b"IHDR":
+            raise Invalid("the PNG has no readable header")
+        width, height = struct.unpack(">II", data[16:24])
+        return int(width), int(height)
+    if data.startswith(JPEG_MAGIC):
+        i = 2
+        while i + 9 <= len(data):
+            if data[i] != 0xFF:
+                raise Invalid("the JPEG has no readable header")
+            marker = data[i + 1]
+            if marker == 0xFF:  # fill byte
+                i += 1
+                continue
+            if marker in _JPEG_SOF:
+                height, width = struct.unpack(">HH", data[i + 5 : i + 9])
+                return int(width), int(height)
+            if marker in (0xD8, 0x01) or 0xD0 <= marker <= 0xD7:  # markers without a length
+                i += 2
+                continue
+            i += 2 + struct.unpack(">H", data[i + 2 : i + 4])[0]
+        raise Invalid("the JPEG has no readable size")
+    raise Invalid("expected a PNG or JPEG file")
+
+
 def check_sam3d(
     image: bytes,
     mask_png: bytes,
@@ -194,6 +228,13 @@ def check_sam3d(
         raise Invalid("mask must be a PNG file")
     if len(mask_png) > policy.max_mask_mb * mb:
         raise Invalid(f"mask is larger than {policy.max_mask_mb} MB")
+    width, height = image_size(image)
+    if not 0 < max(width, height) <= policy.max_image_side_px or min(width, height) < 1:
+        raise Invalid(
+            f"image sides must be 1 to {policy.max_image_side_px} px, got {width}x{height}"
+        )
+    if image_size(mask_png) != (width, height):
+        raise Invalid("mask size must equal the image size")
     if pointmap_npy is not None:
         if not pointmap_npy.startswith(NPY_MAGIC):
             raise Invalid("pointmap must be a .npy file")

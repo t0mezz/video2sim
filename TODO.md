@@ -54,7 +54,10 @@ here.
 - [ ] **G7 [agent] Known gaps.** Over HTTP the pipeline does not warm SAM 3D containers, so a judge's first draws start
   cold (the gateway could start the warm-up when a tracking request arrives). A quota that runs out mid-run fails some
   calls, and stages with a fallback (router surface, material, mass, shape hull) then flag and continue instead of
-  stopping the run. The optional shared response cache of the plan is not built.
+  stopping the run. The optional shared response cache of the plan is not built. Done since the security review of
+  2026-11-05 (D-043): a judging budget of 40 scenes over all tokens, 10 GPU hours of SAM 3D measured as container time,
+  and an image size check. Still open from it: a cap on requests waiting for a slot per token (memory), and `chmod 600`
+  on the page's SQLite file on the home server.
 
 From the pipeline audit of 2026-11-04 on branch `perf-exact-speedups`. Done there, with
 byte-identical outputs: parallel SAM mask decoding and the other exact speedups (64a86e5), the

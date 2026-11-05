@@ -6,6 +6,7 @@ TestClient, so minting, the admin key and the gateway's bounds are exercised end
 
 from __future__ import annotations
 
+import asyncio
 import email.message
 import io
 import re
@@ -30,7 +31,7 @@ from token_page import HttpGateway, Settings, Store, client_ip, hash_code
 from v2s_gateway.app import create_app as create_gateway
 from v2s_gateway.ledger import Ledger, MemoryKv
 from v2s_gateway.policy import POLICY_FILE, Policy
-from v2s_gateway.upstreams import HttpUpstreams, Upstreams
+from v2s_gateway.upstreams import HttpUpstreams, Sam3dResult, Upstreams
 
 GATEWAY = "https://gw.test"
 ADMIN_KEY = "admin-key-of-the-page"
@@ -39,7 +40,7 @@ NOW = datetime(2026, 11, 20, 12, 0, tzinfo=timezone.utc)
 
 
 class _NoSam3d:
-    async def sample(self, request: Any) -> tuple[bytes, str]:
+    async def sample(self, request: Any) -> Sam3dResult:
         raise AssertionError("not used")
 
 
@@ -361,3 +362,44 @@ def test_form_and_token_page_show_the_setup_steps(world: World) -> None:
     assert f"export V2S_JUDGE_TOKEN={token_in(shown)}" in token_html
     assert f"uv run video2sim run my_table.mp4 --out scene/ --gateway {GATEWAY}" in token_html
     assert "&lt;your token&gt;" not in token_html
+
+
+def test_manage_status_joins_holders_with_gateway_use(
+    world: World, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    token = token_in(world.page.get(world.ask().headers["location"]))
+    world.ask(name="Bob Judge", email="bob@example.org", affiliation="")  # never opened
+    asyncio.run(Ledger(MemoryKv(world.gateway_data), clock=lambda: NOW).mint("ops-test", 7))
+    world.gateway.post(
+        "/v1/chat/completions",
+        json={"model": "meta-models/muse-spark-open-1026", "messages": [{"role": "x"}]},
+        headers={"Authorization": f"Bearer {token}"},
+    )  # refused as invalid: not counted
+    for name, value in {
+        "TOKEN_PAGE_DB": str(world.settings.db_path),
+        "V2S_GATEWAY_URL": GATEWAY,
+        "V2S_GATEWAY_ADMIN_KEY": ADMIN_KEY,
+        "TOKEN_PAGE_INVITE_SHA256": hash_code(CODE),
+    }.items():
+        monkeypatch.setenv(name, value)
+    assert manage.main(["status"]) == 0
+    out = capsys.readouterr().out
+    lines = out.splitlines()
+    assert lines[0] == "gateway on"
+    assert lines[1].startswith("judging budget: vlm 0/") and "GPU 0.00/10 h" in lines[1]
+    assert lines[2].startswith("today: vlm 0/")
+    assert "2 issued by this page (1 shown, 0 revoked), 1 minted by hand, 3 on the gateway" in out
+    assert "Ada Judge <ada@example.org> (Hackathon)" in out and "shown, vlm 0/" in out
+    assert "Bob Judge <bob@example.org>  issued 2026-11-20" in out and "not yet shown" in out
+    assert "ops-test  (minted with admin.py)" in out
+    assert token not in out
+
+
+def test_status_marks_revoked_and_missing_tokens() -> None:
+    rows = [
+        {"label": "j-1", "name": "A", "email": "a@x.org", "affiliation": "", "revoked_utc": "t"},
+        {"label": "j-2", "name": "B", "email": "b@x.org", "affiliation": ""},
+    ]
+    lines = manage.status_lines(rows, {"tokens": [], "budget": {}})
+    assert any("j-1  A <a@x.org>" in line and line.endswith("revoked") for line in lines)
+    assert any(line.endswith("not on the gateway") for line in lines)

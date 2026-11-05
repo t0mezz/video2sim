@@ -46,6 +46,16 @@ class Sam3dPolicy(RouteLimits):
     max_image_mb: float = Field(gt=0)
     max_mask_mb: float = Field(gt=0)
     max_pointmap_mb: float = Field(gt=0)
+    max_image_side_px: int = Field(ge=1)
+    scaledown_window_s: float = Field(ge=0)
+
+
+class BudgetPolicy(_Strict):
+    """Totals over all tokens for the whole judging period. Unlike the daily caps they do not
+    reset: a used-up budget refuses calls until it is raised here and redeployed."""
+
+    total_scenes: int = Field(ge=1)
+    gpu_hours: float = Field(gt=0)
 
 
 class AdminPolicy(_Strict):
@@ -66,6 +76,7 @@ class Policy(_Strict):
     vlm: VlmPolicy
     tracking: TrackingPolicy
     sam3d: Sam3dPolicy
+    budget: BudgetPolicy
     admin: AdminPolicy
 
     def limits(self, route: Route) -> RouteLimits:
@@ -82,6 +93,14 @@ class Policy(_Strict):
         return math.ceil(
             self.safety_factor * self.daily_scenes * self.limits(route).calls_per_scene
         )
+
+    def total_cap(self, route: Route) -> int:
+        """Calls all tokens together may ever make on ``route``: ``ceil(total_scenes * k_r)``.
+        No safety factor: ``k_r`` is already an upper bound per scene."""
+        return math.ceil(self.budget.total_scenes * self.limits(route).calls_per_scene)
+
+    def gpu_seconds_cap(self) -> float:
+        return self.budget.gpu_hours * 3600.0
 
 
 def load_policy(path: Path = POLICY_FILE) -> Policy:

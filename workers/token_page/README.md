@@ -75,8 +75,21 @@ The gateway adds its own bounds on top: at most 30 unexpired tokens, 30 days and
 ## Operate
 
 ```bash
+.venv/bin/python manage.py status                  # budgets used, every token with its holder and use
 .venv/bin/python manage.py list                    # label, email, name, shown or revoked
 .venv/bin/python manage.py revoke judge@example.com
+```
+
+`status` asks the gateway (with the admin key) for the judging budget, today's use and each
+token's use, and puts the name and email from this server next to each label, for example:
+
+```text
+gateway on
+judging budget: vlm 31/1600, tracking 2/200, sam3d 48/2000, GPU 0.42/10 h
+today: vlm 31/1200, tracking 2/150, sam3d 48/1500
+tokens: 2 issued by this page (1 shown, 0 revoked), 0 minted by hand, 2 on the gateway now
+  j-7f3a91c2  Ada Judge <ada@example.org> (Hackathon)  issued 2026-11-05  expires 2026-11-26  shown, vlm 31/240 tracking 2/30 sam3d 48/300
+  j-0c11d2e4  Bob Judge <bob@example.org>  issued 2026-11-05  expires 2026-11-26  not yet shown, vlm 0/240 tracking 0/30 sam3d 0/300
 ```
 
 `list` is how a gateway label (in `admin.py list` or the gateway logs) maps back to a person.

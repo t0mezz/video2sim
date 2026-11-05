@@ -13,6 +13,7 @@ import io
 import json
 import logging
 import re
+import struct
 import threading
 import urllib.error
 import urllib.parse
@@ -36,10 +37,25 @@ from starlette.routing import Route
 import admin
 import modal_app
 from v2s_gateway.app import GATEWAY_HEADER, create_app
-from v2s_gateway.checks import Sam3dRequest
-from v2s_gateway.ledger import KILL_KEY, Busy, ConcurrencyGate, Ledger, MemoryKv, MintRefused
+from v2s_gateway.checks import Invalid, Sam3dRequest, image_size
+from v2s_gateway.ledger import (
+    GPU_KEY,
+    KILL_KEY,
+    Busy,
+    ConcurrencyGate,
+    Ledger,
+    MemoryKv,
+    MintRefused,
+)
 from v2s_gateway.policy import POLICY_FILE, Policy, load_policy
-from v2s_gateway.upstreams import HttpUpstreams, UpstreamFailed, Upstreams
+from v2s_gateway.upstreams import (
+    GpuTiming,
+    HttpUpstreams,
+    Sam3dResult,
+    UpstreamFailed,
+    Upstreams,
+    gpu_timing,
+)
 from video2sim.doctor import _one_pixel_png
 from video2sim.gateway_profile import JUDGE_TOKEN_ENV, apply_gateway
 from video2sim.models.sam3d import Sam3dCall, Sam3dConfig, make_transport
@@ -139,8 +155,9 @@ class FakeSam3d:
     fail: UpstreamFailed | None = None
     block: threading.Event | None = None
     entered: threading.Event = field(default_factory=threading.Event)
+    timings: list[GpuTiming | None] = field(default_factory=list)  # one per draw, then None
 
-    async def sample(self, request: Sam3dRequest) -> tuple[bytes, str]:
+    async def sample(self, request: Sam3dRequest) -> Sam3dResult:
         self.calls.append(request)
         self.entered.set()
         if self.block is not None:
@@ -148,7 +165,9 @@ class FakeSam3d:
         if self.fail is not None:
             raise self.fail
         pose = {"rotation_wxyz": [1, 0, 0, 0], "translation": [0, 0, 1], "scale": [1, 1, 1]}
-        return b"glTF-fake-mesh", json.dumps({**pose, "checkpoint": "facebook/sam-3d-objects@x"})
+        pose_json = json.dumps({**pose, "checkpoint": "facebook/sam-3d-objects@x"})
+        timing = self.timings.pop(0) if self.timings else None
+        return Sam3dResult(b"glTF-fake-mesh", pose_json, timing)
 
 
 def _message(headers: Any) -> email.message.Message:
@@ -871,3 +890,156 @@ def test_admin_list_and_revoke(harness: Harness) -> None:
     refusal(harness.client.get("/v1/usage", headers=harness.headers()), 401, "unknown_token")
     gone = harness.client.delete("/admin/tokens/judge-a", headers=admin_headers())
     refusal(gone, 404, "not_found")
+
+
+# --- judging budget, GPU time and image sizes -------------------------------------------------
+
+
+def png_header(width: int, height: int) -> bytes:
+    """A PNG that claims a size: signature and IHDR only, which is all the check reads."""
+    ihdr = struct.pack(">II", width, height) + b"\x08\x02\x00\x00\x00"
+    return b"\x89PNG\r\n\x1a\n" + struct.pack(">I", 13) + b"IHDR" + ihdr + b"\x00" * 4
+
+
+def draw_form(image: bytes, mask: bytes) -> dict[str, Any]:
+    options = Sam3dConfig.from_config(default_cfg()).options()
+    return {
+        "files": {
+            "image": ("image", image, "application/octet-stream"),
+            "mask": ("mask.png", mask, "image/png"),
+        },
+        "data": {"seed": "1", "options": json.dumps(options)},
+    }
+
+
+def admin_budget(h: Harness) -> dict[str, Any]:
+    out: dict[str, Any] = h.client.get("/admin/tokens", headers=admin_headers()).json()["budget"]
+    return out
+
+
+def test_total_budget_covers_all_tokens_and_never_resets(make_harness: Any) -> None:
+    h: Harness = make_harness(make_policy(budget={"total_scenes": 1}, vlm={"calls_per_scene": 2}))
+    second = mint_token(h.data, "judge-b")
+    for token in (h.token, second):
+        ok = h.client.post("/v1/chat/completions", json=chat_body(), headers=h.headers(token))
+        assert ok.status_code == 200
+    response = h.client.post("/v1/chat/completions", json=chat_body(), headers=h.headers())
+    assert "2 calls in all" in refusal(response, 403, "judging_budget")
+    h.clock[0] = NOW + timedelta(days=3)  # unlike the daily cap, a new day does not help
+    later = h.client.post("/v1/chat/completions", json=chat_body(), headers=h.headers(second))
+    refusal(later, 403, "judging_budget")
+    assert admin_budget(h)["total"]["vlm"] == {"used": 2, "cap": 2}
+
+
+def test_unserved_calls_are_given_back_to_the_total_budget(make_harness: Any) -> None:
+    h: Harness = make_harness(make_policy(budget={"total_scenes": 1}, vlm={"calls_per_scene": 1}))
+    h.provider.chat_status = 503
+    response = h.client.post("/v1/chat/completions", json=chat_body(), headers=h.headers())
+    refusal(response, 503, "upstream_unavailable")
+    h.provider.chat_status = 200
+    ok = h.client.post("/v1/chat/completions", json=chat_body(), headers=h.headers())
+    assert ok.status_code == 200
+
+
+def test_gpu_time_is_container_time_with_idle_gaps_and_tails(
+    harness: Harness, tmp_path: Path
+) -> None:
+    tail = harness.policy.sam3d.scaledown_window_s
+    harness.sam3d.timings = [
+        GpuTiming("ta-1", 100.0, 160.0),  # a cold container: start to end, plus its idle tail
+        GpuTiming("ta-1", 170.0, 200.0),  # same container: the time since its last draw ended
+        GpuTiming("ta-2", 0.0, 30.0),  # a second container
+    ]
+    for _ in range(3):
+        response = harness.client.post(
+            "/sam3d/sample", headers=harness.headers(), **sam3d_form(tmp_path)
+        )
+        assert response.status_code == 200
+    expected = (60 + tail) + 40 + (30 + tail)
+    assert harness.data[GPU_KEY] == pytest.approx(expected)
+    assert admin_budget(harness)["gpu_hours"]["used"] == round(expected / 3600, 3)
+
+
+def test_gpu_budget_stops_draws_before_they_reach_the_worker(
+    make_harness: Any, tmp_path: Path
+) -> None:
+    h: Harness = make_harness(make_policy(budget={"gpu_hours": 0.05}))  # 180 s
+    h.sam3d.timings = [GpuTiming("ta-1", 0.0, 20.0)]  # 20 s plus the 300 s tail
+    first = h.client.post("/sam3d/sample", headers=h.headers(), **sam3d_form(tmp_path))
+    assert first.status_code == 200
+    response = h.client.post("/sam3d/sample", headers=h.headers(), **sam3d_form(tmp_path))
+    assert "0.05 hours" in refusal(response, 403, "gpu_budget")
+    assert len(h.sam3d.calls) == 1
+    chat = h.client.post("/v1/chat/completions", json=chat_body(), headers=h.headers())
+    assert chat.status_code == 200  # only SAM 3D stops
+
+
+def test_failed_and_untimed_draws_still_count_gpu_time(harness: Harness, tmp_path: Path) -> None:
+    harness.sam3d.fail = UpstreamFailed(None, retryable=True)  # e.g. a worker timeout
+    response = harness.client.post(
+        "/sam3d/sample", headers=harness.headers(), **sam3d_form(tmp_path)
+    )
+    refusal(response, 503, "upstream_unavailable")
+    assert harness.usage()["routes"]["sam3d"]["used"] == 0  # the call is refunded ...
+    assert harness.data[GPU_KEY] > 0  # ... but its wall time counts
+    harness.sam3d.fail = None
+    before = harness.data[GPU_KEY]
+    harness.client.post("/sam3d/sample", headers=harness.headers(), **sam3d_form(tmp_path))
+    assert harness.data[GPU_KEY] - before >= harness.policy.sam3d.scaledown_window_s
+
+
+def test_worker_stats_become_a_timing() -> None:
+    stats = {
+        "container": "ta-9",
+        "boot_started_utc": 1000.0,
+        "load_s": 60.0,
+        "sample_started_utc": 1062.0,
+        "sample_s": 14.0,
+    }
+    # booted for this draw: boot, loading, 2 s idle and the draw all count
+    assert gpu_timing(stats, 300.0) == GpuTiming("ta-9", 1000.0, 1076.0)
+    # ran for hours before: loading, one idle window and this draw count, not its history
+    later = {**stats, "sample_started_utc": 9000.0}
+    assert gpu_timing(later, 300.0) == GpuTiming("ta-9", 8640.0, 9014.0)
+    assert gpu_timing({**stats, "container": ""}, 300.0) is None
+    assert gpu_timing({"container": "ta-9"}, 300.0) is None
+    assert gpu_timing(None, 300.0) is None
+
+
+def test_image_sides_and_mask_size_are_checked(harness: Harness) -> None:
+    huge = png_header(20000, 20000)  # a few bytes that claim 400 megapixels
+    response = harness.client.post(
+        "/sam3d/sample", headers=harness.headers(), **draw_form(huge, huge)
+    )
+    assert "1 to 4096 px, got 20000x20000" in refusal(response, 400, "invalid_request")
+    response = harness.client.post(
+        "/sam3d/sample",
+        headers=harness.headers(),
+        **draw_form(png_header(3840, 2160), png_header(1920, 1080)),
+    )
+    assert "mask size" in refusal(response, 400, "invalid_request")
+    four_k = png_header(3840, 2160)
+    ok = harness.client.post(
+        "/sam3d/sample", headers=harness.headers(), **draw_form(four_k, four_k)
+    )
+    assert ok.status_code == 200
+    assert len(harness.sam3d.calls) == 1
+
+
+def test_image_size_reads_jpeg_and_png_headers() -> None:
+    import cv2
+    import numpy as np
+
+    ok, jpeg = cv2.imencode(".jpg", np.zeros((30, 40, 3), np.uint8))
+    assert ok and image_size(jpeg.tobytes()) == (40, 30)
+    ok, png = cv2.imencode(".png", np.zeros((7, 5), np.uint8))
+    assert ok and image_size(png.tobytes()) == (5, 7)
+    for broken in (b"\xff\xd8\xff\xe0\x00", b"\x89PNG\r\n\x1a\n", b"GIF89a"):
+        with pytest.raises(Invalid):
+            image_size(broken)
+
+
+def test_policy_tail_matches_the_worker() -> None:
+    source = (ROOT / "src/video2sim/models/sam3d_modal.py").read_text("utf-8")
+    [window] = re.findall(r"scaledown_window=(\d+)", source)
+    assert load_policy().sam3d.scaledown_window_s == float(window)

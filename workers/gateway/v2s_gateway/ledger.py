@@ -5,8 +5,10 @@ On Modal the store is a ``modal.Dict`` and the gateway runs in one container
 atomic. Tokens are stored only as their SHA-256; revoking one deletes its row.
 
 Keys: ``token:<sha256>`` holds a ``TokenRecord`` as a dict, ``used:<sha256>:<route>`` the calls a
-token has made on a route, ``day:<YYYY-MM-DD>:<route>`` the calls of all tokens on a UTC day, and
-``kill`` is true while the gateway is switched off.
+token has made on a route, ``day:<YYYY-MM-DD>:<route>`` the calls of all tokens on a UTC day,
+``total:<route>`` the calls of all tokens ever, ``gpu_seconds`` the SAM 3D container time used,
+``container:<id>`` when a worker container last finished a draw, and ``kill`` is true while the
+gateway is switched off.
 """
 
 from __future__ import annotations
@@ -45,6 +47,13 @@ def used_key(token_hash: str, route: Route) -> str:
 
 def day_key(day: str, route: Route) -> str:
     return f"day:{day}:{route}"
+
+
+def total_key(route: Route) -> str:
+    return f"total:{route}"
+
+
+GPU_KEY = "gpu_seconds"
 
 
 def utc_now() -> datetime:
@@ -127,9 +136,12 @@ class ModalDictKv:
 
 
 class Refused(Exception):
-    """A reservation was refused: the token's quota or the gateway's daily cap is used up."""
+    """A reservation was refused: the token's quota, the daily cap, the total budget or the GPU
+    budget (``limit`` in hours) is used up."""
 
-    def __init__(self, reason: Literal["quota", "daily"], route: Route, limit: int) -> None:
+    def __init__(
+        self, reason: Literal["quota", "daily", "total", "gpu"], route: Route, limit: float
+    ) -> None:
         super().__init__(f"{reason} limit {limit} reached on {route}")
         self.reason, self.route, self.limit = reason, route, limit
 
@@ -171,7 +183,7 @@ class Ledger:
         return bool(await self._kv.get(KILL_KEY))
 
     async def reserve(
-        self, token_hash: str, route: Route, quota: int, daily_cap: int
+        self, token_hash: str, route: Route, quota: int, daily_cap: int, total_cap: int
     ) -> Reservation:
         """Count one call, or raise ``Refused`` without counting it."""
         day = self.now().date().isoformat()
@@ -179,18 +191,58 @@ class Ledger:
             used = int(await self._kv.get(used_key(token_hash, route)) or 0)
             if used >= quota:
                 raise Refused("quota", route, quota)
+            total = int(await self._kv.get(total_key(route)) or 0)
+            if total >= total_cap:
+                raise Refused("total", route, total_cap)
             today = int(await self._kv.get(day_key(day, route)) or 0)
             if today >= daily_cap:
                 raise Refused("daily", route, daily_cap)
             await self._kv.put(used_key(token_hash, route), used + 1)
+            await self._kv.put(total_key(route), total + 1)
             await self._kv.put(day_key(day, route), today + 1)
         return Reservation(token_hash, route, day)
+
+    async def gpu_seconds(self) -> float:
+        return float(await self._kv.get(GPU_KEY) or 0.0)
+
+    async def add_gpu_seconds(self, seconds: float) -> None:
+        """Count GPU time measured without the worker's timings (a failed draw's wall time)."""
+        async with self._lock:
+            await self._kv.put(GPU_KEY, await self.gpu_seconds() + max(0.0, seconds))
+
+    async def add_gpu_draw(
+        self, container: str, start_s: float, end_s: float, tail_s: float
+    ) -> float:
+        """Count the container time one draw adds, and return it. Times are the worker's clock.
+
+        A container is billed from its start to ``tail_s`` after its last draw, and runs one draw
+        at a time. So its first draw adds ``end_s - start_s`` plus the tail it will idle at the
+        end; each later draw adds the time since that container's previous draw ended, idle gap
+        included. Summed, that is the container's whole billed time."""
+        key = f"container:{container}"
+        async with self._lock:
+            last = await self._kv.get(key)
+            if last is None:
+                added = max(0.0, end_s - start_s) + tail_s
+            else:
+                added = max(0.0, end_s - float(last))
+            await self._kv.put(key, max(end_s, float(last or 0.0)))
+            await self._kv.put(GPU_KEY, await self.gpu_seconds() + added)
+        return added
+
+    async def totals(self) -> dict[Route, int]:
+        return {r: int(await self._kv.get(total_key(r)) or 0) for r in ROUTES}
+
+    async def today(self) -> dict[Route, int]:
+        day = self.now().date().isoformat()
+        return {r: int(await self._kv.get(day_key(day, r)) or 0) for r in ROUTES}
 
     async def refund(self, reservation: Reservation) -> None:
         """Give back a call the upstream did not serve."""
         r = reservation
         async with self._lock:
-            for key in (used_key(r.token_hash, r.route), day_key(r.day, r.route)):
+            keys = (used_key(r.token_hash, r.route), day_key(r.day, r.route), total_key(r.route))
+            for key in keys:
                 value = int(await self._kv.get(key) or 0)
                 await self._kv.put(key, max(0, value - 1))
 

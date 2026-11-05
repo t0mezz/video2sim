@@ -40,9 +40,26 @@ class TrackingUpstream(Protocol):
         ...
 
 
+@dataclass(frozen=True)
+class GpuTiming:
+    """When one draw ran, on the worker's clock: ``start_s`` is when its container started
+    working for it (boot and weight loading included when the draw started the container)."""
+
+    container: str
+    start_s: float
+    end_s: float
+
+
+@dataclass(frozen=True)
+class Sam3dResult:
+    glb: bytes
+    pose_json: str
+    timing: GpuTiming | None  # None when the worker reported no timings
+
+
 class Sam3dUpstream(Protocol):
-    async def sample(self, request: Sam3dRequest) -> tuple[bytes, str]:
-        """The GLB and the pose JSON of one draw."""
+    async def sample(self, request: Sam3dRequest) -> Sam3dResult:
+        """The GLB, the pose JSON and the GPU timing of one draw."""
         ...
 
 
@@ -101,11 +118,11 @@ class ModalSam3d:
     ``ModalTransport`` calls it. The gateway runs in the same Modal workspace, so it needs no
     Modal token and the worker gets no public endpoint."""
 
-    def __init__(self, app: str, cls: str) -> None:
-        self._app, self._cls = app, cls
+    def __init__(self, app: str, cls: str, max_idle_s: float) -> None:
+        self._app, self._cls, self._max_idle_s = app, cls, max_idle_s
         self._worker: Any = None
 
-    async def sample(self, request: Sam3dRequest) -> tuple[bytes, str]:
+    async def sample(self, request: Sam3dRequest) -> Sam3dResult:
         import modal
         import modal.exception
 
@@ -125,4 +142,24 @@ class ModalSam3d:
             # Raised by the worker's own code, such as "SAM 3D returned no mesh": the draw is
             # seeded, so the same request would fail again.
             raise UpstreamFailed(None, False) from None
-        return bytes(out["glb"]), str(out["pose_json"])
+        timing = gpu_timing(out.get("stats"), self._max_idle_s)
+        return Sam3dResult(bytes(out["glb"]), str(out["pose_json"]), timing)
+
+
+def gpu_timing(stats: Any, max_idle_s: float) -> GpuTiming | None:
+    """The timing of a draw from the ``stats`` that ``Sam3dWorker.sample`` returns.
+
+    A container's start is its ``boot_started_utc``. A container already running for someone
+    else (the operator's own runs) would bring its whole history along, so the start is at most
+    weight loading, one idle window (``max_idle_s``, the worker's scaledown) and the draw before
+    the draw's end. A container idle for longer would have stopped."""
+    try:
+        container = str(stats["container"])
+        boot = float(stats["boot_started_utc"])
+        end = float(stats["sample_started_utc"]) + float(stats["sample_s"])
+        busy = float(stats["load_s"]) + max_idle_s + float(stats["sample_s"])
+    except (KeyError, TypeError, ValueError):
+        return None
+    if not container:
+        return None
+    return GpuTiming(container, max(boot, end - busy), end)

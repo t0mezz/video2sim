@@ -40,6 +40,12 @@ sam3d:                        # POST /sam3d/sample, forwarded to the Modal worke
   max_image_mb: 16            # dev keyframes are about 2.3 MB
   max_mask_mb: 4
   max_pointmap_mb: 64         # float32 HxWx3; 1080p is 24.9 MB. Off by default (shape.sam3d.use_pointmap)
+  max_image_side_px: 4096     # longest image side; dev frames are 1920x1080 and 3840x2160. The mask must match the image
+  scaledown_window_s: 300     # the worker's idle time before it stops, billed after its last draw; keep equal to models/sam3d_modal.py
+
+budget:                       # totals over all tokens for the whole judging period; they never reset by themselves
+  total_scenes: 40            # each route allows ceil(total_scenes * calls_per_scene) calls in all (human decision 2026-11-05)
+  gpu_hours: 10               # SAM 3D container time in all, from the worker's own timings, idle tails included (same decision)
 
 admin:                        # /admin/tokens, called by the token request page on the home server
   max_tokens: 30              # unexpired tokens at most; minting more is refused, so a leaked admin key cannot drain credit without end

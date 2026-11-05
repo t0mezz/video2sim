@@ -146,6 +146,11 @@ class HttpGateway:
             raise GatewayRefused("The gateway cannot be reached right now.") from None
         return out
 
+    def listing(self) -> dict[str, Any]:
+        """Every token on the gateway with its use, and the budgets (``GET /admin/tokens``)."""
+        out: dict[str, Any] = self._call("GET", "/admin/tokens")
+        return out
+
     def revoke(self, label: str) -> int:
         try:
             return int(self._call("DELETE", f"/admin/tokens/{label}")["revoked"])

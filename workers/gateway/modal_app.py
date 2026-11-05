@@ -75,7 +75,8 @@ def web() -> Any:
         )
     )
     http = HttpUpstreams(client, os.environ["BASETEN_API_KEY"], os.environ["META_MODEL_API_KEY"])
-    upstreams = Upstreams(http, http, ModalSam3d(policy.sam3d.app, policy.sam3d.cls))
+    sam3d = ModalSam3d(policy.sam3d.app, policy.sam3d.cls, policy.sam3d.scaledown_window_s)
+    upstreams = Upstreams(http, http, sam3d)
     # Optional: enables /admin/tokens for the token request page on the home server.
     admin_key = os.environ.get("V2S_GATEWAY_ADMIN_KEY")
     return create_app(policy, Ledger(ModalDictKv(state)), upstreams, admin_key)

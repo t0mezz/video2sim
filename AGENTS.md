@@ -136,7 +136,7 @@ token's usage, and its VLM probes count against the quota. The gateway itself is
 secret `video2sim-gateway`), and `uv run python workers/gateway/admin.py mint|list|revoke|kill|revive` manages tokens and
 the kill switch in its `modal.Dict`; the token request page on vts.kortec.me mints through `/admin/tokens` (D-042). That page is
 `workers/token_page/` (runbook in its `README.md`), run on the home server with `uvicorn --factory token_page:app_from_env`;
-`python workers/token_page/manage.py hash-code|list|revoke EMAIL` hashes invite codes and maps labels back to judges. Its tests run offline. Locally a plain `uv run` may rewrite `uv.lock` with an
+`python workers/token_page/manage.py status|hash-code|list|revoke EMAIL` reports the budgets and each token with its holder, hashes invite codes and maps labels back to judges. Its tests run offline. Locally a plain `uv run` may rewrite `uv.lock` with an
 `exclude-newer` block from a user-level uv config, which breaks `uv sync --locked` in CI; lock with `uv lock --no-config`.
 
 Never document a command that does not exist. When you add one, add it here in the same

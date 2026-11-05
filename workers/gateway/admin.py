@@ -36,6 +36,14 @@ async def mint(
 
 async def report(ledger: Ledger, policy: Policy, out: TextIO) -> None:
     print(f"gateway {'SWITCHED OFF' if await ledger.killed() else 'on'}", file=out)
+    totals, today = await ledger.totals(), await ledger.today()
+    print(
+        "judging budget: "
+        + ", ".join(f"{r} {totals[r]}/{policy.total_cap(r)}" for r in ROUTES)
+        + f", GPU {await ledger.gpu_seconds() / 3600:.2f}/{policy.budget.gpu_hours:g} h",
+        file=out,
+    )
+    print("today: " + ", ".join(f"{r} {today[r]}/{policy.daily_cap(r)}" for r in ROUTES), file=out)
     for token_hash, record in await ledger.tokens():
         used = await ledger.used(token_hash)
         usage = ", ".join(f"{r} {used[r]}/{policy.quota(r, record.scenes)}" for r in ROUTES)

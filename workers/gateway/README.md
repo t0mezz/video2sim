@@ -22,8 +22,8 @@ is in `policy.yaml`. The tests are `tests/test_gateway.py` (fake upstreams, no n
 | --- | --- |
 | Key leak | Keys only in the Modal secret. Upstream error bodies and headers are never passed on: an upstream failure becomes our own 503 (retryable, refunded) or 422 (rejected). Logs hold path, token label, status, bytes and milliseconds only. |
 | Free LLM for others | Model allowlist per route. The VLM body is rebuilt from `model`, `messages`, `temperature` and `max_tokens`; `max_tokens` is clamped to 4096 and set to 4096 when missing. Images and the clip must be `data:` URLs, so no upstream fetches a URL. |
-| GPU burn | SAM 3D options must have exactly the keys of `Sam3dConfig.options()`, an allowed checkpoint and null steps. Size caps on image, mask, pointmap and every body. |
-| Cost runaway | Per-token quota per route, a daily cap per route over all tokens, and a kill switch read on every request. Provider spend limits are the real backstop. |
+| GPU burn | SAM 3D options must have exactly the keys of `Sam3dConfig.options()`, an allowed checkpoint and null steps. Size caps on image, mask, pointmap and every body; the image's long side at most 4096 px, read from its header, and the mask the same size, so a small file claiming a huge image never reaches the GPU. |
+| Cost runaway | Per-token quota per route; a daily cap per route over all tokens; a **judging budget** over all tokens that never resets (40 scenes: `ceil(40 * k_r)` calls per route) and **10 GPU hours** of SAM 3D; a kill switch read on every request. Provider spend limits are the backstop for bugs. |
 | Token leak | Tokens are stored only as SHA-256, with an expiry. Revoking deletes the row. |
 | Overload | Per-token concurrency per route (8 VLM, 4 tracking, 6 SAM 3D, matching the pipeline's own parallelism); a request over it waits up to `queue_wait_s` for a slot, then gets 429. |
 
@@ -38,6 +38,12 @@ calls, with $c$ = `safety_factor`, $n_{\text{scenes}}$ = `scenes_per_token` and 
 `calls_per_scene`. The daily cap uses `daily_scenes` in place of $n_{\text{scenes}}$. The $k_r$ in
 `policy.yaml` are provisional: the largest per-scene counts of cached answers in the local dev
 runs. Task G4 replaces them with a measured run.
+
+GPU time is what Modal bills, not the number of draws: a worker container counts from its start
+until 300 s (its `scaledown_window`) after its last draw, idle gaps included, from the timings
+the worker returns with each draw. A draw that fails counts its wall time, even when the call
+itself is refunded. Once 10 hours are used, every SAM 3D call answers 403 `gpu_budget` before
+it reaches the worker; calls already running finish, so the total can end a few minutes over.
 
 ## Set up (human, each step needs a go-ahead)
 
@@ -97,14 +103,16 @@ What the page itself must do, since the gateway cannot:
 ## Operate
 
 ```bash
-uv run python workers/gateway/admin.py list            # tokens, expiry, usage against quota
+uv run python workers/gateway/admin.py list            # budgets, today, and each token's use
 uv run python workers/gateway/admin.py revoke judge-a  # that token answers 401 from now on
 uv run python workers/gateway/admin.py kill            # every model route answers 503 at once
 uv run python workers/gateway/admin.py revive
 ```
 
 `--scenes N` on `mint` gives one token a different scene allowance. Quotas follow `policy.yaml`
-at the time of the request, so a changed policy takes effect on the next deploy.
+at the time of the request, so a changed policy takes effect on the next deploy. The judging
+budget never resets by itself: to allow more, raise `budget.total_scenes` or `budget.gpu_hours`
+and redeploy; the counts so far stay.
 
 **Kill switch.** `admin.py kill` sets a flag the gateway reads on every request. If Modal itself
 is the problem, `uv run modal app stop video2sim-gateway` stops the app; a new deploy starts it

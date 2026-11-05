@@ -136,6 +136,20 @@ def _refused(refused: Refused) -> GatewayError:
             f"This judge token has used its {refused.route} quota of {refused.limit} calls. "
             f"{REPLAY_HINT}",
         )
+    if refused.reason == "total":
+        return GatewayError(
+            403,
+            "judging_budget",
+            f"The judging budget for {refused.route} ({refused.limit} calls in all) is used up. "
+            f"{REPLAY_HINT}",
+        )
+    if refused.reason == "gpu":
+        return GatewayError(
+            403,
+            "gpu_budget",
+            f"The GPU budget for judging ({refused.limit:g} hours of SAM 3D) is used up. "
+            f"{REPLAY_HINT}",
+        )
     return GatewayError(
         403,
         "daily_budget",
@@ -253,6 +267,7 @@ def create_app(
                 route,
                 policy.quota(route, caller.scenes),
                 policy.daily_cap(route),
+                policy.total_cap(route),
             )
         except Refused as refused:
             await gate.release(key)
@@ -362,14 +377,27 @@ def create_app(
             draw = await read_sam3d_form(request.scope, raw, p)
         except Invalid as error:
             raise invalid(error) from None
+        if await ledger.gpu_seconds() >= policy.gpu_seconds_cap():
+            raise _refused(Refused("gpu", "sam3d", policy.budget.gpu_hours))
         key, reservation = await admit(caller, "sam3d")
+        started = time.monotonic()
         try:
-            glb, pose = await upstreams.sam3d.sample(draw)
+            result = await upstreams.sam3d.sample(draw)
         except UpstreamFailed as failure:
+            # The GPU may have run even though the draw failed (a timeout, say), so its wall
+            # time counts against the GPU budget even when the call itself is refunded.
+            await ledger.add_gpu_seconds(time.monotonic() - started)
             await upstream_failed(reservation, failure)
         finally:
             await gate.release(key)
-        return Response(glb, media_type="model/gltf-binary", headers={POSE_HEADER: pose})
+        if result.timing is None:
+            await ledger.add_gpu_seconds(time.monotonic() - started + p.scaledown_window_s)
+        else:
+            t = result.timing
+            await ledger.add_gpu_draw(t.container, t.start_s, t.end_s, p.scaledown_window_s)
+        return Response(
+            result.glb, media_type="model/gltf-binary", headers={POSE_HEADER: result.pose_json}
+        )
 
     def require_admin(request: Request) -> None:
         if not admin_key:
@@ -425,7 +453,26 @@ def create_app(
             {**describe(record), "used": await ledger.used(token_hash)}
             for token_hash, record in await ledger.tokens()
         ]
-        return JSONResponse({"switched_off": await ledger.killed(), "tokens": rows})
+        return JSONResponse(
+            {
+                "switched_off": await ledger.killed(),
+                "budget": await budget(),
+                "tokens": rows,
+            }
+        )
+
+    async def budget() -> dict[str, Any]:
+        """Use against the totals, today's caps and the GPU budget, over all tokens."""
+        totals = await ledger.totals()
+        today = await ledger.today()
+        return {
+            "total": {r: {"used": totals[r], "cap": policy.total_cap(r)} for r in ROUTES},
+            "today": {r: {"used": today[r], "cap": policy.daily_cap(r)} for r in ROUTES},
+            "gpu_hours": {
+                "used": round(await ledger.gpu_seconds() / 3600.0, 3),
+                "cap": policy.budget.gpu_hours,
+            },
+        }
 
     @app.delete("/admin/tokens/{label}")
     async def admin_revoke(request: Request, label: str) -> JSONResponse:
