@@ -1,0 +1,42 @@
+# What a judge token may call through the gateway, and how much. Read by v2s_gateway/policy.py.
+# None of it changes a pipeline result, so it lives here and not in configs/.
+#
+# A token's quota on a route is ceil(safety_factor * scenes_per_token * calls_per_scene), and
+# the gateway's daily cap on a route is ceil(safety_factor * daily_scenes * calls_per_scene).
+# calls_per_scene is PROVISIONAL until task G4 measures it on a run through the gateway: the
+# values are the largest per-scene counts of cached hosted answers in the local dev runs
+# (runs_dev/, 2026-11-05; at most 31 VLM, 4 tracking and 48 SAM 3D calls), rounded up. Caches
+# can hold answers of earlier configs, so these counts are upper bounds.
+
+scenes_per_token: 3           # human decision pending (plan G0); the plan suggests 3
+safety_factor: 2              # plan suggestion; covers doctor probes and a rerun
+daily_scenes: 15              # all tokens together, per UTC day; a guess
+queue_wait_s: 120             # a request over its concurrency limit waits this long for a slot, then gets 429
+upstream_connect_timeout_s: 10
+upstream_read_timeout_s: 900  # longest wait for the next bytes; a tracking answer can take ~10 minutes
+
+vlm:                          # POST /v1/chat/completions, forwarded to Baseten
+  calls_per_scene: 40         # provisional, see above
+  concurrency: 8              # physics.parallel_mass_calls is 6, and the stages overlap
+  models: [meta-models/muse-spark-open-1026]
+  max_tokens_cap: 4096        # a larger or missing max_tokens is set to this
+  max_images: 16
+  max_body_mb: 32             # router views are downscaled to 1024 px; crops are small
+
+tracking:                     # POST /v1/responses, forwarded to the Meta Model API
+  calls_per_scene: 5          # provisional, see above
+  concurrency: 4              # segmentation.tracking.gap_fill.max_workers is 4 (gap fill is off by default)
+  models: [sam-3.1]
+  max_prompt_chars: 20000     # object prompts carry box tokens (models/sam_prompts.py)
+  max_body_mb: 64             # largest dev clip 18.4 MB, 24.5 MB as base64
+
+sam3d:                        # POST /sam3d/sample, forwarded to the Modal worker of models/sam3d_modal.py
+  calls_per_scene: 50         # provisional, see above
+  concurrency: 6              # shape.parallel_samples is 6; the worker runs at most 4 containers
+  app: video2sim-sam3d
+  cls: Sam3dWorker
+  checkpoints: [facebook/sam-3d-objects]
+  max_inference_steps: null   # null allows only null steps (SAM 3D's own default, as in configs/default.yaml)
+  max_image_mb: 16            # dev keyframes are about 2.3 MB
+  max_mask_mb: 4
+  max_pointmap_mb: 64         # float32 HxWx3; 1080p is 24.9 MB. Off by default (shape.sam3d.use_pointmap)

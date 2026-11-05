@@ -52,6 +52,25 @@ uv run video2sim replay s01 --out scene/      # same progress and package as `vi
 
 Details and the limits of a replay: [docs/judge_snapshot.md](docs/judge_snapshot.md).
 
+## Live inference for judges (optional)
+
+If the gateway is up, you can run the whole pipeline on your own video without any model keys.
+You get a personal token; it has a small usage quota and expires after judging.
+
+```bash
+uv sync
+export V2S_JUDGE_TOKEN=...      # your token; PowerShell: $env:V2S_JUDGE_TOKEN="..."
+uv run video2sim doctor --gateway https://GATEWAY_URL   # shows the token's quota left
+uv run video2sim run my_table.mp4 --out scene/ --gateway https://GATEWAY_URL
+```
+
+Film the table as [docs/capture_protocol.md](docs/capture_protocol.md) describes, with the marker
+board in view. Frames, crops and a clip of your video are forwarded to Baseten, Meta and Modal. The
+gateway does not store them; the providers' retention terms are not yet checked
+([docs/licenses.md](docs/licenses.md)), so do not film anything private. If the gateway is down or
+your quota is used up, `video2sim replay` works without any network. Operators: see
+[workers/gateway/README.md](workers/gateway/README.md).
+
 ## Quick start
 
 ```bash

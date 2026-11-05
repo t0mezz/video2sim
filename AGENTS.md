@@ -40,8 +40,9 @@ src/video2sim/
   pipeline.py            all six stages as one runner
   pick_place.py          scripted Panda demo on an exported scene
   isaac_verify.py        USD side of the Isaac Sim settling verifier (stdlib, NumPy, pxr only)
-  cli.py                 the `video2sim` command (`eval` and `run`)
+  cli.py                 the `video2sim` command (`eval`, `run`, `replay`, `doctor`)
 tests/                   fast tests; no GPU, weights or network needed
+workers/                 services run outside the pipeline: gateway/ (judge gateway, D-041), sam3d_http/
 benchmark/               ground-truth format; scene data itself is not in git
 docs/                    overview, stages, lessons, decisions, capture protocol, license tracker;
                          research/ and history/ hold the evidence
@@ -126,6 +127,15 @@ MuJoCo for the nominal, low and high friction and mass (P4.7, D-021), caching ea
 `video2sim run VIDEO --out FOLDER` runs all six stages through `src/video2sim/pipeline.py` and copies the scene package and the manifest to `FOLDER` (P5.5). It uploads video frames and crops to the hosted models and needs their keys in `.env`.
 
 `video2sim replay [SCENE] --out FOLDER [--video FILE] [--archive ZIP] [--instant]` shows a recorded run of a dev scene from the judge snapshot (`docs/judge_snapshot/index.json`, `src/video2sim/replay.py`): it checks the archive and `export/` hashes, reports the six stages with their recorded times and copies the scene package; it runs no stage, builds no client and reads no key. `python scripts/build_judge_snapshot.py RUNS_DIR SCENE ...` packs finished runs into `data/judge_snapshot/archives/` and updates the lock file; it makes no hosted call and uploads nothing (`docs/judge_snapshot.md`).
+
+`video2sim run VIDEO --out FOLDER --gateway URL` and `video2sim doctor --gateway URL` send every model call to the judge
+gateway at `URL` with the token in `V2S_JUDGE_TOKEN` (`src/video2sim/gateway_profile.py`, D-041); doctor also prints the
+token's usage, and its VLM probes count against the quota. The gateway itself is `workers/gateway/` (runbook in its
+`README.md`, policy in `policy.yaml`): `uv run modal deploy workers/gateway/modal_app.py` deploys it (human go-ahead, Modal
+secret `video2sim-gateway`), and `uv run python workers/gateway/admin.py mint|list|revoke|kill|revive` manages tokens and
+the kill switch in its `modal.Dict`. Its tests run offline. Locally a plain `uv run` may rewrite `uv.lock` with an
+`exclude-newer` block from a user-level uv config, which breaks `uv sync --locked` in CI; lock with `uv lock --no-config`.
+
 Never document a command that does not exist. When you add one, add it here in the same
 change.
 

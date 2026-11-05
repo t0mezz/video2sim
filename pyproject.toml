@@ -35,6 +35,16 @@ dev = [
     "mypy>=1.10",
     "types-PyYAML",
 ]
+# The judge gateway (workers/gateway) and its tests; the pipeline itself never imports these.
+gateway = [
+    "fastapi>=0.162.0",
+    "httpx>=0.28.1",
+    "python-multipart>=0.0.32",
+]
+
+[tool.uv]
+# CI runs the gateway tests and type-checks the gateway, so its group installs by default.
+default-groups = ["dev", "gateway"]
 
 [build-system]
 requires = ["hatchling"]
@@ -46,7 +56,7 @@ packages = ["src/video2sim"]
 [tool.ruff]
 line-length = 100
 target-version = "py310"
-src = ["src", "tests"]
+src = ["src", "tests", "workers/gateway"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "NPY", "RUF"]
@@ -55,7 +65,8 @@ select = ["E", "F", "I", "UP", "B", "SIM", "NPY", "RUF"]
 python_version = "3.10"
 strict = true
 plugins = ["pydantic.mypy"]
-files = ["src", "tests"]
+mypy_path = "workers/gateway"
+files = ["src", "tests", "workers/gateway"]
 
 # Installed only inside the SAM 3D worker image on Modal (models/sam3d_modal.py), never here.
 [[tool.mypy.overrides]]
@@ -76,6 +87,7 @@ follow_imports = "skip"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["workers/gateway"]
 addopts = "-ra"
 markers = [
     "gpu: needs a CUDA GPU (skipped on machines without one)",

@@ -2,7 +2,7 @@
 
 Open work only. Finished work lives in `docs/history/` (task and evidence records) and
 `docs/decisions.md`; scope, targets and the pipeline are in `docs/overview.md`. The old `PLAN.md` is
-kept as `docs/history/plan_2026-11-03.md`. Last updated 2026-11-04. Tick a box only with the
+kept as `docs/history/plan_2026-11-03.md`. Last updated 2026-11-05. Tick a box only with the
 evidence linked on the same line (a result file, a commit, a run id); ticked items are removed at
 the next cleanup, and their evidence stays in the doc or decision row it belongs to.
 
@@ -22,6 +22,35 @@ here.
   clean Linux clone on 2026-11-05).
   Network CI: `.github/workflows/judge-snapshot.yml` replays every scene from the release on ubuntu, macOS and
   Windows (on `src/**` and lock-file changes); first green run still to be checked.
+
+**Live inference for judges (D-041).** Gateway on Modal with per-judge tokens; branch `judge-gateway`. Items
+`G0` to `G6`; runbook in `workers/gateway/README.md`.
+
+- [ ] **G0 [human] Keys, terms and quota policy.** Decided on 2026-11-05: Modal hosting, the `gateway` dependency group,
+  judges' own videos allowed. Open: dedicated Baseten and Meta keys with spend limits and a Modal spend limit; the
+  Modal secret `video2sim-gateway`; the retention terms of Baseten, the Meta Model API and Modal, and whether their
+  terms allow forwarding third parties' requests with our keys (`docs/licenses.md`); `scenes_per_token: 3` and
+  `safety_factor: 2` in `workers/gateway/policy.yaml` confirmed or changed.
+- [ ] **G1 [agent] Gateway code and tests.** Built on branch `judge-gateway`: `workers/gateway/v2s_gateway/`,
+  `modal_app.py`, `admin.py`, `tests/test_gateway.py` (40 tests, fake upstreams, no network; the pipeline's own VLM,
+  tracking and SAM 3D clients drive it). Tick when merged.
+- [ ] **G2 [agent] Client side.** Built on branch `judge-gateway`: `src/video2sim/gateway_profile.py`, `--gateway` on
+  `run` and `doctor`, the gateway's refusal message in client errors (`explain_http_error`), `V2S_JUDGE_TOKEN` in
+  `.env.example`, `tests/test_gateway_profile.py`. Tick when merged.
+- [ ] **G3 [human, hosted] Host spike.** Deploy with a tiny quota and check with a real clip: the largest tracking clip
+  passes Modal's request-size limit; a ~10-minute SSE tracking request does not time out; a cold SAM 3D draw completes.
+  Fallback if the timeout is too short: a long-lived container host plus a Modal token scoped to the SAM 3D app.
+- [ ] **G4 [agent, hosted] Calibration.** Run the smallest dev scene through the gateway and set `calls_per_scene` in
+  `policy.yaml` from `admin.py list`. The values there now are the largest cached-answer counts per dev scene (31 VLM,
+  4 tracking, 48 SAM 3D, rounded up), so upper bounds. Uploads data and spends credit: needs the go-ahead.
+- [ ] **G5 [human] Tokens and docs.** Done: README section, runbook (kill switch, key rotation, teardown), `admin.py`.
+  Open: mint the tokens and send them through the submission form; put the gateway URL into the README.
+- [ ] **G6 [human] Dress rehearsal.** On a clean machine with only a token, follow the README: sync, doctor, run a
+  sample video, time it, check that usage counts down and that a revoked token fails.
+- [ ] **G7 [agent] Known gaps.** Over HTTP the pipeline does not warm SAM 3D containers, so a judge's first draws start
+  cold (the gateway could start the warm-up when a tracking request arrives). A quota that runs out mid-run fails some
+  calls, and stages with a fallback (router surface, material, mass, shape hull) then flag and continue instead of
+  stopping the run. The optional shared response cache of the plan is not built.
 
 From the pipeline audit of 2026-11-04 on branch `perf-exact-speedups`. Done there, with
 byte-identical outputs: parallel SAM mask decoding and the other exact speedups (64a86e5), the

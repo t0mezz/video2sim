@@ -13,6 +13,7 @@ from __future__ import annotations
 import base64
 import contextlib
 import hashlib
+import io
 import json
 import os
 import re
@@ -82,6 +83,21 @@ def image_data_url(path: Path) -> str:
 
 
 _RETRIES = 4
+GATEWAY_HEADER = "X-V2S-Gateway"
+
+
+def explain_http_error(error: urllib.error.HTTPError) -> urllib.error.HTTPError:
+    """``error``, with the judge gateway's reason as its text when the gateway refused the call
+    (``workers/gateway``: quota used up, token revoked, gateway switched off). Other errors are
+    returned as they are, so a provider's error body is never put into a message."""
+    if error.headers is None or error.headers.get(GATEWAY_HEADER) != "1":
+        return error
+    try:
+        body = error.read(4096)
+        message = str(json.loads(body)["message"])
+    except Exception:  # an unreadable refusal keeps the plain status text
+        return error
+    return urllib.error.HTTPError(error.url, error.code, message, error.headers, io.BytesIO(body))
 
 
 def post_json(
@@ -104,7 +120,7 @@ def post_json(
             return data
         except urllib.error.HTTPError as e:
             if e.code not in (429, 500, 502, 503, 504) or attempt == retries - 1:
-                raise
+                raise explain_http_error(e) from e
         time.sleep(2.0 * 2**attempt)
     raise AssertionError("unreachable")
 

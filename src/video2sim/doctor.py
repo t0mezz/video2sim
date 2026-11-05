@@ -3,7 +3,8 @@
 Each model role is built from the config, which resolves its key and imports any
 ``python:`` factory. Unless ``offline`` is set, the VLM roles then get a one-pixel image and the
 HTTP shape server a ``GET /health``. The tracking endpoint is only built, never called, since a
-request is billed per frame. A failure names the role and the reason; nothing is retried.
+request is billed per frame. With ``--gateway`` it also reads the judge token's usage, which calls
+no model. A failure names the role and the reason; nothing is retried.
 """
 
 from __future__ import annotations
@@ -99,5 +100,28 @@ def check_tracking(cfg: dict[str, Any]) -> list[Check]:
     return [_run("tracking", probe)]
 
 
-def run_doctor(cfg: dict[str, Any], offline: bool = False) -> list[Check]:
-    return [*check_vlm(cfg, offline), *check_shape(cfg, offline), *check_tracking(cfg)]
+def check_gateway(url: str, offline: bool) -> list[Check]:
+    from video2sim.gateway_profile import (
+        JUDGE_TOKEN_ENV,
+        describe_usage,
+        gateway_base,
+        gateway_usage,
+    )
+    from video2sim.models.hosted import read_secret
+
+    def probe() -> str:
+        read_secret(JUDGE_TOKEN_ENV)
+        if offline:
+            return f"{gateway_base(url)}, token set"
+        return describe_usage(gateway_usage(url))
+
+    return [_run("gateway", probe)]
+
+
+def run_doctor(
+    cfg: dict[str, Any], offline: bool = False, gateway: str | None = None
+) -> list[Check]:
+    """Every check. With ``gateway`` the token's usage comes first, and the VLM probes below are
+    real calls through the gateway that count against the token's quota."""
+    first = check_gateway(gateway, offline) if gateway is not None else []
+    return [*first, *check_vlm(cfg, offline), *check_shape(cfg, offline), *check_tracking(cfg)]
